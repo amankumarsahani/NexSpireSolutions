@@ -13,63 +13,56 @@ const About = () => {
       },
       { threshold: 0.1 }
     )
-    
+
     const element = document.getElementById('about')
     if (element) observer.observe(element)
-    
+
     return () => observer.disconnect()
   }, [])
 
   const teamMembers = [
     {
-      name: "Alex Johnson",
-      role: "CEO & Lead Developer",
-      image: "https://readdy.ai/api/search-image?query=Professional%20software%20developer%20CEO%20in%20modern%20office%2C%20confident%20business%20leader%20wearing%20casual%20professional%20attire%2C%20friendly%20approachable%20expression%2C%20clean%20bright%20background%2C%20high%20quality%20portrait%20photography&width=300&height=300&seq=team-1&orientation=squarish",
+      name: "Aman Kumar Sahani",
+      role: "Full Stack Developer",
+      image: "https://media.licdn.com/dms/image/v2/D5635AQH5ci5Ugk1vTw/profile-framedphoto-shrink_400_400/B56ZfvUFh9GUAc-/0/1752066710244?e=1764432000&v=beta&t=tKuFhdqPPrrcdpFEn9N8hDVCx1MTK5HeqUAbZ_ise8I",
       skills: ["React", "Node.js", "Python", "AWS"],
       gradient: "from-blue-500 to-blue-600"
     },
     {
-      name: "Sarah Chen",
-      role: "UI/UX Designer",
-      image: "https://readdy.ai/api/search-image?query=Creative%20UI%20UX%20designer%20woman%20working%20on%20digital%20design%2C%20professional%20designer%20in%20modern%20workspace%2C%20focused%20on%20computer%20screen%20showing%20design%20interface%2C%20clean%20contemporary%20office%20environment&width=300&height=300&seq=team-2&orientation=squarish",
-      skills: ["Figma", "Adobe XD", "Sketch", "Prototyping"],
+      name: "Anu Kumar",
+      role: "Full Stack Developer",
+      image: "https://media.licdn.com/dms/image/v2/D5635AQHiirkL_Zj4Kg/profile-framedphoto-shrink_400_400/profile-framedphoto-shrink_400_400/0/1712624046763?e=1764432000&v=beta&t=8cpHTXKwpXe6DU-Gvd8Vf9kdWqGg2TJofno2wUZAVLs",
+      skills: ["React", "Node.js", "Python", "AWS"],
       gradient: "from-purple-500 to-purple-600"
     },
     {
-      name: "Mike Rodriguez",
+      name: "Kshitij Bhardwaj",
       role: "Full Stack Developer",
-      image: "https://readdy.ai/api/search-image?query=Experienced%20full%20stack%20developer%20coding%20on%20multiple%20monitors%2C%20professional%20programmer%20in%20modern%20tech%20office%2C%20focused%20on%20programming%2C%20clean%20workspace%20with%20natural%20lighting&width=300&height=300&seq=team-3&orientation=squarish",
+      image: "https://media.licdn.com/dms/image/v2/D5635AQFLeeMkFr5TQw/profile-framedphoto-shrink_400_400/B56Zitq2hlH0Ak-/0/1755260348813?e=1764432000&v=beta&t=r4fL3zagpQbN7L5-ubGA70k3szERV5yeJM0cLZTno-E",
       skills: ["Vue.js", "Django", "PostgreSQL", "Docker"],
       gradient: "from-green-500 to-green-600"
-    },
-    {
-      name: "Emily Davis",
-      role: "Project Manager",
-      image: "https://readdy.ai/api/search-image?query=Professional%20project%20manager%20woman%20in%20modern%20office%20setting%2C%20confident%20business%20professional%20organizing%20digital%20projects%2C%20clean%20bright%20workspace%2C%20leadership%20portrait%20photography&width=300&height=300&seq=team-4&orientation=squarish",
-      skills: ["Agile", "Scrum", "Jira", "Communication"],
-      gradient: "from-orange-500 to-orange-600"
     }
   ];
 
   const stats = [
-    { 
-      number: "150+", 
-      label: "Projects Completed", 
+    {
+      number: "150+",
+      label: "Projects Completed",
       description: "Successfully delivered across various industries"
     },
-    { 
-      number: "80+", 
-      label: "Happy Clients", 
+    {
+      number: "80+",
+      label: "Happy Clients",
       description: "Long-term partnerships built on trust"
     },
-    { 
-      number: "98%", 
-      label: "Success Rate", 
+    {
+      number: "98%",
+      label: "Success Rate",
       description: "On-time delivery and quality assurance"
     },
-    { 
-      number: "24/7", 
-      label: "Support Available", 
+    {
+      number: "24/7",
+      label: "Support Available",
       description: "Round-the-clock technical assistance"
     }
   ];
@@ -103,53 +96,51 @@ const About = () => {
       <div className="absolute inset-0">
         <div className="absolute top-0 left-0 w-full h-full bg-gradient-to-br from-blue-500/5 via-transparent to-purple-500/5"></div>
         <div className="absolute inset-0 bg-gradient-to-tl from-pink-500/3 via-transparent to-cyan-500/3"></div>
-        
+
         <div className="absolute top-20 left-10 w-80 h-80 bg-gradient-to-br from-blue-200/15 to-cyan-200/10 rounded-full blur-3xl animate-pulse"></div>
-        <div className="absolute bottom-20 right-10 w-96 h-96 bg-gradient-to-bl from-purple-200/12 to-pink-200/8 rounded-full blur-3xl animate-pulse" style={{animationDelay: '2s'}}></div>
-        <div className="absolute top-1/2 left-1/2 transform -translate-x-1/2 -translate-y-1/2 w-72 h-72 bg-gradient-to-r from-indigo-200/10 to-violet-200/8 rounded-full blur-3xl animate-pulse" style={{animationDelay: '4s'}}></div>
-        
+        <div className="absolute bottom-20 right-10 w-96 h-96 bg-gradient-to-bl from-purple-200/12 to-pink-200/8 rounded-full blur-3xl animate-pulse" style={{ animationDelay: '2s' }}></div>
+        <div className="absolute top-1/2 left-1/2 transform -translate-x-1/2 -translate-y-1/2 w-72 h-72 bg-gradient-to-r from-indigo-200/10 to-violet-200/8 rounded-full blur-3xl animate-pulse" style={{ animationDelay: '4s' }}></div>
+
         <div className="absolute inset-0 opacity-5">
           <svg className="w-full h-full" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 100 100">
             <defs>
               <pattern id="about-grid" x="0" y="0" width="20" height="20" patternUnits="userSpaceOnUse">
-                <circle cx="10" cy="10" r="1" fill="currentColor"/>
-                <path d="M10 0v20M0 10h20" stroke="currentColor" strokeWidth="0.5" opacity="0.3"/>
+                <circle cx="10" cy="10" r="1" fill="currentColor" />
+                <path d="M10 0v20M0 10h20" stroke="currentColor" strokeWidth="0.5" opacity="0.3" />
               </pattern>
             </defs>
-            <rect width="100%" height="100%" fill="url(#about-grid)" className="text-indigo-400"/>
+            <rect width="100%" height="100%" fill="url(#about-grid)" className="text-indigo-400" />
           </svg>
         </div>
       </div>
 
       <div className="relative z-10 max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-        
+
         {/* Professional Header */}
-        <div className={`text-center mb-16 transition-all duration-1000 transform ${
-          isVisible ? 'translate-y-0 opacity-100' : 'translate-y-8 opacity-0'
-        }`}>
+        <div className={`text-center mb-16 transition-all duration-1000 transform ${isVisible ? 'translate-y-0 opacity-100' : 'translate-y-8 opacity-0'
+          }`}>
           <div className="inline-flex items-center bg-blue-100/80 backdrop-blur-sm border border-blue-200/60 text-blue-700 text-sm font-semibold px-6 py-3 rounded-full mb-6 shadow-lg">
             <div className="w-2 h-2 bg-blue-600 rounded-full mr-2 animate-pulse"></div>
             About Nexspire Solution
           </div>
-          
+
           <h2 className="text-4xl md:text-5xl lg:text-6xl font-bold text-gray-900 mb-6 leading-tight">
-            Building the Future Through 
+            Building the Future Through
             <span className="block bg-gradient-to-r from-blue-600 to-purple-600 bg-clip-text text-transparent mt-2">
               Technology Excellence
             </span>
           </h2>
-          
+
           <p className="text-xl text-gray-600 max-w-3xl mx-auto leading-relaxed">
-            We are a team of passionate developers, designers, and strategists dedicated to delivering 
+            We are a team of passionate developers, designers, and strategists dedicated to delivering
             innovative software solutions that drive business growth and digital transformation.
           </p>
         </div>
 
         {/* Main Content Grid */}
-        <div className={`grid lg:grid-cols-2 gap-16 items-center mb-20 transition-all duration-1000 delay-300 transform ${
-          isVisible ? 'translate-y-0 opacity-100' : 'translate-y-8 opacity-0'
-        }`}>
-          
+        <div className={`grid lg:grid-cols-2 gap-16 items-center mb-20 transition-all duration-1000 delay-300 transform ${isVisible ? 'translate-y-0 opacity-100' : 'translate-y-8 opacity-0'
+          }`}>
+
           {/* Left: Company Image */}
           <div className="relative group">
             <div className="absolute -inset-4 bg-gradient-to-r from-blue-400/20 to-purple-400/20 rounded-2xl blur-2xl opacity-0 group-hover:opacity-100 transition-opacity duration-700"></div>
@@ -159,7 +150,7 @@ const About = () => {
                 alt="Our professional team at work"
                 className="rounded-xl shadow-lg object-cover w-full h-80 transition-transform duration-700 group-hover:scale-[1.02]"
               />
-              
+
               {/* Floating Stats Cards */}
               <div className="absolute -bottom-4 -right-4 bg-white/95 backdrop-blur-sm rounded-xl p-4 shadow-xl border border-white/30 transform group-hover:scale-105 transition-all duration-500">
                 <div className="text-center">
@@ -167,7 +158,7 @@ const About = () => {
                   <div className="text-xs text-gray-600 font-medium">Years Experience</div>
                 </div>
               </div>
-              
+
               <div className="absolute -top-4 -left-4 bg-white/95 backdrop-blur-sm rounded-xl p-4 shadow-xl border border-white/30 transform group-hover:scale-105 transition-all duration-500">
                 <div className="text-center">
                   <div className="text-2xl font-bold text-purple-600">150+</div>
@@ -183,13 +174,13 @@ const About = () => {
               <h3 className="text-3xl font-bold text-gray-900 mb-6">Who We Are</h3>
               <div className="space-y-4 text-lg text-gray-700 leading-relaxed">
                 <p>
-                  With over 5 years of experience in the software development industry, Nexspire Solution has 
-                  established itself as a <strong>leading AI-powered development agency</strong>, trusted by Fortune 500 companies 
+                  With over 5 years of experience in the software development industry, Nexspire Solution has
+                  established itself as a <strong>leading AI-powered development agency</strong>, trusted by Fortune 500 companies
                   and innovative startups for <strong>digital transformation and modern web solutions</strong>.
                 </p>
                 <p>
-                  Our expert team specializes in <strong>React, Next.js, Node.js, and cloud-native architectures</strong>, 
-                  combining cutting-edge technology with agile methodologies to deliver 
+                  Our expert team specializes in <strong>React, Next.js, Node.js, and cloud-native architectures</strong>,
+                  combining cutting-edge technology with agile methodologies to deliver
                   <strong>scalable, secure, and performance-optimized applications</strong> that drive real business results.
                 </p>
               </div>
@@ -222,9 +213,8 @@ const About = () => {
         </div>
 
         {/* Creative Why Choose Nexspire Solution */}
-        <div className={`mb-24 transition-all duration-1000 delay-500 transform ${
-          isVisible ? 'translate-y-0 opacity-100' : 'translate-y-8 opacity-0'
-        }`}>
+        <div className={`mb-24 transition-all duration-1000 delay-500 transform ${isVisible ? 'translate-y-0 opacity-100' : 'translate-y-8 opacity-0'
+          }`}>
           <div className="text-center mb-16">
             <div className="inline-flex items-center bg-white/60 backdrop-blur-lg border border-gray-200/50 text-gray-700 text-sm font-semibold px-6 py-3 rounded-2xl mb-8 shadow-lg">
               <div className="w-2 h-2 bg-blue-500 rounded-full mr-2"></div>
@@ -245,7 +235,7 @@ const About = () => {
                 const isLeft = index % 2 === 0;
                 const featureIcons = ['ri-flashlight-line', 'ri-shield-check-line', 'ri-rocket-2-line', 'ri-lightbulb-line'];
                 const colors = ['blue', 'purple', 'green', 'orange'];
-                
+
                 return (
                   <div key={index} className={`flex ${isLeft ? 'flex-row' : 'flex-row-reverse'} items-center gap-6 group`}>
                     {/* Icon Section */}
@@ -266,11 +256,11 @@ const About = () => {
                         <p className={`text-gray-600 leading-relaxed ${isLeft ? 'text-left' : 'text-right'}`}>
                           {feature.description}
                         </p>
-                        
+
                         {/* Progress bar */}
                         <div className={`mt-4 ${isLeft ? 'text-left' : 'text-right'}`}>
                           <div className={`h-1 bg-gray-200 rounded-full ${isLeft ? '' : 'ml-auto'} w-24`}>
-                            <div className={`h-full bg-gradient-to-r from-${colors[index]}-400 to-${colors[index]}-600 rounded-full animate-pulse`} style={{width: `${85 + index * 5}%`}}></div>
+                            <div className={`h-full bg-gradient-to-r from-${colors[index]}-400 to-${colors[index]}-600 rounded-full animate-pulse`} style={{ width: `${85 + index * 5}%` }}></div>
                           </div>
                         </div>
                       </div>
@@ -295,9 +285,8 @@ const About = () => {
         </div>
 
         {/* Ultra Modern Track Record Section */}
-        <div className={`mb-24 transition-all duration-1000 delay-700 transform ${
-          isVisible ? 'translate-y-0 opacity-100' : 'translate-y-8 opacity-0'
-        }`}>
+        <div className={`mb-24 transition-all duration-1000 delay-700 transform ${isVisible ? 'translate-y-0 opacity-100' : 'translate-y-8 opacity-0'
+          }`}>
           <div className="text-center mb-16">
             <div className="inline-flex items-center bg-gradient-to-r from-indigo-500/10 via-purple-500/10 to-pink-500/10 backdrop-blur-xl border border-white/20 text-gray-800 text-sm font-bold px-8 py-4 rounded-full mb-8 shadow-2xl hover:shadow-indigo-500/20 transition-all duration-500">
               <div className="w-3 h-3 bg-gradient-to-r from-indigo-500 to-purple-500 rounded-full mr-3 animate-pulse shadow-lg"></div>
@@ -324,25 +313,25 @@ const About = () => {
               ];
               const icons = [
                 'ri-bar-chart-box-line',
-                'ri-target-line', 
+                'ri-target-line',
                 'ri-flashlight-line',
                 'ri-rocket-2-line'
               ];
-              
+
               return (
                 <div key={index} className="group relative">
                   {/* Main Container */}
                   <div className="relative">
                     {/* Background Glow */}
                     <div className={`absolute -inset-4 bg-gradient-to-r ${colors[index].bg} rounded-3xl blur-2xl opacity-60 transition-all duration-700`}></div>
-                    
+
                     {/* Glass Card */}
                     <div className="relative bg-white/10 backdrop-blur-2xl rounded-3xl p-8 border border-white/40 transition-all duration-500 transform -translate-y-2">
-                      
+
                       {/* Icon */}
                       <div className="text-center mb-6">
                         <div className="relative w-16 h-16 mx-auto mb-4">
-                          <div 
+                          <div
                             className="w-full h-full rounded-2xl flex items-center justify-center shadow-xl scale-110 transition-transform duration-300"
                             style={{
                               background: `linear-gradient(135deg, ${colors[index].primary}, ${colors[index].secondary})`
@@ -351,7 +340,7 @@ const About = () => {
                             <i className={`${icons[index]} text-3xl text-white`}></i>
                           </div>
                           {/* Icon Glow */}
-                          <div 
+                          <div
                             className="absolute inset-0 rounded-2xl blur-lg opacity-40"
                             style={{
                               background: `linear-gradient(135deg, ${colors[index].primary}, ${colors[index].secondary})`
@@ -359,11 +348,11 @@ const About = () => {
                           ></div>
                         </div>
                       </div>
-                      
+
                       {/* Animated Counter */}
                       <div className="text-center mb-6">
                         <div className="relative">
-                          <div 
+                          <div
                             className="text-5xl font-black mb-2 scale-105 transition-all duration-300"
                             style={{
                               background: `linear-gradient(135deg, ${colors[index].primary}, ${colors[index].secondary})`,
@@ -374,28 +363,28 @@ const About = () => {
                           >
                             {stat.number}
                           </div>
-                          
+
                           {/* Animated Underline */}
-                          <div 
+                          <div
                             className="h-1 w-16 mx-auto rounded-full transition-all duration-500"
                             style={{ backgroundColor: colors[index].primary }}
                           ></div>
                         </div>
                       </div>
-                      
+
                       {/* Label */}
                       <div className="text-center">
                         <h4 className="text-lg font-bold text-gray-900 transition-colors duration-300">
                           {stat.label}
                         </h4>
                       </div>
-                      
+
                       {/* Floating Elements */}
-                      <div 
+                      <div
                         className="absolute top-4 right-4 w-4 h-4 rounded-full opacity-70 transition-all duration-500 animate-pulse"
                         style={{ backgroundColor: colors[index].primary }}
                       ></div>
-                      <div 
+                      <div
                         className="absolute bottom-4 left-4 w-3 h-3 rounded-full opacity-50 transition-all duration-700"
                         style={{ backgroundColor: colors[index].secondary }}
                       ></div>
@@ -408,9 +397,8 @@ const About = () => {
         </div>
 
         {/* Ultra Modern Team Section */}
-        <div className={`transition-all duration-1000 delay-900 transform ${
-          isVisible ? 'translate-y-0 opacity-100' : 'translate-y-8 opacity-0'
-        }`}>
+        <div className={`transition-all duration-1000 delay-900 transform ${isVisible ? 'translate-y-0 opacity-100' : 'translate-y-8 opacity-0'
+          }`}>
           <div className="text-center mb-16">
             <div className="inline-flex items-center bg-gradient-to-r from-rose-500/10 via-pink-500/10 to-fuchsia-500/10 backdrop-blur-xl border border-white/20 text-gray-800 text-sm font-bold px-8 py-4 rounded-full mb-8 shadow-2xl hover:shadow-pink-500/20 transition-all duration-500">
               <div className="w-3 h-3 bg-gradient-to-r from-rose-500 to-fuchsia-500 rounded-full mr-3 animate-pulse shadow-lg"></div>
@@ -427,7 +415,7 @@ const About = () => {
             </p>
           </div>
 
-          <div className="grid sm:grid-cols-2 lg:grid-cols-4 gap-6 sm:gap-8 lg:gap-10">
+          <div className="grid md:grid-cols-3 gap-6 sm:gap-8 lg:gap-10 justify-items-center max-w-5xl mx-auto">
             {teamMembers.map((member, index) => {
               const memberColors = [
                 { primary: '#6366f1', secondary: '#8b5cf6', bg: 'from-indigo-500/15 to-purple-500/15' },
@@ -435,20 +423,20 @@ const About = () => {
                 { primary: '#10b981', secondary: '#06b6d4', bg: 'from-emerald-500/15 to-cyan-500/15' },
                 { primary: '#8b5cf6', secondary: '#ec4899', bg: 'from-purple-500/15 to-pink-500/15' }
               ];
-              
+
               return (
                 <div
                   key={index}
                   onMouseEnter={() => setHoveredMember(member.name)}
                   onMouseLeave={() => setHoveredMember(null)}
-                  className="group relative"
+                  className="group relative w-80"
                 >
                   {/* Background Glow */}
                   <div className={`absolute -inset-3 bg-gradient-to-r ${memberColors[index].bg} rounded-3xl blur-2xl opacity-60 transition-all duration-700`}></div>
-                  
+
                   {/* Main Card */}
                   <div className="relative bg-white/5 backdrop-blur-2xl rounded-3xl p-8 border border-white/30 transition-all duration-500 transform -translate-y-3 shadow-2xl">
-                    
+
                     {/* Profile Section */}
                     <div className="text-center mb-6">
                       <div className="relative w-28 h-28 mx-auto mb-6">
@@ -459,37 +447,37 @@ const About = () => {
                             alt={member.name}
                             className="w-full h-full rounded-3xl object-cover border-4 border-white/40 shadow-2xl transition-all duration-300"
                           />
-                          
+
                           {/* Gradient Overlay */}
-                          <div 
+                          <div
                             className="absolute inset-0 rounded-3xl opacity-20 transition-all duration-300"
                             style={{
-              background: `linear-gradient(135deg, ${memberColors[index].primary}40, ${memberColors[index].secondary}40)`
+                              background: `linear-gradient(135deg, ${memberColors[index].primary}40, ${memberColors[index].secondary}40)`
                             }}
                           ></div>
                         </div>
-                        
+
                         {/* Status Badge */}
-                        <div 
+                        <div
                           className="absolute -bottom-2 -right-2 w-8 h-8 rounded-2xl border-4 border-white shadow-xl flex items-center justify-center"
                           style={{ backgroundColor: memberColors[index].primary }}
                         >
                           <div className="text-white text-sm">✓</div>
                         </div>
-                        
+
                         {/* Floating Decoration */}
-                        <div 
+                        <div
                           className="absolute -top-2 -left-2 w-6 h-6 rounded-full opacity-80 transition-all duration-500 animate-bounce"
                           style={{ backgroundColor: memberColors[index].secondary }}
                         ></div>
                       </div>
-                      
+
                       {/* Name & Role */}
                       <div className="space-y-2 mb-6">
                         <h4 className="text-xl font-bold text-gray-900 scale-105 transition-transform duration-300">
                           {member.name}
                         </h4>
-                        <p 
+                        <p
                           className="text-sm font-bold"
                           style={{
                             background: `linear-gradient(135deg, ${memberColors[index].primary}, ${memberColors[index].secondary})`,
@@ -501,7 +489,7 @@ const About = () => {
                           {member.role}
                         </p>
                       </div>
-                      
+
                       {/* Skills */}
                       <div className="flex flex-wrap justify-center gap-2">
                         {member.skills.slice(0, 2).map((skill, skillIndex) => (
@@ -514,19 +502,19 @@ const About = () => {
                         ))}
                       </div>
                     </div>
-                    
+
                     {/* Animated Bottom Bar */}
                     <div className="absolute bottom-0 left-2 right-2 h-1.5 rounded-b-3xl overflow-hidden">
-                      <div 
+                      <div
                         className="h-full w-full transition-all duration-700 ease-out"
                         style={{
                           background: `linear-gradient(90deg, ${memberColors[index].primary}, ${memberColors[index].secondary})`
                         }}
                       ></div>
                     </div>
-                    
+
                     {/* Corner Decorations */}
-                    <div 
+                    <div
                       className="absolute top-4 right-4 w-3 h-3 rounded-full opacity-60 transition-all duration-500 animate-pulse"
                       style={{ backgroundColor: memberColors[index].primary }}
                     ></div>
@@ -534,7 +522,7 @@ const About = () => {
 
                   {/* Extended Hover Glow */}
                   {hoveredMember === member.name && (
-                    <div 
+                    <div
                       className="absolute -inset-4 rounded-4xl blur-2xl animate-pulse opacity-30"
                       style={{
                         background: `linear-gradient(135deg, ${memberColors[index].primary}30, ${memberColors[index].secondary}30)`
@@ -547,7 +535,7 @@ const About = () => {
           </div>
         </div>
       </div>
-    </section>
+    </section >
   );
 };
 

@@ -27,19 +27,19 @@ const Contact = () => {
     {
       icon: "ri-mail-line",
       title: "Email Us",
-      details: "hello@nexspiresolution.dev",
+      details: "nexspiretechsolutions@gmail.com",
       description: "Send us an email anytime!"
     },
     {
       icon: "ri-phone-line",
       title: "Call Us",
-      details: "+1 (555) 123-4567",
-      description: "Mon-Fri from 8am to 6pm"
+      details: "+91 76963 09551",
+      description: "Mon-Fri from 8am to 10pm"
     },
     {
       icon: "ri-map-pin-line",
       title: "Visit Us",
-      details: "123 Tech Street, San Francisco, CA",
+      details: "Mohali, SAS Nagar, Punjab, IN",
       description: "Come say hello at our office"
     }
   ];
@@ -60,14 +60,14 @@ const Contact = () => {
           <svg className="w-full h-full" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 60 60">
             <defs>
               <pattern id="contact-pattern" x="0" y="0" width="60" height="60" patternUnits="userSpaceOnUse">
-                <circle cx="30" cy="30" r="2" fill="currentColor" className="text-blue-200"/>
-                <path d="M30 15 L45 30 L30 45 L15 30 Z" fill="none" stroke="currentColor" strokeWidth="0.5" className="text-purple-200"/>
+                <circle cx="30" cy="30" r="2" fill="currentColor" className="text-blue-200" />
+                <path d="M30 15 L45 30 L30 45 L15 30 Z" fill="none" stroke="currentColor" strokeWidth="0.5" className="text-purple-200" />
               </pattern>
             </defs>
-            <rect width="100%" height="100%" fill="url(#contact-pattern)"/>
+            <rect width="100%" height="100%" fill="url(#contact-pattern)" />
           </svg>
         </div>
-        
+
         {/* Gradient Overlays */}
         <div className="absolute top-0 right-0 w-96 h-96 bg-gradient-to-bl from-blue-100/30 via-transparent to-transparent rounded-full blur-3xl"></div>
         <div className="absolute bottom-0 left-0 w-96 h-96 bg-gradient-to-tr from-purple-100/30 via-transparent to-transparent rounded-full blur-3xl"></div>
@@ -103,7 +103,7 @@ const Contact = () => {
                   Send us a message
                 </h3>
               </div>
-              
+
               <div className="flex-1">
                 <form onSubmit={handleSubmit} className="space-y-5 h-full flex flex-col">
                   <div className="grid md:grid-cols-2 gap-4">
@@ -120,14 +120,14 @@ const Contact = () => {
                           onChange={handleChange}
                           required
                           className="w-full px-4 py-3 rounded-lg border border-gray-200 focus:ring-2 focus:ring-blue-500 focus:border-blue-500 transition-all bg-white text-sm"
-                          placeholder="John Doe"
+                          placeholder="Name"
                         />
                         <div className="absolute inset-y-0 right-3 flex items-center pointer-events-none">
                           <i className="ri-user-line text-gray-400 text-sm"></i>
                         </div>
                       </div>
                     </div>
-                    
+
                     <div>
                       <label htmlFor="email" className="block text-sm font-semibold text-gray-700 mb-2">
                         Email Address *
@@ -141,7 +141,7 @@ const Contact = () => {
                           onChange={handleChange}
                           required
                           className="w-full px-4 py-3 rounded-lg border border-gray-200 focus:ring-2 focus:ring-blue-500 focus:border-blue-500 transition-all bg-white text-sm"
-                          placeholder="john@example.com"
+                          placeholder="xyz@gmail.com"
                         />
                         <div className="absolute inset-y-0 right-3 flex items-center pointer-events-none">
                           <i className="ri-mail-line text-gray-400 text-sm"></i>
@@ -149,7 +149,7 @@ const Contact = () => {
                       </div>
                     </div>
                   </div>
-                  
+
                   <div>
                     <label htmlFor="company" className="block text-sm font-semibold text-gray-700 mb-2">
                       Company (Optional)
@@ -169,7 +169,7 @@ const Contact = () => {
                       </div>
                     </div>
                   </div>
-                  
+
                   <div className="flex-1">
                     <label htmlFor="message" className="block text-sm font-semibold text-gray-700 mb-2">
                       Message *
@@ -189,7 +189,7 @@ const Contact = () => {
                       </div>
                     </div>
                   </div>
-                  
+
                   <div className="mt-auto space-y-4">
                     <button
                       type="submit"
@@ -200,7 +200,7 @@ const Contact = () => {
                         <i className="ri-send-plane-line ml-2"></i>
                       </span>
                     </button>
-                    
+
                     {/* Form Security Info */}
                     <div className="flex items-center justify-between text-xs text-gray-500 pt-3 border-t border-gray-200">
                       <div className="flex items-center">
@@ -257,7 +257,7 @@ const Contact = () => {
                     </div>
                   </div>
                 ))}
-                
+
                 {/* Follow Us Section */}
                 <div className="bg-white rounded-lg p-4 shadow-sm border border-blue-100">
                   <div className="flex items-center space-x-3 mb-3">
@@ -306,7 +306,7 @@ const Contact = () => {
               </div>
             </div>
           </div>
-          
+
           <div className="bg-gradient-to-br from-orange-50 to-yellow-50 rounded-2xl p-6 border border-orange-100">
             <div className="flex items-center space-x-4">
               <div className="w-12 h-12 bg-orange-500 rounded-lg flex items-center justify-center">
