@@ -1,0 +1,114 @@
+import apiClient from './axios';
+
+export const authAPI = {
+    login: async (email, password) => {
+        const response = await apiClient.post('/auth/signin', { email, password });
+        return response.data;
+    },
+
+    getCurrentUser: async () => {
+        const response = await apiClient.get('/auth/me');
+        return response.data;
+    },
+
+    logout: async () => {
+        const response = await apiClient.post('/auth/logout');
+        return response.data;
+    },
+};
+
+export const clientsAPI = {
+    getAll: async (params = {}) => {
+        const response = await apiClient.get('/clients', { params });
+        return response.data;
+    },
+
+    getById: async (id) => {
+        const response = await apiClient.get(`/clients/${id}`);
+        return response.data;
+    },
+
+    create: async (data) => {
+        const response = await apiClient.post('/clients', data);
+        return response.data;
+    },
+
+    update: async (id, data) => {
+        const response = await apiClient.put(`/clients/${id}`, data);
+        return response.data;
+    },
+
+    delete: async (id) => {
+        const response = await apiClient.delete(`/clients/${id}`);
+        return response.data;
+    },
+
+    getStats: async () => {
+        const response = await apiClient.get('/clients/stats');
+        return response.data;
+    },
+};
+
+export const projectsAPI = {
+    getAll: async (params = {}) => {
+        const response = await apiClient.get('/projects', { params });
+        return response.data;
+    },
+
+    getById: async (id) => {
+        const response = await apiClient.get(`/projects/${id}`);
+        return response.data;
+    },
+
+    create: async (data) => {
+        const response = await apiClient.post('/projects', data);
+        return response.data;
+    },
+
+    update: async (id, data) => {
+        const response = await apiClient.put(`/projects/${id}`, data);
+        return response.data;
+    },
+
+    delete: async (id) => {
+        const response = await apiClient.delete(`/projects/${id}`);
+        return response.data;
+    },
+
+    getStats: async () => {
+        const response = await apiClient.get('/projects/stats');
+        return response.data;
+    },
+};
+
+export const leadsAPI = {
+    getAll: async (params = {}) => {
+        const response = await apiClient.get('/leads', { params });
+        return response.data;
+    },
+
+    getById: async (id) => {
+        const response = await apiClient.get(`/leads/${id}`);
+        return response.data;
+    },
+
+    create: async (data) => {
+        const response = await apiClient.post('/leads', data);
+        return response.data;
+    },
+
+    update: async (id, data) => {
+        const response = await apiClient.put(`/leads/${id}`, data);
+        return response.data;
+    },
+
+    delete: async (id) => {
+        const response = await apiClient.delete(`/leads/${id}`);
+        return response.data;
+    },
+
+    getStats: async () => {
+        const response = await apiClient.get('/leads/stats');
+        return response.data;
+    },
+};
