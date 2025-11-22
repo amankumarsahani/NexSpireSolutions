@@ -1,0 +1,52 @@
+@import url('https://cdn.jsdelivr.net/npm/remixicon@4.0.0/fonts/remixicon.css');
+@import url('https://fonts.googleapis.com/css2?family=Pacifico&display=swap');
+@import "tailwindcss";
+
+/* Technology Slider Animation */
+@keyframes slide-left {
+  0% {
+    transform: translateX(0);
+  }
+  100% {
+    transform: translateX(-50%);
+  }
+}
+
+.animate-slide-left {
+  animation: slide-left 20s linear infinite;
+}
+
+/* Right to Left Animation */
+@keyframes slide-right {
+  0% {
+    transform: translateX(-50%);
+  }
+  100% {
+    transform: translateX(0);
+  }
+}
+
+.animate-slide-right {
+  animation: slide-right 20s linear infinite;
+}
+
+/* Slower animation for categories */
+@keyframes slide-left-slow {
+  0% {
+    transform: translateX(0);
+  }
+  100% {
+    transform: translateX(-50%);
+  }
+}
+
+.animate-slide-left-slow {
+  animation: slide-left-slow 30s linear infinite;
+}
+
+/* Pause animation on hover */
+.animate-slide-left:hover,
+.animate-slide-right:hover,
+.animate-slide-left-slow:hover {
+  animation-play-state: paused;
+}

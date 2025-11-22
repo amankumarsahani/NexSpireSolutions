@@ -1,0 +1,58 @@
+/* TEAM */
+  Company: Nexspire Solution
+  Location: Worldwide
+  Website: https://nexspiresolution.com
+  Contact: hello@nexspiresolution.dev
+
+/* SITE */
+  Last update: 2024/01/01
+  Language: English
+  Doctype: HTML5
+  IDE: VS Code, Claude Code
+  Framework: React 18, Vite
+  Styling: Tailwind CSS
+  Icons: Remix Icon
+  Fonts: Google Fonts
+  
+/* TECHNOLOGIES USED */
+  Frontend: React, JavaScript ES6+, HTML5, CSS3, Tailwind CSS
+  Build: Vite, Node.js
+  Performance: Code splitting, lazy loading, image optimization
+  SEO: Semantic HTML, structured data, meta tags
+  Accessibility: WCAG 2.1 AA compliance
+  PWA: Service workers, web app manifest
+  
+/* FEATURES */
+  - Responsive design (mobile-first)
+  - Progressive Web App (PWA)
+  - SEO optimized
+  - Accessibility compliant
+  - Fast loading (Core Web Vitals optimized)
+  - Modern JavaScript (ES2022+)
+  - Component-based architecture
+  - Dark/Light theme support
+  
+/* CREDITS */
+  Design inspiration: Modern web trends, Material Design, Apple HIG
+  Images: Unsplash, custom illustrations
+  
+/* THANKS */
+  To the open source community and all the amazing developers
+  who make the web a better place!
+
+                                 _.-.
+                               ,'/ o \`.
+                             ,'  \___/  `.
+                           ,'             `.
+                         ,'     NEXSPIRE   `.
+                       ,'        SOLUTION     `.
+                     ,'                         `.
+                   ,'             ^               `.
+                 ,'              / \                `.
+               ,'              /____ \                `.
+             ,'              /        \                 `.
+           ,'              /            \                  `.
+         ,'              /                \                   `.
+       '                                                        `
+
+                /* Built with ❤️ and lots of ☕ */
