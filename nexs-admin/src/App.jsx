@@ -7,6 +7,7 @@ import Dashboard from './pages/Dashboard';
 import ClientsList from './pages/clients/ClientsList';
 import ProjectsList from './pages/projects/ProjectsList';
 import LeadsList from './pages/leads/LeadsList';
+import Inquiries from './pages/Inquiries';
 
 function ProtectedRoute({ children }) {
   const { isAuthenticated, loading } = useAuth();
@@ -39,6 +40,7 @@ function AppRoutes() {
         <Route path="clients" element={<ClientsList />} />
         <Route path="projects" element={<ProjectsList />} />
         <Route path="leads" element={<LeadsList />} />
+        <Route path="inquiries" element={<Inquiries />} />
       </Route>
     </Routes>
   );

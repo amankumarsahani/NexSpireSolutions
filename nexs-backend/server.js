@@ -62,7 +62,8 @@ app.get('/api', (req, res) => {
             leads: '/api/leads/*',
             team: '/api/team/*',
             documents: '/api/documents/*',
-            messages: '/api/messages/*'
+            messages: '/api/messages/*',
+            inquiries: '/api/inquiries/*'
         }
     });
 });
@@ -75,6 +76,7 @@ const leadRoutes = require('./routes/lead.routes');
 const teamRoutes = require('./routes/team.routes');
 const documentRoutes = require('./routes/document.routes');
 const messageRoutes = require('./routes/message.routes');
+const inquiryRoutes = require('./routes/inquiry.routes');
 
 // Use routes
 app.use('/api/auth', authRoutes);
@@ -84,6 +86,7 @@ app.use('/api/leads', leadRoutes);
 app.use('/api/team', teamRoutes);
 app.use('/api/documents', documentRoutes);
 app.use('/api/messages', messageRoutes);
+app.use('/api/inquiries', inquiryRoutes);
 
 // 404 Handler
 app.use((req, res) => {

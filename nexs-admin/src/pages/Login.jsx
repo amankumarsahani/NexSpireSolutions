@@ -1,4 +1,4 @@
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { useAuth } from '../contexts/AuthContext';
 import toast from 'react-hot-toast';
@@ -7,20 +7,33 @@ export default function Login() {
     const [email, setEmail] = useState('');
     const [password, setPassword] = useState('');
     const [loading, setLoading] = useState(false);
-    const { login } = useAuth();
+    const { login, isAuthenticated } = useAuth();
     const navigate = useNavigate();
+
+    // Redirect if already authenticated
+    useEffect(() => {
+        console.log('[Login] Auth state changed:', { isAuthenticated });
+        if (isAuthenticated) {
+            console.log('[Login] User is authenticated, redirecting to dashboard');
+            navigate('/dashboard', { replace: true });
+        }
+    }, [isAuthenticated, navigate]);
 
     const handleSubmit = async (e) => {
         e.preventDefault();
         setLoading(true);
 
+        console.log('[Login] Attempting login with:', { email });
         const result = await login(email, password);
+        console.log('[Login] Login result:', result);
 
         if (result.success) {
             toast.success('Welcome back!');
-            navigate('/dashboard');
+            console.log('[Login] Login successful, navigating to dashboard');
+            navigate('/dashboard', { replace: true });
         } else {
             toast.error(result.message || 'Invalid credentials');
+            console.log('[Login] Login failed:', result.message);
         }
 
         setLoading(false);

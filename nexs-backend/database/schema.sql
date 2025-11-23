@@ -118,21 +118,6 @@ CREATE TABLE IF NOT EXISTS documents (
   category ENUM('contract', 'design', 'report', 'other') DEFAULT 'other',
   fileUrl VARCHAR(500) NOT NULL,
   fileSize INT,
-  uploadedBy INT,
-  createdAt TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
-  FOREIGN KEY (projectId) REFERENCES projects(id) ON DELETE CASCADE,
-  FOREIGN KEY (uploadedBy) REFERENCES users(id) ON DELETE SET NULL,
-  INDEX idx_project (projectId),
-  INDEX idx_category (category)
-);
-
--- Messages table
-CREATE TABLE IF NOT EXISTS messages (
-  id INT PRIMARY KEY AUTO_INCREMENT,
-  senderId INT,
-  recipientId INT,
-  subject VARCHAR(255),
-  message TEXT NOT NULL,
   isRead BOOLEAN DEFAULT FALSE,
   createdAt TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
   FOREIGN KEY (senderId) REFERENCES users(id) ON DELETE CASCADE,

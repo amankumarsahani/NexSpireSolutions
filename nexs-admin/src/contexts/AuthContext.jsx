@@ -13,9 +13,12 @@ export const AuthProvider = ({ children }) => {
             const savedToken = localStorage.getItem('token');
             const savedUser = localStorage.getItem('user');
 
+            console.log('[AuthContext] Initializing auth:', { hasToken: !!savedToken, hasUser: !!savedUser });
+
             if (savedToken && savedUser) {
                 setToken(savedToken);
                 setUser(JSON.parse(savedUser));
+                console.log('[AuthContext] Restored auth from localStorage');
             }
             setLoading(false);
         };
@@ -25,7 +28,9 @@ export const AuthProvider = ({ children }) => {
 
     const login = async (email, password) => {
         try {
+            console.log('[AuthContext] Login attempt for:', email);
             const response = await authAPI.login(email, password);
+            console.log('[AuthContext] API response:', response);
             const { token: newToken, user: newUser } = response;
 
             localStorage.setItem('token', newToken);
@@ -34,12 +39,13 @@ export const AuthProvider = ({ children }) => {
             setToken(newToken);
             setUser(newUser);
 
+            console.log('[AuthContext] Login successful, state updated:', { token: newToken, user: newUser });
             return { success: true };
         } catch (error) {
-            console.error('Login error:', error);
+            console.error('[AuthContext] Login error:', error);
             return {
                 success: false,
-                message: error.response?.data?.message || 'Login failed',
+                message: error.response?.data?.message || error.response?.data?.error || 'Login failed',
             };
         }
     };
