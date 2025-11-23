@@ -20,6 +20,7 @@ const corsOptions = {
             process.env.CLIENT_URL,
             process.env.CLIENT_URL_PROD,
             'http://localhost:3000',
+            'http://localhost:5173',
             'https://nexspiresolutions.co.in'
         ];
 
@@ -71,18 +72,18 @@ const authRoutes = require('./routes/auth.routes');
 const clientRoutes = require('./routes/client.routes');
 const projectRoutes = require('./routes/project.routes');
 const leadRoutes = require('./routes/lead.routes');
-// const teamRoutes = require('./routes/team.routes');
-// const documentRoutes = require('./routes/document.routes');
-// const messageRoutes = require('./routes/message.routes');
+const teamRoutes = require('./routes/team.routes');
+const documentRoutes = require('./routes/document.routes');
+const messageRoutes = require('./routes/message.routes');
 
 // Use routes
 app.use('/api/auth', authRoutes);
 app.use('/api/clients', clientRoutes);
 app.use('/api/projects', projectRoutes);
 app.use('/api/leads', leadRoutes);
-// app.use('/api/team', teamRoutes);
-// app.use('/api/documents', documentRoutes);
-// app.use('/api/messages', messageRoutes);
+app.use('/api/team', teamRoutes);
+app.use('/api/documents', documentRoutes);
+app.use('/api/messages', messageRoutes);
 
 // 404 Handler
 app.use((req, res) => {

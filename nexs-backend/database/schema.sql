@@ -83,6 +83,16 @@ CREATE TABLE IF NOT EXISTS leads (
   INDEX idx_assigned (assignedTo)
 );
 
+-- Lead Comments table
+CREATE TABLE IF NOT EXISTS lead_comments (
+  id INT PRIMARY KEY AUTO_INCREMENT,
+  leadId INT NOT NULL,
+  comment TEXT NOT NULL,
+  createdAt TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+  FOREIGN KEY (leadId) REFERENCES leads(id) ON DELETE CASCADE,
+  INDEX idx_lead (leadId)
+);
+
 -- Team members table
 CREATE TABLE IF NOT EXISTS team_members (
   id INT PRIMARY KEY AUTO_INCREMENT,
