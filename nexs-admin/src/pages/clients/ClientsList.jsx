@@ -1,8 +1,10 @@
 import { useState, useEffect } from 'react';
+import { useNavigate } from 'react-router-dom';
 import { clientsAPI } from '../../api';
 import toast from 'react-hot-toast';
 
 export default function ClientsList() {
+    const navigate = useNavigate();
     const [clients, setClients] = useState([]);
     const [loading, setLoading] = useState(true);
     const [showModal, setShowModal] = useState(false);
@@ -151,6 +153,12 @@ export default function ClientsList() {
                                 </td>
                                 <td className="px-6 py-4">
                                     <div className="flex gap-2">
+                                        <button
+                                            onClick={() => navigate(`/clients/${client.id}`)}
+                                            className="px-3 py-1 bg-slate-100 text-slate-700 rounded-lg hover:bg-slate-200 transition-colors text-sm font-medium"
+                                        >
+                                            View
+                                        </button>
                                         <button
                                             onClick={() => handleEdit(client)}
                                             className="px-3 py-1 bg-blue-100 text-blue-700 rounded-lg hover:bg-blue-200 transition-colors text-sm font-medium"

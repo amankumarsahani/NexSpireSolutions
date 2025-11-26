@@ -11,5 +11,6 @@ router.get('/:id', ProjectController.getById);
 router.post('/', ProjectController.create);
 router.put('/:id', ProjectController.update);
 router.delete('/:id', ProjectController.delete);
+router.post('/:id/tasks', auth, ProjectController.createTask);
 
 module.exports = router;

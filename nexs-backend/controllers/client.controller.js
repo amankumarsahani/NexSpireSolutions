@@ -41,7 +41,14 @@ const ClientController = {
                 return res.status(404).json({ error: 'Client not found' });
             }
 
-            res.json({ client });
+            const projects = await ClientModel.getProjectsByClientId(req.params.id);
+            const stats = await ClientModel.getRevenueStatsByClientId(req.params.id);
+
+            res.json({
+                client,
+                projects,
+                stats
+            });
         } catch (error) {
             console.error('Get client error:', error);
             res.status(500).json({ error: 'Failed to fetch client' });

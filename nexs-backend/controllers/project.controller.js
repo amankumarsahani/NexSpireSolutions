@@ -14,10 +14,19 @@ const ProjectController = {
     async getById(req, res) {
         try {
             const project = await ProjectModel.findById(req.params.id);
+
             if (!project) {
                 return res.status(404).json({ error: 'Project not found' });
             }
-            res.json({ project });
+
+            const tasks = await ProjectModel.getTasksByProjectId(req.params.id);
+            const documents = await ProjectModel.getDocumentsByProjectId(req.params.id);
+
+            res.json({
+                project,
+                tasks,
+                documents
+            });
         } catch (error) {
             console.error('Get project error:', error);
             res.status(500).json({ error: 'Failed to fetch project' });
@@ -77,6 +86,27 @@ const ProjectController = {
         } catch (error) {
             console.error('Get stats error:', error);
             res.status(500).json({ error: 'Failed to fetch statistics' });
+        }
+    },
+
+    async createTask(req, res) {
+        try {
+            if (!req.body.title) {
+                return res.status(400).json({ error: 'Task title is required' });
+            }
+
+            const taskId = await ProjectModel.createTask({
+                ...req.body,
+                projectId: req.params.id
+            });
+
+            res.status(201).json({
+                message: 'Task created successfully',
+                taskId
+            });
+        } catch (error) {
+            console.error('Create task error:', error);
+            res.status(500).json({ error: 'Failed to create task' });
         }
     }
 };

@@ -130,6 +130,30 @@ const ClientModel = {
             ...statusCounts[0],
             topIndustries: industryCounts
         };
+    },
+
+    // Get projects by client ID
+    async getProjectsByClientId(clientId) {
+        const [rows] = await pool.query(
+            `SELECT * FROM projects WHERE clientId = ? ORDER BY createdAt DESC`,
+            [clientId]
+        );
+        return rows;
+    },
+
+    // Get revenue stats by client ID
+    async getRevenueStatsByClientId(clientId) {
+        const [rows] = await pool.query(
+            `SELECT 
+                SUM(budget) as totalRevenue,
+                COUNT(*) as totalProjects,
+                SUM(CASE WHEN status = 'completed' THEN 1 ELSE 0 END) as completedProjects,
+                SUM(CASE WHEN status = 'in-progress' THEN 1 ELSE 0 END) as activeProjects
+             FROM projects 
+             WHERE clientId = ?`,
+            [clientId]
+        );
+        return rows[0];
     }
 };
 

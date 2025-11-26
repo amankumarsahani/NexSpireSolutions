@@ -1,12 +1,74 @@
 import { Outlet, useLocation } from 'react-router-dom';
 import { useAuth } from '../../contexts/AuthContext';
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
 import Sidebar from './Sidebar';
+import NotificationSidebar from './NotificationSidebar';
+import { notificationsAPI } from '../../api';
+import toast from 'react-hot-toast';
 
 export default function DashboardLayout() {
     const location = useLocation();
     const { user } = useAuth();
     const [sidebarOpen, setSidebarOpen] = useState(false);
+    const [notificationOpen, setNotificationOpen] = useState(false);
+    const [notifications, setNotifications] = useState([]);
+    const [unreadCount, setUnreadCount] = useState(0);
+
+    useEffect(() => {
+        if (user) {
+            fetchUnreadCount();
+            // Poll for unread count every minute
+            const interval = setInterval(fetchUnreadCount, 60000);
+            return () => clearInterval(interval);
+        }
+    }, [user]);
+
+    useEffect(() => {
+        if (notificationOpen) {
+            fetchNotifications();
+        }
+    }, [notificationOpen]);
+
+    const fetchUnreadCount = async () => {
+        try {
+            const data = await notificationsAPI.getUnreadCount();
+            setUnreadCount(data.count);
+        } catch (error) {
+            console.error('Failed to fetch unread count', error);
+        }
+    };
+
+    const fetchNotifications = async () => {
+        try {
+            const data = await notificationsAPI.getAll();
+            setNotifications(data.notifications || []);
+        } catch (error) {
+            toast.error('Failed to load notifications');
+        }
+    };
+
+    const handleMarkRead = async (id) => {
+        try {
+            await notificationsAPI.markRead(id);
+            setNotifications(notifications.map(n =>
+                n.id === id ? { ...n, is_read: 1 } : n
+            ));
+            setUnreadCount(prev => Math.max(0, prev - 1));
+        } catch (error) {
+            toast.error('Failed to mark as read');
+        }
+    };
+
+    const handleMarkAllRead = async () => {
+        try {
+            await notificationsAPI.markAllRead();
+            setNotifications(notifications.map(n => ({ ...n, is_read: 1 })));
+            setUnreadCount(0);
+            toast.success('All marked as read');
+        } catch (error) {
+            toast.error('Failed to mark all as read');
+        }
+    };
 
     const getPageTitle = () => {
         const path = location.pathname;
@@ -21,6 +83,15 @@ export default function DashboardLayout() {
         <div className="flex h-screen bg-slate-50">
             {/* Sidebar */}
             <Sidebar isOpen={sidebarOpen} setIsOpen={setSidebarOpen} />
+
+            {/* Notification Sidebar */}
+            <NotificationSidebar
+                isOpen={notificationOpen}
+                setIsOpen={setNotificationOpen}
+                notifications={notifications}
+                onMarkRead={handleMarkRead}
+                onMarkAllRead={handleMarkAllRead}
+            />
 
             <div className="flex-1 flex flex-col overflow-hidden">
                 {/* Top Header */}
@@ -58,11 +129,16 @@ export default function DashboardLayout() {
                             </div>
 
                             {/* Notifications */}
-                            <button className="relative p-2 hover:bg-slate-100 rounded-lg transition-colors">
+                            <button
+                                onClick={() => setNotificationOpen(true)}
+                                className="relative p-2 hover:bg-slate-100 rounded-lg transition-colors"
+                            >
                                 <svg className="w-5 h-5 text-slate-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                                     <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M15 17h5l-1.405-1.405A2.032 2.032 0 0118 14.158V11a6.002 6.002 0 00-4-5.659V5a2 2 0 10-4 0v.341C7.67 6.165 6 8.388 6 11v3.159c0 .538-.214 1.055-.595 1.436L4 17h5m6 0v1a3 3 0 11-6 0v-1m6 0H9" />
                                 </svg>
-                                <span className="absolute top-1.5 right-1.5 w-2 h-2 bg-red-500 rounded-full"></span>
+                                {unreadCount > 0 && (
+                                    <span className="absolute top-1.5 right-1.5 w-2 h-2 bg-red-500 rounded-full animate-pulse"></span>
+                                )}
                             </button>
 
                             {/* User Avatar */}

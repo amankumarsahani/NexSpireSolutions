@@ -89,6 +89,23 @@ const ProjectModel = {
     `);
 
         return stats[0];
+        return stats[0];
+    },
+
+    async getTasksByProjectId(projectId) {
+        const [rows] = await pool.query(
+            'SELECT * FROM tasks WHERE projectId = ? ORDER BY createdAt DESC',
+            [projectId]
+        );
+        return rows;
+    },
+
+    async getDocumentsByProjectId(projectId) {
+        const [rows] = await pool.query(
+            'SELECT * FROM documents WHERE projectId = ? ORDER BY createdAt DESC',
+            [projectId]
+        );
+        return rows;
     }
 };
 

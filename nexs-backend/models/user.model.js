@@ -4,15 +4,15 @@ const bcrypt = require('bcryptjs');
 const UserModel = {
     // Create new user
     async create(userData) {
-        const { email, password, firstName, lastName, phone, role = 'user' } = userData;
+        const { email, password, firstName, lastName, phone, role = 'user', position, departmentId, joinDate, salary, address, emergencyContact, notes } = userData;
 
         // Hash password
         const hashedPassword = await bcrypt.hash(password, 10);
 
         const [result] = await pool.query(
-            `INSERT INTO users (email, password, firstName, lastName, phone, role) 
-       VALUES (?, ?, ?, ?, ?, ?)`,
-            [email, hashedPassword, firstName, lastName, phone, role]
+            `INSERT INTO users (email, password, firstName, lastName, phone, role, position, departmentId, joinDate, salary, address, emergencyContact, notes) 
+             VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)`,
+            [email, hashedPassword, firstName, lastName, phone, role, position, departmentId, joinDate, salary, address, emergencyContact, notes]
         );
 
         return result.insertId;
@@ -30,7 +30,10 @@ const UserModel = {
     // Find user by ID
     async findById(id) {
         const [rows] = await pool.query(
-            'SELECT id, email, firstName, lastName, phone, role, status, createdAt FROM users WHERE id = ?',
+            `SELECT u.*, d.name as departmentName 
+             FROM users u 
+             LEFT JOIN departments d ON u.departmentId = d.id 
+             WHERE u.id = ?`,
             [id]
         );
         return rows[0];
@@ -38,7 +41,12 @@ const UserModel = {
 
     // Get all users
     async findAll(filters = {}) {
-        let query = 'SELECT id, email, firstName, lastName, phone, role, status, createdAt FROM users WHERE 1=1';
+        let query = `
+            SELECT u.id, u.email, u.firstName, u.lastName, u.phone, u.role, u.status, u.position, u.departmentId, u.joinDate, d.name as departmentName, u.createdAt 
+            FROM users u 
+            LEFT JOIN departments d ON u.departmentId = d.id 
+            WHERE 1=1
+        `;
         const params = [];
 
         if (filters.role) {
@@ -64,11 +72,11 @@ const UserModel = {
 
     // Update user
     async update(id, userData) {
-        const { firstName, lastName, phone, status } = userData;
+        const { firstName, lastName, phone, status, position, departmentId, joinDate, salary, address, emergencyContact, notes } = userData;
 
         await pool.query(
-            `UPDATE users SET firstName = ?, lastName = ?, phone = ?, status = ? WHERE id = ?`,
-            [firstName, lastName, phone, status, id]
+            `UPDATE users SET firstName = ?, lastName = ?, phone = ?, status = ?, position = ?, departmentId = ?, joinDate = ?, salary = ?, address = ?, emergencyContact = ?, notes = ? WHERE id = ?`,
+            [firstName, lastName, phone, status, position, departmentId, joinDate, salary, address, emergencyContact, notes, id]
         );
 
         return this.findById(id);
