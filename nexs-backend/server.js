@@ -81,6 +81,7 @@ const departmentRoutes = require('./routes/department.routes');
 const employeeRoutes = require('./routes/employee.routes');
 const activityLogRoutes = require('./routes/activity_log.routes');
 const notificationRoutes = require('./routes/notification.routes');
+const analyticsRoutes = require('./routes/analytics.routes');
 
 // Use routes
 app.use('/api/auth', authRoutes);
@@ -95,6 +96,7 @@ app.use('/api/departments', departmentRoutes);
 app.use('/api/employees', employeeRoutes);
 app.use('/api/activity-logs', activityLogRoutes);
 app.use('/api/notifications', notificationRoutes);
+app.use('/api/analytics', analyticsRoutes);
 
 // 404 Handler
 app.use((req, res) => {

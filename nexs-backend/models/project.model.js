@@ -106,6 +106,55 @@ const ProjectModel = {
             [projectId]
         );
         return rows;
+    },
+
+    async createTask(taskData) {
+        const {
+            projectId,
+            title,
+            description,
+            status = 'todo',
+            priority = 'medium',
+            assignedTo = null,
+            dueDate = null
+        } = taskData;
+
+        const [result] = await pool.query(
+            `INSERT INTO tasks (projectId, title, description, status, priority, assignedTo, dueDate)
+             VALUES (?, ?, ?, ?, ?, ?, ?)`,
+            [projectId, title, description, status, priority, assignedTo, dueDate]
+        );
+
+        const [rows] = await pool.query('SELECT * FROM tasks WHERE id = ?', [result.insertId]);
+        return rows[0];
+    },
+
+    async updateTask(taskId, taskData) {
+        const fields = [];
+        const values = [];
+        const allowed = ['title', 'description', 'status', 'priority', 'assignedTo', 'dueDate'];
+
+        allowed.forEach((field) => {
+            if (taskData[field] !== undefined) {
+                fields.push(`${field} = ?`);
+                values.push(taskData[field]);
+            }
+        });
+
+        if (!fields.length) {
+            return null;
+        }
+
+        values.push(taskId);
+        await pool.query(`UPDATE tasks SET ${fields.join(', ')} WHERE id = ?`, values);
+
+        const [rows] = await pool.query('SELECT * FROM tasks WHERE id = ?', [taskId]);
+        return rows[0];
+    },
+
+    async deleteTask(taskId) {
+        const [result] = await pool.query('DELETE FROM tasks WHERE id = ?', [taskId]);
+        return result.affectedRows > 0;
     }
 };
 

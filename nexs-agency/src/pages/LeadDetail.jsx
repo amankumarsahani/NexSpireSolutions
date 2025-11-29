@@ -1,6 +1,8 @@
 import { useState, useEffect } from 'react';
 import { useParams, useNavigate, Link } from 'react-router-dom';
-import { leadAPI } from '../services/api';
+import { leadAPI, clientAPI, projectAPI } from '../services/api';
+import AddNoteModal from '../components/AddNoteModal';
+import ConvertLeadModal from '../components/ConvertLeadModal';
 
 export default function LeadDetail() {
     const { id } = useParams();
@@ -9,6 +11,8 @@ export default function LeadDetail() {
     const [comments, setComments] = useState([]);
     const [newComment, setNewComment] = useState('');
     const [loading, setLoading] = useState(true);
+    const [showNoteModal, setShowNoteModal] = useState(false);
+    const [showConvertModal, setShowConvertModal] = useState(false);
 
     useEffect(() => {
         loadLead();
@@ -47,6 +51,52 @@ export default function LeadDetail() {
         } catch (error) {
             console.error('Error adding comment:', error);
             alert('Failed to add comment');
+        }
+    };
+
+    const handleSaveNote = async (noteData) => {
+        try {
+            const response = await leadAPI.addComment(id, noteData.content);
+            setComments([response.data.comment, ...comments]);
+            setShowNoteModal(false);
+        } catch (error) {
+            console.error('Error adding note:', error);
+            alert('Failed to add note');
+        }
+    };
+
+    const handleConvertLead = async (leadId, options) => {
+        try {
+            // Create client from lead info
+            const clientPayload = {
+                companyName: lead.company || lead.contactName,
+                contactName: lead.contactName,
+                email: lead.email,
+                phone: lead.phone,
+                industry: lead.leadSource || 'general',
+                status: 'active'
+            };
+            const clientRes = await clientAPI.create(clientPayload);
+            const newClientId = clientRes.data.client?.id || clientRes.data.id;
+
+            // Optionally create project
+            if (options?.createProject) {
+                await projectAPI.create({
+                    projectName: `Project for ${clientPayload.companyName}`,
+                    clientId: newClientId,
+                    description: `Auto-created from lead ${clientPayload.companyName}`,
+                    status: 'planning'
+                });
+            }
+
+            // Update lead status
+            await leadAPI.update(leadId, { status: 'converted' });
+            setLead({ ...lead, status: 'converted' });
+            setShowConvertModal(false);
+            alert('Lead converted to client successfully');
+        } catch (error) {
+            console.error('Error converting lead:', error);
+            alert('Failed to convert lead');
         }
     };
 
@@ -92,6 +142,22 @@ export default function LeadDetail() {
                                 <div>
                                     <h1 className="text-3xl font-bold text-gray-900">{lead.company}</h1>
                                     <p className="text-xl text-gray-600 mt-1">{lead.contactName}</p>
+                                    <div className="mt-3 flex gap-3">
+                                        <button
+                                            onClick={() => setShowConvertModal(true)}
+                                            className="px-4 py-2 bg-green-600 text-white rounded-lg hover:bg-green-700 font-medium flex items-center gap-2"
+                                        >
+                                            <i className="ri-arrow-right-line"></i>
+                                            Convert to Client
+                                        </button>
+                                        <button
+                                            onClick={() => setShowNoteModal(true)}
+                                            className="px-4 py-2 bg-blue-50 text-blue-700 rounded-lg hover:bg-blue-100 font-medium flex items-center gap-2"
+                                        >
+                                            <i className="ri-sticky-note-line"></i>
+                                            Add Note
+                                        </button>
+                                    </div>
                                     <div className="mt-4">
                                         <label className="text-xs text-gray-500 uppercase font-bold block mb-1">Pipeline Stage</label>
                                         <div className="w-full bg-gray-200 rounded-full h-2.5 max-w-xs">
@@ -143,7 +209,7 @@ export default function LeadDetail() {
                 {/* Comments Sidebar */}
                 <div className="lg:col-span-1">
                     <div className="bg-white rounded-xl shadow-sm p-6 h-full flex flex-col">
-                        <h3 className="text-lg font-bold text-gray-900 mb-4">Comments</h3>
+                        <h3 className="text-lg font-bold text-gray-900 mb-4">Notes</h3>
 
                         <div className="flex-1 overflow-y-auto space-y-4 mb-4 pr-2 max-h-[500px]">
                             {comments.length === 0 ? (
@@ -181,6 +247,20 @@ export default function LeadDetail() {
                     </div>
                 </div>
             </div>
+
+            <AddNoteModal
+                isOpen={showNoteModal}
+                onClose={() => setShowNoteModal(false)}
+                onSave={handleSaveNote}
+                leadId={id}
+            />
+
+            <ConvertLeadModal
+                isOpen={showConvertModal}
+                onClose={() => setShowConvertModal(false)}
+                onConvert={handleConvertLead}
+                lead={lead}
+            />
         </div>
     );
 }

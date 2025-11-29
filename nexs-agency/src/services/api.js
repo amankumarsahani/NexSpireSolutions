@@ -54,7 +54,10 @@ export const projectAPI = {
     create: (data) => api.post('/projects', data),
     update: (id, data) => api.put(`/projects/${id}`, data),
     delete: (id) => api.delete(`/projects/${id}`),
-    getStats: () => api.get('/projects/stats')
+    getStats: () => api.get('/projects/stats'),
+    createTask: (projectId, data) => api.post(`/projects/${projectId}/tasks`, data),
+    updateTask: (projectId, taskId, data) => api.put(`/projects/${projectId}/tasks/${taskId}`, data),
+    deleteTask: (projectId, taskId) => api.delete(`/projects/${projectId}/tasks/${taskId}`)
 };
 
 // Lead Management

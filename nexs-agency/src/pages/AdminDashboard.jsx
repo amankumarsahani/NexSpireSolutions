@@ -5,6 +5,16 @@ import { clientAPI } from '../services/api';
 import { projectAPI } from '../services/api';
 import { leadAPI } from '../services/api';
 import { messageAPI } from '../services/api';
+import ActivityFeed from '../components/ActivityFeed';
+import ConfirmModal from '../components/ConfirmModal';
+import EditTeamMemberModal from '../components/EditTeamMemberModal';
+import EditClientModal from '../components/EditClientModal';
+import EditProjectModal from '../components/EditProjectModal';
+import EditLeadModal from '../components/EditLeadModal';
+import RevenueChart from '../components/charts/RevenueChart';
+import LeadFunnelChart from '../components/charts/LeadFunnelChart';
+import ProjectStatusChart from '../components/charts/ProjectStatusChart';
+import TeamWorkloadChart from '../components/charts/TeamWorkloadChart';
 export default function AdminDashboard() {
     const navigate = useNavigate();
     const location = useLocation();
@@ -81,6 +91,13 @@ export default function AdminDashboard() {
     // Comments State
     const [comments, setComments] = useState([]);
     const [newComment, setNewComment] = useState('');
+
+    // Modal States
+    const [confirmModal, setConfirmModal] = useState({ isOpen: false });
+    const [editTeamModal, setEditTeamModal] = useState({ isOpen: false, member: null });
+    const [editClientModal, setEditClientModal] = useState({ isOpen: false, client: null });
+    const [editProjectModal, setEditProjectModal] = useState({ isOpen: false, project: null });
+    const [editLeadModal, setEditLeadModal] = useState({ isOpen: false, lead: null });
 
     // Load dashboard stats
     useEffect(() => {
@@ -256,6 +273,67 @@ export default function AdminDashboard() {
         if (activeTab === 'leads') navigate(`/admin/leads/${item.id}`);
     };
 
+    // Edit Handler
+    const handleEdit = (type, item) => {
+        if (type === 'team') setEditTeamModal({ isOpen: true, member: item });
+        else if (type === 'client') setEditClientModal({ isOpen: true, client: item });
+        else if (type === 'project') setEditProjectModal({ isOpen: true, project: item });
+        else if (type === 'lead') setEditLeadModal({ isOpen: true, lead: item });
+    };
+
+    // Delete Handler
+    const handleDelete = (type, item) => {
+        setConfirmModal({
+            isOpen: true,
+            title: `Delete ${type.charAt(0).toUpperCase() + type.slice(1)}`,
+            message: `Are you sure you want to delete "${item.name || item.company_name || item.project_name || item.contact_name || item.projectName || item.company || item.contactName}"?`,
+            onConfirm: async () => {
+                try {
+                    if (type === 'team') await teamAPI.delete(item.id);
+                    else if (type === 'client') await clientAPI.delete(item.id);
+                    else if (type === 'project') await projectAPI.delete(item.id);
+                    else if (type === 'lead') await leadAPI.delete(item.id);
+
+                    alert(`${type.charAt(0).toUpperCase() + type.slice(1)} deleted successfully!`);
+                    setConfirmModal({ isOpen: false });
+                    loadData();
+                    loadDashboardStats();
+                } catch (error) {
+                    alert('Error: ' + (error.response?.data?.message || error.message));
+                }
+            }
+        });
+    };
+
+    // Save Handlers
+    const handleSaveTeam = async (id, data) => {
+        await teamAPI.update(id, data);
+        setEditTeamModal({ isOpen: false, member: null });
+        loadData();
+        loadDashboardStats();
+    };
+
+    const handleSaveClient = async (id, data) => {
+        await clientAPI.update(id, data);
+        setEditClientModal({ isOpen: false, client: null });
+        loadData();
+        loadDashboardStats();
+    };
+
+    const handleSaveProject = async (id, data) => {
+        await projectAPI.update(id, data);
+        setEditProjectModal({ isOpen: false, project: null });
+        loadData();
+        loadDashboardStats();
+    };
+
+    const handleSaveLead = async (id, data) => {
+        await leadAPI.update(id, data);
+        setEditLeadModal({ isOpen: false, lead: null });
+        loadData();
+        loadDashboardStats();
+    };
+
     return (
         <>
 
@@ -334,56 +412,68 @@ export default function AdminDashboard() {
                 <div className="p-8">
                     {/* Dashboard View */}
                     {activeTab === 'dashboard' && (
-                        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6 mb-8">
+                        <>
+                            <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6 mb-8">
 
-                            <div className="bg-white rounded-xl shadow-sm p-6 border-l-4 border-blue-500">
-                                <div className="flex items-center justify-between">
-                                    <div>
-                                        <p className="text-gray-500 text-sm">Total Team Members</p>
-                                        <h3 className="text-3xl font-bold text-gray-800 mt-2">{stats.team.total || 0}</h3>
+                                <div className="bg-white rounded-xl shadow-sm p-6 border-l-4 border-blue-500">
+                                    <div className="flex items-center justify-between">
+                                        <div>
+                                            <p className="text-gray-500 text-sm">Total Team Members</p>
+                                            <h3 className="text-3xl font-bold text-gray-800 mt-2">{stats.team.total || 0}</h3>
+                                        </div>
+                                        <div className="bg-blue-100 w-12 h-12 rounded-lg flex items-center justify-center">
+                                            <i className="ri-team-line text-2xl text-blue-600"></i>
+                                        </div>
                                     </div>
-                                    <div className="bg-blue-100 w-12 h-12 rounded-lg flex items-center justify-center">
-                                        <i className="ri-team-line text-2xl text-blue-600"></i>
+                                </div>
+
+                                <div className="bg-white rounded-xl shadow-sm p-6 border-l-4 border-green-500">
+                                    <div className="flex items-center justify-between">
+                                        <div>
+                                            <p className="text-gray-500 text-sm">Total Clients</p>
+                                            <h3 className="text-3xl font-bold text-gray-800 mt-2">{stats.clients.total || 0}</h3>
+                                        </div>
+                                        <div className="bg-green-100 w-12 h-12 rounded-lg flex items-center justify-center">
+                                            <i className="ri-building-line text-2xl text-green-600"></i>
+                                        </div>
+                                    </div>
+                                </div>
+
+                                <div className="bg-white rounded-xl shadow-sm p-6 border-l-4 border-purple-500">
+                                    <div className="flex items-center justify-between">
+                                        <div>
+                                            <p className="text-gray-500 text-sm">Active Projects</p>
+                                            <h3 className="text-3xl font-bold text-gray-800 mt-2">{stats.projects.inProgress || 0}</h3>
+                                        </div>
+                                        <div className="bg-purple-100 w-12 h-12 rounded-lg flex items-center justify-center">
+                                            <i className="ri-folder-line text-2xl text-purple-600"></i>
+                                        </div>
+                                    </div>
+                                </div>
+
+                                <div className="bg-white rounded-xl shadow-sm p-6 border-l-4 border-orange-500">
+                                    <div className="flex items-center justify-between">
+                                        <div>
+                                            <p className="text-gray-500 text-sm">Total Leads</p>
+                                            <h3 className="text-3xl font-bold text-gray-800 mt-2">{stats.leads.total || 0}</h3>
+                                        </div>
+                                        <div className="bg-orange-100 w-12 h-12 rounded-lg flex items-center justify-center">
+                                            <i className="ri-user-star-line text-2xl text-orange-600"></i>
+                                        </div>
                                     </div>
                                 </div>
                             </div>
 
-                            <div className="bg-white rounded-xl shadow-sm p-6 border-l-4 border-green-500">
-                                <div className="flex items-center justify-between">
-                                    <div>
-                                        <p className="text-gray-500 text-sm">Total Clients</p>
-                                        <h3 className="text-3xl font-bold text-gray-800 mt-2">{stats.clients.total || 0}</h3>
-                                    </div>
-                                    <div className="bg-green-100 w-12 h-12 rounded-lg flex items-center justify-center">
-                                        <i className="ri-building-line text-2xl text-green-600"></i>
-                                    </div>
-                                </div>
+                            {/* Charts Grid */}
+                            <div className="grid grid-cols-1 lg:grid-cols-2 gap-6 mb-6">
+                                <RevenueChart />
+                                <LeadFunnelChart />
+                                <ProjectStatusChart />
+                                <TeamWorkloadChart />
                             </div>
-
-                            <div className="bg-white rounded-xl shadow-sm p-6 border-l-4 border-purple-500">
-                                <div className="flex items-center justify-between">
-                                    <div>
-                                        <p className="text-gray-500 text-sm">Active Projects</p>
-                                        <h3 className="text-3xl font-bold text-gray-800 mt-2">{stats.projects.inProgress || 0}</h3>
-                                    </div>
-                                    <div className="bg-purple-100 w-12 h-12 rounded-lg flex items-center justify-center">
-                                        <i className="ri-folder-line text-2xl text-purple-600"></i>
-                                    </div>
-                                </div>
-                            </div>
-
-                            <div className="bg-white rounded-xl shadow-sm p-6 border-l-4 border-orange-500">
-                                <div className="flex items-center justify-between">
-                                    <div>
-                                        <p className="text-gray-500 text-sm">Total Leads</p>
-                                        <h3 className="text-3xl font-bold text-gray-800 mt-2">{stats.leads.total || 0}</h3>
-                                    </div>
-                                    <div className="bg-orange-100 w-12 h-12 rounded-lg flex items-center justify-center">
-                                        <i className="ri-user-star-line text-2xl text-orange-600"></i>
-                                    </div>
-                                </div>
-                            </div>
-                        </div>
+                            {/* Activity Feed */}
+                            <ActivityFeed />
+                        </>
                     )}
 
                     {loading ? (
@@ -469,6 +559,21 @@ export default function AdminDashboard() {
                                                                 {member.status}
                                                             </span>
                                                         </div>
+                                                        {/* Edit/Delete Buttons */}
+                                                        <div className="flex gap-2 mt-4 pt-4 border-t">
+                                                            <button
+                                                                onClick={(e) => { e.stopPropagation(); handleEdit('team', member); }}
+                                                                className="flex-1 px-3 py-2 bg-blue-50 text-blue-700 rounded-lg hover:bg-blue-100 font-medium text-sm flex items-center justify-center gap-2"
+                                                            >
+                                                                <i className="ri-edit-line"></i> Edit
+                                                            </button>
+                                                            <button
+                                                                onClick={(e) => { e.stopPropagation(); handleDelete('team', member); }}
+                                                                className="flex-1 px-3 py-2 bg-red-50 text-red-700 rounded-lg hover:bg-red-100 font-medium text-sm flex items-center justify-center gap-2"
+                                                            >
+                                                                <i className="ri-delete-bin-line"></i> Delete
+                                                            </button>
+                                                        </div>
                                                     </div>
                                                 ))}
                                             </div>
@@ -552,6 +657,21 @@ export default function AdminDashboard() {
                                                                 {client.status}
                                                             </span>
                                                         </div>
+                                                        {/* Edit/Delete Buttons */}
+                                                        <div className="flex gap-2 mt-4 pt-4 border-t">
+                                                            <button
+                                                                onClick={(e) => { e.stopPropagation(); handleEdit('client', client); }}
+                                                                className="flex-1 px-3 py-2 bg-blue-50 text-blue-700 rounded-lg hover:bg-blue-100 font-medium text-sm flex items-center justify-center gap-2"
+                                                            >
+                                                                <i className="ri-edit-line"></i> Edit
+                                                            </button>
+                                                            <button
+                                                                onClick={(e) => { e.stopPropagation(); handleDelete('client', client); }}
+                                                                className="flex-1 px-3 py-2 bg-red-50 text-red-700 rounded-lg hover:bg-red-100 font-medium text-sm flex items-center justify-center gap-2"
+                                                            >
+                                                                <i className="ri-delete-bin-line"></i> Delete
+                                                            </button>
+                                                        </div>
                                                     </div>
                                                 ))}
                                             </div>
@@ -586,7 +706,7 @@ export default function AdminDashboard() {
                                                     <div className="flex items-center gap-2 text-xs text-gray-500">
                                                         <i className="ri-user-line"></i>
                                                         <span>From: {message.senderFirstName} {message.senderLastName}</span>
-                                                        <span>•</span>
+                                                        <span>ΓÇó</span>
                                                         <span>{new Date(message.createdAt).toLocaleString()}</span>
                                                     </div>
                                                 </div>
@@ -708,6 +828,21 @@ export default function AdminDashboard() {
                                                                 <div><i className="ri-money-dollar-circle-line"></i> Budget: ${project.budget || 'N/A'}</div>
                                                                 <div><i className="ri-calendar-line"></i> {project.startDate ? new Date(project.startDate).toLocaleDateString() : 'N/A'}</div>
                                                             </div>
+                                                            {/* Edit/Delete Buttons */}
+                                                            <div className="flex gap-2 mt-4 pt-4 border-t">
+                                                                <button
+                                                                    onClick={(e) => { e.stopPropagation(); handleEdit('project', project); }}
+                                                                    className="flex-1 px-3 py-2 bg-blue-50 text-blue-700 rounded-lg hover:bg-blue-100 font-medium text-sm flex items-center justify-center gap-2"
+                                                                >
+                                                                    <i className="ri-edit-line"></i> Edit
+                                                                </button>
+                                                                <button
+                                                                    onClick={(e) => { e.stopPropagation(); handleDelete('project', project); }}
+                                                                    className="flex-1 px-3 py-2 bg-red-50 text-red-700 rounded-lg hover:bg-red-100 font-medium text-sm flex items-center justify-center gap-2"
+                                                                >
+                                                                    <i className="ri-delete-bin-line"></i> Delete
+                                                                </button>
+                                                            </div>
                                                         </div>
                                                     ))
                                                 )}
@@ -822,23 +957,38 @@ export default function AdminDashboard() {
                                                                     <p className="text-sm text-gray-600">{lead.contactName}</p>
                                                                     <p className="text-sm text-gray-500">{lead.email}</p>
                                                                 </div>
-                                                                <span className={`px-3 py-1 text-xs rounded-full ${lead.status === 'won' ? 'bg-green-100 text-green-800' :
-                                                                    lead.status === 'qualified' ? 'bg-blue-100 text-blue-800' :
-                                                                        lead.status === 'proposal' ? 'bg-purple-100 text-purple-800' :
-                                                                            lead.status === 'negotiation' ? 'bg-yellow-100 text-yellow-800' :
-                                                                                lead.status === 'lost' ? 'bg-red-100 text-red-800' :
-                                                                                    'bg-gray-100 text-gray-800'
-                                                                    }`}>
-                                                                    {lead.status}
-                                                                </span>
-                                                            </div>
-                                                            <div className="grid grid-cols-2 gap-2 text-sm text-gray-500">
-                                                                {lead.leadSource && <div><i className="ri-compass-line"></i> Source: {lead.leadSource}</div>}
-                                                                {lead.estimatedValue && <div><i className="ri-money-dollar-circle-line"></i> Est. Value: ${lead.estimatedValue}</div>}
-                                                            </div>
+                                                            <span className={`px-3 py-1 text-xs rounded-full ${lead.status === 'won' ? 'bg-green-100 text-green-800' :
+                                                                lead.status === 'qualified' ? 'bg-blue-100 text-blue-800' :
+                                                                    lead.status === 'proposal' ? 'bg-purple-100 text-purple-800' :
+                                                                        lead.status === 'negotiation' ? 'bg-yellow-100 text-yellow-800' :
+                                                                            lead.status === 'lost' ? 'bg-red-100 text-red-800' :
+                                                                                'bg-gray-100 text-gray-800'
+                                                                }`}>
+                                                                {lead.status}
+                                                            </span>
                                                         </div>
-                                                    ))
-                                                )}
+                                                        <div className="grid grid-cols-2 gap-2 text-sm text-gray-500">
+                                                            {lead.leadSource && <div><i className="ri-compass-line"></i> Source: {lead.leadSource}</div>}
+                                                            {lead.estimatedValue && <div><i className="ri-money-dollar-circle-line"></i> Est. Value: ${lead.estimatedValue}</div>}
+                                                        </div>
+                                                        {/* Edit/Delete Buttons */}
+                                                        <div className="flex gap-2 mt-4 pt-4 border-t">
+                                                            <button
+                                                                onClick={(e) => { e.stopPropagation(); handleEdit('lead', lead); }}
+                                                                className="flex-1 px-3 py-2 bg-blue-50 text-blue-700 rounded-lg hover:bg-blue-100 font-medium text-sm flex items-center justify-center gap-2"
+                                                            >
+                                                                <i className="ri-edit-line"></i> Edit
+                                                            </button>
+                                                            <button
+                                                                onClick={(e) => { e.stopPropagation(); handleDelete('lead', lead); }}
+                                                                className="flex-1 px-3 py-2 bg-red-50 text-red-700 rounded-lg hover:bg-red-100 font-medium text-sm flex items-center justify-center gap-2"
+                                                            >
+                                                                <i className="ri-delete-bin-line"></i> Delete
+                                                            </button>
+                                                        </div>
+                                                    </div>
+                                                ))
+                                            )}
                                             </div>
                                         </div>
                                     </div>
@@ -849,6 +999,42 @@ export default function AdminDashboard() {
                 </div>
             </div>
 
+
+            {/* Modals */}
+            <ConfirmModal
+                isOpen={confirmModal.isOpen}
+                onClose={() => setConfirmModal({ isOpen: false })}
+                onConfirm={confirmModal.onConfirm}
+                title={confirmModal.title}
+                message={confirmModal.message}
+                confirmText="Delete"
+                confirmStyle="danger"
+            />
+            <EditTeamMemberModal
+                isOpen={editTeamModal.isOpen}
+                onClose={() => setEditTeamModal({ isOpen: false, member: null })}
+                onSave={handleSaveTeam}
+                member={editTeamModal.member}
+            />
+            <EditClientModal
+                isOpen={editClientModal.isOpen}
+                onClose={() => setEditClientModal({ isOpen: false, client: null })}
+                onSave={handleSaveClient}
+                client={editClientModal.client}
+            />
+            <EditProjectModal
+                isOpen={editProjectModal.isOpen}
+                onClose={() => setEditProjectModal({ isOpen: false, project: null })}
+                onSave={handleSaveProject}
+                project={editProjectModal.project}
+                clients={clients}
+            />
+            <EditLeadModal
+                isOpen={editLeadModal.isOpen}
+                onClose={() => setEditLeadModal({ isOpen: false, lead: null })}
+                onSave={handleSaveLead}
+                lead={editLeadModal.lead}
+            />
 
         </>
     );
