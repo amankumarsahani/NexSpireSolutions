@@ -54,7 +54,13 @@ export const projectAPI = {
     create: (data) => api.post('/projects', data),
     update: (id, data) => api.put(`/projects/${id}`, data),
     delete: (id) => api.delete(`/projects/${id}`),
-    getStats: () => api.get('/projects/stats')
+    getStats: () => api.get('/projects/stats'),
+    // Task Management
+    getTasks: (projectId) => api.get(`/projects/${projectId}/tasks`),
+    createTask: (projectId, data) => api.post(`/projects/${projectId}/tasks`, data),
+    updateTask: (projectId, taskId, data) => api.put(`/projects/${projectId}/tasks/${taskId}`, data),
+    deleteTask: (projectId, taskId) => api.delete(`/projects/${projectId}/tasks/${taskId}`),
+    getTaskStats: (projectId) => api.get(`/projects/${projectId}/tasks/stats`)
 };
 
 // Lead Management
@@ -66,7 +72,13 @@ export const leadAPI = {
     delete: (id) => api.delete(`/leads/${id}`),
     getStats: () => api.get('/leads/stats'),
     addComment: (id, comment) => api.post(`/leads/${id}/comments`, { comment }),
-    getComments: (id) => api.get(`/leads/${id}/comments`)
+    getComments: (id) => api.get(`/leads/${id}/comments`),
+    // Note Management
+    getNotes: (id) => api.get(`/leads/${id}/notes`),
+    createNote: (id, data) => api.post(`/leads/${id}/notes`, data),
+    // Lead Conversion
+    convertToClient: (id, data) => api.post(`/leads/${id}/convert`, data),
+    updateScore: (id, score) => api.put(`/leads/${id}/score`, { score })
 };
 
 // Messaging

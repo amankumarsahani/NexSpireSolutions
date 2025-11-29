@@ -14,4 +14,12 @@ router.delete('/:id', LeadController.delete);
 router.post('/:id/comments', LeadController.addComment);
 router.get('/:id/comments', LeadController.getComments);
 
+// Note routes
+router.get('/:id/notes', LeadController.getNotes);
+router.post('/:id/notes', LeadController.createNote);
+
+// Conversion routes
+router.post('/:id/convert', LeadController.convertToClient);
+router.put('/:id/score', LeadController.updateScore);
+
 module.exports = router;

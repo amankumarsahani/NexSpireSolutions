@@ -102,6 +102,93 @@ const LeadController = {
             console.error('Get stats error:', error);
             res.status(500).json({ error: 'Failed to fetch statistics' });
         }
+    },
+
+    // Note Management
+    async getNotes(req, res) {
+        try {
+            const Note = require('../models/note.model');
+            const notes = await Note.findByLeadId(req.params.id);
+            res.json({ notes });
+        } catch (error) {
+            console.error('Get notes error:', error);
+            res.status(500).json({ error: 'Failed to fetch notes' });
+        }
+    },
+
+    async createNote(req, res) {
+        try {
+            const Note = require('../models/note.model');
+            const note = await Note.create({
+                leadId: req.params.id,
+                authorId: req.user?.id || 1, // Default to user 1 if not authenticated
+                ...req.body
+            });
+            res.status(201).json({ message: 'Note added successfully', note });
+        } catch (error) {
+            console.error('Create note error:', error);
+            res.status(500).json({ error: 'Failed to create note' });
+        }
+    },
+
+    // Lead Conversion
+    async convertToClient(req, res) {
+        try {
+            const lead = await LeadModel.findById(req.params.id);
+            if (!lead) {
+                return res.status(404).json({ error: 'Lead not found' });
+            }
+
+            const ClientModel = require('../models/client.model');
+
+            // Create client from lead data
+            const clientData = {
+                companyName: lead.company || lead.contact_name,
+                contactName: lead.contact_name,
+                email: lead.email,
+                phone: lead.phone,
+                industry: lead.industry || 'Not specified',
+                status: 'active'
+            };
+
+            const clientId = await ClientModel.create(clientData);
+
+            // Update lead status to converted
+            await LeadModel.update(req.params.id, { status: 'converted' });
+
+            const client = await ClientModel.findById(clientId);
+            res.json({
+                message: 'Lead converted to client successfully',
+                client,
+                leadId: req.params.id
+            });
+        } catch (error) {
+            console.error('Convert lead error:', error);
+            res.status(500).json({ error: 'Failed to convert lead to client' });
+        }
+    },
+
+    // Update Lead Score
+    async updateScore(req, res) {
+        try {
+            const { score } = req.body;
+            if (score === undefined || score < 0 || score > 100) {
+                return res.status(400).json({ error: 'Score must be between 0 and 100' });
+            }
+
+            const lead = await LeadModel.findById(req.params.id);
+            if (!lead) {
+                return res.status(404).json({ error: 'Lead not found' });
+            }
+
+            await LeadModel.update(req.params.id, { score });
+            const updated = await LeadModel.findById(req.params.id);
+
+            res.json({ message: 'Lead score updated successfully', lead: updated });
+        } catch (error) {
+            console.error('Update lead score error:', error);
+            res.status(500).json({ error: 'Failed to update lead score' });
+        }
     }
 };
 
