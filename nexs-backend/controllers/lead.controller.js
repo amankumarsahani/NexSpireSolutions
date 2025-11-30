@@ -70,6 +70,30 @@ const LeadController = {
         }
     },
 
+    async addComment(req, res) {
+        try {
+            const { comment } = req.body;
+            if (!comment) {
+                return res.status(400).json({ error: 'Comment is required' });
+            }
+            const newComment = await LeadModel.addComment(req.params.id, comment);
+            res.status(201).json({ message: 'Comment added', comment: newComment });
+        } catch (error) {
+            console.error('Add comment error:', error);
+            res.status(500).json({ error: 'Failed to add comment' });
+        }
+    },
+
+    async getComments(req, res) {
+        try {
+            const comments = await LeadModel.getComments(req.params.id);
+            res.json({ comments });
+        } catch (error) {
+            console.error('Get comments error:', error);
+            res.status(500).json({ error: 'Failed to fetch comments' });
+        }
+    },
+
     async getStats(req, res) {
         try {
             const stats = await LeadModel.getStats();

@@ -28,4 +28,9 @@ const testConnection = async () => {
     }
 };
 
-module.exports = { pool, testConnection };
+// Wrapper for query method
+const query = (sql, params) => {
+    return pool.query(sql, params);
+};
+
+module.exports = { pool, testConnection, query };

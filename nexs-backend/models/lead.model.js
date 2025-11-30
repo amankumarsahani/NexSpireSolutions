@@ -79,6 +79,22 @@ const LeadModel = {
     `);
 
         return stats[0];
+    },
+
+    async addComment(leadId, comment) {
+        const [result] = await pool.query(
+            'INSERT INTO lead_comments (leadId, comment) VALUES (?, ?)',
+            [leadId, comment]
+        );
+        return { id: result.insertId, leadId, comment, createdAt: new Date() };
+    },
+
+    async getComments(leadId) {
+        const [rows] = await pool.query(
+            'SELECT * FROM lead_comments WHERE leadId = ? ORDER BY createdAt DESC',
+            [leadId]
+        );
+        return rows;
     }
 };
 

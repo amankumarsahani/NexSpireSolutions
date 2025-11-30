@@ -20,6 +20,7 @@ const corsOptions = {
             process.env.CLIENT_URL,
             process.env.CLIENT_URL_PROD,
             'http://localhost:3000',
+            'http://localhost:5173',
             'https://nexspiresolutions.co.in'
         ];
 
@@ -61,7 +62,8 @@ app.get('/api', (req, res) => {
             leads: '/api/leads/*',
             team: '/api/team/*',
             documents: '/api/documents/*',
-            messages: '/api/messages/*'
+            messages: '/api/messages/*',
+            inquiries: '/api/inquiries/*'
         }
     });
 });
@@ -71,18 +73,34 @@ const authRoutes = require('./routes/auth.routes');
 const clientRoutes = require('./routes/client.routes');
 const projectRoutes = require('./routes/project.routes');
 const leadRoutes = require('./routes/lead.routes');
-// const teamRoutes = require('./routes/team.routes');
-// const documentRoutes = require('./routes/document.routes');
-// const messageRoutes = require('./routes/message.routes');
+const teamRoutes = require('./routes/team.routes');
+const documentRoutes = require('./routes/document.routes');
+const messageRoutes = require('./routes/message.routes');
+const inquiryRoutes = require('./routes/inquiry.routes');
+const departmentRoutes = require('./routes/department.routes');
+const employeeRoutes = require('./routes/employee.routes');
+const activityLogRoutes = require('./routes/activity_log.routes');
+const notificationRoutes = require('./routes/notification.routes');
+const analyticsRoutes = require('./routes/analytics.routes');
+const seoRoutes = require('./routes/seo.routes');
+
 
 // Use routes
 app.use('/api/auth', authRoutes);
 app.use('/api/clients', clientRoutes);
 app.use('/api/projects', projectRoutes);
 app.use('/api/leads', leadRoutes);
-// app.use('/api/team', teamRoutes);
-// app.use('/api/documents', documentRoutes);
-// app.use('/api/messages', messageRoutes);
+app.use('/api/team', teamRoutes);
+app.use('/api/documents', documentRoutes);
+app.use('/api/messages', messageRoutes);
+app.use('/api/inquiries', inquiryRoutes);
+app.use('/api/departments', departmentRoutes);
+app.use('/api/employees', employeeRoutes);
+app.use('/api/activity-logs', activityLogRoutes);
+app.use('/api/notifications', notificationRoutes);
+app.use('/api/analytics', analyticsRoutes);
+app.use('/api/seo', seoRoutes);
+
 
 // 404 Handler
 app.use((req, res) => {
