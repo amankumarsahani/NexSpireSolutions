@@ -15,6 +15,26 @@ CREATE TABLE IF NOT EXISTS departments (
   INDEX idx_manager (managerId)
 );
 
+-- Add budget column if missing (for existing tables)
+SET @dbname = DATABASE();
+SET @tablename = "departments";
+SET @columnname = "budget";
+SET @preparedStatement = (SELECT IF(
+  (
+    SELECT COUNT(*) FROM INFORMATION_SCHEMA.COLUMNS
+    WHERE
+      (table_name = @tablename)
+      AND (table_schema = @dbname)
+      AND (column_name = @columnname)
+  ) > 0,
+  "SELECT 1",
+  "ALTER TABLE departments ADD COLUMN budget DECIMAL(15, 2) DEFAULT 0;"
+));
+PREPARE stmt FROM @preparedStatement;
+EXECUTE stmt;
+DEALLOCATE PREPARE stmt;
+
+
 -- Create teams table with department relationship
 CREATE TABLE IF NOT EXISTS teams (
   id INT PRIMARY KEY AUTO_INCREMENT,
@@ -46,15 +66,82 @@ CREATE TABLE IF NOT EXISTS team_member_assignments (
 );
 
 -- Add teamId column to projects table if it doesn't exist
-ALTER TABLE projects 
-ADD COLUMN IF NOT EXISTS teamId INT NULL AFTER clientId,
-ADD FOREIGN KEY (teamId) REFERENCES teams(id) ON DELETE SET NULL,
-ADD INDEX idx_team (teamId);
+-- Add teamId column to projects table if it doesn't exist
+SET @dbname = DATABASE();
+SET @tablename = "projects";
+SET @columnname = "teamId";
+SET @preparedStatement = (SELECT IF(
+  (
+    SELECT COUNT(*) FROM INFORMATION_SCHEMA.COLUMNS
+    WHERE
+      (table_name = @tablename)
+      AND (table_schema = @dbname)
+      AND (column_name = @columnname)
+  ) > 0,
+  "SELECT 1",
+  "ALTER TABLE projects ADD COLUMN teamId INT NULL AFTER clientId;"
+));
+PREPARE stmt FROM @preparedStatement;
+EXECUTE stmt;
+DEALLOCATE PREPARE stmt;
 
--- Add departmentId to existing team_members table if needed (for backward compatibility)
-ALTER TABLE team_members
-ADD COLUMN IF NOT EXISTS departmentId INT NULL AFTER department,
-ADD FOREIGN KEY (departmentId) REFERENCES departments(id) ON DELETE SET NULL;
+-- Add FK to projects (only if column exists, which it should now)
+-- Note: Checking for FK existence is harder, so we'll skip if it fails or assume it's fine to try adding if we added the column. 
+-- For simplicity, we'll try to add the FK only if we added the column, but that's complex.
+-- Instead, let's just run the FK add in a separate block that ignores errors or checks for constraint name.
+SET @constraintName = "projects_ibfk_team"; -- Guessing name or we can name it explicitly
+-- Actually, let's just try to add the FK. If it fails, it fails. But migrate.js stops.
+-- Let's use a similar check for the FK.
+SET @preparedStatement = (SELECT IF(
+  (
+    SELECT COUNT(*) FROM INFORMATION_SCHEMA.TABLE_CONSTRAINTS
+    WHERE
+      (table_name = @tablename)
+      AND (table_schema = @dbname)
+      AND (constraint_name = 'fk_projects_team')
+  ) > 0,
+  "SELECT 1",
+  "ALTER TABLE projects ADD CONSTRAINT fk_projects_team FOREIGN KEY (teamId) REFERENCES teams(id) ON DELETE SET NULL;"
+));
+PREPARE stmt FROM @preparedStatement;
+EXECUTE stmt;
+DEALLOCATE PREPARE stmt;
+
+
+-- Add departmentId to existing team_members table if needed
+SET @tablename = "team_members";
+SET @columnname = "departmentId";
+SET @preparedStatement = (SELECT IF(
+  (
+    SELECT COUNT(*) FROM INFORMATION_SCHEMA.COLUMNS
+    WHERE
+      (table_name = @tablename)
+      AND (table_schema = @dbname)
+      AND (column_name = @columnname)
+  ) > 0,
+  "SELECT 1",
+  "ALTER TABLE team_members ADD COLUMN departmentId INT NULL AFTER department;"
+));
+PREPARE stmt FROM @preparedStatement;
+EXECUTE stmt;
+DEALLOCATE PREPARE stmt;
+
+-- Add FK for team_members
+SET @preparedStatement = (SELECT IF(
+  (
+    SELECT COUNT(*) FROM INFORMATION_SCHEMA.TABLE_CONSTRAINTS
+    WHERE
+      (table_name = @tablename)
+      AND (table_schema = @dbname)
+      AND (constraint_name = 'fk_team_members_department')
+  ) > 0,
+  "SELECT 1",
+  "ALTER TABLE team_members ADD CONSTRAINT fk_team_members_department FOREIGN KEY (departmentId) REFERENCES departments(id) ON DELETE SET NULL;"
+));
+PREPARE stmt FROM @preparedStatement;
+EXECUTE stmt;
+DEALLOCATE PREPARE stmt;
+
 
 -- Insert sample departments
 INSERT INTO departments (name, description, budget) VALUES

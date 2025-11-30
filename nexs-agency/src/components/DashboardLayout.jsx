@@ -74,6 +74,13 @@ export default function DashboardLayout() {
                         <i className="ri-message-3-line text-xl"></i>
                         <span>Messages</span>
                     </button>
+                    <button
+                        onClick={() => navigate('/admin/seo')}
+                        className={`w-full text-left px-6 py-3 flex items-center gap-3 transition-colors ${location.pathname.includes('/admin/seo') ? 'bg-purple-600 border-l-4 border-purple-400' : 'hover:bg-gray-800'}`}
+                    >
+                        <i className="ri-line-chart-line text-xl"></i>
+                        <span>SEO Tools</span>
+                    </button>
                 </nav>
                 <div className="absolute bottom-0 w-64 p-6 border-t border-gray-800 bg-gray-900">
                     <div className="flex items-center gap-3 mb-4">

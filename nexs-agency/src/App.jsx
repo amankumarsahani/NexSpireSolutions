@@ -18,7 +18,9 @@ import TeamDetail from './pages/TeamDetail';
 import ClientDetail from './pages/ClientDetail';
 import ProjectDetail from './pages/ProjectDetail';
 import LeadDetail from './pages/LeadDetail';
+import SEOTools from './pages/SEOTools';
 import DashboardLayout from './components/DashboardLayout';
+
 
 // Protected Route Component
 function ProtectedRoute({ children }) {
@@ -75,6 +77,7 @@ function App() {
             <Route path="clients/:id" element={<ClientDetail />} />
             <Route path="projects/:id" element={<ProjectDetail />} />
             <Route path="leads/:id" element={<LeadDetail />} />
+            <Route path="seo" element={<SEOTools />} />
           </Route>
         </Routes>
       </AuthProvider>

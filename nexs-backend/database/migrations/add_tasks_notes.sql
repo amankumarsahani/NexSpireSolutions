@@ -16,6 +16,43 @@ CREATE TABLE IF NOT EXISTS tasks (
     CHECK (status IN ('todo', 'in-progress', 'done', 'cancelled'))
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4;
 
+-- Add project_id column if missing
+SET @dbname = DATABASE();
+SET @tablename = "tasks";
+SET @columnname = "project_id";
+SET @preparedStatement = (SELECT IF(
+  (
+    SELECT COUNT(*) FROM INFORMATION_SCHEMA.COLUMNS
+    WHERE
+      (table_name = @tablename)
+      AND (table_schema = @dbname)
+      AND (column_name = @columnname)
+  ) > 0,
+  "SELECT 1",
+  "ALTER TABLE tasks ADD COLUMN project_id INT NOT NULL;"
+));
+PREPARE stmt FROM @preparedStatement;
+EXECUTE stmt;
+DEALLOCATE PREPARE stmt;
+
+-- Add assigned_to column if missing
+SET @columnname = "assigned_to";
+SET @preparedStatement = (SELECT IF(
+  (
+    SELECT COUNT(*) FROM INFORMATION_SCHEMA.COLUMNS
+    WHERE
+      (table_name = @tablename)
+      AND (table_schema = @dbname)
+      AND (column_name = @columnname)
+  ) > 0,
+  "SELECT 1",
+  "ALTER TABLE tasks ADD COLUMN assigned_to INT;"
+));
+PREPARE stmt FROM @preparedStatement;
+EXECUTE stmt;
+DEALLOCATE PREPARE stmt;
+
+
 -- Notes table for lead management (MySQL 5.7+ compatible)
 CREATE TABLE IF NOT EXISTS notes (
     id INT AUTO_INCREMENT PRIMARY KEY,
