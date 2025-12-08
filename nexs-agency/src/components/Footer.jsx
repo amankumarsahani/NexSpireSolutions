@@ -1,24 +1,26 @@
+import { Link } from 'react-router-dom';
+
 const Footer = () => {
   const currentYear = new Date().getFullYear();
 
   const footerLinks = {
     Services: [
-      { name: "Web Development", href: "#services" },
-      { name: "Mobile Apps", href: "#services" },
-      { name: "Cloud Solutions", href: "#services" },
-      { name: "UI/UX Design", href: "#services" }
+      { name: "Web Development", href: "/services" },
+      { name: "Mobile Apps", href: "/services" },
+      { name: "Cloud Solutions", href: "/services" },
+      { name: "UI/UX Design", href: "/services" }
     ],
     Company: [
-      { name: "About Us", href: "#about" },
-      { name: "Our Team", href: "#about" },
-      { name: "Portfolio", href: "#portfolio" },
-      { name: "Contact", href: "#contact" }
+      { name: "About Us", href: "/about" },
+      { name: "Our Team", href: "/about" },
+      { name: "Portfolio", href: "/portfolio" },
+      { name: "Contact", href: "/contact" }
     ],
     Resources: [
-      { name: "Blog", href: "#" },
-      { name: "Case Studies", href: "#" },
-      { name: "Documentation", href: "#" },
-      { name: "Support", href: "#" }
+      { name: "Blog", href: "/blog" },
+      { name: "Case Studies", href: "/blog" },
+      { name: "Documentation", href: "/blog" },
+      { name: "Support", href: "/contact" }
     ]
   };
 
@@ -37,14 +39,14 @@ const Footer = () => {
           <div className="grid lg:grid-cols-4 gap-8">
             {/* Company Info */}
             <div className="lg:col-span-1">
-              <a
-                href="#home"
+              <Link
+                to="/"
                 className="text-2xl font-['Pacifico'] bg-gradient-to-r from-blue-400 to-purple-400 bg-clip-text text-transparent mb-4 inline-block"
               >
                 Nexspire Solution
-              </a>
+              </Link>
               <p className="text-gray-400 mb-6 leading-relaxed">
-                We're a passionate team dedicated to creating exceptional software 
+                We're a passionate team dedicated to creating exceptional software
                 solutions that help businesses thrive in the digital world.
               </p>
               <div className="flex space-x-4">
@@ -68,12 +70,12 @@ const Footer = () => {
                 <ul className="space-y-3">
                   {links.map((link, index) => (
                     <li key={index}>
-                      <a
-                        href={link.href}
+                      <Link
+                        to={link.href}
                         className="text-gray-400 hover:text-white transition-colors duration-300"
                       >
                         {link.name}
-                      </a>
+                      </Link>
                     </li>
                   ))}
                 </ul>
@@ -111,15 +113,15 @@ const Footer = () => {
               © {currentYear} Nexspire Solution. All rights reserved.
             </p>
             <div className="flex space-x-6 mt-4 md:mt-0">
-              <a href="#" className="text-gray-400 hover:text-white text-sm transition-colors">
+              <Link to="/privacy-policy" className="text-gray-400 hover:text-white text-sm transition-colors">
                 Privacy Policy
-              </a>
-              <a href="#" className="text-gray-400 hover:text-white text-sm transition-colors">
+              </Link>
+              <Link to="/terms" className="text-gray-400 hover:text-white text-sm transition-colors">
                 Terms of Service
-              </a>
-              <a href="#" className="text-gray-400 hover:text-white text-sm transition-colors">
+              </Link>
+              <Link to="#" className="text-gray-400 hover:text-white text-sm transition-colors">
                 Cookie Policy
-              </a>
+              </Link>
             </div>
           </div>
         </div>

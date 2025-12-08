@@ -313,7 +313,7 @@ const About = () => {
               ];
               const icons = [
                 'ri-bar-chart-box-line',
-                'ri-target-line',
+                'ri-rocket-line',
                 'ri-flashlight-line',
                 'ri-rocket-2-line'
               ];

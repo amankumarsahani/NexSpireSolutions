@@ -8,7 +8,7 @@ function Careers() {
             Build your career with us and help shape the future of software development. We're looking for passionate individuals who love creating amazing digital experiences.
           </p>
         </div>
-        
+
         <div className="grid lg:grid-cols-3 gap-8 mb-16">
           <div className="lg:col-span-2">
             <h3 className="text-2xl font-semibold text-gray-900 mb-8">Open Positions</h3>
@@ -78,7 +78,7 @@ function Careers() {
                   </div>
                 </div>
               </div>
-              
+
               <div className="bg-white rounded-xl p-6 shadow-lg hover:shadow-xl transition-shadow">
                 <div className="flex flex-col md:flex-row md:items-start justify-between mb-4">
                   <div className="flex-1">
@@ -144,7 +144,7 @@ function Careers() {
                   </div>
                 </div>
               </div>
-              
+
               <div className="bg-white rounded-xl p-6 shadow-lg hover:shadow-xl transition-shadow">
                 <div className="flex flex-col md:flex-row md:items-start justify-between mb-4">
                   <div className="flex-1">
@@ -210,7 +210,7 @@ function Careers() {
               </div>
             </div>
           </div>
-          
+
           <div>
             <h3 className="text-2xl font-semibold text-gray-900 mb-8">Why Work With Us?</h3>
             <div className="space-y-6">
@@ -225,7 +225,7 @@ function Careers() {
                   Work with passionate professionals in a collaborative environment that values innovation and creativity.
                 </p>
               </div>
-              
+
               <div className="bg-white rounded-xl p-6 shadow-lg">
                 <div className="flex items-center mb-4">
                   <div className="w-12 h-12 bg-green-100 rounded-lg flex items-center justify-center mr-4">
@@ -237,7 +237,7 @@ function Careers() {
                   Continuous learning opportunities, mentorship programs, and clear career advancement paths.
                 </p>
               </div>
-              
+
               <div className="bg-white rounded-xl p-6 shadow-lg">
                 <div className="flex items-center mb-4">
                   <div className="w-12 h-12 bg-purple-100 rounded-lg flex items-center justify-center mr-4">
@@ -249,7 +249,7 @@ function Careers() {
                   Flexible working hours, remote-first culture, and generous vacation policies to maintain work-life balance.
                 </p>
               </div>
-              
+
               <div className="bg-white rounded-xl p-6 shadow-lg">
                 <div className="flex items-center mb-4">
                   <div className="w-12 h-12 bg-orange-100 rounded-lg flex items-center justify-center mr-4">
@@ -264,7 +264,7 @@ function Careers() {
             </div>
           </div>
         </div>
-        
+
         <div className="bg-blue-600 rounded-2xl p-8 md:p-12 text-center text-white">
           <h3 className="text-2xl font-semibold mb-4">Don't See the Right Role?</h3>
           <p className="text-blue-100 mb-8 max-w-2xl mx-auto">
@@ -275,7 +275,7 @@ function Careers() {
               Submit Resume
             </button>
             <a
-              href="mailto:careers@nexspiresolution.com"
+              href="mailto:careers@nexspiresolutions.co.in"
               className="border-2 border-white text-white px-8 py-3 rounded-lg hover:bg-white hover:text-blue-600 transition-colors cursor-pointer whitespace-nowrap font-medium"
             >
               Contact HR

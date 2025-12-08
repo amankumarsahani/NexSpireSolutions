@@ -1,12 +1,94 @@
 @import url('https://cdn.jsdelivr.net/npm/remixicon@4.0.0/fonts/remixicon.css');
-@import url('https://fonts.googleapis.com/css2?family=Pacifico&display=swap');
+@import url('https://fonts.googleapis.com/css2?family=Pacifico&family=Inter:wght@300;400;500;600;700&family=Outfit:wght@300;400;500;600;700;800&display=swap');
 @import "tailwindcss";
+
+@theme {
+  --font-sans: 'Inter', system-ui, sans-serif;
+  --font-display: 'Outfit', system-ui, sans-serif;
+}
+
+/* Base Styles */
+body {
+  font-family: var(--font-sans);
+  @apply bg-gray-50 text-gray-900 antialiased;
+}
+
+h1,
+h2,
+h3,
+h4,
+h5,
+h6 {
+  font-family: var(--font-display);
+}
+
+/* Custom Animations */
+@keyframes fade-in-up {
+  0% {
+    opacity: 0;
+    transform: translateY(20px);
+  }
+
+  100% {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+.animate-fade-in-up {
+  animation: fade-in-up 0.8s ease-out forwards;
+}
+
+.delay-100 {
+  animation-delay: 100ms;
+}
+
+.delay-200 {
+  animation-delay: 200ms;
+}
+
+.delay-300 {
+  animation-delay: 300ms;
+}
+
+@keyframes float {
+
+  0%,
+  100% {
+    transform: translateY(0);
+  }
+
+  50% {
+    transform: translateY(-10px);
+  }
+}
+
+.animate-float {
+  animation: float 6s ease-in-out infinite;
+}
+
+@keyframes pulse-glow {
+
+  0%,
+  100% {
+    box-shadow: 0 0 20px rgba(59, 130, 246, 0.5);
+  }
+
+  50% {
+    box-shadow: 0 0 40px rgba(59, 130, 246, 0.8);
+  }
+}
+
+.animate-pulse-glow {
+  animation: pulse-glow 3s infinite;
+}
 
 /* Technology Slider Animation */
 @keyframes slide-left {
   0% {
     transform: translateX(0);
   }
+
   100% {
     transform: translateX(-50%);
   }
@@ -16,37 +98,19 @@
   animation: slide-left 20s linear infinite;
 }
 
-/* Right to Left Animation */
-@keyframes slide-right {
-  0% {
-    transform: translateX(-50%);
-  }
-  100% {
-    transform: translateX(0);
-  }
+/* Utilities */
+.glass-card {
+  @apply bg-white/10 backdrop-blur-lg border border-white/20;
 }
 
-.animate-slide-right {
-  animation: slide-right 20s linear infinite;
+.text-gradient {
+  @apply bg-clip-text text-transparent bg-gradient-to-r from-blue-600 to-purple-600;
 }
 
-/* Slower animation for categories */
-@keyframes slide-left-slow {
-  0% {
-    transform: translateX(0);
-  }
-  100% {
-    transform: translateX(-50%);
-  }
+.section-padding {
+  @apply py-20 lg:py-32;
 }
 
-.animate-slide-left-slow {
-  animation: slide-left-slow 30s linear infinite;
-}
-
-/* Pause animation on hover */
-.animate-slide-left:hover,
-.animate-slide-right:hover,
-.animate-slide-left-slow:hover {
-  animation-play-state: paused;
+.container-custom {
+  @apply max-w-7xl mx-auto px-4 sm:px-6 lg:px-8;
 }
