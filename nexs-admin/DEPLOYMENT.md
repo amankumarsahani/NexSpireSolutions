@@ -1,199 +1,156 @@
-# Nexs-Admin Deployment Guide
+# Deploy Nexs-Admin to GitHub Pages
 
-## Cloudflare Pages Deployment
+This guide explains how to deploy the Nexs-Admin dashboard to GitHub Pages at `admin.nexspiresolutions.co.in`.
 
-This guide will walk you through deploying the Nexs-Admin dashboard to Cloudflare Pages with GitHub integration.
-
-### Prerequisites
-
-- GitHub account with the nexs-admin repository
-- Cloudflare account with access to `nexspiresolutions.co.in` domain
-- GitHub repository should be pushed and up-to-date
-
-### Step 1: Push Code to GitHub
-
-If you haven't already, push your code to GitHub:
+## Quick Deploy
 
 ```bash
-cd "E:\Smart Code\Freelance Project\Nexs\nexs-admin"
+npm run deploy
+```
+
+This command will:
+1. Build the production version
+2. Deploy to GitHub Pages automatically
+
+## Manual Setup (First Time Only)
+
+### 1. Enable GitHub Pages
+
+1. Go to your GitHub repository: `https://github.com/amankumarsahani/NexSpireSolutions`
+2. Click **Settings** → **Pages**
+3. Under **Source**, select:
+   - **Source**: Deploy from a branch
+   - **Branch**: `gh-pages`
+   - **Folder**: `/ (root)`
+4. Click **Save**
+
+### 2. Configure Custom Domain
+
+In the same **Pages** settings:
+
+1. Under **Custom domain**, enter: `admin.nexspiresolutions.co.in`
+2. Click **Save**
+3. Wait for DNS check to complete
+4. Enable **Enforce HTTPS** (after DNS propagates)
+
+### 3. Configure DNS in Cloudflare
+
+Go to Cloudflare Dashboard → DNS → Add record:
+
+```
+Type: CNAME
+Name: admin
+Target: amankumarsahani.github.io
+Proxy status: DNS only (gray cloud)
+TTL: Auto
+```
+
+This is the same pattern as your nexs-agency deployment!
+
+## Deployment Workflow
+
+### Option 1: Automatic (Recommended)
+
+Every push to `master` branch automatically triggers GitHub Actions to build and deploy.
+
+```bash
+# Make your changes
 git add .
-git commit -m "Add Cloudflare Pages deployment configuration"
-git push origin main
+git commit -m "Update dashboard"
+git push origin master
 ```
 
-### Step 2: Create Cloudflare Pages Project
+GitHub Actions will:
+- Build the project with production settings
+- Deploy to GitHub Pages
+- Your changes will be live in 2-5 minutes
 
-1. **Login to Cloudflare Dashboard**
-   - Go to [https://dash.cloudflare.com/](https://dash.cloudflare.com/)
-   - Navigate to **Pages** from the left sidebar
+### Option 2: Manual Deploy
 
-2. **Create New Project**
-   - Click **"Create a project"**
-   - Select **"Connect to Git"**
+Use the deploy script anytime:
 
-3. **Connect GitHub Repository**
-   - Click **"Connect GitHub"** (authorize if first time)
-   - Select your repository: `nexs-admin`
-   - Click **"Begin setup"**
+```bash
+npm run deploy
+```
 
-4. **Configure Build Settings**
-   - **Project name**: `nexs-admin`
-   - **Production branch**: `main` (or your default branch)
-   - **Framework preset**: `Vite`
-   - **Build command**: `npm run build`
-   - **Build output directory**: `dist`
-   - **Root directory**: `/` (leave empty)
-   - **Node version**: `18` (detected from .node-version)
+This creates a `gh-pages` branch and pushes the built files.
 
-5. **Environment Variables**
-   Click **"Add variable"** and add:
-   - **Variable name**: `VITE_API_URL`
-   - **Value**: `https://api.nexspiresolutions.co.in/api`
+## Verify Deployment
 
-6. **Deploy**
-   - Click **"Save and Deploy"**
-   - Wait for the build to complete (usually 2-5 minutes)
-   - You'll get a temporary URL: `https://nexs-admin-xxx.pages.dev`
+1. **Check GitHub Actions**: 
+   - Go to repository → **Actions** tab
+   - See the latest workflow run
+   - Ensure it completed successfully
 
-### Step 3: Configure Custom Subdomain
+2. **Visit the Site**:
+   - Temporary URL: `https://amankumarsahani.github.io/nexs-admin/`
+   - Custom domain: `https://admin.nexspiresolutions.co.in` (after DNS setup)
 
-1. **Add Custom Domain**
-   - In your Cloudflare Pages project, go to **"Custom domains"**
-   - Click **"Set up a custom domain"**
-   - Enter: `admin.nexspiresolutions.co.in`
-   - Click **"Continue"**
+3. **Test Functionality**:
+   - Login page loads
+   - API calls work with backend
+   - All routes function correctly
 
-2. **DNS Configuration**
-   - Cloudflare will automatically add the required DNS records
-   - Since `nexspiresolutions.co.in` is already on Cloudflare, this is automatic
-   - The CNAME record will point to your Pages deployment
+## Important Notes
 
-3. **SSL/TLS**
-   - SSL certificate is automatically provisioned (may take a few minutes)
-   - Your site will be accessible at `https://admin.nexspiresolutions.co.in`
+### Base Path
 
-### Step 4: Verify Deployment
+The app is configured with base path `/nexs-admin/` in `vite.config.js`. This is required for GitHub Pages subdirectory deployment.
 
-1. **Check Build Status**
-   - Go to **Deployments** tab in Cloudflare Pages
-   - Ensure the build completed successfully
-   - Check build logs for any errors
+### Environment Variables
 
-2. **Test the Application**
-   - Visit `https://admin.nexspiresolutions.co.in`
-   - Verify the login page loads correctly
-   - Test login functionality
-   - Check that API calls work with your backend
+Production API URL is set in the GitHub Actions workflow:
+```yaml
+VITE_API_URL: https://api.nexspiresolutions.co.in/api
+```
 
-3. **Test CORS**
-   - Ensure your backend (`api.nexspiresolutions.co.in`) allows requests from `admin.nexspiresolutions.co.in`
-   - CORS origin should include: `https://admin.nexspiresolutions.co.in`
+### CORS Configuration
 
-### Step 5: Enable Automatic Deployments
-
-Cloudflare Pages automatically deploys when you push to your production branch:
-
-1. **Make a Change**
-   ```bash
-   # Make some changes to your code
-   git add .
-   git commit -m "Update feature"
-   git push origin main
-   ```
-
-2. **Automatic Build**
-   - Cloudflare automatically detects the push
-   - Triggers a new build
-   - Deploys to production upon success
-
-3. **View Deployment**
-   - Check the **Deployments** tab in Cloudflare Pages
-   - Each commit gets its own deployment
-   - Click on any deployment to see details
-
-### Updating Backend CORS
-
-Your backend needs to allow requests from the admin subdomain. Update your CORS configuration in `nexs-backend`:
-
+Backend already includes admin subdomain in CORS:
 ```javascript
-// In your backend CORS configuration
-const allowedOrigins = [
-  'https://nexspiresolutions.co.in',
-  'https://admin.nexspiresolutions.co.in',
-  'http://localhost:5173', // For local development
-];
+'https://admin.nexspiresolutions.co.in'
 ```
 
-### Troubleshooting
+## Troubleshooting
 
-#### Build Fails
+### Build Fails in GitHub Actions
 
-- **Check build logs** in Cloudflare Pages dashboard
-- **Verify Node version** matches your local environment
-- **Check npm dependencies** are all in package.json
-- **Ensure .env.production** has correct API URL
+- Check the Actions log for errors
+- Ensure all dependencies are in `package.json`
+- Verify Node version compatibility
 
-#### API Calls Fail
+### 404 on Routes
 
-- **CORS errors**: Update backend CORS to include admin subdomain
-- **Wrong API URL**: Check environment variable in Cloudflare Pages
-- **SSL issues**: Ensure backend has valid SSL certificate
+- Ensure `base: '/nexs-admin/'` is in `vite.config.js`
+- Check that routes in React Router match the base path
 
-#### Custom Domain Not Working
+### Custom Domain Not Working
 
-- **DNS propagation**: May take up to 24 hours (usually minutes)
-- **Check DNS records** in Cloudflare DNS dashboard
-- **SSL provisioning**: Wait a few minutes for automatic SSL
+- Verify CNAME record in Cloudflare DNS
+- Check that `public/CNAME` file contains correct domain
+- Wait up to 24 hours for DNS propagation
+- Ensure DNS is set to "DNS only" (gray cloud), not proxied
 
-#### 404 Errors on Refresh
+### API Calls Fail
 
-Cloudflare Pages handles SPAs automatically, but if you encounter issues:
-- Check that your routing is client-side (React Router)
-- Cloudflare Pages automatically serves index.html for all routes
+- Check backend CORS includes admin subdomain
+- Verify `VITE_API_URL` in production build
+- Check browser console for CORS errors
 
-### Monitoring and Logs
+## Comparison: GitHub Pages vs Cloudflare Pages
 
-1. **Analytics**
-   - View traffic analytics in Cloudflare Pages dashboard
-   - Monitor performance metrics
+You're now using GitHub Pages (same as nexs-agency):
 
-2. **Build Logs**
-   - Each deployment has detailed build logs
-   - Useful for debugging build issues
+✅ **Benefits**:
+- Familiar workflow
+- Same deployment process as nexs-agency
+- Free hosting
+- Automatic HTTPS
+- Simple DNS setup with CNAME
 
-3. **Function Logs** (if using Pages Functions)
-   - Real-time logs available in dashboard
-   - Helps debug server-side issues
+**How it works**:
+```
+Push to GitHub → GitHub Actions builds → Deploys to GitHub Pages → Live!
+```
 
-### Rollback
-
-To rollback to a previous version:
-
-1. Go to **Deployments** tab
-2. Find the working deployment
-3. Click **"..."** menu
-4. Select **"Rollback to this deployment"**
-
-### Environment-Specific Deployments
-
-For preview deployments (feature branches):
-
-- Push to any non-production branch
-- Cloudflare creates a preview deployment
-- URL format: `https://branch-name.nexs-admin-xxx.pages.dev`
-- Perfect for testing before merging to main
-
----
-
-## Additional Resources
-
-- [Cloudflare Pages Documentation](https://developers.cloudflare.com/pages/)
-- [Vite Deployment Guide](https://vitejs.dev/guide/static-deploy.html)
-- [Cloudflare DNS Documentation](https://developers.cloudflare.com/dns/)
-
-## Support
-
-If you encounter issues:
-1. Check Cloudflare Pages build logs
-2. Review Cloudflare community forums
-3. Contact Cloudflare support for infrastructure issues
+Same as nexs-agency, but with automatic builds via GitHub Actions!
