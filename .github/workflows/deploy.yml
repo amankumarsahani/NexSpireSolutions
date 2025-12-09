@@ -4,6 +4,9 @@ on:
   push:
     branches:
       - master
+    paths:
+      - 'nexs-agency/**'
+      - '.github/workflows/deploy.yml'
   workflow_dispatch:
 
 permissions:
@@ -28,34 +31,20 @@ jobs:
         with:
           node-version: '20'
           cache: 'npm'
-          cache-dependency-path: |
-            nexs-agency/package-lock.json
-            nexs-admin/package-lock.json
+          cache-dependency-path: nexs-agency/package-lock.json
       
-      # Build nexs-agency
-      - name: Install and build nexs-agency
+      - name: Install dependencies
         run: |
           cd nexs-agency
           npm ci
+      
+      - name: Build production bundle
+        run: |
+          cd nexs-agency
           npm run build:prod
         env:
           VITE_API_URL: https://api.nexspiresolutions.co.in/api
           VITE_ENV: production
-      
-      # Build nexs-admin  
-      - name: Install and build nexs-admin
-        run: |
-          cd nexs-admin
-          npm ci
-          npm run build:prod
-        env:
-          VITE_API_URL: https://api.nexspiresolutions.co.in/api
-      
-      # Copy nexs-admin into nexs-agency dist
-      - name: Combine builds
-        run: |
-          mkdir -p nexs-agency/dist/admin
-          cp -r nexs-admin/dist/* nexs-agency/dist/admin/
       
       - name: Upload artifact
         uses: actions/upload-pages-artifact@v3
