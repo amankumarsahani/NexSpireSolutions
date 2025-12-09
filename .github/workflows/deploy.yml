@@ -28,14 +28,17 @@ jobs:
         with:
           node-version: '20'
           cache: 'npm'
-          cache-dependency-path: nexs-agency/package-lock.json
+          cache-dependency-path: |
+            nexs-agency/package-lock.json
+            nexs-admin/package-lock.json
       
-      - name: Install dependencies
+      # Build nexs-agency
+      - name: Install nexs-agency dependencies
         run: |
           cd nexs-agency
           npm ci
       
-      - name: Build production bundle
+      - name: Build nexs-agency
         run: |
           cd nexs-agency
           npm run build:prod
@@ -43,10 +46,33 @@ jobs:
           VITE_API_URL: https://api.nexspiresolutions.co.in/api
           VITE_ENV: production
       
+      # Build nexs-admin
+      - name: Install nexs-admin dependencies
+        run: |
+          cd nexs-admin
+          npm ci
+      
+      - name: Build nexs-admin
+        run: |
+          cd nexs-admin
+          npm run build:prod
+        env:
+          VITE_API_URL: https://api.nexspiresolutions.co.in/api
+      
+      # Combine both builds
+      - name: Combine builds
+        run: |
+          mkdir -p combined-dist
+          # Copy nexs-agency to root
+          cp -r nexs-agency/dist/* combined-dist/
+          # Copy nexs-admin to /nexs-admin subdirectory
+          mkdir -p combined-dist/nexs-admin
+          cp -r nexs-admin/dist/* combined-dist/nexs-admin/
+      
       - name: Upload artifact
         uses: actions/upload-pages-artifact@v3
         with:
-          path: nexs-agency/dist
+          path: combined-dist
 
   deploy:
     environment:
