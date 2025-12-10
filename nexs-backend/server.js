@@ -21,6 +21,7 @@ const corsOptions = {
             process.env.CLIENT_URL_PROD,
             'http://localhost:3000',
             'http://localhost:5173',
+            'http://localhost:5174',
             'https://nexspiresolutions.co.in',
             'https://admin.nexspiresolutions.co.in'
         ];

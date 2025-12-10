@@ -107,4 +107,16 @@ export const documentAPI = {
     getStats: () => api.get('/documents/stats')
 };
 
+// Inquiry Management (Public - Contact Form)
+export const inquiryAPI = {
+    // Public endpoint - no authentication required
+    submit: (data) => api.post('/inquiries', data),
+    // Protected endpoints (admin only)
+    getAll: (params) => api.get('/inquiries', { params }),
+    getById: (id) => api.get(`/inquiries/${id}`),
+    updateStatus: (id, status) => api.patch(`/inquiries/${id}/status`, { status }),
+    delete: (id) => api.delete(`/inquiries/${id}`),
+    getStats: () => api.get('/inquiries/stats')
+};
+
 export default api;

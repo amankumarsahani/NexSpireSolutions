@@ -4,6 +4,7 @@ import { motion, AnimatePresence, useScroll, useSpring } from 'framer-motion';
 import confetti from 'canvas-confetti';
 import { clsx } from 'clsx';
 import { twMerge } from 'tailwind-merge';
+import { inquiryAPI } from '../services/api';
 
 // Utility for tailwind class merging
 function cn(...inputs) {
@@ -37,38 +38,47 @@ const ContactPage = () => {
     });
 
     const [formState, setFormState] = useState({
-        firstName: '',
-        lastName: '',
+        name: '',
         email: '',
-        subject: 'General Inquiry',
+        phone: '',
+        company: '',
         message: ''
     });
 
     const [isSubmitting, setIsSubmitting] = useState(false);
     const [isSuccess, setIsSuccess] = useState(false);
+    const [error, setError] = useState('');
 
     const handleChange = (e) => {
         setFormState({
             ...formState,
             [e.target.name]: e.target.value
         });
+        setError(''); // Clear error on input change
     };
 
     const handleSubmit = async (e) => {
         e.preventDefault();
         setIsSubmitting(true);
+        setError('');
 
-        // Simulate API call
-        await new Promise(resolve => setTimeout(resolve, 2000));
+        try {
+            // Submit form data directly (fields now match backend API)
+            await inquiryAPI.submit(formState);
 
-        setIsSubmitting(false);
-        setIsSuccess(true);
-        confetti({
-            particleCount: 150,
-            spread: 70,
-            origin: { y: 0.6 },
-            colors: ['#3B82F6', '#8B5CF6', '#10B981']
-        });
+            setIsSubmitting(false);
+            setIsSuccess(true);
+            confetti({
+                particleCount: 150,
+                spread: 70,
+                origin: { y: 0.6 },
+                colors: ['#3B82F6', '#8B5CF6', '#10B981']
+            });
+        } catch (err) {
+            console.error('Form submission error:', err);
+            setIsSubmitting(false);
+            setError(err.response?.data?.error || 'Failed to send message. Please try again.');
+        }
     };
 
     const faqs = [
@@ -254,31 +264,17 @@ const ContactPage = () => {
                                     <p className="text-gray-500 mb-10">We'd love to hear about your project.</p>
 
                                     <form onSubmit={handleSubmit} className="space-y-8">
-                                        <div className="grid md:grid-cols-2 gap-8">
-                                            <div className="space-y-2 group">
-                                                <label className="text-xs font-bold text-gray-500 uppercase tracking-widest group-focus-within:text-blue-600 transition-colors">First Name</label>
-                                                <input
-                                                    type="text"
-                                                    name="firstName"
-                                                    value={formState.firstName}
-                                                    onChange={handleChange}
-                                                    required
-                                                    className="w-full px-0 py-3 border-b-2 border-gray-100 focus:border-blue-600 focus:outline-none transition-colors bg-transparent placeholder-gray-300 font-medium text-lg"
-                                                    placeholder="John"
-                                                />
-                                            </div>
-                                            <div className="space-y-2 group">
-                                                <label className="text-xs font-bold text-gray-500 uppercase tracking-widest group-focus-within:text-blue-600 transition-colors">Last Name</label>
-                                                <input
-                                                    type="text"
-                                                    name="lastName"
-                                                    value={formState.lastName}
-                                                    onChange={handleChange}
-                                                    required
-                                                    className="w-full px-0 py-3 border-b-2 border-gray-100 focus:border-blue-600 focus:outline-none transition-colors bg-transparent placeholder-gray-300 font-medium text-lg"
-                                                    placeholder="Doe"
-                                                />
-                                            </div>
+                                        <div className="space-y-2 group">
+                                            <label className="text-xs font-bold text-gray-500 uppercase tracking-widest group-focus-within:text-blue-600 transition-colors">Full Name</label>
+                                            <input
+                                                type="text"
+                                                name="name"
+                                                value={formState.name}
+                                                onChange={handleChange}
+                                                required
+                                                className="w-full px-0 py-3 border-b-2 border-gray-100 focus:border-blue-600 focus:outline-none transition-colors bg-transparent placeholder-gray-300 font-medium text-lg"
+                                                placeholder="John Doe"
+                                            />
                                         </div>
 
                                         <div className="space-y-2 group">
@@ -294,19 +290,29 @@ const ContactPage = () => {
                                             />
                                         </div>
 
-                                        <div className="space-y-2 group">
-                                            <label className="text-xs font-bold text-gray-500 uppercase tracking-widest group-focus-within:text-blue-600 transition-colors">Subject</label>
-                                            <select
-                                                name="subject"
-                                                value={formState.subject}
-                                                onChange={handleChange}
-                                                className="w-full px-0 py-3 border-b-2 border-gray-100 focus:border-blue-600 focus:outline-none transition-colors bg-transparent text-gray-900 font-medium text-lg cursor-pointer"
-                                            >
-                                                <option>General Inquiry</option>
-                                                <option>Project Proposal</option>
-                                                <option>Careers</option>
-                                                <option>Partnership</option>
-                                            </select>
+                                        <div className="grid md:grid-cols-2 gap-8">
+                                            <div className="space-y-2 group">
+                                                <label className="text-xs font-bold text-gray-500 uppercase tracking-widest group-focus-within:text-blue-600 transition-colors">Phone (Optional)</label>
+                                                <input
+                                                    type="tel"
+                                                    name="phone"
+                                                    value={formState.phone}
+                                                    onChange={handleChange}
+                                                    className="w-full px-0 py-3 border-b-2 border-gray-100 focus:border-blue-600 focus:outline-none transition-colors bg-transparent placeholder-gray-300 font-medium text-lg"
+                                                    placeholder="+91 12345 67890"
+                                                />
+                                            </div>
+                                            <div className="space-y-2 group">
+                                                <label className="text-xs font-bold text-gray-500 uppercase tracking-widest group-focus-within:text-blue-600 transition-colors">Company (Optional)</label>
+                                                <input
+                                                    type="text"
+                                                    name="company"
+                                                    value={formState.company}
+                                                    onChange={handleChange}
+                                                    className="w-full px-0 py-3 border-b-2 border-gray-100 focus:border-blue-600 focus:outline-none transition-colors bg-transparent placeholder-gray-300 font-medium text-lg"
+                                                    placeholder="Your Company"
+                                                />
+                                            </div>
                                         </div>
 
                                         <div className="space-y-2 group">
@@ -321,6 +327,16 @@ const ContactPage = () => {
                                                 placeholder="Tell us about your project..."
                                             ></textarea>
                                         </div>
+
+                                        {/* Error Message */}
+                                        {error && (
+                                            <div className="bg-red-50 border border-red-200 text-red-700 px-4 py-3 rounded-lg text-sm">
+                                                <div className="flex items-center">
+                                                    <i className="ri-error-warning-line mr-2"></i>
+                                                    <span>{error}</span>
+                                                </div>
+                                            </div>
+                                        )}
 
                                         <button
                                             disabled={isSubmitting}

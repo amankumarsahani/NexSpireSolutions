@@ -5,7 +5,9 @@
     "main": "server.js",
     "scripts": {
         "start": "node server.js",
-        "dev": "nodemon server.js"
+        "dev": "nodemon server.js",
+        "db:init": "node database/setup.js",
+        "migrate": "node database/migrate.js"
     },
     "keywords": [
         "express",
