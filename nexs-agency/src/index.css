@@ -36,6 +36,12 @@
 }
 
 /* Base Styles */
+html,
+body {
+  overflow-x: hidden;
+  max-width: 100vw;
+}
+
 body {
   font-family: var(--font-sans);
   @apply bg-gray-50 text-gray-900 antialiased;
@@ -145,6 +151,21 @@ h6 {
   .animate-scroll-infinite {
     animation: scroll-infinite 30s linear infinite;
   }
+}
+
+/* Marquee Animation for Services Page */
+@keyframes marquee {
+  0% {
+    transform: translateX(0);
+  }
+
+  100% {
+    transform: translateX(-50%);
+  }
+}
+
+.animate-marquee {
+  animation: marquee 40s linear infinite;
 }
 
 /* Utilities */
