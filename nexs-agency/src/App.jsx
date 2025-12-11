@@ -4,24 +4,22 @@ import { Helmet } from 'react-helmet-async';
 import { AuthProvider, useAuth } from './context/AuthContext';
 import ScrollReveal from './components/ScrollReveal';
 
-// Critical components - load immediately
+// Critical components - load immediately (including all landing page sections)
 import Header from './components/Header';
 import Hero from './components/Hero';
+import Services from './components/Services';
+import About from './components/About';
+import Portfolio from './components/Portfolio';
+import Technologies from './components/Technologies';
+import Testimonials from './components/Testimonials';
+import Blog from './components/Blog';
+import FAQ from './components/FAQ';
+import Partners from './components/Partners';
+import Contact from './components/Contact';
 import Footer from './components/Footer';
 import PublicLayout from './components/PublicLayout';
 
-// Lazy load landing page sections (below the fold)
-const Services = lazy(() => import('./components/Services'));
-const About = lazy(() => import('./components/About'));
-const Portfolio = lazy(() => import('./components/Portfolio'));
-const Technologies = lazy(() => import('./components/Technologies'));
-const Testimonials = lazy(() => import('./components/Testimonials'));
-const Blog = lazy(() => import('./components/Blog'));
-const FAQ = lazy(() => import('./components/FAQ'));
-const Partners = lazy(() => import('./components/Partners'));
-const Contact = lazy(() => import('./components/Contact'));
-
-// Lazy load pages (route-based splitting)
+// Lazy load pages (route-based splitting - these actually benefit from it)
 const ServicesPage = lazy(() => import('./pages/ServicesPage'));
 const AboutPage = lazy(() => import('./pages/AboutPage'));
 const PortfolioPage = lazy(() => import('./pages/PortfolioPage'));
@@ -45,19 +43,6 @@ const LoadingSpinner = () => (
     <div className="flex flex-col items-center gap-4">
       <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-blue-400"></div>
       <p className="text-white/60 text-sm">Loading...</p>
-    </div>
-  </div>
-);
-
-// Section loading placeholder (smaller, for sections)
-const SectionLoader = () => (
-  <div className="py-20 flex items-center justify-center">
-    <div className="animate-pulse flex space-x-4">
-      <div className="rounded-full bg-slate-200 h-10 w-10"></div>
-      <div className="flex-1 space-y-4 py-1">
-        <div className="h-4 bg-slate-200 rounded w-3/4"></div>
-        <div className="h-4 bg-slate-200 rounded w-1/2"></div>
-      </div>
     </div>
   </div>
 );
@@ -95,63 +80,45 @@ const LandingPage = memo(function LandingPage() {
         <meta name="twitter:description" content="Expert software engineering. AI, Cloud, Web & Mobile. Based in Mohali, serving the world." />
       </Helmet>
 
-      {/* Hero loads immediately without reveal for faster FCP */}
+      {/* Hero loads immediately for faster FCP */}
       <Hero />
 
-      {/* Lazy loaded sections with scroll-reveal animations */}
-      <Suspense fallback={<SectionLoader />}>
-        <ScrollReveal animation="fade-up" delay={0}>
-          <Services />
-        </ScrollReveal>
-      </Suspense>
+      {/* Sections with scroll-reveal animations (no lazy loading for reliability) */}
+      <ScrollReveal animation="fade-up" delay={0}>
+        <Services />
+      </ScrollReveal>
 
-      <Suspense fallback={<SectionLoader />}>
-        <ScrollReveal animation="fade-up" delay={100}>
-          <About />
-        </ScrollReveal>
-      </Suspense>
+      <ScrollReveal animation="fade-up" delay={100}>
+        <About />
+      </ScrollReveal>
 
-      <Suspense fallback={<SectionLoader />}>
-        <ScrollReveal animation="zoom" delay={0}>
-          <Portfolio />
-        </ScrollReveal>
-      </Suspense>
+      <ScrollReveal animation="zoom" delay={0}>
+        <Portfolio />
+      </ScrollReveal>
 
-      <Suspense fallback={<SectionLoader />}>
-        <ScrollReveal animation="fade-up" delay={0}>
-          <Technologies />
-        </ScrollReveal>
-      </Suspense>
+      <ScrollReveal animation="fade-up" delay={0}>
+        <Technologies />
+      </ScrollReveal>
 
-      <Suspense fallback={<SectionLoader />}>
-        <ScrollReveal animation="fade-left" delay={0}>
-          <Testimonials />
-        </ScrollReveal>
-      </Suspense>
+      <ScrollReveal animation="fade-left" delay={0}>
+        <Testimonials />
+      </ScrollReveal>
 
-      <Suspense fallback={<SectionLoader />}>
-        <ScrollReveal animation="fade-up" delay={0}>
-          <Blog />
-        </ScrollReveal>
-      </Suspense>
+      <ScrollReveal animation="fade-up" delay={0}>
+        <Blog />
+      </ScrollReveal>
 
-      <Suspense fallback={<SectionLoader />}>
-        <ScrollReveal animation="fade-right" delay={0}>
-          <FAQ />
-        </ScrollReveal>
-      </Suspense>
+      <ScrollReveal animation="fade-right" delay={0}>
+        <FAQ />
+      </ScrollReveal>
 
-      <Suspense fallback={<SectionLoader />}>
-        <ScrollReveal animation="zoom" delay={0}>
-          <Partners />
-        </ScrollReveal>
-      </Suspense>
+      <ScrollReveal animation="zoom" delay={0}>
+        <Partners />
+      </ScrollReveal>
 
-      <Suspense fallback={<SectionLoader />}>
-        <ScrollReveal animation="fade-up" delay={0}>
-          <Contact />
-        </ScrollReveal>
-      </Suspense>
+      <ScrollReveal animation="fade-up" delay={0}>
+        <Contact />
+      </ScrollReveal>
     </div>
   );
 });
