@@ -4,6 +4,9 @@ on:
   push:
     branches:
       - master
+    paths:
+      - 'nexs-agency/**'
+      - '.github/workflows/deploy.yml'
   workflow_dispatch:
 
 permissions:

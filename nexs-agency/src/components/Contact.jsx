@@ -1,12 +1,17 @@
 import { useState } from 'react';
+import { inquiryAPI } from '../services/api';
 
 const Contact = () => {
   const [formData, setFormData] = useState({
     name: '',
     email: '',
+    phone: '',
     company: '',
     message: ''
   });
+
+  const [isSubmitting, setIsSubmitting] = useState(false);
+  const [submitStatus, setSubmitStatus] = useState({ type: '', message: '' });
 
   const handleChange = (e) => {
     setFormData({
@@ -15,12 +20,35 @@ const Contact = () => {
     });
   };
 
-  const handleSubmit = (e) => {
+  const handleSubmit = async (e) => {
     e.preventDefault();
-    console.log('Form submitted:', formData);
-    // Handle form submission logic here
-    alert('Thank you for your message! We\'ll get back to you soon.');
-    setFormData({ name: '', email: '', company: '', message: '' });
+    setIsSubmitting(true);
+    setSubmitStatus({ type: '', message: '' });
+
+    try {
+      await inquiryAPI.submit(formData);
+
+      setSubmitStatus({
+        type: 'success',
+        message: 'Thank you for your message! We\'ll get back to you within 24 hours.'
+      });
+
+      // Reset form
+      setFormData({ name: '', email: '', phone: '', company: '', message: '' });
+
+      // Clear success message after 5 seconds
+      setTimeout(() => {
+        setSubmitStatus({ type: '', message: '' });
+      }, 5000);
+    } catch (error) {
+      console.error('Form submission error:', error);
+      setSubmitStatus({
+        type: 'error',
+        message: error.response?.data?.error || 'Failed to send message. Please try again.'
+      });
+    } finally {
+      setIsSubmitting(false);
+    }
   };
 
   const contactInfo = [
@@ -170,6 +198,26 @@ const Contact = () => {
                     </div>
                   </div>
 
+                  <div>
+                    <label htmlFor="phone" className="block text-sm font-semibold text-gray-700 mb-2">
+                      Phone (Optional)
+                    </label>
+                    <div className="relative">
+                      <input
+                        type="tel"
+                        id="phone"
+                        name="phone"
+                        value={formData.phone}
+                        onChange={handleChange}
+                        className="w-full px-4 py-3 rounded-lg border border-gray-200 focus:ring-2 focus:ring-blue-500 focus:border-blue-500 transition-all bg-white text-sm"
+                        placeholder="+91 12345 67890"
+                      />
+                      <div className="absolute inset-y-0 right-3 flex items-center pointer-events-none">
+                        <i className="ri-phone-line text-gray-400 text-sm"></i>
+                      </div>
+                    </div>
+                  </div>
+
                   <div className="flex-1">
                     <label htmlFor="message" className="block text-sm font-semibold text-gray-700 mb-2">
                       Message *
@@ -191,13 +239,39 @@ const Contact = () => {
                   </div>
 
                   <div className="mt-auto space-y-4">
+                    {/* Status Message */}
+                    {submitStatus.message && (
+                      <div className={`p-3 rounded-lg text-sm ${submitStatus.type === 'success'
+                          ? 'bg-green-50 text-green-700 border border-green-200'
+                          : 'bg-red-50 text-red-700 border border-red-200'
+                        }`}>
+                        <div className="flex items-center">
+                          <i className={`${submitStatus.type === 'success'
+                              ? 'ri-checkbox-circle-line'
+                              : 'ri-error-warning-line'
+                            } mr-2`}></i>
+                          <span>{submitStatus.message}</span>
+                        </div>
+                      </div>
+                    )}
+
                     <button
                       type="submit"
-                      className="w-full bg-gradient-to-r from-blue-600 to-purple-600 text-white py-3 rounded-lg font-semibold hover:shadow-lg hover:shadow-blue-500/25 transition-all duration-300 transform hover:scale-[1.02] active:scale-[0.98] text-sm"
+                      disabled={isSubmitting}
+                      className="w-full bg-gradient-to-r from-blue-600 to-purple-600 text-white py-3 rounded-lg font-semibold hover:shadow-lg hover:shadow-blue-500/25 transition-all duration-300 transform hover:scale-[1.02] active:scale-[0.98] text-sm disabled:opacity-60 disabled:cursor-not-allowed disabled:transform-none"
                     >
                       <span className="flex items-center justify-center">
-                        Send Message
-                        <i className="ri-send-plane-line ml-2"></i>
+                        {isSubmitting ? (
+                          <>
+                            <i className="ri-loader-4-line animate-spin mr-2"></i>
+                            Sending...
+                          </>
+                        ) : (
+                          <>
+                            Send Message
+                            <i className="ri-send-plane-line ml-2"></i>
+                          </>
+                        )}
                       </span>
                     </button>
 
