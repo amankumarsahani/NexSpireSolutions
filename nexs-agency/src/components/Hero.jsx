@@ -134,6 +134,10 @@ const Hero = () => {
                 <img
                   src={tech.logo}
                   alt={tech.name}
+                  loading="lazy"
+                  decoding="async"
+                  width="32"
+                  height="32"
                   className="h-6 sm:h-8 w-auto opacity-60 hover:opacity-100 transition-opacity filter brightness-0 invert"
                   onError={(e) => {
                     e.target.style.display = 'none'
@@ -291,21 +295,6 @@ const Hero = () => {
         
         .animate-circuit {
           animation: circuit 20s linear infinite;
-        }
-        
-        @keyframes scroll-infinite {
-          0% { transform: translateX(0); }
-          100% { transform: translateX(-50%); }
-        }
-        
-        .animate-scroll-infinite {
-          animation: scroll-infinite 20s linear infinite;
-        }
-        
-        @media (min-width: 768px) {
-          .animate-scroll-infinite {
-            animation: scroll-infinite 30s linear infinite;
-          }
         }
       `}</style>
     </section>

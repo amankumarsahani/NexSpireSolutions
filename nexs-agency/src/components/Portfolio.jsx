@@ -1,6 +1,6 @@
-import { useState, useEffect } from 'react'
+import { useState, useEffect, memo } from 'react'
 
-const Portfolio = () => {
+const Portfolio = memo(function Portfolio() {
   const [activeCategory, setActiveCategory] = useState("All")
   const [isVisible, setIsVisible] = useState(false)
 
@@ -253,6 +253,6 @@ const Portfolio = () => {
       </div>
     </section>
   );
-};
+});
 
 export default Portfolio;

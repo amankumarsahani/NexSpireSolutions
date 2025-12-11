@@ -7,6 +7,34 @@
   --font-display: 'Outfit', system-ui, sans-serif;
 }
 
+/* Performance Optimizations */
+* {
+  /* Contain layout recalculations */
+  contain-intrinsic-size: auto;
+}
+
+/* GPU acceleration for animated elements */
+.animate-scroll-infinite,
+.animate-slide-left,
+.animate-pulse,
+.animate-spin {
+  will-change: transform;
+  transform: translateZ(0);
+  backface-visibility: hidden;
+}
+
+/* Reduce motion for users who prefer it */
+@media (prefers-reduced-motion: reduce) {
+
+  *,
+  *::before,
+  *::after {
+    animation-duration: 0.01ms !important;
+    animation-iteration-count: 1 !important;
+    transition-duration: 0.01ms !important;
+  }
+}
+
 /* Base Styles */
 body {
   font-family: var(--font-sans);
@@ -96,6 +124,27 @@ h6 {
 
 .animate-slide-left {
   animation: slide-left 20s linear infinite;
+}
+
+/* Hero Tech Scroll Animation */
+@keyframes scroll-infinite {
+  0% {
+    transform: translateX(0);
+  }
+
+  100% {
+    transform: translateX(-50%);
+  }
+}
+
+.animate-scroll-infinite {
+  animation: scroll-infinite 20s linear infinite;
+}
+
+@media (min-width: 768px) {
+  .animate-scroll-infinite {
+    animation: scroll-infinite 30s linear infinite;
+  }
 }
 
 /* Utilities */
