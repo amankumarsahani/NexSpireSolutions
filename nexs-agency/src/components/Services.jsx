@@ -1,6 +1,6 @@
-import { useState, useEffect } from 'react'
+import { useState, useEffect, memo } from 'react'
 
-const Services = () => {
+const Services = memo(function Services() {
   const [hoveredCard, setHoveredCard] = useState(null)
   const [currentSlide, setCurrentSlide] = useState(0)
 
@@ -330,6 +330,6 @@ const Services = () => {
       </div>
     </section>
   );
-};
+});
 
 export default Services;
