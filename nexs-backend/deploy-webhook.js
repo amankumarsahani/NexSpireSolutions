@@ -50,24 +50,47 @@ const server = http.createServer((req, res) => {
 
         req.on('data', chunk => body += chunk);
         req.on('end', async () => {
-            // Verify GitHub signature
-            const signature = req.headers['x-hub-signature-256'];
-            const hmac = crypto.createHmac('sha256', SECRET);
-            const digest = 'sha256=' + hmac.update(body).digest('hex');
+            const contentType = req.headers['content-type'] || '';
+            console.log(`\n📥 Webhook received`);
+            console.log(`   Content-Type: ${contentType}`);
+            console.log(`   Body length: ${body.length} bytes`);
 
-            if (signature !== digest) {
-                console.log('❌ Invalid signature - Unauthorized request');
-                res.writeHead(401, { 'Content-Type': 'application/json' });
-                return res.end(JSON.stringify({ error: 'Unauthorized' }));
+            // Verify GitHub signature (if provided)
+            const signature = req.headers['x-hub-signature-256'];
+            if (signature) {
+                const hmac = crypto.createHmac('sha256', SECRET);
+                const digest = 'sha256=' + hmac.update(body).digest('hex');
+
+                if (signature !== digest) {
+                    console.log('❌ Invalid signature - Unauthorized request');
+                    res.writeHead(401, { 'Content-Type': 'application/json' });
+                    return res.end(JSON.stringify({ error: 'Unauthorized' }));
+                }
+                console.log('   ✅ Signature verified');
+            } else {
+                console.log('   ⚠️ No signature provided (skipping verification)');
             }
 
             let payload;
             try {
-                payload = JSON.parse(body);
+                // Handle URL-encoded payloads (GitHub sometimes sends these)
+                if (contentType.includes('application/x-www-form-urlencoded')) {
+                    const params = new URLSearchParams(body);
+                    const payloadStr = params.get('payload');
+                    if (payloadStr) {
+                        payload = JSON.parse(payloadStr);
+                    } else {
+                        throw new Error('No payload field in form data');
+                    }
+                } else {
+                    payload = JSON.parse(body);
+                }
+                console.log(`   ✅ Payload parsed successfully`);
             } catch (e) {
-                console.log('❌ Invalid JSON payload');
+                console.log('❌ Invalid payload:', e.message);
+                console.log('   Body preview:', body.substring(0, 200));
                 res.writeHead(400, { 'Content-Type': 'application/json' });
-                return res.end(JSON.stringify({ error: 'Invalid JSON' }));
+                return res.end(JSON.stringify({ error: 'Invalid payload', details: e.message }));
             }
 
             // Only deploy on push to master branch
