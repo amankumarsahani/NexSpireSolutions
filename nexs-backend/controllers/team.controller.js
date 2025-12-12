@@ -1,4 +1,5 @@
 const TeamModel = require('../models/team.model');
+const UserModel = require('../models/user.model');
 
 const TeamController = {
     // Get all team members
@@ -57,7 +58,7 @@ const TeamController = {
     // Create new team member
     async create(req, res) {
         try {
-            const { name, email, phone, position, department, workload, status, joinDate } = req.body;
+            const { name, email, phone, position, department, workload, status, joinDate, role = 'user' } = req.body;
 
             // Validation
             if (!name || !email) {
@@ -67,7 +68,7 @@ const TeamController = {
                 });
             }
 
-            // Check if email already exists
+            // Check if email already exists in Team Members
             const existingMember = await TeamModel.getByEmail(email);
             if (existingMember) {
                 return res.status(400).json({
@@ -76,6 +77,27 @@ const TeamController = {
                 });
             }
 
+            // 1. Ensure User Account exists (for Login)
+            let user = await UserModel.findByEmail(email);
+            if (!user) {
+                // Create user with default password
+                const defaultPassword = 'Password123!';
+                // Split name
+                const nameParts = name.trim().split(/\s+/);
+                const firstName = nameParts[0];
+                const lastName = nameParts.slice(1).join(' ') || '';
+
+                await UserModel.create({
+                    email,
+                    password: defaultPassword,
+                    firstName,
+                    lastName,
+                    phone,
+                    role
+                });
+            }
+
+            // 2. Create Team Member Profile
             const teamMember = await TeamModel.create({
                 name,
                 email,
@@ -89,7 +111,7 @@ const TeamController = {
 
             res.status(201).json({
                 success: true,
-                message: 'Team member created successfully',
+                message: 'Team member invited successfully. Default password: Password123!',
                 data: teamMember
             });
         } catch (error) {

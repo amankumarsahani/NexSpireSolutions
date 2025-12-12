@@ -2,12 +2,12 @@ const { pool } = require('../config/database');
 
 const LeadModel = {
     async create(leadData) {
-        const { contactName, email, phone, company, leadSource, status = 'new', estimatedValue, notes, assignedTo } = leadData;
+        const { contactName, email, phone, company, leadSource, status = 'new', estimatedValue, notes, assignedTo, score = 0 } = leadData;
 
         const [result] = await pool.query(
-            `INSERT INTO leads (contactName, email, phone, company, leadSource, status, estimatedValue, notes, assignedTo) 
-       VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?)`,
-            [contactName, email, phone, company, leadSource, status, estimatedValue, notes, assignedTo]
+            `INSERT INTO leads (contactName, email, phone, company, leadSource, status, estimatedValue, notes, assignedTo, score) 
+       VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?)`,
+            [contactName, email, phone, company, leadSource, status, estimatedValue, notes, assignedTo, score]
         );
 
         return result.insertId;
@@ -50,13 +50,29 @@ const LeadModel = {
     },
 
     async update(id, leadData) {
-        const { contactName, email, phone, company, leadSource, status, estimatedValue, notes, assignedTo } = leadData;
+        // Dynamic update query generation
+        const fields = [];
+        const values = [];
 
-        await pool.query(
-            `UPDATE leads SET contactName = ?, email = ?, phone = ?, company = ?, leadSource = ?, 
-       status = ?, estimatedValue = ?, notes = ?, assignedTo = ? WHERE id = ?`,
-            [contactName, email, phone, company, leadSource, status, estimatedValue, notes, assignedTo, id]
-        );
+        // Allowed fields for update
+        const allowedFields = ['contactName', 'email', 'phone', 'company', 'leadSource', 'status', 'estimatedValue', 'notes', 'assignedTo', 'score'];
+
+        for (const [key, value] of Object.entries(leadData)) {
+            if (allowedFields.includes(key) && value !== undefined) {
+                fields.push(`${key} = ?`);
+                values.push(value);
+            }
+        }
+
+        if (fields.length === 0) {
+            return this.findById(id);
+        }
+
+        values.push(id);
+
+        const query = `UPDATE leads SET ${fields.join(', ')} WHERE id = ?`;
+
+        await pool.query(query, values);
 
         return this.findById(id);
     },
