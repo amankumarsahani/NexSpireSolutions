@@ -1,6 +1,10 @@
+import { lazy, Suspense, memo } from 'react';
 import { BrowserRouter, Routes, Route, Navigate } from 'react-router-dom';
 import { Helmet } from 'react-helmet-async';
 import { AuthProvider, useAuth } from './context/AuthContext';
+import ScrollReveal from './components/ScrollReveal';
+
+// Critical components - load immediately (including all landing page sections)
 import Header from './components/Header';
 import Hero from './components/Hero';
 import Services from './components/Services';
@@ -13,39 +17,49 @@ import FAQ from './components/FAQ';
 import Partners from './components/Partners';
 import Contact from './components/Contact';
 import Footer from './components/Footer';
-import AdminLogin from './pages/AdminLogin';
-import AdminDashboard from './pages/AdminDashboard';
-import TeamDetail from './pages/TeamDetail';
-import ClientDetail from './pages/ClientDetail';
-import ProjectDetail from './pages/ProjectDetail';
-import LeadDetail from './pages/LeadDetail';
-import DashboardLayout from './components/DashboardLayout';
 import PublicLayout from './components/PublicLayout';
-import ServicesPage from './pages/ServicesPage';
-import AboutPage from './pages/AboutPage';
-import PortfolioPage from './pages/PortfolioPage';
-import ContactPage from './pages/ContactPage';
-import BlogPage from './pages/BlogPage';
-import PrivacyPolicy from './pages/PrivacyPolicy';
-import TermsOfService from './pages/TermsOfService';
+
+// Lazy load pages (route-based splitting - these actually benefit from it)
+const ServicesPage = lazy(() => import('./pages/ServicesPage'));
+const AboutPage = lazy(() => import('./pages/AboutPage'));
+const PortfolioPage = lazy(() => import('./pages/PortfolioPage'));
+const ContactPage = lazy(() => import('./pages/ContactPage'));
+const BlogPage = lazy(() => import('./pages/BlogPage'));
+const PrivacyPolicy = lazy(() => import('./pages/PrivacyPolicy'));
+const TermsOfService = lazy(() => import('./pages/TermsOfService'));
+
+// Lazy load admin (rarely accessed by most users)
+const AdminLogin = lazy(() => import('./pages/AdminLogin'));
+const AdminDashboard = lazy(() => import('./pages/AdminDashboard'));
+const TeamDetail = lazy(() => import('./pages/TeamDetail'));
+const ClientDetail = lazy(() => import('./pages/ClientDetail'));
+const ProjectDetail = lazy(() => import('./pages/ProjectDetail'));
+const LeadDetail = lazy(() => import('./pages/LeadDetail'));
+const DashboardLayout = lazy(() => import('./components/DashboardLayout'));
+
+// Loading spinner component
+const LoadingSpinner = () => (
+  <div className="min-h-screen flex items-center justify-center bg-gradient-to-br from-slate-900 to-indigo-900">
+    <div className="flex flex-col items-center gap-4">
+      <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-blue-400"></div>
+      <p className="text-white/60 text-sm">Loading...</p>
+    </div>
+  </div>
+);
 
 // Protected Route Component
 function ProtectedRoute({ children }) {
   const { isAuthenticated, loading } = useAuth();
 
   if (loading) {
-    return (
-      <div className="min-h-screen flex items-center justify-center">
-        <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-blue-600"></div>
-      </div>
-    );
+    return <LoadingSpinner />;
   }
 
   return isAuthenticated ? children : <Navigate to="/admin/login" />;
 }
 
-// Main Landing Page
-function LandingPage() {
+// Memoized Landing Page for better performance
+const LandingPage = memo(function LandingPage() {
   return (
     <div className="min-h-screen bg-white">
       <Helmet>
@@ -65,52 +79,84 @@ function LandingPage() {
         <meta name="twitter:title" content="Nexspire Solutions - AI Tech & Freelance Experts" />
         <meta name="twitter:description" content="Expert software engineering. AI, Cloud, Web & Mobile. Based in Mohali, serving the world." />
       </Helmet>
+
+      {/* Hero loads immediately for faster FCP */}
       <Hero />
-      <Services />
-      <About />
-      <Portfolio />
-      <Technologies />
-      <Testimonials />
-      <Blog />
-      <FAQ />
-      <Partners />
-      <Contact />
+
+      {/* Sections with scroll-reveal animations (no lazy loading for reliability) */}
+      <ScrollReveal animation="fade-up" delay={0}>
+        <Services />
+      </ScrollReveal>
+
+      <ScrollReveal animation="fade-up" delay={100}>
+        <About />
+      </ScrollReveal>
+
+      <ScrollReveal animation="zoom" delay={0}>
+        <Portfolio />
+      </ScrollReveal>
+
+      <ScrollReveal animation="fade-up" delay={0}>
+        <Technologies />
+      </ScrollReveal>
+
+      <ScrollReveal animation="fade-left" delay={0}>
+        <Testimonials />
+      </ScrollReveal>
+
+      <ScrollReveal animation="fade-up" delay={0}>
+        <Blog />
+      </ScrollReveal>
+
+      <ScrollReveal animation="fade-right" delay={0}>
+        <FAQ />
+      </ScrollReveal>
+
+      <ScrollReveal animation="zoom" delay={0}>
+        <Partners />
+      </ScrollReveal>
+
+      <ScrollReveal animation="fade-up" delay={0}>
+        <Contact />
+      </ScrollReveal>
     </div>
   );
-}
+});
 
 function App() {
   return (
     <BrowserRouter>
       <AuthProvider>
-        <Routes>
-          <Route element={<PublicLayout />}>
-            <Route path="/" element={<LandingPage />} />
-            <Route path="/services" element={<ServicesPage />} />
-            <Route path="/about" element={<AboutPage />} />
-            <Route path="/portfolio" element={<PortfolioPage />} />
-            <Route path="/contact" element={<ContactPage />} />
-            <Route path="/blog" element={<BlogPage />} />
-            <Route path="/privacy-policy" element={<PrivacyPolicy />} />
-            <Route path="/terms" element={<TermsOfService />} />
-          </Route>
+        <Suspense fallback={<LoadingSpinner />}>
+          <Routes>
+            <Route element={<PublicLayout />}>
+              <Route path="/" element={<LandingPage />} />
+              <Route path="/services" element={<ServicesPage />} />
+              <Route path="/about" element={<AboutPage />} />
+              <Route path="/portfolio" element={<PortfolioPage />} />
+              <Route path="/contact" element={<ContactPage />} />
+              <Route path="/blog" element={<BlogPage />} />
+              <Route path="/privacy-policy" element={<PrivacyPolicy />} />
+              <Route path="/terms" element={<TermsOfService />} />
+            </Route>
 
-          <Route path="/admin/login" element={<AdminLogin />} />
-          <Route
-            path="/admin"
-            element={
-              <ProtectedRoute>
-                <DashboardLayout />
-              </ProtectedRoute>
-            }
-          >
-            <Route path="dashboard" element={<AdminDashboard />} />
-            <Route path="team/:id" element={<TeamDetail />} />
-            <Route path="clients/:id" element={<ClientDetail />} />
-            <Route path="projects/:id" element={<ProjectDetail />} />
-            <Route path="leads/:id" element={<LeadDetail />} />
-          </Route>
-        </Routes>
+            <Route path="/admin/login" element={<AdminLogin />} />
+            <Route
+              path="/admin"
+              element={
+                <ProtectedRoute>
+                  <DashboardLayout />
+                </ProtectedRoute>
+              }
+            >
+              <Route path="dashboard" element={<AdminDashboard />} />
+              <Route path="team/:id" element={<TeamDetail />} />
+              <Route path="clients/:id" element={<ClientDetail />} />
+              <Route path="projects/:id" element={<ProjectDetail />} />
+              <Route path="leads/:id" element={<LeadDetail />} />
+            </Route>
+          </Routes>
+        </Suspense>
       </AuthProvider>
     </BrowserRouter>
   );
