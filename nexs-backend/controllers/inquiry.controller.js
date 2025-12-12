@@ -1,4 +1,5 @@
 const InquiryModel = require('../models/inquiry.model');
+const emailService = require('../services/email.service');
 
 class InquiryController {
     // Get all inquiries
@@ -66,6 +67,11 @@ class InquiryController {
                 company,
                 message
             });
+
+            // Send email notification asynchronously (don't block response)
+            emailService.sendInquiryNotification({
+                name, email, phone, company, message, inquiryId
+            }).catch(err => console.error('Email notification failed:', err));
 
             res.status(201).json({
                 success: true,
