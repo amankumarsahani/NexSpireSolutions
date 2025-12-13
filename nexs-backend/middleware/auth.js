@@ -42,4 +42,44 @@ const isAdmin = (req, res, next) => {
     next();
 };
 
-module.exports = { auth, isAdmin };
+// Middleware to check if user is manager or admin
+const isManager = (req, res, next) => {
+    if (!['admin', 'manager'].includes(req.user.role)) {
+        return res.status(403).json({
+            error: 'Access denied. Manager or Admin privileges required.'
+        });
+    }
+    next();
+};
+
+// Middleware to check if user is sales operator, manager, or admin
+const isSalesOperator = (req, res, next) => {
+    if (!['admin', 'manager', 'sales_operator'].includes(req.user.role)) {
+        return res.status(403).json({
+            error: 'Access denied. Sales Operator privileges required.'
+        });
+    }
+    next();
+};
+
+// Middleware factory to check for specific roles
+const hasRole = (...allowedRoles) => {
+    return (req, res, next) => {
+        if (!allowedRoles.includes(req.user.role)) {
+            return res.status(403).json({
+                error: `Access denied. Required role: ${allowedRoles.join(' or ')}.`,
+                userRole: req.user.role
+            });
+        }
+        next();
+    };
+};
+
+// Roles hierarchy and permissions reference:
+// admin - Full access to everything, create users, assign leads, view all stats
+// manager - Can manage team, leads, clients, projects. Cannot manage other admins
+// sales_operator - Can view/manage assigned leads and inquiries, convert inquiries
+// user - Can view and edit assigned items only
+
+module.exports = { auth, isAdmin, isManager, isSalesOperator, hasRole };
+

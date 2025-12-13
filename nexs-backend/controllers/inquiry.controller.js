@@ -1,14 +1,25 @@
 const InquiryModel = require('../models/inquiry.model');
 const emailService = require('../services/email.service');
+const AssignmentService = require('../services/assignment.service');
 
 class InquiryController {
-    // Get all inquiries
+    // Get all inquiries (filtered by role)
     async getAllInquiries(req, res) {
         try {
             const page = parseInt(req.query.page) || 1;
             const limit = parseInt(req.query.limit) || 50;
+            const userRole = req.user?.role;
+            const userId = req.user?.id;
 
-            const inquiries = await InquiryModel.findAll(page, limit);
+            let inquiries;
+
+            // Sales operators only see their assigned inquiries
+            if (userRole === 'sales_operator') {
+                inquiries = await InquiryModel.findByAssignee(userId, page, limit);
+            } else {
+                // Admin sees all
+                inquiries = await InquiryModel.findAll(page, limit);
+            }
 
             res.json({
                 success: true,
@@ -60,12 +71,16 @@ class InquiryController {
                 });
             }
 
+            // Get next assignee using round-robin
+            const assignedTo = await AssignmentService.getNextAssignee('inquiry');
+
             const inquiryId = await InquiryModel.create({
                 name,
                 email,
                 phone,
                 company,
-                message
+                message,
+                assignedTo
             });
 
             // Send email notification asynchronously (don't block response)
@@ -76,7 +91,8 @@ class InquiryController {
             res.status(201).json({
                 success: true,
                 message: 'Inquiry submitted successfully',
-                inquiryId
+                inquiryId,
+                assignedTo
             });
         } catch (error) {
             console.error('Create inquiry error:', error);
@@ -147,8 +163,18 @@ class InquiryController {
     // Get stats
     async getStats(req, res) {
         try {
-            const stats = await InquiryModel.getStats();
-            res.json(stats);
+            const userRole = req.user?.role;
+            const userId = req.user?.id;
+
+            let stats;
+            // Sales operators get only their assigned inquiry stats
+            if (userRole === 'sales_operator' && userId) {
+                stats = await InquiryModel.getStatsByUser(userId);
+            } else {
+                stats = await InquiryModel.getStats();
+            }
+
+            res.json({ success: true, data: stats });
         } catch (error) {
             console.error('Get stats error:', error);
             res.status(500).json({
@@ -213,6 +239,56 @@ class InquiryController {
             });
         }
     }
+
+    // Assign inquiry to a user (admin only)
+    async assignInquiry(req, res) {
+        try {
+            const { id } = req.params;
+            const { assignedTo } = req.body;
+
+            if (!assignedTo) {
+                return res.status(400).json({
+                    error: 'assignedTo is required'
+                });
+            }
+
+            const inquiry = await InquiryModel.findById(id);
+            if (!inquiry) {
+                return res.status(404).json({
+                    error: 'Inquiry not found'
+                });
+            }
+
+            await InquiryModel.updateAssignee(id, assignedTo);
+
+            res.json({
+                success: true,
+                message: 'Inquiry assigned successfully'
+            });
+        } catch (error) {
+            console.error('Assign inquiry error:', error);
+            res.status(500).json({
+                error: 'Failed to assign inquiry'
+            });
+        }
+    }
+
+    // Get assignable users list
+    async getAssignableUsers(req, res) {
+        try {
+            const users = await AssignmentService.getAssignableUsers();
+            res.json({
+                success: true,
+                data: users
+            });
+        } catch (error) {
+            console.error('Get assignable users error:', error);
+            res.status(500).json({
+                error: 'Failed to fetch assignable users'
+            });
+        }
+    }
 }
 
 module.exports = new InquiryController();
+
