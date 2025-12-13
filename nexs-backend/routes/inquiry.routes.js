@@ -11,6 +11,7 @@ router.get('/', auth, isAdmin, inquiryController.getAllInquiries);
 router.get('/stats', auth, isAdmin, inquiryController.getStats);
 router.get('/:id', auth, isAdmin, inquiryController.getInquiryById);
 router.patch('/:id/status', auth, isAdmin, inquiryController.updateInquiryStatus);
+router.post('/:id/convert-to-lead', auth, isAdmin, inquiryController.convertToLead);
 router.delete('/:id', auth, isAdmin, inquiryController.deleteInquiry);
 
 module.exports = router;

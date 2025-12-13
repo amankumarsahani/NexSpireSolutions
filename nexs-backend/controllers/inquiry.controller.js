@@ -156,6 +156,63 @@ class InquiryController {
             });
         }
     }
+
+    // Convert inquiry to lead
+    async convertToLead(req, res) {
+        try {
+            const { id } = req.params;
+            const { estimatedValue, notes } = req.body;
+
+            // Get the inquiry
+            const inquiry = await InquiryModel.findById(id);
+            if (!inquiry) {
+                return res.status(404).json({
+                    error: 'Inquiry not found'
+                });
+            }
+
+            // Check if already converted
+            if (inquiry.status === 'converted') {
+                return res.status(400).json({
+                    error: 'Inquiry has already been converted to a lead'
+                });
+            }
+
+            // Create lead from inquiry data
+            const LeadModel = require('../models/lead.model');
+            const leadData = {
+                contactName: inquiry.name,
+                email: inquiry.email,
+                phone: inquiry.phone || null,
+                company: inquiry.company || null,
+                leadSource: 'Website Inquiry',
+                status: 'new',
+                estimatedValue: estimatedValue || null,
+                notes: notes || inquiry.message || null,
+                score: 50 // Default score for converted inquiries
+            };
+
+            const leadId = await LeadModel.create(leadData);
+
+            // Update inquiry status to converted
+            await InquiryModel.updateStatus(id, 'converted');
+
+            // Get the created lead
+            const lead = await LeadModel.findById(leadId);
+
+            res.json({
+                success: true,
+                message: 'Inquiry converted to lead successfully',
+                lead,
+                inquiryId: id
+            });
+        } catch (error) {
+            console.error('Convert to lead error:', error);
+            res.status(500).json({
+                error: 'Failed to convert inquiry to lead'
+            });
+        }
+    }
 }
 
 module.exports = new InquiryController();
