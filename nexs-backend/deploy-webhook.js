@@ -1,11 +1,18 @@
 const http = require('http');
 const crypto = require('crypto');
 const { exec } = require('child_process');
+const nodemailer = require('nodemailer');
+
+// Load environment variables
+require('dotenv').config();
 
 // ⚠️ IMPORTANT: Change this secret and keep it safe!
 const SECRET = 'nexspire-webhook-secret-2024';
 const PORT = 9000;
 const REPO_PATH = '/var/www/html/NexSpireSolutions';
+
+// Email configuration
+const DEPLOY_NOTIFY_EMAILS = process.env.DEPLOY_NOTIFY_EMAILS || process.env.NOTIFICATION_EMAILS || '';
 
 // Deployment status tracking
 let deploymentStatus = {
@@ -14,6 +21,100 @@ let deploymentStatus = {
     frontend: 'idle',
     error: null
 };
+
+// Email transporter (initialized lazily)
+let emailTransporter = null;
+
+function getEmailTransporter() {
+    if (emailTransporter) return emailTransporter;
+
+    const { SMTP_HOST, SMTP_PORT, SMTP_USER, SMTP_PASSWORD, SMTP_SECURE } = process.env;
+
+    if (!SMTP_HOST || !SMTP_USER || !SMTP_PASSWORD) {
+        console.log('⚠️ Email notifications disabled: SMTP not configured');
+        return null;
+    }
+
+    emailTransporter = nodemailer.createTransport({
+        host: SMTP_HOST,
+        port: parseInt(SMTP_PORT) || 587,
+        secure: SMTP_SECURE === 'true',
+        auth: {
+            user: SMTP_USER,
+            pass: SMTP_PASSWORD
+        }
+    });
+
+    return emailTransporter;
+}
+
+/**
+ * Send deployment notification email
+ */
+async function sendDeploymentNotification({ status, pusher, commit, duration, error }) {
+    const recipients = DEPLOY_NOTIFY_EMAILS.split(',').map(e => e.trim()).filter(Boolean);
+
+    if (recipients.length === 0) {
+        console.log('📧 No deployment notification recipients configured');
+        return;
+    }
+
+    const transporter = getEmailTransporter();
+    if (!transporter) return;
+
+    const isSuccess = status === 'success';
+    const emoji = isSuccess ? '✅' : '❌';
+    const statusText = isSuccess ? 'Successful' : 'Failed';
+    const timestamp = new Date().toLocaleString('en-IN', { timeZone: 'Asia/Kolkata' });
+
+    const html = `
+        <div style="font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif; max-width: 600px; margin: 0 auto; padding: 20px;">
+            <div style="background: ${isSuccess ? 'linear-gradient(135deg, #10b981 0%, #059669 100%)' : 'linear-gradient(135deg, #ef4444 0%, #dc2626 100%)'}; color: white; padding: 24px; border-radius: 12px 12px 0 0;">
+                <h1 style="margin: 0; font-size: 24px;">${emoji} Deployment ${statusText}</h1>
+                <p style="margin: 8px 0 0 0; opacity: 0.9;">${timestamp}</p>
+            </div>
+            
+            <div style="background: #f8fafc; padding: 24px; border: 1px solid #e2e8f0; border-top: none;">
+                <table style="width: 100%; border-collapse: collapse;">
+                    <tr>
+                        <td style="padding: 8px 0; color: #64748b; font-size: 14px; width: 100px;">Pushed by:</td>
+                        <td style="padding: 8px 0; color: #1e293b; font-weight: 500;">${pusher || 'Unknown'}</td>
+                    </tr>
+                    <tr>
+                        <td style="padding: 8px 0; color: #64748b; font-size: 14px;">Commit:</td>
+                        <td style="padding: 8px 0; color: #1e293b;">${commit || 'N/A'}</td>
+                    </tr>
+                    <tr>
+                        <td style="padding: 8px 0; color: #64748b; font-size: 14px;">Duration:</td>
+                        <td style="padding: 8px 0; color: #1e293b;">${duration || 'N/A'}</td>
+                    </tr>
+                    ${error ? `
+                    <tr>
+                        <td style="padding: 8px 0; color: #dc2626; font-size: 14px;">Error:</td>
+                        <td style="padding: 8px 0; color: #dc2626; font-family: monospace;">${error}</td>
+                    </tr>
+                    ` : ''}
+                </table>
+            </div>
+            
+            <div style="background: #1e293b; color: #94a3b8; padding: 16px 24px; border-radius: 0 0 12px 12px; text-align: center; font-size: 12px;">
+                NexSpire Solutions Auto-Deploy System
+            </div>
+        </div>
+    `;
+
+    try {
+        await transporter.sendMail({
+            from: `"Deploy Bot" <${process.env.SMTP_FROM_EMAIL || process.env.SMTP_USER}>`,
+            to: recipients.join(', '),
+            subject: `${emoji} Deployment ${statusText}: NexSpire Solutions`,
+            html
+        });
+        console.log(`📧 Deployment notification sent to: ${recipients.join(', ')}`);
+    } catch (err) {
+        console.error('📧 Failed to send deployment notification:', err.message);
+    }
+}
 
 // Helper function to run commands with promise
 function runCommand(cmd, name) {
@@ -95,11 +196,15 @@ const server = http.createServer((req, res) => {
 
             // Only deploy on push to master branch
             if (payload.ref === 'refs/heads/master') {
+                const deployStartTime = Date.now();
                 const timestamp = new Date().toISOString();
+                const pusherName = payload.pusher?.name || 'unknown';
+                const commitMessage = payload.head_commit?.message || 'unknown';
+
                 console.log(`\n${'='.repeat(60)}`);
                 console.log(`🚀 [${timestamp}] DEPLOYMENT TRIGGERED`);
-                console.log(`   Pusher: ${payload.pusher?.name || 'unknown'}`);
-                console.log(`   Commit: ${payload.head_commit?.message || 'unknown'}`);
+                console.log(`   Pusher: ${pusherName}`);
+                console.log(`   Commit: ${commitMessage}`);
                 console.log(`${'='.repeat(60)}`);
 
                 // Update status
@@ -159,24 +264,46 @@ const server = http.createServer((req, res) => {
                     );
                     deploymentStatus.frontend = 'deployed';
 
+                    const deployDuration = ((Date.now() - deployStartTime) / 1000).toFixed(1) + 's';
+
                     console.log(`\n${'='.repeat(60)}`);
                     console.log(`🎉 DEPLOYMENT COMPLETE!`);
                     console.log(`   Migrations: ✅ Up to date`);
                     console.log(`   Backend: ✅ Running`);
                     console.log(`   Frontend: ✅ Built to dist/`);
+                    console.log(`   Duration: ${deployDuration}`);
                     console.log(`${'='.repeat(60)}\n`);
 
+                    // Send success notification
+                    await sendDeploymentNotification({
+                        status: 'success',
+                        pusher: pusherName,
+                        commit: commitMessage,
+                        duration: deployDuration
+                    });
+
                 } catch (err) {
+                    const deployDuration = ((Date.now() - deployStartTime) / 1000).toFixed(1) + 's';
+
                     console.error(`\n❌ DEPLOYMENT FAILED: ${err.name}`);
                     console.error(`   Error: ${err.error}`);
                     deploymentStatus.error = `${err.name}: ${err.error}`;
 
-                    if (deploymentStatus.backend === 'installing') {
+                    if (deploymentStatus.backend === 'installing' || deploymentStatus.backend === 'migrating') {
                         deploymentStatus.backend = 'failed';
                     }
                     if (deploymentStatus.frontend === 'building') {
                         deploymentStatus.frontend = 'failed';
                     }
+
+                    // Send failure notification
+                    await sendDeploymentNotification({
+                        status: 'failed',
+                        pusher: pusherName,
+                        commit: commitMessage,
+                        duration: deployDuration,
+                        error: `${err.name}: ${err.error}`
+                    });
                 }
 
             } else {
