@@ -62,7 +62,7 @@ app.get('/api', (req, res) => {
             clients: '/api/clients/*',
             projects: '/api/projects/*',
             leads: '/api/leads/*',
-            team: '/api/team/*',
+            teams: '/api/teams/*',
             documents: '/api/documents/*',
             messages: '/api/messages/*',
             inquiries: '/api/inquiries/*'
@@ -86,11 +86,12 @@ app.use('/api/auth', authRoutes);
 app.use('/api/clients', clientRoutes);
 app.use('/api/projects', projectRoutes);
 app.use('/api/leads', leadRoutes);
-app.use('/api/team', teamRoutes);
+app.use('/api/teams', teamRoutes);
 app.use('/api/documents', documentRoutes);
 app.use('/api/messages', messageRoutes);
 app.use('/api/inquiries', inquiryRoutes);
 app.use('/api/email-templates', emailTemplateRoutes);
+app.use('/api/activities', require('./routes/activity.routes'));
 
 // 404 Handler
 app.use((req, res) => {

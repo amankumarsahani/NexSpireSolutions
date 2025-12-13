@@ -74,6 +74,7 @@ CREATE TABLE IF NOT EXISTS leads (
   leadSource VARCHAR(100),
   status ENUM('new', 'contacted', 'qualified', 'proposal', 'negotiation', 'won', 'lost') DEFAULT 'new',
   estimatedValue DECIMAL(12, 2),
+  score INT DEFAULT 0,
   notes TEXT,
   assignedTo INT,
   createdAt TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
