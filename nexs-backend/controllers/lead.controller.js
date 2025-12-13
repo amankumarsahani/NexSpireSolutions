@@ -47,7 +47,29 @@ const LeadController = {
                 return res.status(404).json({ error: 'Lead not found' });
             }
 
+            const oldStatus = lead.status;
+            const newStatus = req.body.status;
+
             const updated = await LeadModel.update(req.params.id, req.body);
+
+            // Auto-log status changes as activities
+            if (newStatus && oldStatus !== newStatus) {
+                try {
+                    const ActivityModel = require('../models/activity.model');
+                    await ActivityModel.create({
+                        entityType: 'lead',
+                        entityId: req.params.id,
+                        type: 'status_change',
+                        summary: `Status changed: ${oldStatus} → ${newStatus}`,
+                        details: `Lead status updated from "${oldStatus}" to "${newStatus}"`,
+                        performedBy: req.user?.id || null
+                    });
+                } catch (activityErr) {
+                    console.error('Failed to log activity:', activityErr);
+                    // Don't fail the main request if activity logging fails
+                }
+            }
+
             res.json({ message: 'Lead updated successfully', lead: updated });
         } catch (error) {
             console.error('Update lead error:', error);
