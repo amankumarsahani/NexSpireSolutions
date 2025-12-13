@@ -104,7 +104,8 @@ class EmailService {
      */
     async sendTemplateEmail({ to, subject, template, data = {} }) {
         try {
-            const html = templateLoader.render(template, data);
+            // Use async version to support database templates
+            const html = await templateLoader.renderAsync(template, data);
             return await this.sendEmail({ to, subject, html });
         } catch (error) {
             console.error(`✗ Template email failed (${template}):`, error.message);

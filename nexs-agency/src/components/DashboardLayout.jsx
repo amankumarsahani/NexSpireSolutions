@@ -16,11 +16,16 @@ export default function DashboardLayout() {
         if (location.pathname.includes('/admin/clients') && tabName === 'clients') return true;
         if (location.pathname.includes('/admin/projects') && tabName === 'projects') return true;
         if (location.pathname.includes('/admin/leads') && tabName === 'leads') return true;
+        if (location.pathname.includes('/admin/email-templates') && tabName === 'email-templates') return true;
         return false;
     };
 
     const handleNavigation = (tabName) => {
-        navigate(`/admin/dashboard?tab=${tabName}`);
+        if (tabName === 'email-templates') {
+            navigate('/admin/email-templates');
+        } else {
+            navigate(`/admin/dashboard?tab=${tabName}`);
+        }
     };
 
     return (
@@ -73,6 +78,13 @@ export default function DashboardLayout() {
                     >
                         <i className="ri-message-3-line text-xl"></i>
                         <span>Messages</span>
+                    </button>
+                    <button
+                        onClick={() => handleNavigation('email-templates')}
+                        className={`w-full text-left px-6 py-3 flex items-center gap-3 transition-colors ${isActive('email-templates') ? 'bg-blue-600 border-l-4 border-blue-400' : 'hover:bg-gray-800'}`}
+                    >
+                        <i className="ri-mail-settings-line text-xl"></i>
+                        <span>Email Templates</span>
                     </button>
                 </nav>
                 <div className="absolute bottom-0 w-64 p-6 border-t border-gray-800 bg-gray-900">

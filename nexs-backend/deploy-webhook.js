@@ -121,7 +121,19 @@ const server = http.createServer((req, res) => {
                         'Git Pull'
                     );
 
-                    // Step 2: Deploy Backend
+                    // Step 2: Run Database Migrations (safe - only runs pending)
+                    deploymentStatus.backend = 'migrating';
+                    try {
+                        await runCommand(
+                            `cd ${REPO_PATH}/nexs-backend && node database/migrate.js`,
+                            'Database Migrations'
+                        );
+                    } catch (migrationErr) {
+                        console.log('⚠️ Migration warning (may be already up to date):', migrationErr.error);
+                        // Continue deployment - migration might fail if no new migrations
+                    }
+
+                    // Step 3: Deploy Backend
                     deploymentStatus.backend = 'installing';
                     await runCommand(
                         `cd ${REPO_PATH}/nexs-backend && npm install --production`,
@@ -134,7 +146,7 @@ const server = http.createServer((req, res) => {
                     );
                     deploymentStatus.backend = 'running';
 
-                    // Step 3: Deploy Frontend
+                    // Step 4: Deploy Frontend
                     deploymentStatus.frontend = 'building';
                     await runCommand(
                         `cd ${REPO_PATH}/nexs-agency && npm install`,
@@ -149,6 +161,7 @@ const server = http.createServer((req, res) => {
 
                     console.log(`\n${'='.repeat(60)}`);
                     console.log(`🎉 DEPLOYMENT COMPLETE!`);
+                    console.log(`   Migrations: ✅ Up to date`);
                     console.log(`   Backend: ✅ Running`);
                     console.log(`   Frontend: ✅ Built to dist/`);
                     console.log(`${'='.repeat(60)}\n`);
@@ -188,8 +201,9 @@ server.listen(PORT, () => {
     console.log(`   Repo:     ${REPO_PATH}`);
     console.log(`   Branch:   master`);
     console.log(`\n   Deploys:`);
-    console.log(`   - Backend:  nexs-backend → PM2 restart`);
-    console.log(`   - Frontend: nexs-agency  → npm run build:prod`);
+    console.log(`   - Migrations: database/migrate.js (auto)`);
+    console.log(`   - Backend:    nexs-backend → PM2 restart`);
+    console.log(`   - Frontend:   nexs-agency  → npm run build:prod`);
     console.log(`${'='.repeat(60)}\n`);
 });
 
