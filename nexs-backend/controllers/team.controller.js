@@ -157,10 +157,6 @@ const TeamController = {
                                                 <td style="padding: 8px 0; color: #64748b;">Password:</td>
                                                 <td style="padding: 8px 0; color: #1e293b; font-weight: 600; font-family: monospace; background: #fef3c7; padding: 4px 8px; border-radius: 4px;">${generatedPassword}</td>
                                             </tr>
-                                            <tr>
-                                                <td style="padding: 8px 0; color: #64748b;">Role:</td>
-                                                <td style="padding: 8px 0; color: #1e293b; font-weight: 600; text-transform: capitalize;">${role}</td>
-                                            </tr>
                                         </table>
                                     </div>
                                     
