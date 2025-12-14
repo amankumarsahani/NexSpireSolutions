@@ -221,6 +221,75 @@ class EmailTemplateController {
             });
         }
     }
+
+    /**
+     * Send email using template or raw HTML
+     */
+    async sendEmail(req, res) {
+        try {
+            const { to, subject, html, templateId, variables, entityType, entityId } = req.body;
+
+            if (!to) {
+                return res.status(400).json({ error: 'Recipient email is required' });
+            }
+
+            let emailHtml = html;
+            let emailSubject = subject;
+
+            // If templateId provided, fetch and render template
+            if (templateId) {
+                const template = await EmailTemplateModel.findById(templateId);
+                if (!template) {
+                    return res.status(404).json({ error: 'Template not found' });
+                }
+                emailHtml = templateLoader.substituteVariables(template.html_content, variables || {});
+                emailSubject = templateLoader.substituteVariables(template.subject || subject, variables || {});
+            }
+
+            if (!emailHtml) {
+                return res.status(400).json({ error: 'Email content is required' });
+            }
+
+            // Use the email service to send
+            const emailService = require('../services/email.service');
+            const result = await emailService.sendEmail({
+                to,
+                subject: emailSubject || 'Message from Nexspire Solutions',
+                html: emailHtml
+            });
+
+            if (!result.success) {
+                return res.status(500).json({ error: 'Failed to send email: ' + result.error });
+            }
+
+            // Log activity if entity provided
+            if (entityType && entityId) {
+                try {
+                    const ActivityModel = require('../models/activity.model');
+                    await ActivityModel.create({
+                        entityType,
+                        entityId,
+                        type: 'email',
+                        summary: `Email sent to ${to}`,
+                        details: `Subject: ${emailSubject}`,
+                        userId: req.user?.id
+                    });
+                } catch (actError) {
+                    console.error('Failed to log activity:', actError);
+                }
+            }
+
+            res.json({
+                success: true,
+                message: 'Email sent successfully',
+                messageId: result.messageId
+            });
+        } catch (error) {
+            console.error('Send email error:', error);
+            res.status(500).json({ error: 'Failed to send email' });
+        }
+    }
 }
 
 module.exports = new EmailTemplateController();
+

@@ -27,4 +27,8 @@ router.put('/:id', emailTemplateController.updateTemplate);
 // Delete template
 router.delete('/:id', emailTemplateController.deleteTemplate);
 
+// Send email
+router.post('/send', emailTemplateController.sendEmail);
+
 module.exports = router;
+
