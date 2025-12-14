@@ -62,7 +62,7 @@ class EmailService {
      * @param {string} [options.from] - Sender (optional, uses default)
      * @returns {Promise<Object>} Send result
      */
-    async sendEmail({ to, subject, html, text, from }) {
+    async sendEmail({ to, subject, html, text, from, attachments }) {
         if (!this.isConfigured) {
             console.warn('Email not sent: SMTP not configured');
             return { success: false, error: 'SMTP not configured' };
@@ -75,7 +75,7 @@ class EmailService {
                 subject,
                 html,
                 text: text || this.stripHtml(html),
-                attachments: options.attachments || []
+                attachments: attachments || []
             };
 
             const result = await this.transporter.sendMail(mailOptions);
