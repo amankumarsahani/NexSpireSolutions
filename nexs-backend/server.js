@@ -91,6 +91,7 @@ app.use('/api/documents', documentRoutes);
 app.use('/api/messages', messageRoutes);
 app.use('/api/inquiries', inquiryRoutes);
 app.use('/api/email-templates', emailTemplateRoutes);
+app.use('/api/document-templates', require('./routes/document-template.routes'));
 app.use('/api/activities', require('./routes/activity.routes'));
 
 // 404 Handler
