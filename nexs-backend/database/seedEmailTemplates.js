@@ -1,16 +1,15 @@
--- Default Email Templates Seed
--- Run this to populate email_templates table with pre-built templates
+/**
+ * Seed Default Email Templates
+ * Run this with: node database/seedEmailTemplates.js
+ */
+const { query } = require('../config/database');
 
--- Clear existing templates (optional - comment out if you want to keep existing)
--- DELETE FROM email_templates;
-
--- 1. Welcome Email Template
-INSERT INTO email_templates (name, type, subject, html_content, description, variables, category, is_active)
-VALUES (
-    'welcome-email',
-    'email',
-    'Welcome to NexSpire Solutions!',
-    '<!DOCTYPE html>
+const templates = [
+    {
+        name: 'welcome-email',
+        type: 'email',
+        subject: 'Welcome to NexSpire Solutions!',
+        html_content: `<!DOCTYPE html>
 <html>
 <head>
     <style>
@@ -48,20 +47,16 @@ VALUES (
         </div>
     </div>
 </body>
-</html>',
-    'Welcome email sent to new clients and leads',
-    '["contact_name", "email", "company_name"]',
-    'notification',
-    true
-) ON DUPLICATE KEY UPDATE updated_at = CURRENT_TIMESTAMP;
-
--- 2. Project Proposal Template
-INSERT INTO email_templates (name, type, subject, html_content, description, variables, category, is_active)
-VALUES (
-    'project-proposal',
-    'email',
-    'Project Proposal from NexSpire Solutions',
-    '<!DOCTYPE html>
+</html>`,
+        description: 'Welcome email sent to new clients and leads',
+        variables: JSON.stringify(['contact_name', 'email', 'company_name']),
+        category: 'notification'
+    },
+    {
+        name: 'project-proposal',
+        type: 'email',
+        subject: 'Project Proposal from NexSpire Solutions',
+        html_content: `<!DOCTYPE html>
 <html>
 <head>
     <style>
@@ -102,20 +97,16 @@ VALUES (
         </div>
     </div>
 </body>
-</html>',
-    'Project proposal email for potential clients',
-    '["contact_name", "company_name", "project_description"]',
-    'transactional',
-    true
-) ON DUPLICATE KEY UPDATE updated_at = CURRENT_TIMESTAMP;
-
--- 3. Follow-up Email Template
-INSERT INTO email_templates (name, type, subject, html_content, description, variables, category, is_active)
-VALUES (
-    'follow-up',
-    'email',
-    'Following Up - NexSpire Solutions',
-    '<!DOCTYPE html>
+</html>`,
+        description: 'Project proposal email for potential clients',
+        variables: JSON.stringify(['contact_name', 'company_name', 'project_description']),
+        category: 'transactional'
+    },
+    {
+        name: 'follow-up',
+        type: 'email',
+        subject: 'Following Up - NexSpire Solutions',
+        html_content: `<!DOCTYPE html>
 <html>
 <head>
     <style>
@@ -146,20 +137,16 @@ VALUES (
         </div>
     </div>
 </body>
-</html>',
-    'Follow-up email for leads and inquiries',
-    '["contact_name"]',
-    'notification',
-    true
-) ON DUPLICATE KEY UPDATE updated_at = CURRENT_TIMESTAMP;
-
--- 4. Project Update Template
-INSERT INTO email_templates (name, type, subject, html_content, description, variables, category, is_active)
-VALUES (
-    'project-update',
-    'email',
-    'Project Update - {{project_name}}',
-    '<!DOCTYPE html>
+</html>`,
+        description: 'Follow-up email for leads and inquiries',
+        variables: JSON.stringify(['contact_name']),
+        category: 'notification'
+    },
+    {
+        name: 'project-update',
+        type: 'email',
+        subject: 'Project Update - {{project_name}}',
+        html_content: `<!DOCTYPE html>
 <html>
 <head>
     <style>
@@ -203,20 +190,16 @@ VALUES (
         </div>
     </div>
 </body>
-</html>',
-    'Regular project progress update for clients',
-    '["contact_name", "project_name", "progress_percentage", "milestone_title", "milestone_description", "next_steps"]',
-    'transactional',
-    true
-) ON DUPLICATE KEY UPDATE updated_at = CURRENT_TIMESTAMP;
-
--- 5. Thank You Email Template
-INSERT INTO email_templates (name, type, subject, html_content, description, variables, category, is_active)
-VALUES (
-    'thank-you',
-    'email',
-    'Thank You for Choosing NexSpire Solutions!',
-    '<!DOCTYPE html>
+</html>`,
+        description: 'Regular project progress update for clients',
+        variables: JSON.stringify(['contact_name', 'project_name', 'progress_percentage', 'milestone_title', 'milestone_description', 'next_steps']),
+        category: 'transactional'
+    },
+    {
+        name: 'thank-you',
+        type: 'email',
+        subject: 'Thank You for Choosing NexSpire Solutions!',
+        html_content: `<!DOCTYPE html>
 <html>
 <head>
     <style>
@@ -224,8 +207,8 @@ VALUES (
         .container { max-width: 600px; margin: 0 auto; padding: 20px; }
         .header { background: linear-gradient(135deg, #ec4899, #be185d); padding: 30px; text-align: center; border-radius: 10px 10px 0 0; }
         .header h1 { color: white; margin: 0; }
-        .icon-circle { width: 60px; height: 60px; background: linear-gradient(135deg, #ec4899, #be185d); border-radius: 50%; margin: 0 auto 20px; display: flex; align-items: center; justify-content: center; }
-        .icon-circle svg { width: 30px; height: 30px; fill: white; }
+        .content { background: #f8fafc; padding: 30px; border: 1px solid #e2e8f0; text-align: center; }
+        .icon-circle { width: 60px; height: 60px; background: linear-gradient(135deg, #ec4899, #be185d); border-radius: 50%; margin: 0 auto 20px; }
         .btn { display: inline-block; background: #ec4899; color: white; padding: 12px 30px; text-decoration: none; border-radius: 8px; margin-top: 20px; }
         .footer { text-align: center; padding: 20px; color: #64748b; font-size: 12px; }
     </style>
@@ -236,9 +219,7 @@ VALUES (
             <h1>Thank You!</h1>
         </div>
         <div class="content">
-            <div class="icon-circle">
-                <svg viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg"><path d="M12 21.35l-1.45-1.32C5.4 15.36 2 12.28 2 8.5 2 5.42 4.42 3 7.5 3c1.74 0 3.41.81 4.5 2.09C13.09 3.81 14.76 3 16.5 3 19.58 3 22 5.42 22 8.5c0 3.78-3.4 6.86-8.55 11.54L12 21.35z"/></svg>
-            </div>
+            <div class="icon-circle"></div>
             <p>Dear {{contact_name}},</p>
             <p>We just wanted to take a moment to say <strong>THANK YOU</strong> for choosing NexSpire Solutions.</p>
             <p>Your trust in us means the world, and we are committed to exceeding your expectations.</p>
@@ -251,20 +232,16 @@ VALUES (
         </div>
     </div>
 </body>
-</html>',
-    'Thank you email for clients after project completion',
-    '["contact_name", "company_name"]',
-    'notification',
-    true
-) ON DUPLICATE KEY UPDATE updated_at = CURRENT_TIMESTAMP;
-
--- 6. Meeting Confirmation Template
-INSERT INTO email_templates (name, type, subject, html_content, description, variables, category, is_active)
-VALUES (
-    'meeting-confirmation',
-    'email',
-    'Meeting Confirmed - {{meeting_date}}',
-    '<!DOCTYPE html>
+</html>`,
+        description: 'Thank you email for clients after project completion',
+        variables: JSON.stringify(['contact_name', 'company_name']),
+        category: 'notification'
+    },
+    {
+        name: 'meeting-confirmation',
+        type: 'email',
+        subject: 'Meeting Confirmed - {{meeting_date}}',
+        html_content: `<!DOCTYPE html>
 <html>
 <head>
     <style>
@@ -274,9 +251,7 @@ VALUES (
         .header h1 { color: white; margin: 0; }
         .content { background: #f8fafc; padding: 30px; border: 1px solid #e2e8f0; }
         .meeting-box { background: #f5f3ff; border: 2px solid #8b5cf6; border-radius: 12px; padding: 25px; margin: 20px 0; }
-        .meeting-detail { display: flex; align-items: center; margin: 12px 0; }
-        .meeting-icon { width: 36px; height: 36px; background: #8b5cf6; border-radius: 8px; display: flex; align-items: center; justify-content: center; margin-right: 12px; flex-shrink: 0; }
-        .meeting-icon svg { width: 18px; height: 18px; fill: white; }
+        .meeting-detail { margin: 12px 0; }
         .btn { display: inline-block; background: #8b5cf6; color: white; padding: 12px 30px; text-decoration: none; border-radius: 8px; margin-top: 10px; margin-right: 10px; }
         .btn-outline { display: inline-block; background: transparent; color: #8b5cf6; padding: 12px 30px; text-decoration: none; border-radius: 8px; margin-top: 10px; border: 2px solid #8b5cf6; }
         .footer { text-align: center; padding: 20px; color: #64748b; font-size: 12px; }
@@ -291,22 +266,10 @@ VALUES (
             <p>Hi {{contact_name}},</p>
             <p>Your meeting with NexSpire Solutions has been confirmed!</p>
             <div class="meeting-box">
-                <div class="meeting-detail">
-                    <span class="meeting-icon"><svg viewBox="0 0 24 24"><path d="M19 3h-1V1h-2v2H8V1H6v2H5c-1.11 0-1.99.9-1.99 2L3 19a2 2 0 0 0 2 2h14c1.1 0 2-.9 2-2V5c0-1.1-.9-2-2-2zm0 16H5V8h14v11zM9 10H7v2h2v-2zm4 0h-2v2h2v-2zm4 0h-2v2h2v-2z"/></svg></span>
-                    <span><strong>Date:</strong> {{meeting_date}}</span>
-                </div>
-                <div class="meeting-detail">
-                    <span class="meeting-icon"><svg viewBox="0 0 24 24"><path d="M11.99 2C6.47 2 2 6.48 2 12s4.47 10 9.99 10C17.52 22 22 17.52 22 12S17.52 2 11.99 2zM12 20c-4.42 0-8-3.58-8-8s3.58-8 8-8 8 3.58 8 8-3.58 8-8 8zm.5-13H11v6l5.25 3.15.75-1.23-4.5-2.67z"/></svg></span>
-                    <span><strong>Time:</strong> {{meeting_time}}</span>
-                </div>
-                <div class="meeting-detail">
-                    <span class="meeting-icon"><svg viewBox="0 0 24 24"><path d="M12 2C8.13 2 5 5.13 5 9c0 5.25 7 13 7 13s7-7.75 7-13c0-3.87-3.13-7-7-7zm0 9.5a2.5 2.5 0 0 1 0-5 2.5 2.5 0 0 1 0 5z"/></svg></span>
-                    <span><strong>Location:</strong> {{meeting_location}}</span>
-                </div>
-                <div class="meeting-detail">
-                    <span class="meeting-icon"><svg viewBox="0 0 24 24"><path d="M19 3H5c-1.1 0-2 .9-2 2v14c0 1.1.9 2 2 2h14c1.1 0 2-.9 2-2V5c0-1.1-.9-2-2-2zm-5 14H7v-2h7v2zm3-4H7v-2h10v2zm0-4H7V7h10v2z"/></svg></span>
-                    <span><strong>Agenda:</strong> {{meeting_agenda}}</span>
-                </div>
+                <div class="meeting-detail"><strong>Date:</strong> {{meeting_date}}</div>
+                <div class="meeting-detail"><strong>Time:</strong> {{meeting_time}}</div>
+                <div class="meeting-detail"><strong>Location:</strong> {{meeting_location}}</div>
+                <div class="meeting-detail"><strong>Agenda:</strong> {{meeting_agenda}}</div>
             </div>
             <p>Please make sure to join on time. If you need to reschedule, please let us know at least 24 hours in advance.</p>
             <a href="#" class="btn">Add to Calendar</a>
@@ -317,13 +280,58 @@ VALUES (
         </div>
     </div>
 </body>
-</html>',
-    'Meeting confirmation email with details',
-    '["contact_name", "meeting_date", "meeting_time", "meeting_location", "meeting_agenda"]',
-    'transactional',
-    true
-) ON DUPLICATE KEY UPDATE updated_at = CURRENT_TIMESTAMP;
+</html>`,
+        description: 'Meeting confirmation email with details',
+        variables: JSON.stringify(['contact_name', 'meeting_date', 'meeting_time', 'meeting_location', 'meeting_agenda']),
+        category: 'transactional'
+    }
+];
 
--- Display confirmation
-SELECT 'Default email templates have been created/updated successfully!' AS message;
-SELECT name, category, is_active FROM email_templates ORDER BY category, name;
+async function seedTemplates() {
+    console.log('🌱 Seeding email templates...');
+
+    for (const template of templates) {
+        try {
+            // Check if template already exists
+            const [existing] = await query(
+                'SELECT id FROM email_templates WHERE name = ?',
+                [template.name]
+            );
+
+            if (existing && existing.length > 0) {
+                // Update existing
+                await query(
+                    `UPDATE email_templates SET 
+                        type = ?, subject = ?, html_content = ?, 
+                        description = ?, variables = ?, category = ?, 
+                        is_active = true, updated_at = NOW()
+                    WHERE name = ?`,
+                    [template.type, template.subject, template.html_content,
+                    template.description, template.variables, template.category,
+                    template.name]
+                );
+                console.log(`  ✓ Updated: ${template.name}`);
+            } else {
+                // Insert new
+                await query(
+                    `INSERT INTO email_templates 
+                        (name, type, subject, html_content, description, variables, category, is_active)
+                    VALUES (?, ?, ?, ?, ?, ?, ?, true)`,
+                    [template.name, template.type, template.subject, template.html_content,
+                    template.description, template.variables, template.category]
+                );
+                console.log(`  ✓ Created: ${template.name}`);
+            }
+        } catch (error) {
+            console.error(`  ✗ Error with ${template.name}:`, error.message);
+        }
+    }
+
+    console.log('✅ Email templates seeding completed!');
+    process.exit(0);
+}
+
+seedTemplates().catch(err => {
+    console.error('Seeding failed:', err);
+    process.exit(1);
+});
