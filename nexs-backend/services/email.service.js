@@ -74,7 +74,8 @@ class EmailService {
                 to: Array.isArray(to) ? to.join(', ') : to,
                 subject,
                 html,
-                text: text || this.stripHtml(html)
+                text: text || this.stripHtml(html),
+                attachments: options.attachments || []
             };
 
             const result = await this.transporter.sendMail(mailOptions);

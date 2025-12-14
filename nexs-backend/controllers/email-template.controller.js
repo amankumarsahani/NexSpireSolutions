@@ -227,7 +227,7 @@ class EmailTemplateController {
      */
     async sendEmail(req, res) {
         try {
-            const { to, subject, html, templateId, variables, entityType, entityId } = req.body;
+            const { to, subject, html, templateId, variables, entityType, entityId, attachments } = req.body;
 
             if (!to) {
                 return res.status(400).json({ error: 'Recipient email is required' });
@@ -255,7 +255,8 @@ class EmailTemplateController {
             const result = await emailService.sendEmail({
                 to,
                 subject: emailSubject || 'Message from Nexspire Solutions',
-                html: emailHtml
+                html: emailHtml,
+                attachments: attachments || []
             });
 
             if (!result.success) {
