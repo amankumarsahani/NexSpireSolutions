@@ -15,6 +15,7 @@ class EmailTemplateModel {
         let sql = 'SELECT * FROM email_templates WHERE 1=1';
         const params = [];
 
+        // Only add type filter if type is specified (may not have type column in older DBs)
         if (type) {
             sql += ' AND type = ?';
             params.push(type);
@@ -30,10 +31,35 @@ class EmailTemplateModel {
             params.push(isActive);
         }
 
-        sql += ' ORDER BY type ASC, name ASC';
+        sql += ' ORDER BY category ASC, name ASC';
 
-        const [rows] = await query(sql, params);
-        return rows.map(this.parseRow);
+        try {
+            const [rows] = await query(sql, params);
+            return rows.map(this.parseRow);
+        } catch (error) {
+            // If query fails (possibly due to missing type column), try without type filter
+            if (type && error.code === 'ER_BAD_FIELD_ERROR') {
+                console.log('Type column may not exist, retrying without type filter');
+                let fallbackSql = 'SELECT * FROM email_templates WHERE 1=1';
+                const fallbackParams = [];
+
+                if (category) {
+                    fallbackSql += ' AND category = ?';
+                    fallbackParams.push(category);
+                }
+
+                if (isActive !== undefined) {
+                    fallbackSql += ' AND is_active = ?';
+                    fallbackParams.push(isActive);
+                }
+
+                fallbackSql += ' ORDER BY category ASC, name ASC';
+
+                const [fallbackRows] = await query(fallbackSql, fallbackParams);
+                return fallbackRows.map(this.parseRow);
+            }
+            throw error;
+        }
     }
 
     /**
@@ -147,21 +173,42 @@ class EmailTemplateModel {
      * @returns {Promise<Object>} Stats
      */
     static async getStats() {
-        const [rows] = await query(`
-            SELECT 
-                COUNT(*) as total,
-                SUM(CASE WHEN is_active = true THEN 1 ELSE 0 END) as active,
-                SUM(CASE WHEN type = 'email' THEN 1 ELSE 0 END) as email,
-                SUM(CASE WHEN type = 'sms' THEN 1 ELSE 0 END) as sms,
-                SUM(CASE WHEN type = 'whatsapp' THEN 1 ELSE 0 END) as whatsapp,
-                SUM(CASE WHEN type = 'push' THEN 1 ELSE 0 END) as push,
-                SUM(CASE WHEN category = 'notification' THEN 1 ELSE 0 END) as notification,
-                SUM(CASE WHEN category = 'marketing' THEN 1 ELSE 0 END) as marketing,
-                SUM(CASE WHEN category = 'transactional' THEN 1 ELSE 0 END) as transactional,
-                SUM(CASE WHEN category = 'system' THEN 1 ELSE 0 END) as system
-            FROM email_templates
-        `);
-        return rows[0];
+        try {
+            // Try with type column first
+            const [rows] = await query(`
+                SELECT 
+                    COUNT(*) as total,
+                    SUM(CASE WHEN is_active = true THEN 1 ELSE 0 END) as active,
+                    SUM(CASE WHEN type = 'email' THEN 1 ELSE 0 END) as email,
+                    SUM(CASE WHEN type = 'sms' THEN 1 ELSE 0 END) as sms,
+                    SUM(CASE WHEN type = 'whatsapp' THEN 1 ELSE 0 END) as whatsapp,
+                    SUM(CASE WHEN type = 'push' THEN 1 ELSE 0 END) as push,
+                    SUM(CASE WHEN category = 'notification' THEN 1 ELSE 0 END) as notification,
+                    SUM(CASE WHEN category = 'marketing' THEN 1 ELSE 0 END) as marketing,
+                    SUM(CASE WHEN category = 'transactional' THEN 1 ELSE 0 END) as transactional,
+                    SUM(CASE WHEN category = 'system' THEN 1 ELSE 0 END) as system
+                FROM email_templates
+            `);
+            return rows[0];
+        } catch (error) {
+            // Fallback if type column doesn't exist
+            console.log('Type column may not exist, using fallback stats query');
+            const [rows] = await query(`
+                SELECT 
+                    COUNT(*) as total,
+                    COUNT(*) as email,
+                    0 as sms,
+                    0 as whatsapp,
+                    0 as push,
+                    SUM(CASE WHEN is_active = true THEN 1 ELSE 0 END) as active,
+                    SUM(CASE WHEN category = 'notification' THEN 1 ELSE 0 END) as notification,
+                    SUM(CASE WHEN category = 'marketing' THEN 1 ELSE 0 END) as marketing,
+                    SUM(CASE WHEN category = 'transactional' THEN 1 ELSE 0 END) as transactional,
+                    SUM(CASE WHEN category = 'system' THEN 1 ELSE 0 END) as system
+                FROM email_templates
+            `);
+            return rows[0];
+        }
     }
 
     /**

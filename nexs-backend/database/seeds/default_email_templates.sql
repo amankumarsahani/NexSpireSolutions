@@ -5,9 +5,10 @@
 -- DELETE FROM email_templates;
 
 -- 1. Welcome Email Template
-INSERT INTO email_templates (name, subject, html_content, description, variables, category, is_active)
+INSERT INTO email_templates (name, type, subject, html_content, description, variables, category, is_active)
 VALUES (
     'welcome-email',
+    'email',
     'Welcome to NexSpire Solutions!',
     '<!DOCTYPE html>
 <html>
@@ -55,9 +56,10 @@ VALUES (
 ) ON DUPLICATE KEY UPDATE updated_at = CURRENT_TIMESTAMP;
 
 -- 2. Project Proposal Template
-INSERT INTO email_templates (name, subject, html_content, description, variables, category, is_active)
+INSERT INTO email_templates (name, type, subject, html_content, description, variables, category, is_active)
 VALUES (
     'project-proposal',
+    'email',
     'Project Proposal from NexSpire Solutions',
     '<!DOCTYPE html>
 <html>
@@ -108,9 +110,10 @@ VALUES (
 ) ON DUPLICATE KEY UPDATE updated_at = CURRENT_TIMESTAMP;
 
 -- 3. Follow-up Email Template
-INSERT INTO email_templates (name, subject, html_content, description, variables, category, is_active)
+INSERT INTO email_templates (name, type, subject, html_content, description, variables, category, is_active)
 VALUES (
     'follow-up',
+    'email',
     'Following Up - NexSpire Solutions',
     '<!DOCTYPE html>
 <html>
@@ -151,9 +154,10 @@ VALUES (
 ) ON DUPLICATE KEY UPDATE updated_at = CURRENT_TIMESTAMP;
 
 -- 4. Project Update Template
-INSERT INTO email_templates (name, subject, html_content, description, variables, category, is_active)
+INSERT INTO email_templates (name, type, subject, html_content, description, variables, category, is_active)
 VALUES (
     'project-update',
+    'email',
     'Project Update - {{project_name}}',
     '<!DOCTYPE html>
 <html>
@@ -207,9 +211,10 @@ VALUES (
 ) ON DUPLICATE KEY UPDATE updated_at = CURRENT_TIMESTAMP;
 
 -- 5. Thank You Email Template
-INSERT INTO email_templates (name, subject, html_content, description, variables, category, is_active)
+INSERT INTO email_templates (name, type, subject, html_content, description, variables, category, is_active)
 VALUES (
     'thank-you',
+    'email',
     'Thank You for Choosing NexSpire Solutions!',
     '<!DOCTYPE html>
 <html>
@@ -254,9 +259,10 @@ VALUES (
 ) ON DUPLICATE KEY UPDATE updated_at = CURRENT_TIMESTAMP;
 
 -- 6. Meeting Confirmation Template
-INSERT INTO email_templates (name, subject, html_content, description, variables, category, is_active)
+INSERT INTO email_templates (name, type, subject, html_content, description, variables, category, is_active)
 VALUES (
     'meeting-confirmation',
+    'email',
     'Meeting Confirmed - {{meeting_date}}',
     '<!DOCTYPE html>
 <html>
