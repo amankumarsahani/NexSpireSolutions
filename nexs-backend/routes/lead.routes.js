@@ -9,6 +9,7 @@ router.get('/stats', LeadController.getStats);
 router.get('/', LeadController.getAll);
 router.get('/:id', LeadController.getById);
 router.post('/', LeadController.create);
+router.post('/bulk-create', LeadController.bulkCreate);
 router.put('/:id', LeadController.update);
 router.delete('/:id', LeadController.delete);
 router.post('/:id/comments', LeadController.addComment);

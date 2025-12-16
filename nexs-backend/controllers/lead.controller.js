@@ -40,6 +40,25 @@ const LeadController = {
         }
     },
 
+    async bulkCreate(req, res) {
+        try {
+            const leads = req.body.leads; // Expecting { leads: [...] }
+            if (!Array.isArray(leads) || leads.length === 0) {
+                return res.status(400).json({ error: 'Invalid or empty leads array' });
+            }
+
+            const { count, skipped } = await LeadModel.bulkCreate(leads);
+            res.status(201).json({
+                message: `Import complete: ${count} imported, ${skipped} skipped (duplicates)`,
+                count,
+                skipped
+            });
+        } catch (error) {
+            console.error('Bulk create lead error:', error);
+            res.status(500).json({ error: 'Failed to import leads' });
+        }
+    },
+
     async update(req, res) {
         try {
             const lead = await LeadModel.findById(req.params.id);

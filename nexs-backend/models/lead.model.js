@@ -13,6 +13,46 @@ const LeadModel = {
         return result.insertId;
     },
 
+    async bulkCreate(leadsData) {
+        if (!leadsData || leadsData.length === 0) return { count: 0, skipped: 0 };
+
+        // 1. Filter out leads without email or contactName
+        const validLeads = leadsData.filter(l => l.email && l.contactName);
+        if (validLeads.length === 0) return { count: 0, skipped: leadsData.length };
+
+        // 2. Check for existing emails
+        const emails = validLeads.map(l => l.email);
+        const [existingRows] = await pool.query(
+            'SELECT email FROM leads WHERE email IN (?)',
+            [emails]
+        );
+        const existingEmails = new Set(existingRows.map(r => r.email));
+
+        // 3. Filter valid leads that are NOT in existingEmails
+        const newLeads = validLeads.filter(l => !existingEmails.has(l.email));
+
+        if (newLeads.length === 0) {
+            return { count: 0, skipped: leadsData.length };
+        }
+
+        // 4. Construct Bulk Insert
+        const values = [];
+        const placeholders = newLeads.map(lead => {
+            const { contactName, email, phone, company, leadSource, status = 'new', estimatedValue, notes, assignedTo, score = 0 } = lead;
+            values.push(contactName, email, phone, company, leadSource, status, estimatedValue, notes, assignedTo, score);
+            return '(?, ?, ?, ?, ?, ?, ?, ?, ?, ?)';
+        }).join(', ');
+
+        const query = `INSERT INTO leads (contactName, email, phone, company, leadSource, status, estimatedValue, notes, assignedTo, score) VALUES ${placeholders}`;
+
+        const [result] = await pool.query(query, values);
+
+        return {
+            count: result.affectedRows,
+            skipped: leadsData.length - result.affectedRows
+        };
+    },
+
     async findAll(filters = {}) {
         let query = 'SELECT l.*, u.firstName, u.lastName FROM leads l LEFT JOIN users u ON l.assignedTo = u.id WHERE 1=1';
         const params = [];
