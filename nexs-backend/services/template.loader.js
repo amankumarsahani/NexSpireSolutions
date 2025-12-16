@@ -3,13 +3,29 @@ const path = require('path');
 
 /**
  * Template Loader - Loads and renders email templates
- * Templates are stored in /templates/emails/ directory
+ * Supports both database templates and file-based templates
+ * Database templates take priority over file-based templates
  * Supports variable substitution via {{variable}} syntax
  */
 class TemplateLoader {
     constructor() {
         this.templatesDir = path.join(__dirname, '..', 'templates', 'emails');
         this.cache = new Map();
+        this.EmailTemplateModel = null;
+    }
+
+    /**
+     * Lazy load the model to avoid circular dependencies
+     */
+    getModel() {
+        if (!this.EmailTemplateModel) {
+            try {
+                this.EmailTemplateModel = require('../models/email-template.model');
+            } catch (e) {
+                console.warn('EmailTemplateModel not available, using file-only mode');
+            }
+        }
+        return this.EmailTemplateModel;
     }
 
     /**
@@ -40,6 +56,23 @@ class TemplateLoader {
     }
 
     /**
+     * Load template from database
+     * @param {string} templateName - Template name
+     * @returns {Promise<Object|null>} Template object or null
+     */
+    async loadFromDatabase(templateName) {
+        const Model = this.getModel();
+        if (!Model) return null;
+
+        try {
+            return await Model.findByName(templateName);
+        } catch (e) {
+            console.warn(`Failed to load template from DB: ${e.message}`);
+            return null;
+        }
+    }
+
+    /**
      * Load base layout template
      * @returns {string} Base template content
      */
@@ -62,13 +95,14 @@ class TemplateLoader {
         }
 
         // Remove any remaining unsubstituted variables
-        result = result.replace(/{{\s*\w+\s*}}/g, '');
+        result = result.replace(/{{\\s*\\w+\\s*}}/g, '');
 
         return result;
     }
 
     /**
-     * Render a template with variables, wrapped in base layout
+     * Render a template with variables, wrapped in base layout (sync version)
+     * Uses file-based templates only
      * @param {string} templateName - Name of template file (without .html)
      * @param {Object} variables - Variables to substitute in template
      * @param {boolean} useBaseLayout - Whether to wrap in base layout (default: true)
@@ -88,7 +122,50 @@ class TemplateLoader {
                 });
                 return baseTemplate;
             } catch (error) {
-                // If base template doesn't exist, return content only
+                console.warn('Base template not found, using content-only template');
+                return content;
+            }
+        }
+
+        return content;
+    }
+
+    /**
+     * Render a template with variables (async version)
+     * Checks database first, falls back to file-based
+     * @param {string} templateName - Name of template
+     * @param {Object} variables - Variables to substitute
+     * @param {boolean} useBaseLayout - Whether to wrap in base layout
+     * @returns {Promise<string>} Rendered HTML
+     */
+    async renderAsync(templateName, variables = {}, useBaseLayout = true) {
+        let content;
+
+        // Try database first
+        const dbTemplate = await this.loadFromDatabase(templateName);
+        if (dbTemplate && dbTemplate.html_content) {
+            content = dbTemplate.html_content;
+        } else {
+            // Fallback to file
+            try {
+                content = this.loadTemplate(templateName);
+            } catch (e) {
+                throw new Error(`Template '${templateName}' not found in database or files`);
+            }
+        }
+
+        content = this.substituteVariables(content, variables);
+
+        if (useBaseLayout) {
+            try {
+                let baseTemplate = this.loadBaseTemplate();
+                baseTemplate = this.substituteVariables(baseTemplate, {
+                    CONTENT: content,
+                    year: new Date().getFullYear(),
+                    ...variables
+                });
+                return baseTemplate;
+            } catch (error) {
                 console.warn('Base template not found, using content-only template');
                 return content;
             }
@@ -105,7 +182,7 @@ class TemplateLoader {
     }
 
     /**
-     * Get list of available templates
+     * Get list of available templates (file-based only)
      * @returns {string[]} Array of template names
      */
     getAvailableTemplates() {

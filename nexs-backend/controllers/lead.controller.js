@@ -1,9 +1,22 @@
 const LeadModel = require('../models/lead.model');
+const AssignmentService = require('../services/assignment.service');
 
 const LeadController = {
     async getAll(req, res) {
         try {
-            const leads = await LeadModel.findAll(req.query);
+            const userRole = req.user?.role;
+            const userId = req.user?.id;
+
+            let leads;
+
+            // Sales operators only see their assigned leads
+            if (userRole === 'sales_operator') {
+                leads = await LeadModel.findByAssignee(userId, req.query);
+            } else {
+                // Admin sees all
+                leads = await LeadModel.findAll(req.query);
+            }
+
             res.json({ leads });
         } catch (error) {
             console.error('Get leads error:', error);
@@ -30,7 +43,14 @@ const LeadController = {
                 return res.status(400).json({ error: 'Contact name is required' });
             }
 
-            const leadId = await LeadModel.create(req.body);
+            // Get next assignee if not specified
+            let assignedTo = req.body.assignedTo;
+            if (!assignedTo) {
+                assignedTo = await AssignmentService.getNextAssignee('lead');
+            }
+
+            const leadData = { ...req.body, assignedTo };
+            const leadId = await LeadModel.create(leadData);
             const lead = await LeadModel.findById(leadId);
 
             res.status(201).json({ message: 'Lead created successfully', lead });
@@ -66,7 +86,29 @@ const LeadController = {
                 return res.status(404).json({ error: 'Lead not found' });
             }
 
+            const oldStatus = lead.status;
+            const newStatus = req.body.status;
+
             const updated = await LeadModel.update(req.params.id, req.body);
+
+            // Auto-log status changes as activities
+            if (newStatus && oldStatus !== newStatus) {
+                try {
+                    const ActivityModel = require('../models/activity.model');
+                    await ActivityModel.create({
+                        entityType: 'lead',
+                        entityId: req.params.id,
+                        type: 'status_change',
+                        summary: `Status changed: ${oldStatus} → ${newStatus}`,
+                        details: `Lead status updated from "${oldStatus}" to "${newStatus}"`,
+                        performedBy: req.user?.id || null
+                    });
+                } catch (activityErr) {
+                    console.error('Failed to log activity:', activityErr);
+                    // Don't fail the main request if activity logging fails
+                }
+            }
+
             res.json({ message: 'Lead updated successfully', lead: updated });
         } catch (error) {
             console.error('Update lead error:', error);
@@ -115,8 +157,18 @@ const LeadController = {
 
     async getStats(req, res) {
         try {
-            const stats = await LeadModel.getStats();
-            res.json({ stats });
+            const userRole = req.user?.role;
+            const userId = req.user?.id;
+
+            let stats;
+            // Sales operators get only their assigned leads stats
+            if (userRole === 'sales_operator' && userId) {
+                stats = await LeadModel.getStatsByUser(userId);
+            } else {
+                stats = await LeadModel.getStats();
+            }
+
+            res.json(stats);
         } catch (error) {
             console.error('Get stats error:', error);
             res.status(500).json({ error: 'Failed to fetch statistics' });
@@ -208,7 +260,49 @@ const LeadController = {
             console.error('Update lead score error:', error);
             res.status(500).json({ error: 'Failed to update lead score' });
         }
+    },
+
+    // Assign lead to a user (admin only)
+    async assignLead(req, res) {
+        try {
+            const { id } = req.params;
+            const { assignedTo } = req.body;
+
+            if (!assignedTo) {
+                return res.status(400).json({ error: 'assignedTo is required' });
+            }
+
+            const lead = await LeadModel.findById(id);
+            if (!lead) {
+                return res.status(404).json({ error: 'Lead not found' });
+            }
+
+            await LeadModel.updateAssignee(id, assignedTo);
+
+            res.json({
+                success: true,
+                message: 'Lead assigned successfully'
+            });
+        } catch (error) {
+            console.error('Assign lead error:', error);
+            res.status(500).json({ error: 'Failed to assign lead' });
+        }
+    },
+
+    // Get assignable users list
+    async getAssignableUsers(req, res) {
+        try {
+            const users = await AssignmentService.getAssignableUsers();
+            res.json({
+                success: true,
+                data: users
+            });
+        } catch (error) {
+            console.error('Get assignable users error:', error);
+            res.status(500).json({ error: 'Failed to fetch assignable users' });
+        }
     }
 };
 
 module.exports = LeadController;
+

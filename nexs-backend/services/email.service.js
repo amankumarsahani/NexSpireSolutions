@@ -62,7 +62,7 @@ class EmailService {
      * @param {string} [options.from] - Sender (optional, uses default)
      * @returns {Promise<Object>} Send result
      */
-    async sendEmail({ to, subject, html, text, from }) {
+    async sendEmail({ to, subject, html, text, from, attachments }) {
         if (!this.isConfigured) {
             console.warn('Email not sent: SMTP not configured');
             return { success: false, error: 'SMTP not configured' };
@@ -74,7 +74,8 @@ class EmailService {
                 to: Array.isArray(to) ? to.join(', ') : to,
                 subject,
                 html,
-                text: text || this.stripHtml(html)
+                text: text || this.stripHtml(html),
+                attachments: attachments || []
             };
 
             const result = await this.transporter.sendMail(mailOptions);
@@ -104,7 +105,8 @@ class EmailService {
      */
     async sendTemplateEmail({ to, subject, template, data = {} }) {
         try {
-            const html = templateLoader.render(template, data);
+            // Use async version to support database templates
+            const html = await templateLoader.renderAsync(template, data);
             return await this.sendEmail({ to, subject, html });
         } catch (error) {
             console.error(`✗ Template email failed (${template}):`, error.message);

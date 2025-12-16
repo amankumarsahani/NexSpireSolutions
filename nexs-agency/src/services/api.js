@@ -119,4 +119,15 @@ export const inquiryAPI = {
     getStats: () => api.get('/inquiries/stats')
 };
 
+// Email Template Management
+export const emailTemplateAPI = {
+    getAll: (params) => api.get('/email-templates', { params }),
+    getById: (id) => api.get(`/email-templates/${id}`),
+    create: (data) => api.post('/email-templates', data),
+    update: (id, data) => api.put(`/email-templates/${id}`, data),
+    delete: (id) => api.delete(`/email-templates/${id}`),
+    preview: (id, data) => api.post(`/email-templates/${id}/preview`, data),
+    getStats: () => api.get('/email-templates/stats')
+};
+
 export default api;

@@ -1,4 +1,4 @@
-const pool = require('../config/database');
+const { pool } = require('../config/database');
 
 class ActivityModel {
     static async create(activityData) {
@@ -7,27 +7,28 @@ class ActivityModel {
       INSERT INTO activities (entityType, entityId, type, summary, details, performedBy)
       VALUES (?, ?, ?, ?, ?, ?)
     `;
-        const [result] = await pool.execute(query, [entityType, entityId, type, summary, details, performedBy]);
+        const [result] = await pool.query(query, [entityType, entityId, type, summary, details, performedBy]);
         return result.insertId;
     }
 
     static async getByEntity(entityType, entityId) {
-        const query = `
+        const sql = `
       SELECT a.*, u.firstName, u.lastName 
       FROM activities a
       LEFT JOIN users u ON a.performedBy = u.id
       WHERE a.entityType = ? AND a.entityId = ?
       ORDER BY a.createdAt DESC
     `;
-        const [rows] = await pool.execute(query, [entityType, entityId]);
+        const [rows] = await pool.query(sql, [entityType, entityId]);
         return rows;
     }
 
     static async delete(id) {
-        const query = 'DELETE FROM activities WHERE id = ?';
-        const [result] = await pool.execute(query, [id]);
+        const sql = 'DELETE FROM activities WHERE id = ?';
+        const [result] = await pool.query(sql, [id]);
         return result.affectedRows;
     }
 }
 
 module.exports = ActivityModel;
+
