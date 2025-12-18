@@ -95,6 +95,10 @@ app.use('/api/document-templates', require('./routes/document-template.routes'))
 app.use('/api/activities', require('./routes/activity.routes'));
 app.use('/api/dashboard', require('./routes/dashboard.routes'));
 
+// NexCRM Master Routes (Tenant Management)
+app.use('/api/tenants', require('./routes/tenant.routes'));
+app.use('/api/plans', require('./routes/plan.routes'));
+
 // 404 Handler
 app.use((req, res) => {
     res.status(404).json({
