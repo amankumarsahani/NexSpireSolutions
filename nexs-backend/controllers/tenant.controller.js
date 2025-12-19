@@ -64,7 +64,7 @@ class TenantController {
                     slug: tenant.slug,
                     subdomain: tenant.subdomain,
                     status: tenant.status,
-                    apiUrl: `https://${tenant.subdomain}-api.nexcrm.in`
+                    apiUrl: `https://${tenant.slug}.crm-api.nexspiresolutions.co.in`
                 }
             });
         } catch (error) {
