@@ -24,10 +24,10 @@ class Provisioner {
         this.cfApiToken = process.env.CLOUDFLARE_API_TOKEN;
         this.cfZoneId = process.env.CLOUDFLARE_ZONE_ID;
         this.cfTunnelId = process.env.CLOUDFLARE_TUNNEL_ID;
-        this.cfDomain = process.env.NEXCRM_DOMAIN || 'nexcrm.in';
+        this.cfDomain = process.env.NEXCRM_DOMAIN || 'crm-api.nexspiresolutions.co.in';
 
         // Cloudflare tunnel config path
-        this.cfConfigPath = process.env.CF_CONFIG_PATH || '/root/.cloudflared/config.yml';
+        this.cfConfigPath = process.env.CF_CONFIG_PATH || '/etc/cloudflared/config.yml';
     }
 
     /**
@@ -82,7 +82,7 @@ class Provisioner {
                 port,
                 dbName,
                 processName,
-                subdomain: `${slug}-api.${this.cfDomain}`,
+                subdomain: `${slug}.${this.cfDomain}`,
                 adminPassword,
                 cfRouteId
             };
@@ -206,7 +206,7 @@ class Provisioner {
                     },
                     body: JSON.stringify({
                         type: 'CNAME',
-                        name: `${slug}-api.${this.cfDomain}`,
+                        name: `${slug}.${this.cfDomain}`,
                         content: `${this.cfTunnelId}.cfargotunnel.com`,
                         proxied: true,
                         ttl: 1
@@ -241,7 +241,7 @@ class Provisioner {
             let config = await fs.readFile(this.cfConfigPath, 'utf8');
 
             // Insert new route before catch-all
-            const newRoute = `  - hostname: ${slug}-api.${this.cfDomain}\n    service: http://localhost:${port}\n`;
+            const newRoute = `  - hostname: ${slug}.${this.cfDomain}\n    service: http://localhost:${port}\n`;
 
             // Find the catch-all and insert before it
             config = config.replace(
