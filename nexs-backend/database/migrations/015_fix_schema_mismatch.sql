@@ -19,6 +19,12 @@ ALTER TABLE inquiries
 ADD COLUMN IF NOT EXISTS updated_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP;
 
 -- =============================================
+-- Fix email_templates table - add type column
+-- =============================================
+ALTER TABLE email_templates 
+ADD COLUMN IF NOT EXISTS type VARCHAR(50) DEFAULT 'email';
+
+-- =============================================
 -- Fix document_templates table - add timestamps
 -- =============================================
 ALTER TABLE document_templates 
