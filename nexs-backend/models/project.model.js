@@ -38,7 +38,7 @@ const ProjectModel = {
             params.push(searchTerm, searchTerm);
         }
 
-        query += ' ORDER BY p.createdAt DESC';
+        query += ' ORDER BY p.created_at DESC';
 
         if (filters.limit) {
             query += ' LIMIT ?';

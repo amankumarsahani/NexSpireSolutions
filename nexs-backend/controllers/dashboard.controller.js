@@ -89,7 +89,7 @@ const DashboardController = {
       const [recentLeads] = await pool.query(`
         SELECT id, contactName as name, company, status, estimatedValue as value, score 
         FROM leads 
-        ORDER BY createdAt DESC 
+        ORDER BY created_at DESC 
         LIMIT 5
       `);
 

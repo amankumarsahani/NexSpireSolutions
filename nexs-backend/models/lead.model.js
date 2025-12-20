@@ -74,7 +74,7 @@ const LeadModel = {
             params.push(searchTerm, searchTerm, searchTerm);
         }
 
-        query += ' ORDER BY l.createdAt DESC';
+        query += ' ORDER BY l.created_at DESC';
 
         if (filters.limit) {
             query += ' LIMIT ?';
@@ -96,7 +96,7 @@ const LeadModel = {
             params.push(filters.status);
         }
 
-        query += ' ORDER BY l.createdAt DESC';
+        query += ' ORDER BY l.created_at DESC';
 
         if (filters.limit) {
             query += ' LIMIT ?';

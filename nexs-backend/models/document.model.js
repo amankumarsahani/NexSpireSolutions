@@ -29,7 +29,7 @@ const DocumentModel = {
                 params.push(filters.uploadedBy);
             }
 
-            query += ' ORDER BY d.createdAt DESC';
+            query += ' ORDER BY d.created_at DESC';
 
             const [rows] = await pool.query(query, params);
             return rows;
@@ -63,7 +63,7 @@ const DocumentModel = {
                 FROM documents d
                 LEFT JOIN users u ON d.uploadedBy = u.id
                 WHERE d.projectId = ?
-                ORDER BY d.createdAt DESC`,
+                ORDER BY d.created_at DESC`,
                 [projectId]
             );
             return rows;
@@ -175,7 +175,7 @@ const DocumentModel = {
                 `SELECT d.*, p.name as projectName 
                 FROM documents d
                 LEFT JOIN projects p ON d.projectId = p.id
-                ORDER BY d.createdAt DESC 
+                ORDER BY d.created_at DESC 
                 LIMIT 5`
             );
 

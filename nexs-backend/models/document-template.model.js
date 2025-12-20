@@ -3,7 +3,7 @@ const { pool } = require('../config/database');
 const DocumentTemplateModel = {
     // Get all document templates (without content for list view)
     async findAll(filters = {}) {
-        let query = 'SELECT id, name, slug, description, category, variables, isActive, isDefault, createdAt, updatedAt FROM document_templates WHERE 1=1';
+        let query = 'SELECT id, name, slug, description, category, variables, isActive, isDefault, created_at, updated_at FROM document_templates WHERE 1=1';
         const params = [];
 
         if (filters.category) {

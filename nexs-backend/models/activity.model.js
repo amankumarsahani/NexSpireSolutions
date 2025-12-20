@@ -17,7 +17,7 @@ class ActivityModel {
       FROM activities a
       LEFT JOIN users u ON a.performedBy = u.id
       WHERE a.entityType = ? AND a.entityId = ?
-      ORDER BY a.createdAt DESC
+      ORDER BY a.created_at DESC
     `;
         const [rows] = await pool.query(sql, [entityType, entityId]);
         return rows;
