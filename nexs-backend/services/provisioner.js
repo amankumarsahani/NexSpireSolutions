@@ -26,6 +26,8 @@ class Provisioner {
         this.cfTunnelId = process.env.CLOUDFLARE_TUNNEL_ID;
         this.cfDomain = process.env.NEXCRM_DOMAIN || 'nexspiresolutions.co.in';
         this.cfPagesUrl = process.env.NEXCRM_PAGES_URL || 'nexcrm-frontend.pages.dev';
+        this.cfAccountId = process.env.CLOUDFLARE_ACCOUNT_ID; // For Pages API
+        this.cfPagesProject = process.env.NEXCRM_PAGES_PROJECT || 'nexcrm-frontend';
 
         // Cloudflare tunnel config path
         this.cfConfigPath = process.env.CF_CONFIG_PATH || '/etc/cloudflared/config.yml';
@@ -241,6 +243,7 @@ class Provisioner {
 
     /**
      * Add Cloudflare DNS record for frontend (tenant-crm.domain -> Pages)
+     * AND attach the custom domain to Pages project
      */
     async addCloudflareFrontendRoute(slug) {
         if (!this.cfApiToken || !this.cfZoneId || !this.cfPagesUrl) {
@@ -248,8 +251,11 @@ class Provisioner {
             return null;
         }
 
+        const customDomain = `${slug}-crm.${this.cfDomain}`;
+
         try {
-            const response = await fetch(
+            // Step 1: Create DNS CNAME record
+            const dnsResponse = await fetch(
                 `https://api.cloudflare.com/client/v4/zones/${this.cfZoneId}/dns_records`,
                 {
                     method: 'POST',
@@ -259,7 +265,7 @@ class Provisioner {
                     },
                     body: JSON.stringify({
                         type: 'CNAME',
-                        name: `${slug}-crm.${this.cfDomain}`,
+                        name: customDomain,
                         content: this.cfPagesUrl,
                         proxied: true,
                         ttl: 1
@@ -267,19 +273,62 @@ class Provisioner {
                 }
             );
 
-            const data = await response.json();
+            const dnsData = await dnsResponse.json();
 
-            if (!data.success) {
-                console.error('[Provisioner] Frontend DNS error:', data.errors);
-                // Don't throw - frontend DNS is optional
+            if (!dnsData.success) {
+                console.error('[Provisioner] Frontend DNS error:', dnsData.errors);
                 return null;
             }
 
-            return data.result.id;
+            console.log(`[Provisioner] DNS record created: ${customDomain}`);
+
+            // Step 2: Attach domain to Cloudflare Pages project
+            if (this.cfAccountId && this.cfPagesProject) {
+                await this.attachDomainToPages(customDomain);
+            } else {
+                console.warn('[Provisioner] Pages account/project not set, manual domain attachment required');
+            }
+
+            return dnsData.result.id;
 
         } catch (error) {
             console.warn('[Provisioner] Frontend DNS error:', error.message);
             return null;
+        }
+    }
+
+    /**
+     * Attach custom domain to Cloudflare Pages project
+     */
+    async attachDomainToPages(domain) {
+        try {
+            const response = await fetch(
+                `https://api.cloudflare.com/client/v4/accounts/${this.cfAccountId}/pages/projects/${this.cfPagesProject}/domains`,
+                {
+                    method: 'POST',
+                    headers: {
+                        'Authorization': `Bearer ${this.cfApiToken}`,
+                        'Content-Type': 'application/json'
+                    },
+                    body: JSON.stringify({
+                        name: domain
+                    })
+                }
+            );
+
+            const data = await response.json();
+
+            if (!data.success) {
+                console.error('[Provisioner] Pages domain attachment error:', data.errors);
+                return false;
+            }
+
+            console.log(`[Provisioner] Domain attached to Pages: ${domain}`);
+            return true;
+
+        } catch (error) {
+            console.warn('[Provisioner] Pages domain attachment error:', error.message);
+            return false;
         }
     }
 
@@ -291,8 +340,16 @@ class Provisioner {
             // Read current config
             let config = await fs.readFile(this.cfConfigPath, 'utf8');
 
+            const hostname = `${slug}-crm-api.${this.cfDomain}`;
+
+            // Check if entry already exists
+            if (config.includes(hostname)) {
+                console.log(`[Provisioner] Tunnel config already has entry for ${hostname}`);
+                return;
+            }
+
             // Insert new route before catch-all
-            const newRoute = `  - hostname: ${slug}-crm-api.${this.cfDomain}\n    service: http://localhost:${port}\n`;
+            const newRoute = `  - hostname: ${hostname}\n    service: http://localhost:${port}\n`;
 
             // Find the catch-all and insert before it
             config = config.replace(
@@ -302,8 +359,9 @@ class Provisioner {
 
             await fs.writeFile(this.cfConfigPath, config);
 
-            // Restart cloudflared to apply changes
-            await execAsync('systemctl restart cloudflared');
+            // Restart cloudflared to apply changes (use sudo)
+            await execAsync('sudo systemctl restart cloudflared');
+            console.log('[Provisioner] Tunnel config updated and cloudflared restarted');
 
         } catch (error) {
             console.warn('[Provisioner] Could not update tunnel config:', error.message);
