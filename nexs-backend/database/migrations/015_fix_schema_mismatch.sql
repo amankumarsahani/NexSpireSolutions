@@ -5,18 +5,18 @@
 -- Fix clients table - add companyName column
 -- =============================================
 ALTER TABLE clients 
-ADD COLUMN IF NOT EXISTS companyName VARCHAR(255) AFTER name;
+ADD COLUMN IF NOT EXISTS companyName VARCHAR(255);
 
 UPDATE clients SET companyName = name WHERE companyName IS NULL;
 
 -- =============================================
--- Fix inquiries table - add created_at if missing
+-- Fix inquiries table - add timestamps
 -- =============================================
 ALTER TABLE inquiries 
-ADD COLUMN IF NOT EXISTS created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP AFTER updated_at;
+ADD COLUMN IF NOT EXISTS created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP;
 
 ALTER TABLE inquiries 
-ADD COLUMN IF NOT EXISTS updated_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP AFTER status;
+ADD COLUMN IF NOT EXISTS updated_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP;
 
 -- =============================================
 -- Fix document_templates table - add timestamps
