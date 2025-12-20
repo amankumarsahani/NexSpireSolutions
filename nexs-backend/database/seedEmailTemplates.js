@@ -323,7 +323,7 @@ async function seedTemplates() {
                 console.log(`  ✓ Created: ${template.name}`);
             }
         } catch (error) {
-            console.error(`  ✗ Error with ${template.name}:`, error.message);
+            console.error(`  ✗ Error with ${template.name}:`, error.message || error);
         }
     }
 
