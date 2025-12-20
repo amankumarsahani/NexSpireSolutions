@@ -103,7 +103,8 @@ class Provisioner {
 
         // Grant privileges (adjust user as needed)
         const dbUser = process.env.DB_USER || 'nexcrm';
-        await pool.query(`GRANT ALL PRIVILEGES ON \`${dbName}\`.* TO '${dbUser}'@'%'`);
+        const dbHost = process.env.DB_HOST || 'localhost';
+        await pool.query(`GRANT ALL PRIVILEGES ON \`${dbName}\`.* TO '${dbUser}'@'${dbHost}'`);
         await pool.query('FLUSH PRIVILEGES');
     }
 
