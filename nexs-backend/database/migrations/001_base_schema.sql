@@ -90,3 +90,23 @@ CREATE TABLE IF NOT EXISTS projects (
     INDEX idx_status (status),
     FOREIGN KEY (clientId) REFERENCES clients(id) ON DELETE SET NULL
 );
+
+-- ============================================
+-- TEAM MEMBERS TABLE
+-- ============================================
+CREATE TABLE IF NOT EXISTS team_members (
+    id INT PRIMARY KEY AUTO_INCREMENT,
+    name VARCHAR(255) NOT NULL,
+    email VARCHAR(255),
+    phone VARCHAR(20),
+    position VARCHAR(100),
+    department VARCHAR(100),
+    workload INT DEFAULT 0,
+    status ENUM('active', 'inactive', 'on_leave') DEFAULT 'active',
+    joinDate DATE,
+    userId INT,
+    created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+    updated_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
+    
+    FOREIGN KEY (userId) REFERENCES users(id) ON DELETE SET NULL
+);
