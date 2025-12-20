@@ -373,7 +373,7 @@ async function seedTemplates() {
             );
             console.log(`  ✅ Added template: ${template.name}`);
         } catch (error) {
-            console.error(`  ❌ Error adding ${template.name}:`, error.message);
+            console.error(`  ❌ Error adding ${template.name}:`, error.message || error);
         }
     }
 
