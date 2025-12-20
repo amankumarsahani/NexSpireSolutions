@@ -25,6 +25,7 @@ class Provisioner {
         this.cfZoneId = process.env.CLOUDFLARE_ZONE_ID;
         this.cfTunnelId = process.env.CLOUDFLARE_TUNNEL_ID;
         this.cfDomain = process.env.NEXCRM_DOMAIN || 'nexspiresolutions.co.in';
+        this.cfPagesUrl = process.env.NEXCRM_PAGES_URL || 'nexcrm-frontend.pages.dev';
 
         // Cloudflare tunnel config path
         this.cfConfigPath = process.env.CF_CONFIG_PATH || '/etc/cloudflared/config.yml';
@@ -65,12 +66,17 @@ class Provisioner {
                 process_status: 'stopped'
             });
 
-            // 6. Add Cloudflare DNS route (if configured)
+            // 6. Add Cloudflare DNS routes (API + Frontend)
             let cfRouteId = null;
             if (this.cfApiToken && this.cfZoneId) {
+                // API subdomain (tenant-crm-api.domain -> tunnel)
                 cfRouteId = await this.addCloudflareRoute(slug, port);
                 await TenantModel.updateCfDnsRecordId(id, cfRouteId);
-                console.log(`[Provisioner] Cloudflare route added`);
+                console.log(`[Provisioner] Cloudflare API route added`);
+
+                // Frontend subdomain (tenant-crm.domain -> Cloudflare Pages)
+                await this.addCloudflareFrontendRoute(slug);
+                console.log(`[Provisioner] Cloudflare frontend route added`);
             }
 
             // 7. Start PM2 process
@@ -230,6 +236,50 @@ class Provisioner {
         } catch (error) {
             console.error('[Provisioner] Cloudflare error:', error);
             throw error;
+        }
+    }
+
+    /**
+     * Add Cloudflare DNS record for frontend (tenant-crm.domain -> Pages)
+     */
+    async addCloudflareFrontendRoute(slug) {
+        if (!this.cfApiToken || !this.cfZoneId || !this.cfPagesUrl) {
+            console.warn('[Provisioner] Cloudflare Pages config not set, skipping frontend DNS');
+            return null;
+        }
+
+        try {
+            const response = await fetch(
+                `https://api.cloudflare.com/client/v4/zones/${this.cfZoneId}/dns_records`,
+                {
+                    method: 'POST',
+                    headers: {
+                        'Authorization': `Bearer ${this.cfApiToken}`,
+                        'Content-Type': 'application/json'
+                    },
+                    body: JSON.stringify({
+                        type: 'CNAME',
+                        name: `${slug}-crm.${this.cfDomain}`,
+                        content: this.cfPagesUrl,
+                        proxied: true,
+                        ttl: 1
+                    })
+                }
+            );
+
+            const data = await response.json();
+
+            if (!data.success) {
+                console.error('[Provisioner] Frontend DNS error:', data.errors);
+                // Don't throw - frontend DNS is optional
+                return null;
+            }
+
+            return data.result.id;
+
+        } catch (error) {
+            console.warn('[Provisioner] Frontend DNS error:', error.message);
+            return null;
         }
     }
 
