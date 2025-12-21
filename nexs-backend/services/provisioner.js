@@ -4,6 +4,7 @@
  * - Database creation and migration
  * - PM2 process management
  * - Cloudflare DNS configuration
+ * - Registry service registration (for mobile app lookup)
  */
 
 const { exec } = require('child_process');
@@ -29,6 +30,10 @@ class Provisioner {
         this.cfAccountId = process.env.CLOUDFLARE_ACCOUNT_ID; // For Pages API
         this.cfPagesProject = process.env.NEXCRM_PAGES_PROJECT || 'nexcrm-frontend';
 
+        // Registry service config (for mobile app lookup)
+        this.registryUrl = process.env.REGISTRY_URL || 'http://localhost:4000';
+        this.registryApiKey = process.env.REGISTRY_API_KEY;
+
         // Cloudflare tunnel config path
         this.cfConfigPath = process.env.CF_CONFIG_PATH || '/etc/cloudflared/config.yml';
     }
@@ -37,7 +42,7 @@ class Provisioner {
      * Full tenant provisioning flow
      */
     async provisionTenant(tenant) {
-        const { id, name, slug, email, industry_type } = tenant;
+        const { id, name, slug, email, industry_type, plan_slug } = tenant;
 
         console.log(`[Provisioner] Starting provisioning for: ${slug}`);
 
@@ -51,9 +56,9 @@ class Provisioner {
             await this.createDatabase(dbName);
             console.log(`[Provisioner] Created database: ${dbName}`);
 
-            // 3. Run migrations on new database
-            await this.runMigrations(dbName);
-            console.log(`[Provisioner] Migrations complete`);
+            // 3. Run migrations on new database (base + industry-specific)
+            await this.runMigrations(dbName, industry_type);
+            console.log(`[Provisioner] Migrations complete (industry: ${industry_type})`);
 
             // 4. Create admin user in tenant DB
             const adminPassword = await this.createTenantAdmin(dbName, email, name);
@@ -81,10 +86,21 @@ class Provisioner {
                 console.log(`[Provisioner] Cloudflare frontend route added`);
             }
 
-            // 7. Start PM2 process
-            await this.startProcess({ slug, assigned_port: port, db_name: dbName, industry_type });
+            // 7. Start PM2 process (with industry and plan for feature config)
+            await this.startProcess({ slug, assigned_port: port, db_name: dbName, industry_type, plan_slug });
             await TenantModel.updateProcessStatus(id, 'running');
             console.log(`[Provisioner] PM2 process started`);
+
+            // 8. Register with registry service (for mobile app lookup)
+            const apiSubdomain = `${slug}-crm-api.${this.cfDomain}`;
+            await this.registerWithRegistry({
+                email,
+                tenant_slug: slug,
+                tenant_name: name,
+                subdomain: apiSubdomain,
+                industry: industry_type
+            });
+            console.log(`[Provisioner] Registered with registry service`);
 
             return {
                 port,
@@ -119,33 +135,58 @@ class Provisioner {
     /**
      * Run migrations on tenant database
      */
-    async runMigrations(dbName) {
+    async runMigrations(dbName, industryType = 'general') {
         // Get the base CRM schema migration
         const schemaFile = path.join(this.migrationsPath, 'nexcrm_base_schema.sql');
 
+        // Create tenant database connection
+        const tenantPool = require('mysql2/promise').createPool({
+            host: process.env.DB_HOST || 'localhost',
+            port: process.env.DB_PORT || 3306,
+            user: process.env.DB_USER,
+            password: process.env.DB_PASSWORD,
+            database: dbName,
+            multipleStatements: true
+        });
+
         try {
-            const sql = await fs.readFile(schemaFile, 'utf8');
-
-            // Execute on tenant database
-            const tenantPool = require('mysql2/promise').createPool({
-                host: process.env.DB_HOST || 'localhost',
-                port: process.env.DB_PORT || 3306,
-                user: process.env.DB_USER,
-                password: process.env.DB_PASSWORD,
-                database: dbName,
-                multipleStatements: true
-            });
-
-            await tenantPool.query(sql);
-            await tenantPool.end();
-
-        } catch (error) {
-            // If schema file doesn't exist yet, skip (we'll create it later)
-            if (error.code === 'ENOENT') {
-                console.warn(`[Provisioner] Schema file not found: ${schemaFile}. Skipping migrations.`);
-                return;
+            // 1. Run base schema
+            try {
+                const sql = await fs.readFile(schemaFile, 'utf8');
+                await tenantPool.query(sql);
+                console.log(`[Provisioner] Base schema migration complete`);
+            } catch (error) {
+                if (error.code === 'ENOENT') {
+                    console.warn(`[Provisioner] Schema file not found: ${schemaFile}. Skipping base migrations.`);
+                } else {
+                    throw error;
+                }
             }
-            throw error;
+
+            // 2. Run industry-specific migrations
+            if (industryType && industryType !== 'general') {
+                const industryMigrationsPath = path.join(this.migrationsPath, 'industry', industryType);
+                try {
+                    const files = await fs.readdir(industryMigrationsPath);
+                    const sqlFiles = files.filter(f => f.endsWith('.sql')).sort();
+
+                    for (const file of sqlFiles) {
+                        const filePath = path.join(industryMigrationsPath, file);
+                        const sql = await fs.readFile(filePath, 'utf8');
+                        await tenantPool.query(sql);
+                        console.log(`[Provisioner] Industry migration complete: ${file}`);
+                    }
+                } catch (error) {
+                    if (error.code === 'ENOENT') {
+                        console.log(`[Provisioner] No industry migrations for: ${industryType}`);
+                    } else {
+                        console.warn(`[Provisioner] Industry migration error:`, error.message);
+                    }
+                }
+            }
+
+        } finally {
+            await tenantPool.end();
         }
     }
 
@@ -373,7 +414,13 @@ class Provisioner {
      * Start PM2 process for tenant
      */
     async startProcess(tenant) {
-        const { slug, assigned_port, db_name, industry_type = 'general' } = tenant;
+        const {
+            slug,
+            assigned_port,
+            db_name,
+            industry_type = 'general',
+            plan_slug = 'starter'
+        } = tenant;
 
         const cmd = `pm2 start ${this.nexcrmBackendPath}/server.js \
             --name "tenant-${slug}" \
@@ -381,7 +428,8 @@ class Provisioner {
             -- \
             --port ${assigned_port} \
             --db ${db_name} \
-            --industry ${industry_type}`;
+            --industry ${industry_type} \
+            --plan ${plan_slug}`;
 
         try {
             await execAsync(cmd);
@@ -457,6 +505,78 @@ class Provisioner {
             console.warn('[Provisioner] Could not remove DNS record:', error.message);
         }
     }
+
+    /**
+     * Register email with registry service (for mobile app lookup)
+     */
+    async registerWithRegistry(data) {
+        if (!this.registryUrl || !this.registryApiKey) {
+            console.log('[Provisioner] Registry service not configured, skipping registration');
+            return;
+        }
+
+        const { email, tenant_slug, tenant_name, subdomain, industry } = data;
+
+        try {
+            const response = await fetch(`${this.registryUrl}/register`, {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json',
+                    'X-API-Key': this.registryApiKey
+                },
+                body: JSON.stringify({
+                    email,
+                    tenant_slug,
+                    tenant_name,
+                    subdomain,
+                    api_url: `https://${subdomain}`,
+                    frontend_url: `https://${tenant_slug}-crm.${this.cfDomain}`,
+                    industry: industry || 'general'
+                })
+            });
+
+            if (!response.ok) {
+                const errorText = await response.text();
+                console.warn('[Provisioner] Registry registration failed:', errorText);
+            }
+        } catch (error) {
+            console.warn('[Provisioner] Could not register with registry:', error.message);
+            // Don't throw - provisioning can succeed without registry
+        }
+    }
+
+    /**
+     * Register additional user email with registry service
+     */
+    async registerUserWithRegistry(email, tenant) {
+        if (!this.registryUrl || !this.registryApiKey) {
+            return;
+        }
+
+        const subdomain = `${tenant.slug}-crm-api.${this.cfDomain}`;
+
+        try {
+            await fetch(`${this.registryUrl}/register`, {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json',
+                    'X-API-Key': this.registryApiKey
+                },
+                body: JSON.stringify({
+                    email,
+                    tenant_slug: tenant.slug,
+                    tenant_name: tenant.name,
+                    subdomain,
+                    api_url: `https://${subdomain}`,
+                    frontend_url: `https://${tenant.slug}-crm.${this.cfDomain}`,
+                    industry: tenant.industry_type || 'general'
+                })
+            });
+        } catch (error) {
+            console.warn('[Provisioner] Could not register user with registry:', error.message);
+        }
+    }
 }
 
 module.exports = new Provisioner();
+

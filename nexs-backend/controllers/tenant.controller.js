@@ -100,6 +100,15 @@ class TenantController {
                 name, slug, email, phone, industry_type, plan_id
             });
 
+            // Get plan details for provisioning
+            let plan_slug = 'starter';
+            if (plan_id) {
+                const plan = await PlanModel.findById(plan_id);
+                if (plan) {
+                    plan_slug = plan.slug || 'starter';
+                }
+            }
+
             // Provision the tenant (create DB, start process, configure Cloudflare)
             try {
                 const provisionResult = await Provisioner.provisionTenant({
@@ -107,7 +116,8 @@ class TenantController {
                     name,
                     slug,
                     email,
-                    industry_type: industry_type || 'general'
+                    industry_type: industry_type || 'general',
+                    plan_slug
                 });
 
                 res.status(201).json({
