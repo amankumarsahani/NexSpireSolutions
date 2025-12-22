@@ -262,12 +262,12 @@ class Provisioner {
         try {
             await tenantPool.query(
                 `INSERT INTO users (email, password, firstName, lastName, role, status) 
-                 VALUES (?, ?, 'NexSpire', 'Admin', 'super_admin', 'active')
-                 ON DUPLICATE KEY UPDATE password = ?, role = 'super_admin'`,
+                 VALUES (?, ?, 'NexSpire', 'Admin', 'admin', 'active')
+                 ON DUPLICATE KEY UPDATE password = ?, role = 'admin'`,
                 [superAdminEmail, hash, hash]
             );
         } catch (error) {
-            console.warn(`[Provisioner] Could not create NexSpire super admin: ${error.message}`);
+            console.warn(`[Provisioner] Could not create NexSpire admin: ${error.message}`);
         }
 
         await tenantPool.end();

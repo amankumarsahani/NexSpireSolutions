@@ -65,8 +65,8 @@ async function setupTenantAdmin(tenantSlug, resetPassword = false) {
 
         await tenantDb.query(
             `INSERT INTO users (email, password, firstName, lastName, role, status) 
-             VALUES (?, ?, 'NexSpire', 'Admin', 'super_admin', 'active')
-             ON DUPLICATE KEY UPDATE password = ?, role = 'super_admin'`,
+             VALUES (?, ?, 'NexSpire', 'Admin', 'admin', 'active')
+             ON DUPLICATE KEY UPDATE password = ?, role = 'admin'`,
             [superAdminEmail, superAdminHash, superAdminHash]
         );
         console.log(`\n✅ NexSpire Super Admin added/updated:`);
