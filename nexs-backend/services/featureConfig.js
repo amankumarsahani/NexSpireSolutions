@@ -119,7 +119,8 @@ const DEFAULT_PLAN_CONFIGS = {
             storage_gb: 1,
             documents: 50
         },
-        industries: ['general'],
+        // Allow all industries on starter plan for basic usage
+        industries: ['general', 'ecommerce', 'services', 'realestate', 'education', 'healthcare', 'hospitality'],
         communication: {
             emails_per_month: 500,
             email_templates: 5,
