@@ -67,6 +67,60 @@ const INDUSTRY_MODULES = {
         'rooms',
         'guests',
         'housekeeping'
+    ],
+
+    // Fitness/Gym specific
+    fitness: [
+        'gym_members',
+        'gym_classes',
+        'memberships',
+        'equipment',
+        'trainers'
+    ],
+
+    // Legal/Law Firm specific
+    legal: [
+        'legal_cases',
+        'legal_clients',
+        'court_dates',
+        'case_documents',
+        'billing'
+    ],
+
+    // Manufacturing specific
+    manufacturing: [
+        'production',
+        'raw_materials',
+        'work_orders',
+        'quality_checks',
+        'suppliers'
+    ],
+
+    // Logistics/Transport specific
+    logistics: [
+        'shipments',
+        'vehicles',
+        'drivers',
+        'warehouses',
+        'routes'
+    ],
+
+    // Restaurant/Food specific
+    restaurant: [
+        'menu',
+        'tables',
+        'restaurant_orders',
+        'kitchen',
+        'table_reservations'
+    ],
+
+    // Salon/Spa specific
+    salon: [
+        'salon_bookings',
+        'salon_services',
+        'salon_staff',
+        'packages',
+        'salon_products'
     ]
 };
 
@@ -120,7 +174,7 @@ const DEFAULT_PLAN_CONFIGS = {
             documents: 50
         },
         // Allow all industries on starter plan for basic usage
-        industries: ['general', 'ecommerce', 'services', 'realestate', 'education', 'healthcare', 'hospitality'],
+        industries: ['general', 'ecommerce', 'services', 'realestate', 'education', 'healthcare', 'hospitality', 'fitness', 'legal', 'manufacturing', 'logistics', 'restaurant', 'salon'],
         communication: {
             emails_per_month: 500,
             email_templates: 5,
