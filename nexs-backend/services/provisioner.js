@@ -471,8 +471,10 @@ class Provisioner {
             plan_slug = 'starter'
         } = tenant;
 
+        // --cwd ensures the process runs from the NexCRM directory so .env is found
         const cmd = `pm2 start ${this.nexcrmBackendPath}/server.js \
             --name "tenant-${slug}" \
+            --cwd "${this.nexcrmBackendPath}" \
             --max-memory-restart 80M \
             -- \
             --port ${assigned_port} \
