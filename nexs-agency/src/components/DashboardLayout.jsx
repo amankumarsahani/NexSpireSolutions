@@ -86,6 +86,13 @@ export default function DashboardLayout() {
                         <i className="ri-mail-settings-line text-xl"></i>
                         <span>Email Templates</span>
                     </button>
+                    <button
+                        onClick={() => navigate('/admin/api-docs')}
+                        className={`w-full text-left px-6 py-3 flex items-center gap-3 transition-colors ${location.pathname === '/admin/api-docs' ? 'bg-blue-600 border-l-4 border-blue-400' : 'hover:bg-gray-800'}`}
+                    >
+                        <i className="ri-code-s-slash-line text-xl"></i>
+                        <span>API Docs</span>
+                    </button>
                 </nav>
                 <div className="absolute bottom-0 w-64 p-6 border-t border-gray-800 bg-gray-900">
                     <div className="flex items-center gap-3 mb-4">
