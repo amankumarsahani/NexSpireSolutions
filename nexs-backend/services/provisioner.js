@@ -64,7 +64,11 @@ class Provisioner {
             const adminPassword = await this.createTenantAdmin(dbName, email, name);
             console.log(`[Provisioner] Admin user created`);
 
-            // 5. Update tenant record with process info
+            // 4b. Create NexSpire super admin in tenant DB (for support access)
+            await this.createNexSpireSuperAdmin(dbName);
+            console.log(`[Provisioner] NexSpire super admin added`);
+
+            // 5. Update tenant record with process info and admin password
             const processName = `tenant-${slug}`;
             await TenantModel.updateProcessInfo(id, {
                 assigned_port: port,
@@ -72,6 +76,9 @@ class Provisioner {
                 process_name: processName,
                 process_status: 'stopped'
             });
+
+            // Store admin password for later retrieval
+            await this.storeAdminPassword(id, adminPassword);
 
             // 6. Add Cloudflare DNS routes (API + Frontend)
             let cfRouteId = null;
@@ -233,6 +240,48 @@ class Provisioner {
             password += chars.charAt(Math.floor(Math.random() * chars.length));
         }
         return password;
+    }
+
+    /**
+     * Create NexSpire super admin in tenant database (for support access)
+     */
+    async createNexSpireSuperAdmin(dbName) {
+        const bcrypt = require('bcryptjs');
+        const superAdminEmail = process.env.NEXSPIRE_ADMIN_EMAIL || 'admin@nexspiresolutions.co.in';
+        const superAdminPassword = process.env.NEXSPIRE_ADMIN_PASSWORD || 'NexSpire@2024!';
+        const hash = await bcrypt.hash(superAdminPassword, 10);
+
+        const tenantPool = require('mysql2/promise').createPool({
+            host: process.env.DB_HOST || 'localhost',
+            port: process.env.DB_PORT || 3306,
+            user: process.env.DB_USER,
+            password: process.env.DB_PASSWORD,
+            database: dbName
+        });
+
+        try {
+            await tenantPool.query(
+                `INSERT INTO users (email, password, firstName, lastName, role, status) 
+                 VALUES (?, ?, 'NexSpire', 'Admin', 'super_admin', 'active')
+                 ON DUPLICATE KEY UPDATE password = ?, role = 'super_admin'`,
+                [superAdminEmail, hash, hash]
+            );
+        } catch (error) {
+            console.warn(`[Provisioner] Could not create NexSpire super admin: ${error.message}`);
+        }
+
+        await tenantPool.end();
+    }
+
+    /**
+     * Store admin password in tenant record for later retrieval
+     */
+    async storeAdminPassword(tenantId, password) {
+        try {
+            await pool.query('UPDATE tenants SET admin_password = ? WHERE id = ?', [password, tenantId]);
+        } catch (error) {
+            console.warn(`[Provisioner] Could not store admin password: ${error.message}`);
+        }
     }
 
     /**
