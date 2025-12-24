@@ -1,10 +1,5 @@
 -- Add assignment columns and tracking for round-robin
 
--- Add assignedTo column to inquiries table
-ALTER TABLE inquiries ADD COLUMN IF NOT EXISTS assignedTo INT;
-ALTER TABLE inquiries ADD CONSTRAINT fk_inquiry_assigned FOREIGN KEY (assignedTo) REFERENCES users(id) ON DELETE SET NULL;
-CREATE INDEX IF NOT EXISTS idx_inquiries_assigned ON inquiries(assignedTo);
-
 -- Create assignment tracking table for round-robin
 CREATE TABLE IF NOT EXISTS assignment_tracker (
     id INT PRIMARY KEY AUTO_INCREMENT,

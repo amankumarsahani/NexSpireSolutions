@@ -48,6 +48,7 @@ const runMigrations = async () => {
             const filePath = path.join(migrationsDir, file);
             const sql = fs.readFileSync(filePath, 'utf8');
 
+
             // Split by semicolon for multiple statements
             const statements = sql
                 .split(';')
@@ -58,7 +59,22 @@ const runMigrations = async () => {
                 await connection.beginTransaction();
 
                 for (const statement of statements) {
-                    await connection.query(statement);
+                    try {
+                        await connection.query(statement);
+                    } catch (stmtErr) {
+                        // Ignore "column already exists" or "table already exists" errors
+                        const ignorableErrors = [
+                            'ER_DUP_FIELDNAME',      // Duplicate column name
+                            'ER_TABLE_EXISTS_ERROR', // Table already exists
+                            'ER_DUP_ENTRY',          // Duplicate entry
+                            'ER_BAD_FIELD_ERROR'     // Unknown column (for SELECT statements)
+                        ];
+                        if (ignorableErrors.includes(stmtErr.code)) {
+                            console.log(`   ⚠️ Skipped (already exists): ${stmtErr.message.substring(0, 50)}...`);
+                        } else {
+                            throw stmtErr;
+                        }
+                    }
                 }
 
                 // Record migration

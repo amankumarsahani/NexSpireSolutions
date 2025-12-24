@@ -3,16 +3,14 @@
 -- =============================================
 
 -- 1. Add industry_type to tenants table
-ALTER TABLE tenants
-ADD COLUMN IF NOT EXISTS industry_type VARCHAR(50) DEFAULT 'general' AFTER plan_id,
-ADD COLUMN IF NOT EXISTS features JSON AFTER industry_type;
+ALTER TABLE tenants ADD COLUMN industry_type VARCHAR(50) DEFAULT 'general' AFTER plan_id;
+ALTER TABLE tenants ADD COLUMN features JSON AFTER industry_type;
 
 -- 2. Add feature configuration to plans table
-ALTER TABLE plans
-ADD COLUMN IF NOT EXISTS feature_limits JSON AFTER max_leads,
-ADD COLUMN IF NOT EXISTS allowed_industries JSON AFTER feature_limits,
-ADD COLUMN IF NOT EXISTS communication_limits JSON AFTER allowed_industries,
-ADD COLUMN IF NOT EXISTS enabled_features JSON AFTER communication_limits;
+ALTER TABLE plans ADD COLUMN feature_limits JSON AFTER max_leads;
+ALTER TABLE plans ADD COLUMN allowed_industries JSON AFTER feature_limits;
+ALTER TABLE plans ADD COLUMN communication_limits JSON AFTER allowed_industries;
+ALTER TABLE plans ADD COLUMN enabled_features JSON AFTER communication_limits;
 
 -- 3. Update existing plans with feature configurations
 
@@ -192,4 +190,4 @@ INSERT INTO industry_configs (industry_type, display_name, description, modules,
 )
 ON DUPLICATE KEY UPDATE 
     display_name = VALUES(display_name),
-    modules = VALUES(modules);
+    modules = VALUES(modules)
