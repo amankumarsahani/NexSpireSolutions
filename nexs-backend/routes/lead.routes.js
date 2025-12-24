@@ -6,8 +6,8 @@ const { auth, isAdmin, isSalesOperator } = require('../middleware/auth');
 // All routes require authentication
 router.use(auth);
 
-// Stats - accessible by sales_operator (filtered by their assigned) and admin (all)
-router.get('/stats', isSalesOperator, LeadController.getStats);
+router.get('/stats', LeadController.getStats);
+router.post('/bulk-create', isSalesOperator, LeadController.bulkCreate);
 
 // Assignable users - admin only
 router.get('/assignable-users', isAdmin, LeadController.getAssignableUsers);

@@ -41,7 +41,7 @@ const ClientModel = {
         }
 
         // Sorting
-        const sortBy = filters.sortBy || 'createdAt';
+        const sortBy = filters.sortBy || 'created_at';
         const sortOrder = filters.sortOrder || 'DESC';
         query += ` ORDER BY ${sortBy} ${sortOrder}`;
 

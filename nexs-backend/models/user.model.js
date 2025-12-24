@@ -30,7 +30,7 @@ const UserModel = {
     // Find user by ID
     async findById(id) {
         const [rows] = await pool.query(
-            'SELECT id, email, firstName, lastName, phone, role, status, createdAt FROM users WHERE id = ?',
+            'SELECT id, email, firstName, lastName, phone, role, status, created_at FROM users WHERE id = ?',
             [id]
         );
         return rows[0];
@@ -38,7 +38,7 @@ const UserModel = {
 
     // Get all users
     async findAll(filters = {}) {
-        let query = 'SELECT id, email, firstName, lastName, phone, role, status, createdAt FROM users WHERE 1=1';
+        let query = 'SELECT id, email, firstName, lastName, phone, role, status, created_at FROM users WHERE 1=1';
         const params = [];
 
         if (filters.role) {
@@ -51,7 +51,7 @@ const UserModel = {
             params.push(filters.status);
         }
 
-        query += ' ORDER BY createdAt DESC';
+        query += ' ORDER BY created_at DESC';
 
         if (filters.limit) {
             query += ' LIMIT ?';

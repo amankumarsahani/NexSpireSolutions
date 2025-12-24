@@ -8,7 +8,7 @@ class InquiryModel {
             `SELECT i.*, u.firstName as assignedFirstName, u.lastName as assignedLastName, u.email as assignedEmail
              FROM inquiries i
              LEFT JOIN users u ON i.assignedTo = u.id
-             ORDER BY i.createdAt DESC LIMIT ? OFFSET ?`,
+             ORDER BY i.created_at DESC LIMIT ? OFFSET ?`,
             [limit, offset]
         );
         return rows;
@@ -22,7 +22,7 @@ class InquiryModel {
              FROM inquiries i
              LEFT JOIN users u ON i.assignedTo = u.id
              WHERE i.assignedTo = ?
-             ORDER BY i.createdAt DESC LIMIT ? OFFSET ?`,
+             ORDER BY i.created_at DESC LIMIT ? OFFSET ?`,
             [userId, limit, offset]
         );
         return rows;

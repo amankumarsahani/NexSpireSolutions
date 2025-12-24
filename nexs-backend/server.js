@@ -93,6 +93,15 @@ app.use('/api/inquiries', inquiryRoutes);
 app.use('/api/email-templates', emailTemplateRoutes);
 app.use('/api/document-templates', require('./routes/document-template.routes'));
 app.use('/api/activities', require('./routes/activity.routes'));
+app.use('/api/dashboard', require('./routes/dashboard.routes'));
+
+// NexCRM Master Routes (Tenant Management)
+app.use('/api/tenants', require('./routes/tenant.routes'));
+app.use('/api/plans', require('./routes/plan.routes'));
+
+// Billing & Webhooks
+app.use('/api/billing', require('./routes/billing.routes'));
+app.use('/webhooks', require('./routes/webhook.routes'));
 
 // 404 Handler
 app.use((req, res) => {

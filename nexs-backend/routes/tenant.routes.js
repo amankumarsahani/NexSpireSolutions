@@ -1,0 +1,29 @@
+const express = require('express');
+const router = express.Router();
+const tenantController = require('../controllers/tenant.controller');
+const { auth, isAdmin } = require('../middleware/auth');
+
+// All routes require authentication and admin role
+router.use(auth);
+router.use(isAdmin);
+
+// Stats
+router.get('/stats', tenantController.getStats);
+
+// Public lookup (for frontend API discovery) - might be made public later
+router.get('/lookup/:slug', tenantController.getTenantBySlug);
+
+// CRUD
+router.get('/', tenantController.getAllTenants);
+router.get('/:id', tenantController.getTenant);
+router.post('/', tenantController.createTenant);
+router.patch('/:id', tenantController.updateTenant);
+router.delete('/:id', tenantController.deleteTenant);
+
+// Process Management
+router.post('/:id/provision', tenantController.provisionTenant);
+router.post('/:id/start', tenantController.startTenant);
+router.post('/:id/stop', tenantController.stopTenant);
+router.post('/:id/restart', tenantController.restartTenant);
+
+module.exports = router;

@@ -12,7 +12,7 @@ const MessageModel = {
                 FROM messages m
                 JOIN users u ON m.senderId = u.id
                 WHERE m.recipientId = ?
-                ORDER BY m.createdAt DESC`,
+                ORDER BY m.created_at DESC`,
                 [userId]
             );
             return rows;
@@ -32,7 +32,7 @@ const MessageModel = {
                 FROM messages m
                 JOIN users u ON m.recipientId = u.id
                 WHERE m.senderId = ?
-                ORDER BY m.createdAt DESC`,
+                ORDER BY m.created_at DESC`,
                 [userId]
             );
             return rows;
@@ -88,7 +88,7 @@ const MessageModel = {
                 JOIN users u ON m.senderId = u.id
                 WHERE (m.senderId = ? AND m.recipientId = ?) 
                 OR (m.senderId = ? AND m.recipientId = ?)
-                ORDER BY m.createdAt ASC`,
+                ORDER BY m.created_at ASC`,
                 [user1Id, user2Id, user2Id, user1Id]
             );
             return rows;
@@ -184,7 +184,7 @@ const MessageModel = {
                 FROM messages m
                 JOIN users u ON m.senderId = u.id
                 WHERE m.recipientId = ?
-                ORDER BY m.createdAt DESC
+                ORDER BY m.created_at DESC
                 LIMIT 5`,
                 [userId]
             );
