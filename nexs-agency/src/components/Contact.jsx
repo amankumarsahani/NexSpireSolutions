@@ -61,7 +61,7 @@ const Contact = () => {
     {
       icon: "ri-phone-line",
       title: "Call Us",
-      details: "+91 76963 09551",
+      details: "+91 9729916844",
       description: "Mon-Fri from 8am to 10pm"
     },
     {
@@ -242,13 +242,13 @@ const Contact = () => {
                     {/* Status Message */}
                     {submitStatus.message && (
                       <div className={`p-3 rounded-lg text-sm ${submitStatus.type === 'success'
-                          ? 'bg-green-50 text-green-700 border border-green-200'
-                          : 'bg-red-50 text-red-700 border border-red-200'
+                        ? 'bg-green-50 text-green-700 border border-green-200'
+                        : 'bg-red-50 text-red-700 border border-red-200'
                         }`}>
                         <div className="flex items-center">
                           <i className={`${submitStatus.type === 'success'
-                              ? 'ri-checkbox-circle-line'
-                              : 'ri-error-warning-line'
+                            ? 'ri-checkbox-circle-line'
+                            : 'ri-error-warning-line'
                             } mr-2`}></i>
                           <span>{submitStatus.message}</span>
                         </div>

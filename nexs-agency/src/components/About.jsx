@@ -396,7 +396,7 @@ const About = () => {
           </div>
         </div>
 
-        {/* Ultra Modern Team Section */}
+        {/* Ultra Modern Team Section - COMMENTED OUT
         <div className={`transition-all duration-1000 delay-900 transform ${isVisible ? 'translate-y-0 opacity-100' : 'translate-y-8 opacity-0'
           }`}>
           <div className="text-center mb-16">
@@ -431,16 +431,12 @@ const About = () => {
                   onMouseLeave={() => setHoveredMember(null)}
                   className="group relative w-80"
                 >
-                  {/* Background Glow */}
                   <div className={`absolute -inset-3 bg-gradient-to-r ${memberColors[index].bg} rounded-3xl blur-2xl opacity-60 transition-all duration-700`}></div>
 
-                  {/* Main Card */}
                   <div className="relative bg-white/5 backdrop-blur-2xl rounded-3xl p-8 border border-white/30 transition-all duration-500 transform -translate-y-3 shadow-2xl">
 
-                    {/* Profile Section */}
                     <div className="text-center mb-6">
                       <div className="relative w-28 h-28 mx-auto mb-6">
-                        {/* Image Container */}
                         <div className="relative w-full h-full scale-105 transition-transform duration-500">
                           <img
                             src={member.image}
@@ -448,7 +444,6 @@ const About = () => {
                             className="w-full h-full rounded-3xl object-cover border-4 border-white/40 shadow-2xl transition-all duration-300"
                           />
 
-                          {/* Gradient Overlay */}
                           <div
                             className="absolute inset-0 rounded-3xl opacity-20 transition-all duration-300"
                             style={{
@@ -457,7 +452,6 @@ const About = () => {
                           ></div>
                         </div>
 
-                        {/* Status Badge */}
                         <div
                           className="absolute -bottom-2 -right-2 w-8 h-8 rounded-2xl border-4 border-white shadow-xl flex items-center justify-center"
                           style={{ backgroundColor: memberColors[index].primary }}
@@ -465,14 +459,12 @@ const About = () => {
                           <div className="text-white text-sm">✓</div>
                         </div>
 
-                        {/* Floating Decoration */}
                         <div
                           className="absolute -top-2 -left-2 w-6 h-6 rounded-full opacity-80 transition-all duration-500 animate-bounce"
                           style={{ backgroundColor: memberColors[index].secondary }}
                         ></div>
                       </div>
 
-                      {/* Name & Role */}
                       <div className="space-y-2 mb-6">
                         <h4 className="text-xl font-bold text-gray-900 scale-105 transition-transform duration-300">
                           {member.name}
@@ -490,7 +482,6 @@ const About = () => {
                         </p>
                       </div>
 
-                      {/* Skills */}
                       <div className="flex flex-wrap justify-center gap-2">
                         {member.skills.slice(0, 2).map((skill, skillIndex) => (
                           <span
@@ -503,7 +494,6 @@ const About = () => {
                       </div>
                     </div>
 
-                    {/* Animated Bottom Bar */}
                     <div className="absolute bottom-0 left-2 right-2 h-1.5 rounded-b-3xl overflow-hidden">
                       <div
                         className="h-full w-full transition-all duration-700 ease-out"
@@ -513,14 +503,12 @@ const About = () => {
                       ></div>
                     </div>
 
-                    {/* Corner Decorations */}
                     <div
                       className="absolute top-4 right-4 w-3 h-3 rounded-full opacity-60 transition-all duration-500 animate-pulse"
                       style={{ backgroundColor: memberColors[index].primary }}
                     ></div>
                   </div>
 
-                  {/* Extended Hover Glow */}
                   {hoveredMember === member.name && (
                     <div
                       className="absolute -inset-4 rounded-4xl blur-2xl animate-pulse opacity-30"
@@ -534,6 +522,7 @@ const About = () => {
             })}
           </div>
         </div>
+        */}
       </div>
     </section >
   );
