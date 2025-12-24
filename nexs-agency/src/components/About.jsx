@@ -21,13 +21,13 @@ const About = () => {
   }, [])
 
   const teamMembers = [
-    {
-      name: "Aman Kumar Sahani",
-      role: "Full Stack Developer",
-      image: "https://media.licdn.com/dms/image/v2/D5635AQH5ci5Ugk1vTw/profile-framedphoto-shrink_400_400/B56ZfvUFh9GUAc-/0/1752066710244?e=1764432000&v=beta&t=tKuFhdqPPrrcdpFEn9N8hDVCx1MTK5HeqUAbZ_ise8I",
-      skills: ["React", "Node.js", "Python", "AWS"],
-      gradient: "from-blue-500 to-blue-600"
-    },
+    // {
+    //   name: "Aman Kumar Sahani",
+    //   role: "Full Stack Developer",
+    //   image: "https://media.licdn.com/dms/image/v2/D5635AQH5ci5Ugk1vTw/profile-framedphoto-shrink_400_400/B56ZfvUFh9GUAc-/0/1752066710244?e=1764432000&v=beta&t=tKuFhdqPPrrcdpFEn9N8hDVCx1MTK5HeqUAbZ_ise8I",
+    //   skills: ["React", "Node.js", "Python", "AWS"],
+    //   gradient: "from-blue-500 to-blue-600"
+    // },
     {
       name: "Anu Kumar",
       role: "Full Stack Developer",

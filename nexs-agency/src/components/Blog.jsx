@@ -9,17 +9,17 @@ function Blog() {
   }, [])
 
   const blogPosts = [
-    {
-      title: "The Future of Web Development: Trends to Watch in 2024",
-      category: "Web Development",
-      image: "https://images.unsplash.com/photo-1517180102446-f3ece451e9d8?w=400&h=250&fit=crop",
-      description: "Explore the latest trends shaping the web development landscape, from AI integration to advanced frameworks.",
-      tags: ["React", "Next.js", "AI", "Trends"],
-      author: "Aman Kumar Sahani",
-      date: "March 15, 2025",
-      readTime: "5 min read",
-      color: "from-blue-500 to-cyan-500"
-    },
+    // {
+    //   title: "The Future of Web Development: Trends to Watch in 2024",
+    //   category: "Web Development",
+    //   image: "https://images.unsplash.com/photo-1517180102446-f3ece451e9d8?w=400&h=250&fit=crop",
+    //   description: "Explore the latest trends shaping the web development landscape, from AI integration to advanced frameworks.",
+    //   tags: ["React", "Next.js", "AI", "Trends"],
+    //   author: "Aman Kumar Sahani",
+    //   date: "March 15, 2025",
+    //   readTime: "5 min read",
+    //   color: "from-blue-500 to-cyan-500"
+    // },
     {
       title: "Mobile App Development: Native vs Cross-Platform in 2024",
       category: "Mobile Development",
@@ -31,17 +31,17 @@ function Blog() {
       readTime: "7 min read",
       color: "from-purple-500 to-pink-500"
     },
-    {
-      title: "Building Scalable Cloud Architecture: Best Practices",
-      category: "Cloud & DevOps",
-      image: "https://images.unsplash.com/photo-1451187580459-43490279c0fa?w=400&h=250&fit=crop",
-      description: "Learn how to design and implement cloud solutions that grow with your business needs while maintaining performance.",
-      tags: ["AWS", "Azure", "Kubernetes", "DevOps"],
-      author: "Aman Kumar Sahani",
-      date: "March 10, 2025",
-      readTime: "8 min read",
-      color: "from-green-500 to-emerald-500"
-    },
+    // {
+    //   title: "Building Scalable Cloud Architecture: Best Practices",
+    //   category: "Cloud & DevOps",
+    //   image: "https://images.unsplash.com/photo-1451187580459-43490279c0fa?w=400&h=250&fit=crop",
+    //   description: "Learn how to design and implement cloud solutions that grow with your business needs while maintaining performance.",
+    //   tags: ["AWS", "Azure", "Kubernetes", "DevOps"],
+    //   author: "Aman Kumar Sahani",
+    //   date: "March 10, 2025",
+    //   readTime: "8 min read",
+    //   color: "from-green-500 to-emerald-500"
+    // },
     {
       title: "UI/UX Design Principles for Modern Web Applications",
       category: "Design",
@@ -64,17 +64,17 @@ function Blog() {
       readTime: "9 min read",
       color: "from-red-500 to-pink-500"
     },
-    {
-      title: "AI Integration in Modern Software Development",
-      category: "AI & Technology",
-      image: "https://images.unsplash.com/photo-1677442136019-21780ecad995?w=400&h=250&fit=crop",
-      description: "How artificial intelligence is revolutionizing software development and what developers need to know about AI integration.",
-      tags: ["AI", "Machine Learning", "GPT", "Automation"],
-      author: "Aman Kumar Sahani",
-      date: "March 3, 2025",
-      readTime: "10 min read",
-      color: "from-indigo-500 to-purple-500"
-    }
+    // {
+    //   title: "AI Integration in Modern Software Development",
+    //   category: "AI & Technology",
+    //   image: "https://images.unsplash.com/photo-1677442136019-21780ecad995?w=400&h=250&fit=crop",
+    //   description: "How artificial intelligence is revolutionizing software development and what developers need to know about AI integration.",
+    //   tags: ["AI", "Machine Learning", "GPT", "Automation"],
+    //   author: "Aman Kumar Sahani",
+    //   date: "March 3, 2025",
+    //   readTime: "10 min read",
+    //   color: "from-indigo-500 to-purple-500"
+    // }
   ]
 
   const categories = ["All", "Web Development", "Mobile Development", "Cloud & DevOps", "Design", "Security", "AI & Technology"]

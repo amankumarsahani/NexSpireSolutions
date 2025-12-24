@@ -77,12 +77,12 @@ const AboutPage = () => {
   ];
 
   const team = [
-    {
-      name: "Aman Kumar Sahani",
-      role: "Founder & Lead Architect",
-      image: avatarAman,
-      bio: "Visionary leader with a passion for scalable architecture and AI integration."
-    },
+    // {
+    //   name: "Aman Kumar Sahani",
+    //   role: "Founder & Lead Architect",
+    //   image: avatarAman,
+    //   bio: "Visionary leader with a passion for scalable architecture and AI integration."
+    // },
     {
       name: "Anu Kumar",
       role: "Creative Director",

@@ -33,17 +33,17 @@ const BlogPage = () => {
     }, []);
 
     const posts = [
-        {
-            id: 1,
-            title: "The Future of AI in Web Development",
-            excerpt: "How artificial intelligence is reshaping the way we build and interact with the web. From automated testing to generative UI, the landscape is changing fast.",
-            category: "Technology",
-            author: "Aman Kumar",
-            date: "Mar 15, 2024",
-            readTime: "5 min read",
-            image: "https://images.unsplash.com/photo-1677442136019-21780ecad995?w=1200&q=80",
-            featured: true
-        },
+        // {
+        //     id: 1,
+        //     title: "The Future of AI in Web Development",
+        //     excerpt: "How artificial intelligence is reshaping the way we build and interact with the web. From automated testing to generative UI, the landscape is changing fast.",
+        //     category: "Technology",
+        //     author: "Aman Kumar",
+        //     date: "Mar 15, 2024",
+        //     readTime: "5 min read",
+        //     image: "https://images.unsplash.com/photo-1677442136019-21780ecad995?w=1200&q=80",
+        //     featured: true
+        // },
         {
             id: 2,
             title: "Mastering React Server Components",
@@ -66,17 +66,17 @@ const BlogPage = () => {
             image: "https://images.unsplash.com/photo-1586717791821-3f44a5638d48?w=800&q=80",
             featured: false
         },
-        {
-            id: 4,
-            title: "Cloud Native Architecture Patterns",
-            excerpt: "Best practices for building scalable and resilient applications on the cloud.",
-            category: "Cloud",
-            author: "Aman Kumar",
-            date: "Mar 08, 2024",
-            readTime: "10 min read",
-            image: "https://images.unsplash.com/photo-1451187580459-43490279c0fa?w=800&q=80",
-            featured: false
-        },
+        // {
+        //     id: 4,
+        //     title: "Cloud Native Architecture Patterns",
+        //     excerpt: "Best practices for building scalable and resilient applications on the cloud.",
+        //     category: "Cloud",
+        //     author: "Aman Kumar",
+        //     date: "Mar 08, 2024",
+        //     readTime: "10 min read",
+        //     image: "https://images.unsplash.com/photo-1451187580459-43490279c0fa?w=800&q=80",
+        //     featured: false
+        // },
         {
             id: 5,
             title: "The State of Mobile Dev in 2024",
