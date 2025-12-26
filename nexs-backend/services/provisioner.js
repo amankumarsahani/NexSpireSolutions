@@ -109,6 +109,12 @@ class Provisioner {
             });
             console.log(`[Provisioner] Registered with registry service`);
 
+            // 9. Add storefront DNS (slug.domain -> Cloudflare Pages for storefront)
+            if (this.cfApiToken && this.cfZoneId) {
+                await this.addStorefrontRoute(slug);
+                console.log(`[Provisioner] Cloudflare storefront route added`);
+            }
+
             return {
                 port,
                 dbName,
@@ -419,6 +425,81 @@ class Provisioner {
         } catch (error) {
             console.warn('[Provisioner] Pages domain attachment error:', error.message);
             return false;
+        }
+    }
+
+    /**
+     * Add Cloudflare DNS record for storefront (slug.domain -> Storefront Pages)
+     */
+    async addStorefrontRoute(slug) {
+        if (!this.cfApiToken || !this.cfZoneId) {
+            console.warn('[Provisioner] Cloudflare not configured, skipping storefront DNS');
+            return null;
+        }
+
+        const storefrontDomain = `${slug}.${this.cfDomain}`;
+        const storefrontPagesUrl = process.env.NEXCRM_STOREFRONT_PAGES_URL || 'nexcrm-storefront.pages.dev';
+        const storefrontProject = process.env.NEXCRM_STOREFRONT_PROJECT || 'nexcrm-storefront';
+
+        try {
+            // Create DNS CNAME record for storefront
+            const dnsResponse = await fetch(
+                `https://api.cloudflare.com/client/v4/zones/${this.cfZoneId}/dns_records`,
+                {
+                    method: 'POST',
+                    headers: {
+                        'Authorization': `Bearer ${this.cfApiToken}`,
+                        'Content-Type': 'application/json'
+                    },
+                    body: JSON.stringify({
+                        type: 'CNAME',
+                        name: storefrontDomain,
+                        content: storefrontPagesUrl,
+                        proxied: true,
+                        ttl: 1
+                    })
+                }
+            );
+
+            const dnsData = await dnsResponse.json();
+
+            if (!dnsData.success) {
+                // Check if record already exists
+                if (dnsData.errors?.[0]?.code === 81053) {
+                    console.log(`[Provisioner] Storefront DNS already exists: ${storefrontDomain}`);
+                    return null;
+                }
+                console.error('[Provisioner] Storefront DNS error:', dnsData.errors);
+                return null;
+            }
+
+            console.log(`[Provisioner] Storefront DNS created: ${storefrontDomain}`);
+
+            // Attach domain to storefront Pages project
+            if (this.cfAccountId && storefrontProject) {
+                try {
+                    await fetch(
+                        `https://api.cloudflare.com/client/v4/accounts/${this.cfAccountId}/pages/projects/${storefrontProject}/domains`,
+                        {
+                            method: 'POST',
+                            headers: {
+                                'Authorization': `Bearer ${this.cfApiToken}`,
+                                'Content-Type': 'application/json'
+                            },
+                            body: JSON.stringify({ name: storefrontDomain })
+                        }
+                    );
+                    console.log(`[Provisioner] Storefront domain attached to Pages: ${storefrontDomain}`);
+                } catch (e) {
+                    console.warn('[Provisioner] Could not attach storefront domain to Pages:', e.message);
+                }
+            }
+
+            return dnsData.result.id;
+
+        } catch (error) {
+            console.warn('[Provisioner] Storefront DNS error:', error.message);
+            return null;
         }
     }
 
