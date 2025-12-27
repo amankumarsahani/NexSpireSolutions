@@ -1,22 +1,37 @@
 -- =============================================
 -- Services Industry Module
--- Tables: services, appointments, bookings, timesheets
+-- Tables: service_categories, services, appointments, bookings, timesheets
 -- =============================================
+
+-- Service Categories
+CREATE TABLE IF NOT EXISTS service_categories (
+    id INT PRIMARY KEY AUTO_INCREMENT,
+    name VARCHAR(150) NOT NULL,
+    slug VARCHAR(150) UNIQUE,
+    description TEXT,
+    image VARCHAR(500),
+    active BOOLEAN DEFAULT TRUE,
+    sort_order INT DEFAULT 0,
+    created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+    updated_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
+    
+    INDEX idx_active (active)
+);
 
 -- Services catalog (what services the business offers)
 CREATE TABLE IF NOT EXISTS services (
     id INT PRIMARY KEY AUTO_INCREMENT,
     name VARCHAR(150) NOT NULL,
     slug VARCHAR(150) UNIQUE,
-    category VARCHAR(100),
+    category_id INT,
     
     -- Pricing
     price DECIMAL(10,2) NOT NULL,
+    compare_price DECIMAL(10,2),
     price_type ENUM('fixed', 'hourly', 'per_session', 'custom') DEFAULT 'fixed',
-    min_price DECIMAL(10,2),
-    max_price DECIMAL(10,2),
     
     -- Duration
+    duration INT DEFAULT 60,
     duration_minutes INT DEFAULT 60,
     buffer_time_before INT DEFAULT 0,
     buffer_time_after INT DEFAULT 15,
@@ -24,17 +39,22 @@ CREATE TABLE IF NOT EXISTS services (
     -- Details
     description TEXT,
     short_description VARCHAR(500),
-    image_url VARCHAR(500),
+    image VARCHAR(500),
+    images JSON,
+    
+    -- Display
+    featured BOOLEAN DEFAULT FALSE,
+    active BOOLEAN DEFAULT TRUE,
+    sort_order INT DEFAULT 0,
     
     -- Availability
-    is_active BOOLEAN DEFAULT TRUE,
-    availability_days JSON, -- ["monday", "tuesday", ...]
-    availability_slots JSON, -- [{"start": "09:00", "end": "17:00"}, ...]
+    availability_days JSON,
+    availability_slots JSON,
     max_bookings_per_slot INT DEFAULT 1,
     
     -- Staff assignment
     requires_staff BOOLEAN DEFAULT TRUE,
-    allowed_staff JSON, -- [1, 2, 3] (user IDs)
+    allowed_staff JSON,
     
     -- Settings
     requires_deposit BOOLEAN DEFAULT FALSE,
@@ -46,8 +66,10 @@ CREATE TABLE IF NOT EXISTS services (
     created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
     updated_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
     
-    INDEX idx_active (is_active),
-    INDEX idx_category (category)
+    FOREIGN KEY (category_id) REFERENCES service_categories(id) ON DELETE SET NULL,
+    INDEX idx_active (active),
+    INDEX idx_featured (featured),
+    INDEX idx_category (category_id)
 );
 
 -- Appointments (scheduled service bookings)
@@ -89,10 +111,10 @@ CREATE TABLE IF NOT EXISTS appointments (
     
     -- Reminders
     reminder_sent BOOLEAN DEFAULT FALSE,
-    reminder_sent_at TIMESTAMP,
+    reminder_sent_at TIMESTAMP NULL,
     
     -- Cancellation
-    cancelled_at TIMESTAMP,
+    cancelled_at TIMESTAMP NULL,
     cancellation_reason TEXT,
     
     created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
@@ -126,7 +148,7 @@ CREATE TABLE IF NOT EXISTS timesheets (
     -- Status
     status ENUM('draft', 'submitted', 'approved', 'rejected') DEFAULT 'draft',
     approved_by INT,
-    approved_at TIMESTAMP,
+    approved_at TIMESTAMP NULL,
     
     -- Notes
     notes TEXT,
@@ -144,7 +166,7 @@ CREATE TABLE IF NOT EXISTS timesheets (
 CREATE TABLE IF NOT EXISTS staff_availability (
     id INT PRIMARY KEY AUTO_INCREMENT,
     user_id INT NOT NULL,
-    day_of_week TINYINT NOT NULL, -- 0=Sunday, 1=Monday, etc.
+    day_of_week TINYINT NOT NULL,
     start_time TIME NOT NULL,
     end_time TIME NOT NULL,
     is_available BOOLEAN DEFAULT TRUE,
@@ -220,14 +242,6 @@ CREATE TABLE IF NOT EXISTS customer_packages (
     FOREIGN KEY (client_id) REFERENCES clients(id) ON DELETE CASCADE
 );
 
--- Generate appointment number trigger
-DELIMITER //
-CREATE TRIGGER before_appointment_insert
-BEFORE INSERT ON appointments
-FOR EACH ROW
-BEGIN
-    IF NEW.appointment_number IS NULL THEN
-        SET NEW.appointment_number = CONCAT('APT', DATE_FORMAT(NOW(), '%y%m'), LPAD(FLOOR(RAND() * 10000), 4, '0'));
-    END IF;
-END//
-DELIMITER ;
+-- Insert default category
+INSERT IGNORE INTO service_categories (id, name, slug, description, active) VALUES 
+(1, 'General', 'general', 'General services', TRUE);
