@@ -13,10 +13,8 @@ const inquiryRateLimit = rateLimit({
     },
     standardHeaders: true,
     legacyHeaders: false,
-    keyGenerator: (req) => {
-        // Use X-Forwarded-For header if behind a proxy, otherwise use IP
-        return req.headers['x-forwarded-for']?.split(',')[0]?.trim() || req.ip;
-    }
+    // Disable validation to prevent IPv6 crash
+    validate: { xForwardedForHeader: false, default: true }
 });
 
 /**
@@ -31,7 +29,8 @@ const generalRateLimit = rateLimit({
         retryAfter: 15
     },
     standardHeaders: true,
-    legacyHeaders: false
+    legacyHeaders: false,
+    validate: { xForwardedForHeader: false, default: true }
 });
 
 module.exports = {
