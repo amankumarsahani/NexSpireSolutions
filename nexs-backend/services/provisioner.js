@@ -566,9 +566,56 @@ class Provisioner {
         try {
             await execAsync(cmd);
             await execAsync('pm2 save');
+
+            // Update ecosystem.config.js for reboot persistence
+            await this.updateEcosystemConfig(tenant);
         } catch (error) {
             console.error('[Provisioner] PM2 start error:', error);
             throw error;
+        }
+    }
+
+    /**
+     * Update ecosystem.config.js to include new tenant
+     * This ensures the tenant process restarts on system reboot
+     */
+    async updateEcosystemConfig(tenant) {
+        const ecosystemPath = process.env.ECOSYSTEM_CONFIG_PATH || '/var/www/html/ecosystem.config.js';
+
+        try {
+            // Read current config
+            let configContent = await fs.readFile(ecosystemPath, 'utf8');
+
+            const processName = `tenant-${tenant.slug}`;
+
+            // Check if already exists
+            if (configContent.includes(`name: "${processName}"`)) {
+                console.log(`[Provisioner] Ecosystem config already has ${processName}`);
+                return;
+            }
+
+            // Create new app entry
+            const newApp = `    {
+      name: "${processName}",
+      cwd: "${this.nexcrmBackendPath}",
+      script: "server.js",
+      args: "--port ${tenant.assigned_port} --db ${tenant.db_name} --industry ${tenant.industry_type || 'general'} --plan ${tenant.plan_slug || 'starter'}"
+    }`;
+
+            // Insert before the closing bracket of apps array
+            // Find the last closing brace before "  ]"
+            const insertPoint = configContent.lastIndexOf('    }') + 5;
+            const beforeInsert = configContent.substring(0, insertPoint);
+            const afterInsert = configContent.substring(insertPoint);
+
+            configContent = beforeInsert + ',\n' + newApp + afterInsert;
+
+            await fs.writeFile(ecosystemPath, configContent);
+            console.log(`[Provisioner] Added ${processName} to ecosystem.config.js`);
+
+        } catch (error) {
+            console.warn('[Provisioner] Could not update ecosystem.config.js:', error.message);
+            // Don't throw - PM2 process is already started and saved
         }
     }
 
