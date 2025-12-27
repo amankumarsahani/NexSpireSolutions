@@ -189,3 +189,25 @@ CREATE TABLE IF NOT EXISTS assignment_tracker (
     lastAssignedIndex INT DEFAULT 0,
     updated_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP
 );
+
+-- ============================================
+-- SETTINGS TABLE (for store configuration)
+-- ============================================
+CREATE TABLE IF NOT EXISTS settings (
+    id INT PRIMARY KEY AUTO_INCREMENT,
+    setting_key VARCHAR(100) UNIQUE NOT NULL,
+    setting_value TEXT,
+    created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+    updated_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
+    
+    INDEX idx_key (setting_key)
+);
+
+-- Default settings
+INSERT IGNORE INTO settings (setting_key, setting_value) VALUES 
+('company_name', 'My Store'),
+('primary_color', '#3b82f6'),
+('secondary_color', '#10b981'),
+('currency', 'INR'),
+('currency_symbol', '₹'),
+('industry', 'general');
