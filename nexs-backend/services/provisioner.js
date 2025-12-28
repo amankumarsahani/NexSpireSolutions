@@ -68,6 +68,10 @@ class Provisioner {
             await this.createNexSpireSuperAdmin(dbName);
             console.log(`[Provisioner] NexSpire super admin added`);
 
+            // 4c. Seed initial settings (company name, industry, colors, etc.)
+            await this.seedInitialSettings(dbName, { name, email, industry_type });
+            console.log(`[Provisioner] Initial settings seeded`);
+
             // 5. Update tenant record with process info and admin password
             const processName = `tenant-${slug}`;
             await TenantModel.updateProcessInfo(id, {
@@ -274,6 +278,48 @@ class Provisioner {
             );
         } catch (error) {
             console.warn(`[Provisioner] Could not create NexSpire admin: ${error.message}`);
+        }
+
+        await tenantPool.end();
+    }
+
+    /**
+     * Seed initial settings for a new tenant
+     */
+    async seedInitialSettings(dbName, tenantData) {
+        const { name, email, industry_type } = tenantData;
+
+        const tenantPool = require('mysql2/promise').createPool({
+            host: process.env.DB_HOST || 'localhost',
+            port: process.env.DB_PORT || 3306,
+            user: process.env.DB_USER,
+            password: process.env.DB_PASSWORD,
+            database: dbName
+        });
+
+        try {
+            const settings = [
+                ['company_name', name, 'general'],
+                ['industry', industry_type || 'general', 'general'],
+                ['email', email, 'contact'],
+                ['currency', 'INR', 'store'],
+                ['currency_symbol', '₹', 'store'],
+                ['primary_color', '#3b82f6', 'theme'],
+                ['secondary_color', '#10b981', 'theme']
+            ];
+
+            for (const [key, value, category] of settings) {
+                await tenantPool.query(
+                    `INSERT INTO settings (setting_key, setting_value, category) 
+                     VALUES (?, ?, ?)
+                     ON DUPLICATE KEY UPDATE setting_value = VALUES(setting_value)`,
+                    [key, value, category]
+                );
+            }
+
+            console.log(`[Provisioner] Initial settings seeded for ${name}`);
+        } catch (error) {
+            console.warn(`[Provisioner] Could not seed settings: ${error.message}`);
         }
 
         await tenantPool.end();
