@@ -529,10 +529,18 @@ class Provisioner {
             );
 
             await fs.writeFile(this.cfConfigPath, config);
+            console.log('[Provisioner] Tunnel config updated');
 
-            // Restart cloudflared to apply changes (use sudo)
-            await execAsync('sudo systemctl restart cloudflared');
-            console.log('[Provisioner] Tunnel config updated and cloudflared restarted');
+            // Restart cloudflared AFTER a delay to allow API response to be sent first
+            // This prevents breaking the connection that's waiting for the provisioning response
+            setTimeout(async () => {
+                try {
+                    await execAsync('sudo systemctl restart cloudflared');
+                    console.log('[Provisioner] Cloudflared restarted (deferred)');
+                } catch (err) {
+                    console.warn('[Provisioner] Deferred cloudflared restart failed:', err.message);
+                }
+            }, 2000); // 2 second delay
 
         } catch (error) {
             console.warn('[Provisioner] Could not update tunnel config:', error.message);
