@@ -502,7 +502,6 @@ class Provisioner {
             return null;
         }
     }
-
     /**
      * Update Cloudflare tunnel config
      */
@@ -531,8 +530,8 @@ class Provisioner {
             await fs.writeFile(this.cfConfigPath, config);
             console.log('[Provisioner] Tunnel config updated');
 
-            // Restart cloudflared AFTER a delay to allow API response to be sent first
-            // This prevents breaking the connection that's waiting for the provisioning response
+            // Restart cloudflared AFTER a longer delay to allow API response AND subsequent 
+            // fetchData() calls to complete before tunnel restart breaks connections
             setTimeout(async () => {
                 try {
                     await execAsync('sudo systemctl restart cloudflared');
@@ -540,7 +539,7 @@ class Provisioner {
                 } catch (err) {
                     console.warn('[Provisioner] Deferred cloudflared restart failed:', err.message);
                 }
-            }, 2000); // 2 second delay
+            }, 5000); // 5 second delay - gives time for response + fetchData()
 
         } catch (error) {
             console.warn('[Provisioner] Could not update tunnel config:', error.message);
