@@ -755,7 +755,353 @@ class Provisioner {
             console.warn('[Provisioner] Could not register user with registry:', error.message);
         }
     }
+
+    /**
+     * Get PM2 logs for a tenant process
+     */
+    async getProcessLogs(tenant, lines = 100) {
+        const processName = tenant.process_name || `tenant-${tenant.slug}`;
+
+        try {
+            // Get both stdout and stderr logs
+            const { stdout: outLogs } = await execAsync(
+                `pm2 logs ${processName} --nostream --lines ${lines} 2>&1 || echo "No logs available"`
+            );
+
+            return {
+                logs: outLogs,
+                processName,
+                timestamp: new Date().toISOString()
+            };
+        } catch (error) {
+            console.warn('[Provisioner] Could not get PM2 logs:', error.message);
+            return {
+                logs: `Error fetching logs: ${error.message}`,
+                processName,
+                timestamp: new Date().toISOString()
+            };
+        }
+    }
+
+    /**
+     * Remove Cloudflare frontend DNS record (tenant-crm.domain)
+     */
+    async removeCloudflareFrontendRoute(slug) {
+        if (!this.cfApiToken || !this.cfZoneId) {
+            return null;
+        }
+
+        const hostname = `${slug}-crm.${this.cfDomain}`;
+
+        try {
+            // First, find the DNS record ID
+            const searchResponse = await fetch(
+                `https://api.cloudflare.com/client/v4/zones/${this.cfZoneId}/dns_records?name=${hostname}`,
+                {
+                    headers: {
+                        'Authorization': `Bearer ${this.cfApiToken}`
+                    }
+                }
+            );
+
+            const searchData = await searchResponse.json();
+
+            if (!searchData.success || !searchData.result.length) {
+                console.log(`[Provisioner] Frontend DNS record not found: ${hostname}`);
+                return null;
+            }
+
+            const recordId = searchData.result[0].id;
+
+            // Delete the record
+            await fetch(
+                `https://api.cloudflare.com/client/v4/zones/${this.cfZoneId}/dns_records/${recordId}`,
+                {
+                    method: 'DELETE',
+                    headers: {
+                        'Authorization': `Bearer ${this.cfApiToken}`
+                    }
+                }
+            );
+
+            console.log(`[Provisioner] Removed frontend DNS: ${hostname}`);
+            return recordId;
+
+        } catch (error) {
+            console.warn('[Provisioner] Could not remove frontend DNS:', error.message);
+            return null;
+        }
+    }
+
+    /**
+     * Remove Cloudflare storefront DNS record (slug.domain)
+     */
+    async removeStorefrontRoute(slug) {
+        if (!this.cfApiToken || !this.cfZoneId) {
+            return null;
+        }
+
+        const hostname = `${slug}.${this.cfDomain}`;
+
+        try {
+            // Find the DNS record ID
+            const searchResponse = await fetch(
+                `https://api.cloudflare.com/client/v4/zones/${this.cfZoneId}/dns_records?name=${hostname}`,
+                {
+                    headers: {
+                        'Authorization': `Bearer ${this.cfApiToken}`
+                    }
+                }
+            );
+
+            const searchData = await searchResponse.json();
+
+            if (!searchData.success || !searchData.result.length) {
+                console.log(`[Provisioner] Storefront DNS record not found: ${hostname}`);
+                return null;
+            }
+
+            const recordId = searchData.result[0].id;
+
+            // Delete the record
+            await fetch(
+                `https://api.cloudflare.com/client/v4/zones/${this.cfZoneId}/dns_records/${recordId}`,
+                {
+                    method: 'DELETE',
+                    headers: {
+                        'Authorization': `Bearer ${this.cfApiToken}`
+                    }
+                }
+            );
+
+            console.log(`[Provisioner] Removed storefront DNS: ${hostname}`);
+            return recordId;
+
+        } catch (error) {
+            console.warn('[Provisioner] Could not remove storefront DNS:', error.message);
+            return null;
+        }
+    }
+
+    /**
+     * Remove custom domain from Cloudflare Pages project
+     */
+    async removeDomainFromPages(domain, project = null) {
+        if (!this.cfApiToken || !this.cfAccountId) {
+            return false;
+        }
+
+        const projectName = project || this.cfPagesProject;
+
+        try {
+            const response = await fetch(
+                `https://api.cloudflare.com/client/v4/accounts/${this.cfAccountId}/pages/projects/${projectName}/domains/${domain}`,
+                {
+                    method: 'DELETE',
+                    headers: {
+                        'Authorization': `Bearer ${this.cfApiToken}`
+                    }
+                }
+            );
+
+            const data = await response.json();
+
+            if (data.success) {
+                console.log(`[Provisioner] Removed domain from Pages: ${domain}`);
+                return true;
+            }
+
+            console.warn('[Provisioner] Could not remove domain from Pages:', data.errors);
+            return false;
+
+        } catch (error) {
+            console.warn('[Provisioner] Pages domain removal error:', error.message);
+            return false;
+        }
+    }
+
+    /**
+     * Remove tenant from ecosystem.config.js
+     */
+    async removeFromEcosystemConfig(processName) {
+        const ecosystemPath = process.env.ECOSYSTEM_CONFIG_PATH || '/var/www/html/ecosystem.config.js';
+
+        try {
+            let configContent = await fs.readFile(ecosystemPath, 'utf8');
+
+            // Find and remove the process block
+            // Match the entire app object including surrounding formatting
+            const regex = new RegExp(
+                `\\s*,?\\s*\\{[^}]*name:\\s*"${processName}"[^}]*\\}`,
+                'g'
+            );
+
+            const newContent = configContent.replace(regex, '');
+
+            // Clean up any double commas that might result
+            const cleanedContent = newContent.replace(/,(\s*,)+/g, ',').replace(/\[\s*,/g, '[');
+
+            await fs.writeFile(ecosystemPath, cleanedContent);
+            console.log(`[Provisioner] Removed ${processName} from ecosystem.config.js`);
+            return true;
+
+        } catch (error) {
+            console.warn('[Provisioner] Could not update ecosystem.config.js:', error.message);
+            return false;
+        }
+    }
+
+    /**
+     * Remove tenant route from Cloudflare tunnel config
+     */
+    async removeFromTunnelConfig(slug) {
+        try {
+            let config = await fs.readFile(this.cfConfigPath, 'utf8');
+
+            const hostname = `${slug}-crm-api.${this.cfDomain}`;
+
+            // Remove the route entry (hostname + service lines)
+            const lines = config.split('\n');
+            const newLines = [];
+            let skipNext = false;
+
+            for (let i = 0; i < lines.length; i++) {
+                if (lines[i].includes(`hostname: ${hostname}`)) {
+                    skipNext = true; // Skip the next line (service line)
+                    continue;
+                }
+                if (skipNext && lines[i].trim().startsWith('service:')) {
+                    skipNext = false;
+                    continue;
+                }
+                newLines.push(lines[i]);
+            }
+
+            await fs.writeFile(this.cfConfigPath, newLines.join('\n'));
+
+            // Restart cloudflared
+            await execAsync('sudo systemctl restart cloudflared');
+            console.log(`[Provisioner] Removed ${hostname} from tunnel config`);
+            return true;
+
+        } catch (error) {
+            console.warn('[Provisioner] Could not update tunnel config:', error.message);
+            return false;
+        }
+    }
+
+    /**
+     * Drop tenant database
+     */
+    async dropDatabase(dbName) {
+        try {
+            await pool.query(`DROP DATABASE IF EXISTS \`${dbName}\``);
+            console.log(`[Provisioner] Dropped database: ${dbName}`);
+            return true;
+        } catch (error) {
+            console.error('[Provisioner] Could not drop database:', error.message);
+            return false;
+        }
+    }
+
+    /**
+     * Full cleanup - remove all tenant resources
+     */
+    async fullCleanup(tenant, options = {}) {
+        const { dropDb = false } = options;
+        const results = {
+            pm2Deleted: false,
+            apiDnsRemoved: false,
+            frontendDnsRemoved: false,
+            storefrontDnsRemoved: false,
+            pagesDomainsRemoved: false,
+            tunnelConfigUpdated: false,
+            ecosystemUpdated: false,
+            databaseDropped: false
+        };
+
+        const processName = tenant.process_name || `tenant-${tenant.slug}`;
+
+        console.log(`[Provisioner] Starting full cleanup for: ${tenant.slug}`);
+
+        // 1. Stop and delete PM2 process
+        try {
+            await this.deleteProcess(tenant);
+            results.pm2Deleted = true;
+        } catch (e) {
+            console.warn('[Provisioner] PM2 delete failed:', e.message);
+        }
+
+        // 2. Remove API DNS record
+        if (tenant.cf_dns_record_id) {
+            try {
+                await this.removeCloudflareRoute(tenant.cf_dns_record_id);
+                results.apiDnsRemoved = true;
+            } catch (e) {
+                console.warn('[Provisioner] API DNS removal failed:', e.message);
+            }
+        }
+
+        // 3. Remove frontend DNS record
+        try {
+            await this.removeCloudflareFrontendRoute(tenant.slug);
+            results.frontendDnsRemoved = true;
+        } catch (e) {
+            console.warn('[Provisioner] Frontend DNS removal failed:', e.message);
+        }
+
+        // 4. Remove storefront DNS record
+        try {
+            await this.removeStorefrontRoute(tenant.slug);
+            results.storefrontDnsRemoved = true;
+        } catch (e) {
+            console.warn('[Provisioner] Storefront DNS removal failed:', e.message);
+        }
+
+        // 5. Remove custom domains from Cloudflare Pages
+        try {
+            const frontendDomain = `${tenant.slug}-crm.${this.cfDomain}`;
+            const storefrontDomain = `${tenant.slug}.${this.cfDomain}`;
+            const storefrontProject = process.env.NEXCRM_STOREFRONT_PROJECT || 'nexcrm-storefront';
+
+            await this.removeDomainFromPages(frontendDomain, this.cfPagesProject);
+            await this.removeDomainFromPages(storefrontDomain, storefrontProject);
+            results.pagesDomainsRemoved = true;
+        } catch (e) {
+            console.warn('[Provisioner] Pages domain removal failed:', e.message);
+        }
+
+        // 6. Remove from tunnel config
+        try {
+            await this.removeFromTunnelConfig(tenant.slug);
+            results.tunnelConfigUpdated = true;
+        } catch (e) {
+            console.warn('[Provisioner] Tunnel config update failed:', e.message);
+        }
+
+        // 7. Remove from ecosystem.config.js
+        try {
+            await this.removeFromEcosystemConfig(processName);
+            results.ecosystemUpdated = true;
+        } catch (e) {
+            console.warn('[Provisioner] Ecosystem config update failed:', e.message);
+        }
+
+        // 8. Drop database (optional)
+        if (dropDb && tenant.db_name) {
+            try {
+                await this.dropDatabase(tenant.db_name);
+                results.databaseDropped = true;
+            } catch (e) {
+                console.warn('[Provisioner] Database drop failed:', e.message);
+            }
+        }
+
+        console.log(`[Provisioner] Full cleanup complete for: ${tenant.slug}`, results);
+        return results;
+    }
 }
 
 module.exports = new Provisioner();
+
 

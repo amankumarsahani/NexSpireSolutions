@@ -328,6 +328,63 @@ class TenantController {
             res.status(500).json({ error: 'Failed to delete tenant' });
         }
     }
+
+    /**
+     * Get PM2 logs for a tenant
+     */
+    async getLogs(req, res) {
+        try {
+            const { id } = req.params;
+            const { lines = 100 } = req.query;
+
+            const tenant = await TenantModel.findById(id);
+            if (!tenant) {
+                return res.status(404).json({ error: 'Tenant not found' });
+            }
+
+            const logsData = await Provisioner.getProcessLogs(tenant, parseInt(lines));
+
+            res.json({
+                success: true,
+                data: logsData
+            });
+        } catch (error) {
+            console.error('Get logs error:', error);
+            res.status(500).json({ error: 'Failed to fetch logs' });
+        }
+    }
+
+    /**
+     * Full delete tenant - removes all resources
+     */
+    async fullDeleteTenant(req, res) {
+        try {
+            const { id } = req.params;
+            const { dropDatabase = false } = req.body;
+
+            const tenant = await TenantModel.findById(id);
+            if (!tenant) {
+                return res.status(404).json({ error: 'Tenant not found' });
+            }
+
+            // Perform full cleanup
+            const cleanupResults = await Provisioner.fullCleanup(tenant, {
+                dropDb: dropDatabase
+            });
+
+            // Hard delete from database
+            await TenantModel.hardDelete(id);
+
+            res.json({
+                success: true,
+                message: 'Tenant fully deleted',
+                data: cleanupResults
+            });
+        } catch (error) {
+            console.error('Full delete tenant error:', error);
+            res.status(500).json({ error: 'Failed to fully delete tenant' });
+        }
+    }
 }
 
 module.exports = new TenantController();

@@ -216,6 +216,18 @@ class TenantModel {
         // Update status to cancelled
         await pool.query('UPDATE tenants SET status = ? WHERE id = ?', ['cancelled', id]);
     }
+
+    /**
+     * Hard delete tenant - permanently remove from database
+     */
+    static async hardDelete(id) {
+        // Release port first
+        await this.releasePort(id);
+
+        // Permanently delete from database
+        await pool.query('DELETE FROM tenants WHERE id = ?', [id]);
+    }
 }
 
 module.exports = TenantModel;
+

@@ -20,6 +20,12 @@ router.post('/', tenantController.createTenant);
 router.patch('/:id', tenantController.updateTenant);
 router.delete('/:id', tenantController.deleteTenant);
 
+// PM2 Logs
+router.get('/:id/logs', tenantController.getLogs);
+
+// Full Delete (removes all resources)
+router.delete('/:id/full-delete', tenantController.fullDeleteTenant);
+
 // Process Management
 router.post('/:id/provision', tenantController.provisionTenant);
 router.post('/:id/start', tenantController.startTenant);
@@ -27,3 +33,4 @@ router.post('/:id/stop', tenantController.stopTenant);
 router.post('/:id/restart', tenantController.restartTenant);
 
 module.exports = router;
+
