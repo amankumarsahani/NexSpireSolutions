@@ -14,6 +14,7 @@ const fs = require('fs').promises;
 const path = require('path');
 const { pool } = require('../config/database');
 const TenantModel = require('../models/tenant.model');
+const EmailService = require('./email.service');
 
 class Provisioner {
     constructor() {
@@ -36,6 +37,14 @@ class Provisioner {
 
         // Cloudflare tunnel config path
         this.cfConfigPath = process.env.CF_CONFIG_PATH || '/etc/cloudflared/config.yml';
+
+        // Log configuration status
+        console.log('[Provisioner] Configuration:');
+        console.log(`  - CF API Token: ${this.cfApiToken ? 'SET' : 'NOT SET'}`);
+        console.log(`  - CF Zone ID: ${this.cfZoneId ? 'SET' : 'NOT SET'}`);
+        console.log(`  - CF Account ID: ${this.cfAccountId ? 'SET' : 'NOT SET (required for Pages domains)'}`);
+        console.log(`  - CF Pages Project: ${this.cfPagesProject}`);
+        console.log(`  - SMTP configured: ${process.env.SMTP_HOST ? 'YES' : 'NO'}`);
     }
 
     /**
@@ -117,6 +126,20 @@ class Provisioner {
             if (this.cfApiToken && this.cfZoneId) {
                 await this.addStorefrontRoute(slug);
                 console.log(`[Provisioner] Cloudflare storefront route added`);
+            }
+
+            // 10. Send welcome email with credentials
+            try {
+                await EmailService.sendTenantWelcomeEmail({
+                    name,
+                    email,
+                    password: adminPassword,
+                    slug,
+                    industry: industry_type
+                });
+                console.log(`[Provisioner] Welcome email sent to ${email}`);
+            } catch (emailError) {
+                console.warn(`[Provisioner] Could not send welcome email:`, emailError.message);
             }
 
             return {

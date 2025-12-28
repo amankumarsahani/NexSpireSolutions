@@ -194,6 +194,144 @@ class EmailService {
     }
 
     /**
+     * Send welcome email to new tenant with credentials
+     * @param {Object} tenant - Tenant data
+     * @param {string} tenant.name - Tenant/Company name
+     * @param {string} tenant.email - Admin email
+     * @param {string} tenant.password - Admin password
+     * @param {string} tenant.slug - Tenant slug
+     * @param {string} tenant.industry - Industry type
+     * @returns {Promise<Object>} Send result
+     */
+    async sendTenantWelcomeEmail(tenant) {
+        const { name, email, password, slug, industry } = tenant;
+
+        const domain = process.env.NEXCRM_DOMAIN || 'nexspiresolutions.co.in';
+        const crmUrl = `https://${slug}-crm.${domain}`;
+        const storefrontUrl = `https://${slug}.${domain}`;
+        const apiUrl = `https://${slug}-crm-api.${domain}`;
+
+        const html = `
+<!DOCTYPE html>
+<html>
+<head>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+</head>
+<body style="margin:0;padding:0;font-family:'Segoe UI',Tahoma,Geneva,Verdana,sans-serif;background-color:#f8fafc;">
+    <table width="100%" cellpadding="0" cellspacing="0" style="background-color:#f8fafc;padding:40px 20px;">
+        <tr>
+            <td align="center">
+                <table width="600" cellpadding="0" cellspacing="0" style="background-color:#ffffff;border-radius:16px;box-shadow:0 4px 6px rgba(0,0,0,0.05);">
+                    <!-- Header -->
+                    <tr>
+                        <td style="background:linear-gradient(135deg,#3b82f6 0%,#8b5cf6 100%);padding:40px;border-radius:16px 16px 0 0;text-align:center;">
+                            <h1 style="color:#ffffff;margin:0;font-size:28px;font-weight:700;">Welcome to NexSpire CRM</h1>
+                            <p style="color:rgba(255,255,255,0.9);margin:10px 0 0;font-size:16px;">Your business management platform is ready</p>
+                        </td>
+                    </tr>
+                    
+                    <!-- Content -->
+                    <tr>
+                        <td style="padding:40px;">
+                            <p style="color:#1e293b;font-size:16px;line-height:1.6;margin:0 0 20px;">
+                                Hello <strong>${name}</strong>,
+                            </p>
+                            <p style="color:#475569;font-size:15px;line-height:1.6;margin:0 0 30px;">
+                                Congratulations! Your NexSpire CRM account has been successfully created and provisioned. 
+                                Below are your login credentials and access URLs.
+                            </p>
+                            
+                            <!-- Credentials Box -->
+                            <table width="100%" cellpadding="0" cellspacing="0" style="background-color:#f1f5f9;border-radius:12px;padding:24px;margin-bottom:30px;">
+                                <tr>
+                                    <td>
+                                        <h3 style="color:#1e293b;margin:0 0 16px;font-size:16px;">Your Login Credentials</h3>
+                                        <table width="100%" cellpadding="8" cellspacing="0">
+                                            <tr>
+                                                <td style="color:#64748b;font-size:14px;width:100px;">Email:</td>
+                                                <td style="color:#1e293b;font-size:14px;font-weight:600;">${email}</td>
+                                            </tr>
+                                            <tr>
+                                                <td style="color:#64748b;font-size:14px;">Password:</td>
+                                                <td style="color:#1e293b;font-size:14px;font-weight:600;font-family:monospace;background:#e2e8f0;padding:4px 8px;border-radius:4px;">${password}</td>
+                                            </tr>
+                                        </table>
+                                    </td>
+                                </tr>
+                            </table>
+                            
+                            <!-- Access Links -->
+                            <h3 style="color:#1e293b;margin:0 0 16px;font-size:16px;">Your Platform URLs</h3>
+                            <table width="100%" cellpadding="12" cellspacing="0" style="margin-bottom:30px;">
+                                <tr>
+                                    <td style="background-color:#dbeafe;border-radius:8px;padding:16px;">
+                                        <strong style="color:#1e40af;font-size:13px;text-transform:uppercase;letter-spacing:0.5px;">CRM Dashboard</strong><br>
+                                        <a href="${crmUrl}" style="color:#3b82f6;font-size:14px;text-decoration:none;">${crmUrl}</a>
+                                    </td>
+                                </tr>
+                                <tr><td style="height:12px;"></td></tr>
+                                <tr>
+                                    <td style="background-color:#dcfce7;border-radius:8px;padding:16px;">
+                                        <strong style="color:#166534;font-size:13px;text-transform:uppercase;letter-spacing:0.5px;">Storefront</strong><br>
+                                        <a href="${storefrontUrl}" style="color:#16a34a;font-size:14px;text-decoration:none;">${storefrontUrl}</a>
+                                    </td>
+                                </tr>
+                                <tr><td style="height:12px;"></td></tr>
+                                <tr>
+                                    <td style="background-color:#fef3c7;border-radius:8px;padding:16px;">
+                                        <strong style="color:#92400e;font-size:13px;text-transform:uppercase;letter-spacing:0.5px;">API Endpoint</strong><br>
+                                        <a href="${apiUrl}" style="color:#d97706;font-size:14px;text-decoration:none;">${apiUrl}</a>
+                                    </td>
+                                </tr>
+                            </table>
+                            
+                            <!-- CTA Button -->
+                            <table width="100%" cellpadding="0" cellspacing="0">
+                                <tr>
+                                    <td align="center">
+                                        <a href="${crmUrl}" style="display:inline-block;background:linear-gradient(135deg,#3b82f6,#8b5cf6);color:#ffffff;text-decoration:none;padding:14px 32px;border-radius:8px;font-weight:600;font-size:15px;">
+                                            Login to Dashboard
+                                        </a>
+                                    </td>
+                                </tr>
+                            </table>
+                            
+                            <!-- Security Note -->
+                            <p style="color:#94a3b8;font-size:13px;line-height:1.5;margin:30px 0 0;padding-top:20px;border-top:1px solid #e2e8f0;">
+                                For security, we recommend changing your password after your first login. 
+                                If you did not request this account, please contact our support team immediately.
+                            </p>
+                        </td>
+                    </tr>
+                    
+                    <!-- Footer -->
+                    <tr>
+                        <td style="background-color:#f8fafc;padding:24px 40px;border-radius:0 0 16px 16px;text-align:center;border-top:1px solid #e2e8f0;">
+                            <p style="color:#64748b;font-size:13px;margin:0;">
+                                © ${new Date().getFullYear()} NexSpire Solutions. All rights reserved.
+                            </p>
+                            <p style="color:#94a3b8;font-size:12px;margin:8px 0 0;">
+                                Industry: ${industry || 'General'} | Plan: Starter
+                            </p>
+                        </td>
+                    </tr>
+                </table>
+            </td>
+        </tr>
+    </table>
+</body>
+</html>
+        `;
+
+        return await this.sendEmail({
+            to: email,
+            subject: `🎉 Welcome to NexSpire CRM - Your ${name} Account is Ready!`,
+            html
+        });
+    }
+
+    /**
      * Get notification recipients from environment
      * @returns {string[]} Array of email addresses
      */
