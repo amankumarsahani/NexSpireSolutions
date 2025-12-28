@@ -322,21 +322,21 @@ class Provisioner {
 
         try {
             const settings = [
-                ['company_name', name, 'general'],
-                ['industry', industry_type || 'general', 'general'],
-                ['email', email, 'contact'],
-                ['currency', 'INR', 'store'],
-                ['currency_symbol', '₹', 'store'],
-                ['primary_color', '#3b82f6', 'theme'],
-                ['secondary_color', '#10b981', 'theme']
+                ['company_name', name],
+                ['industry', industry_type || 'general'],
+                ['email', email],
+                ['currency', 'INR'],
+                ['currency_symbol', '₹'],
+                ['primary_color', '#3b82f6'],
+                ['secondary_color', '#10b981']
             ];
 
-            for (const [key, value, category] of settings) {
+            for (const [key, value] of settings) {
                 await tenantPool.query(
-                    `INSERT INTO settings (setting_key, setting_value, category) 
-                     VALUES (?, ?, ?)
+                    `INSERT INTO settings (setting_key, setting_value) 
+                     VALUES (?, ?)
                      ON DUPLICATE KEY UPDATE setting_value = VALUES(setting_value)`,
-                    [key, value, category]
+                    [key, value]
                 );
             }
 
@@ -547,7 +547,7 @@ class Provisioner {
             // Attach domain to storefront Pages project
             if (this.cfAccountId && storefrontProject) {
                 try {
-                    await fetch(
+                    const pagesResponse = await fetch(
                         `https://api.cloudflare.com/client/v4/accounts/${this.cfAccountId}/pages/projects/${storefrontProject}/domains`,
                         {
                             method: 'POST',
@@ -558,10 +558,18 @@ class Provisioner {
                             body: JSON.stringify({ name: storefrontDomain })
                         }
                     );
-                    console.log(`[Provisioner] Storefront domain attached to Pages: ${storefrontDomain}`);
+                    const pagesData = await pagesResponse.json();
+
+                    if (!pagesData.success) {
+                        console.error(`[Provisioner] Storefront Pages domain error:`, pagesData.errors);
+                    } else {
+                        console.log(`[Provisioner] Storefront domain attached to Pages: ${storefrontDomain}`);
+                    }
                 } catch (e) {
                     console.warn('[Provisioner] Could not attach storefront domain to Pages:', e.message);
                 }
+            } else {
+                console.warn('[Provisioner] Missing cfAccountId or storefrontProject for Pages attachment');
             }
 
             return dnsData.result.id;

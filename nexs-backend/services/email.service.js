@@ -213,109 +213,190 @@ class EmailService {
 
         const html = `
 <!DOCTYPE html>
-<html>
+<html lang="en">
 <head>
     <meta charset="utf-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Welcome to NexSpire CRM</title>
 </head>
-<body style="margin:0;padding:0;font-family:'Segoe UI',Tahoma,Geneva,Verdana,sans-serif;background-color:#f8fafc;">
-    <table width="100%" cellpadding="0" cellspacing="0" style="background-color:#f8fafc;padding:40px 20px;">
+<body style="margin:0;padding:0;background-color:#f1f5f9;font-family:-apple-system,BlinkMacSystemFont,'Segoe UI',Roboto,'Helvetica Neue',Arial,sans-serif;">
+    <table width="100%" cellpadding="0" cellspacing="0" style="background-color:#f1f5f9;padding:32px 16px;">
         <tr>
             <td align="center">
-                <table width="600" cellpadding="0" cellspacing="0" style="background-color:#ffffff;border-radius:16px;box-shadow:0 4px 6px rgba(0,0,0,0.05);">
+                <table width="100%" cellpadding="0" cellspacing="0" style="max-width:600px;background-color:#ffffff;border-radius:12px;overflow:hidden;box-shadow:0 4px 12px rgba(0,0,0,0.1);">
+                    
                     <!-- Header -->
                     <tr>
-                        <td style="background:linear-gradient(135deg,#3b82f6 0%,#8b5cf6 100%);padding:40px;border-radius:16px 16px 0 0;text-align:center;">
-                            <h1 style="color:#ffffff;margin:0;font-size:28px;font-weight:700;">Welcome to NexSpire CRM</h1>
-                            <p style="color:rgba(255,255,255,0.9);margin:10px 0 0;font-size:16px;">Your business management platform is ready</p>
+                        <td style="background-color:#1e293b;padding:32px 40px;text-align:center;">
+                            <table width="100%" cellpadding="0" cellspacing="0">
+                                <tr>
+                                    <td align="center" style="padding-bottom:16px;">
+                                        <div style="width:56px;height:56px;background-color:#3b82f6;border-radius:12px;display:inline-block;line-height:56px;text-align:center;">
+                                            <span style="color:#ffffff;font-size:24px;font-weight:bold;">N</span>
+                                        </div>
+                                    </td>
+                                </tr>
+                                <tr>
+                                    <td align="center">
+                                        <h1 style="color:#ffffff;margin:0;font-size:24px;font-weight:600;letter-spacing:-0.5px;">Welcome to NexSpire CRM</h1>
+                                        <p style="color:#94a3b8;margin:8px 0 0;font-size:15px;">Your business management platform is ready</p>
+                                    </td>
+                                </tr>
+                            </table>
                         </td>
                     </tr>
                     
-                    <!-- Content -->
+                    <!-- Body Content -->
                     <tr>
                         <td style="padding:40px;">
-                            <p style="color:#1e293b;font-size:16px;line-height:1.6;margin:0 0 20px;">
+                            
+                            <!-- Greeting -->
+                            <p style="color:#1e293b;font-size:16px;line-height:1.6;margin:0 0 24px;">
                                 Hello <strong>${name}</strong>,
                             </p>
-                            <p style="color:#475569;font-size:15px;line-height:1.6;margin:0 0 30px;">
-                                Congratulations! Your NexSpire CRM account has been successfully created and provisioned. 
-                                Below are your login credentials and access URLs.
+                            <p style="color:#475569;font-size:15px;line-height:1.7;margin:0 0 32px;">
+                                Congratulations! Your NexSpire CRM account has been successfully created and is now ready to use. Below you will find your login credentials and platform access URLs.
                             </p>
                             
-                            <!-- Credentials Box -->
-                            <table width="100%" cellpadding="0" cellspacing="0" style="background-color:#f1f5f9;border-radius:12px;padding:24px;margin-bottom:30px;">
+                            <!-- Credentials Section -->
+                            <table width="100%" cellpadding="0" cellspacing="0" style="background-color:#f8fafc;border:1px solid #e2e8f0;border-radius:8px;margin-bottom:32px;">
                                 <tr>
-                                    <td>
-                                        <h3 style="color:#1e293b;margin:0 0 16px;font-size:16px;">Your Login Credentials</h3>
-                                        <table width="100%" cellpadding="8" cellspacing="0">
+                                    <td style="padding:24px;">
+                                        <table width="100%" cellpadding="0" cellspacing="0">
                                             <tr>
-                                                <td style="color:#64748b;font-size:14px;width:100px;">Email:</td>
-                                                <td style="color:#1e293b;font-size:14px;font-weight:600;">${email}</td>
+                                                <td style="padding-bottom:16px;border-bottom:1px solid #e2e8f0;">
+                                                    <span style="color:#64748b;font-size:12px;text-transform:uppercase;letter-spacing:1px;font-weight:600;">Login Credentials</span>
+                                                </td>
                                             </tr>
                                             <tr>
-                                                <td style="color:#64748b;font-size:14px;">Password:</td>
-                                                <td style="color:#1e293b;font-size:14px;font-weight:600;font-family:monospace;background:#e2e8f0;padding:4px 8px;border-radius:4px;">${password}</td>
+                                                <td style="padding-top:16px;">
+                                                    <table width="100%" cellpadding="0" cellspacing="0">
+                                                        <tr>
+                                                            <td style="padding:8px 0;">
+                                                                <span style="color:#64748b;font-size:13px;">Email Address</span><br>
+                                                                <span style="color:#0f172a;font-size:15px;font-weight:600;">${email}</span>
+                                                            </td>
+                                                        </tr>
+                                                        <tr>
+                                                            <td style="padding:8px 0;">
+                                                                <span style="color:#64748b;font-size:13px;">Password</span><br>
+                                                                <code style="display:inline-block;background-color:#1e293b;color:#f1f5f9;padding:8px 16px;border-radius:6px;font-size:14px;font-family:'Courier New',monospace;margin-top:4px;">${password}</code>
+                                                            </td>
+                                                        </tr>
+                                                    </table>
+                                                </td>
                                             </tr>
                                         </table>
                                     </td>
                                 </tr>
                             </table>
                             
-                            <!-- Access Links -->
-                            <h3 style="color:#1e293b;margin:0 0 16px;font-size:16px;">Your Platform URLs</h3>
-                            <table width="100%" cellpadding="12" cellspacing="0" style="margin-bottom:30px;">
+                            <!-- Platform URLs -->
+                            <table width="100%" cellpadding="0" cellspacing="0" style="margin-bottom:32px;">
                                 <tr>
-                                    <td style="background-color:#dbeafe;border-radius:8px;padding:16px;">
-                                        <strong style="color:#1e40af;font-size:13px;text-transform:uppercase;letter-spacing:0.5px;">CRM Dashboard</strong><br>
-                                        <a href="${crmUrl}" style="color:#3b82f6;font-size:14px;text-decoration:none;">${crmUrl}</a>
+                                    <td style="padding-bottom:16px;">
+                                        <span style="color:#64748b;font-size:12px;text-transform:uppercase;letter-spacing:1px;font-weight:600;">Your Platform URLs</span>
                                     </td>
                                 </tr>
-                                <tr><td style="height:12px;"></td></tr>
+                                
+                                <!-- CRM Dashboard -->
                                 <tr>
-                                    <td style="background-color:#dcfce7;border-radius:8px;padding:16px;">
-                                        <strong style="color:#166534;font-size:13px;text-transform:uppercase;letter-spacing:0.5px;">Storefront</strong><br>
-                                        <a href="${storefrontUrl}" style="color:#16a34a;font-size:14px;text-decoration:none;">${storefrontUrl}</a>
+                                    <td style="padding:12px 16px;background-color:#eff6ff;border-left:4px solid #3b82f6;border-radius:0 6px 6px 0;margin-bottom:8px;">
+                                        <table width="100%" cellpadding="0" cellspacing="0">
+                                            <tr>
+                                                <td>
+                                                    <span style="color:#1e40af;font-size:11px;text-transform:uppercase;letter-spacing:0.5px;font-weight:600;">CRM Dashboard</span><br>
+                                                    <a href="${crmUrl}" style="color:#1e293b;font-size:14px;text-decoration:none;word-break:break-all;">${crmUrl}</a>
+                                                </td>
+                                            </tr>
+                                        </table>
                                     </td>
                                 </tr>
-                                <tr><td style="height:12px;"></td></tr>
+                                <tr><td style="height:8px;"></td></tr>
+                                
+                                <!-- Storefront -->
                                 <tr>
-                                    <td style="background-color:#fef3c7;border-radius:8px;padding:16px;">
-                                        <strong style="color:#92400e;font-size:13px;text-transform:uppercase;letter-spacing:0.5px;">API Endpoint</strong><br>
-                                        <a href="${apiUrl}" style="color:#d97706;font-size:14px;text-decoration:none;">${apiUrl}</a>
+                                    <td style="padding:12px 16px;background-color:#f0fdf4;border-left:4px solid #22c55e;border-radius:0 6px 6px 0;">
+                                        <table width="100%" cellpadding="0" cellspacing="0">
+                                            <tr>
+                                                <td>
+                                                    <span style="color:#166534;font-size:11px;text-transform:uppercase;letter-spacing:0.5px;font-weight:600;">Storefront</span><br>
+                                                    <a href="${storefrontUrl}" style="color:#1e293b;font-size:14px;text-decoration:none;word-break:break-all;">${storefrontUrl}</a>
+                                                </td>
+                                            </tr>
+                                        </table>
+                                    </td>
+                                </tr>
+                                <tr><td style="height:8px;"></td></tr>
+                                
+                                <!-- API Endpoint -->
+                                <tr>
+                                    <td style="padding:12px 16px;background-color:#fefce8;border-left:4px solid #eab308;border-radius:0 6px 6px 0;">
+                                        <table width="100%" cellpadding="0" cellspacing="0">
+                                            <tr>
+                                                <td>
+                                                    <span style="color:#854d0e;font-size:11px;text-transform:uppercase;letter-spacing:0.5px;font-weight:600;">API Endpoint</span><br>
+                                                    <a href="${apiUrl}" style="color:#1e293b;font-size:14px;text-decoration:none;word-break:break-all;">${apiUrl}</a>
+                                                </td>
+                                            </tr>
+                                        </table>
                                     </td>
                                 </tr>
                             </table>
                             
                             <!-- CTA Button -->
-                            <table width="100%" cellpadding="0" cellspacing="0">
+                            <table width="100%" cellpadding="0" cellspacing="0" style="margin-bottom:32px;">
                                 <tr>
                                     <td align="center">
-                                        <a href="${crmUrl}" style="display:inline-block;background:linear-gradient(135deg,#3b82f6,#8b5cf6);color:#ffffff;text-decoration:none;padding:14px 32px;border-radius:8px;font-weight:600;font-size:15px;">
-                                            Login to Dashboard
-                                        </a>
+                                        <a href="${crmUrl}" style="display:inline-block;background-color:#3b82f6;color:#ffffff;text-decoration:none;padding:14px 40px;border-radius:8px;font-weight:600;font-size:15px;">Access Your Dashboard</a>
                                     </td>
                                 </tr>
                             </table>
                             
-                            <!-- Security Note -->
-                            <p style="color:#94a3b8;font-size:13px;line-height:1.5;margin:30px 0 0;padding-top:20px;border-top:1px solid #e2e8f0;">
-                                For security, we recommend changing your password after your first login. 
-                                If you did not request this account, please contact our support team immediately.
-                            </p>
+                            <!-- Security Notice -->
+                            <table width="100%" cellpadding="0" cellspacing="0" style="background-color:#fef2f2;border:1px solid #fecaca;border-radius:8px;">
+                                <tr>
+                                    <td style="padding:16px;">
+                                        <table width="100%" cellpadding="0" cellspacing="0">
+                                            <tr>
+                                                <td width="24" valign="top" style="padding-right:12px;">
+                                                    <div style="width:20px;height:20px;background-color:#dc2626;border-radius:50%;text-align:center;line-height:20px;">
+                                                        <span style="color:#ffffff;font-size:12px;font-weight:bold;">!</span>
+                                                    </div>
+                                                </td>
+                                                <td>
+                                                    <span style="color:#991b1b;font-size:13px;font-weight:600;">Security Notice</span>
+                                                    <p style="color:#7f1d1d;font-size:13px;line-height:1.5;margin:4px 0 0;">
+                                                        Please change your password after your first login. Keep your credentials secure and do not share them with anyone.
+                                                    </p>
+                                                </td>
+                                            </tr>
+                                        </table>
+                                    </td>
+                                </tr>
+                            </table>
+                            
                         </td>
                     </tr>
                     
                     <!-- Footer -->
                     <tr>
-                        <td style="background-color:#f8fafc;padding:24px 40px;border-radius:0 0 16px 16px;text-align:center;border-top:1px solid #e2e8f0;">
-                            <p style="color:#64748b;font-size:13px;margin:0;">
-                                © ${new Date().getFullYear()} NexSpire Solutions. All rights reserved.
-                            </p>
-                            <p style="color:#94a3b8;font-size:12px;margin:8px 0 0;">
-                                Industry: ${industry || 'General'} | Plan: Starter
-                            </p>
+                        <td style="background-color:#f8fafc;padding:24px 40px;border-top:1px solid #e2e8f0;">
+                            <table width="100%" cellpadding="0" cellspacing="0">
+                                <tr>
+                                    <td align="center">
+                                        <p style="color:#64748b;font-size:13px;margin:0 0 8px;">
+                                            Industry: <strong>${industry || 'General'}</strong> | Plan: <strong>Starter</strong>
+                                        </p>
+                                        <p style="color:#94a3b8;font-size:12px;margin:0;">
+                                            &copy; ${new Date().getFullYear()} NexSpire Solutions. All rights reserved.
+                                        </p>
+                                    </td>
+                                </tr>
+                            </table>
                         </td>
                     </tr>
+                    
                 </table>
             </td>
         </tr>
@@ -326,7 +407,7 @@ class EmailService {
 
         return await this.sendEmail({
             to: email,
-            subject: `🎉 Welcome to NexSpire CRM - Your ${name} Account is Ready!`,
+            subject: `Welcome to NexSpire CRM - Your ${name} Account is Ready`,
             html
         });
     }
