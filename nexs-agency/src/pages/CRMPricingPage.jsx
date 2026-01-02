@@ -552,12 +552,14 @@ export default function CRMPricingPage() {
                                     const captchaToken = await getCaptchaToken();
 
                                     const formData = new FormData(e.target);
+                                    const selectedPlanValue = formData.get('plan') || selectedPlan || 'General';
+                                    const userMessage = formData.get('message') || '';
                                     const data = {
                                         name: formData.get('name'),
                                         email: formData.get('email'),
                                         phone: formData.get('phone'),
                                         company: formData.get('company'),
-                                        message: `[NexCRM ${formData.get('plan') || selectedPlan || 'General'} Plan Inquiry]\n\n${formData.get('message') || 'Interested in learning more.'}`,
+                                        message: `📋 Plan: NexCRM ${selectedPlanValue}\n\n${userMessage || 'Interested in learning more about NexCRM.'}`,
                                         captchaToken
                                     };
 
