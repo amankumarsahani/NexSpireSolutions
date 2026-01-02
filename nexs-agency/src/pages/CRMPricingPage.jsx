@@ -136,25 +136,26 @@ export default function CRMPricingPage() {
     const [submitting, setSubmitting] = useState(false);
     const [submitted, setSubmitted] = useState(false);
 
+    // reCAPTCHA site key (same as EnquiryPopup)
+    const RECAPTCHA_SITE_KEY = '6LcrNTYsAAAAAAiRJyNE6h2kWSsof7HrIHRx4Z8z';
+
     // Load reCAPTCHA v3 script
     useEffect(() => {
-        const siteKey = process.env.RECAPTCHA_SECRET_KEY;
-        if (!siteKey || document.getElementById('recaptcha-script')) return;
+        if (document.getElementById('recaptcha-script')) return;
 
         const script = document.createElement('script');
         script.id = 'recaptcha-script';
-        script.src = `https://www.google.com/recaptcha/api.js?render=${siteKey}`;
+        script.src = `https://www.google.com/recaptcha/api.js?render=${RECAPTCHA_SITE_KEY}`;
         script.async = true;
         document.head.appendChild(script);
     }, []);
 
     const getCaptchaToken = async () => {
-        const siteKey = process.env.RECAPTCHA_SECRET_KEY;
-        if (!siteKey || !window.grecaptcha) return null;
+        if (!window.grecaptcha) return null;
 
         try {
             await new Promise(resolve => window.grecaptcha.ready(resolve));
-            return await window.grecaptcha.execute(siteKey, { action: 'inquiry' });
+            return await window.grecaptcha.execute(RECAPTCHA_SITE_KEY, { action: 'pricing_inquiry' });
         } catch (err) {
             console.warn('reCAPTCHA error:', err);
             return null;
