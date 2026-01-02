@@ -503,7 +503,7 @@ export default function CRMPricingPage() {
                                     };
 
                                     try {
-                                        const response = await fetch(`${import.meta.env.VITE_API_URL || ''}/api/inquiries`, {
+                                        const response = await fetch(`${import.meta.env.VITE_API_URL || ''}/inquiries`, {
                                             method: 'POST',
                                             headers: { 'Content-Type': 'application/json' },
                                             body: JSON.stringify(data)
@@ -607,7 +607,7 @@ export default function CRMPricingPage() {
                                 </button>
 
                                 <p className="text-center text-xs text-slate-500">
-                                    By submitting, you agree to our <a href="/privacy" className="text-blue-600 hover:underline">Privacy Policy</a>
+                                    By submitting, you agree to our <a href="/privacy-policy" className="text-blue-600 hover:underline">Privacy Policy</a>
                                 </p>
                             </form>
                         )}
