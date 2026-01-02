@@ -61,17 +61,18 @@ const tiers = [
     },
     {
         name: 'Enterprise',
-        price: { monthly: 14999, yearly: 12749 },
-        currency: '₹',
+        price: { monthly: null, yearly: null },
+        currency: '',
         description: 'For large organizations',
         popular: false,
         cta: 'Contact Sales',
+        isCustom: true,
         limits: {
             leads: 'Unlimited',
             customers: 'Unlimited',
             products: 'Unlimited',
             teamMembers: 'Unlimited',
-            storage: '100 GB'
+            storage: 'Custom'
         }
     }
 ];
@@ -132,10 +133,13 @@ export default function CRMPricingPage() {
     const [isYearly, setIsYearly] = useState(false);
     const [showContactModal, setShowContactModal] = useState(false);
     const [selectedPlan, setSelectedPlan] = useState('');
+    const [submitting, setSubmitting] = useState(false);
+    const [submitted, setSubmitted] = useState(false);
 
     const handleContactClick = (planName) => {
         setSelectedPlan(planName);
         setShowContactModal(true);
+        setSubmitted(false);
     };
 
     return (
@@ -192,12 +196,21 @@ export default function CRMPricingPage() {
                                 <p className="text-sm text-slate-500 mb-4">{tier.description}</p>
 
                                 <div className="mb-6">
-                                    <span className="text-4xl font-bold text-slate-900">
-                                        {tier.currency}{isYearly ? tier.price.yearly : tier.price.monthly}
-                                    </span>
-                                    <span className="text-slate-500">/month</span>
-                                    {isYearly && (
-                                        <p className="text-sm text-emerald-600 mt-1">Billed annually</p>
+                                    {tier.isCustom ? (
+                                        <>
+                                            <span className="text-4xl font-bold text-slate-900">Custom</span>
+                                            <p className="text-sm text-slate-500 mt-1">Tailored for your needs</p>
+                                        </>
+                                    ) : (
+                                        <>
+                                            <span className="text-4xl font-bold text-slate-900">
+                                                {tier.currency}{isYearly ? tier.price.yearly : tier.price.monthly}
+                                            </span>
+                                            <span className="text-slate-500">/month</span>
+                                            {isYearly && (
+                                                <p className="text-sm text-emerald-600 mt-1">Billed annually</p>
+                                            )}
+                                        </>
                                     )}
                                 </div>
 
@@ -454,97 +467,150 @@ export default function CRMPricingPage() {
                             </p>
                         </div>
 
-                        <form
-                            className="space-y-4"
-                            onSubmit={(e) => {
-                                e.preventDefault();
-                                const formData = new FormData(e.target);
-                                const data = Object.fromEntries(formData);
-                                // You can integrate with your backend API here
-                                alert(`Thank you ${data.name}! We'll contact you shortly about the ${selectedPlan || 'NexCRM'} plan.`);
-                                setShowContactModal(false);
-                            }}
-                        >
-                            <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
-                                <div>
-                                    <label className="block text-sm font-medium text-slate-700 mb-1">Name *</label>
-                                    <input
-                                        type="text"
-                                        name="name"
-                                        required
-                                        className="w-full px-4 py-2.5 border border-slate-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500 outline-none transition-colors"
-                                        placeholder="Your name"
-                                    />
+                        {submitted ? (
+                            /* Success Message */
+                            <div className="text-center py-8">
+                                <div className="w-16 h-16 bg-emerald-100 rounded-full flex items-center justify-center mx-auto mb-4">
+                                    <svg className="w-8 h-8 text-emerald-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                        <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M5 13l4 4L19 7" />
+                                    </svg>
                                 </div>
-                                <div>
-                                    <label className="block text-sm font-medium text-slate-700 mb-1">Email *</label>
-                                    <input
-                                        type="email"
-                                        name="email"
-                                        required
-                                        className="w-full px-4 py-2.5 border border-slate-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500 outline-none transition-colors"
-                                        placeholder="you@company.com"
-                                    />
-                                </div>
-                            </div>
-
-                            <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
-                                <div>
-                                    <label className="block text-sm font-medium text-slate-700 mb-1">Phone</label>
-                                    <input
-                                        type="tel"
-                                        name="phone"
-                                        className="w-full px-4 py-2.5 border border-slate-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500 outline-none transition-colors"
-                                        placeholder="+91 98765 43210"
-                                    />
-                                </div>
-                                <div>
-                                    <label className="block text-sm font-medium text-slate-700 mb-1">Company</label>
-                                    <input
-                                        type="text"
-                                        name="company"
-                                        className="w-full px-4 py-2.5 border border-slate-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500 outline-none transition-colors"
-                                        placeholder="Your company"
-                                    />
-                                </div>
-                            </div>
-
-                            <div>
-                                <label className="block text-sm font-medium text-slate-700 mb-1">Interested Plan</label>
-                                <select
-                                    name="plan"
-                                    defaultValue={selectedPlan}
-                                    className="w-full px-4 py-2.5 border border-slate-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500 outline-none transition-colors"
+                                <h4 className="text-xl font-bold text-slate-900 mb-2">Thank You!</h4>
+                                <p className="text-slate-600 mb-6">
+                                    We've received your inquiry and will get back to you within 24 hours.
+                                </p>
+                                <button
+                                    onClick={() => setShowContactModal(false)}
+                                    className="px-6 py-2.5 bg-blue-600 text-white font-medium rounded-lg hover:bg-blue-700 transition-colors"
                                 >
-                                    <option value="">Select a plan</option>
-                                    <option value="Starter">Starter - ₹999/mo</option>
-                                    <option value="Growth">Growth - ₹2,499/mo</option>
-                                    <option value="Business">Business - ₹5,999/mo</option>
-                                    <option value="Enterprise">Enterprise - ₹14,999/mo</option>
-                                </select>
+                                    Close
+                                </button>
                             </div>
+                        ) : (
+                            /* Contact Form */
+                            <form
+                                className="space-y-4"
+                                onSubmit={async (e) => {
+                                    e.preventDefault();
+                                    setSubmitting(true);
+                                    const formData = new FormData(e.target);
+                                    const data = {
+                                        name: formData.get('name'),
+                                        email: formData.get('email'),
+                                        phone: formData.get('phone'),
+                                        company: formData.get('company'),
+                                        message: `[NexCRM ${formData.get('plan') || selectedPlan || 'General'} Plan Inquiry]\n\n${formData.get('message') || 'Interested in learning more.'}`
+                                    };
 
-                            <div>
-                                <label className="block text-sm font-medium text-slate-700 mb-1">Message</label>
-                                <textarea
-                                    name="message"
-                                    rows={3}
-                                    className="w-full px-4 py-2.5 border border-slate-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500 outline-none transition-colors resize-none"
-                                    placeholder="Tell us about your requirements..."
-                                />
-                            </div>
+                                    try {
+                                        const response = await fetch(`${import.meta.env.VITE_API_URL || ''}/api/inquiries`, {
+                                            method: 'POST',
+                                            headers: { 'Content-Type': 'application/json' },
+                                            body: JSON.stringify(data)
+                                        });
 
-                            <button
-                                type="submit"
-                                className="w-full py-3 px-4 bg-blue-600 text-white font-semibold rounded-lg hover:bg-blue-700 transition-colors"
+                                        if (response.ok) {
+                                            setSubmitted(true);
+                                        } else {
+                                            alert('Something went wrong. Please try again.');
+                                        }
+                                    } catch (err) {
+                                        alert('Network error. Please try again.');
+                                    } finally {
+                                        setSubmitting(false);
+                                    }
+                                }}
                             >
-                                Submit Request
-                            </button>
+                                <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
+                                    <div>
+                                        <label className="block text-sm font-medium text-slate-700 mb-1">Name *</label>
+                                        <input
+                                            type="text"
+                                            name="name"
+                                            required
+                                            className="w-full px-4 py-2.5 border border-slate-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500 outline-none transition-colors"
+                                            placeholder="Your name"
+                                        />
+                                    </div>
+                                    <div>
+                                        <label className="block text-sm font-medium text-slate-700 mb-1">Email *</label>
+                                        <input
+                                            type="email"
+                                            name="email"
+                                            required
+                                            className="w-full px-4 py-2.5 border border-slate-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500 outline-none transition-colors"
+                                            placeholder="you@company.com"
+                                        />
+                                    </div>
+                                </div>
 
-                            <p className="text-center text-xs text-slate-500">
-                                By submitting, you agree to our <a href="/privacy" className="text-blue-600 hover:underline">Privacy Policy</a>
-                            </p>
-                        </form>
+                                <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
+                                    <div>
+                                        <label className="block text-sm font-medium text-slate-700 mb-1">Phone</label>
+                                        <input
+                                            type="tel"
+                                            name="phone"
+                                            className="w-full px-4 py-2.5 border border-slate-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500 outline-none transition-colors"
+                                            placeholder="+91 98765 43210"
+                                        />
+                                    </div>
+                                    <div>
+                                        <label className="block text-sm font-medium text-slate-700 mb-1">Company</label>
+                                        <input
+                                            type="text"
+                                            name="company"
+                                            className="w-full px-4 py-2.5 border border-slate-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500 outline-none transition-colors"
+                                            placeholder="Your company"
+                                        />
+                                    </div>
+                                </div>
+
+                                <div>
+                                    <label className="block text-sm font-medium text-slate-700 mb-1">Interested Plan</label>
+                                    <select
+                                        name="plan"
+                                        defaultValue={selectedPlan}
+                                        className="w-full px-4 py-2.5 border border-slate-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500 outline-none transition-colors"
+                                    >
+                                        <option value="">Select a plan</option>
+                                        <option value="Starter">Starter - ₹999/mo</option>
+                                        <option value="Growth">Growth - ₹2,499/mo</option>
+                                        <option value="Business">Business - ₹5,999/mo</option>
+                                        <option value="Enterprise">Enterprise - ₹14,999/mo</option>
+                                    </select>
+                                </div>
+
+                                <div>
+                                    <label className="block text-sm font-medium text-slate-700 mb-1">Message</label>
+                                    <textarea
+                                        name="message"
+                                        rows={3}
+                                        className="w-full px-4 py-2.5 border border-slate-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500 outline-none transition-colors resize-none"
+                                        placeholder="Tell us about your requirements..."
+                                    />
+                                </div>
+
+                                <button
+                                    type="submit"
+                                    disabled={submitting}
+                                    className="w-full py-3 px-4 bg-blue-600 text-white font-semibold rounded-lg hover:bg-blue-700 transition-colors disabled:opacity-50 disabled:cursor-not-allowed flex items-center justify-center gap-2"
+                                >
+                                    {submitting ? (
+                                        <>
+                                            <svg className="animate-spin w-5 h-5" fill="none" viewBox="0 0 24 24">
+                                                <circle className="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" strokeWidth="4" />
+                                                <path className="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z" />
+                                            </svg>
+                                            Submitting...
+                                        </>
+                                    ) : 'Submit Request'}
+                                </button>
+
+                                <p className="text-center text-xs text-slate-500">
+                                    By submitting, you agree to our <a href="/privacy" className="text-blue-600 hover:underline">Privacy Policy</a>
+                                </p>
+                            </form>
+                        )}
                     </div>
                 </div>
             )}
