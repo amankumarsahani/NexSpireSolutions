@@ -138,7 +138,7 @@ export default function CRMPricingPage() {
 
     // Load reCAPTCHA v3 script
     useEffect(() => {
-        const siteKey = import.meta.env.VITE_RECAPTCHA_SITE_KEY;
+        const siteKey = process.env.RECAPTCHA_SECRET_KEY;
         if (!siteKey || document.getElementById('recaptcha-script')) return;
 
         const script = document.createElement('script');
@@ -149,7 +149,7 @@ export default function CRMPricingPage() {
     }, []);
 
     const getCaptchaToken = async () => {
-        const siteKey = import.meta.env.VITE_RECAPTCHA_SITE_KEY;
+        const siteKey = process.env.RECAPTCHA_SECRET_KEY;
         if (!siteKey || !window.grecaptcha) return null;
 
         try {
