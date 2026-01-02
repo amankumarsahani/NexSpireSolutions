@@ -20,7 +20,7 @@ const tiers = [
         currency: '₹',
         description: 'Perfect for small businesses & startups',
         popular: false,
-        cta: 'Start Free Trial',
+        cta: 'Contact Sales',
         limits: {
             leads: '500',
             customers: '200',
@@ -35,7 +35,7 @@ const tiers = [
         currency: '₹',
         description: 'Ideal for growing businesses',
         popular: true,
-        cta: 'Start Free Trial',
+        cta: 'Contact Sales',
         limits: {
             leads: '2,000',
             customers: '1,000',
@@ -50,7 +50,7 @@ const tiers = [
         currency: '₹',
         description: 'For established businesses',
         popular: false,
-        cta: 'Start Free Trial',
+        cta: 'Contact Sales',
         limits: {
             leads: '10,000',
             customers: '5,000',
@@ -130,6 +130,13 @@ const FeatureValue = ({ value, soon }) => {
 
 export default function CRMPricingPage() {
     const [isYearly, setIsYearly] = useState(false);
+    const [showContactModal, setShowContactModal] = useState(false);
+    const [selectedPlan, setSelectedPlan] = useState('');
+
+    const handleContactClick = (planName) => {
+        setSelectedPlan(planName);
+        setShowContactModal(true);
+    };
 
     return (
         <div className="min-h-screen bg-gradient-to-b from-slate-50 to-white">
@@ -148,7 +155,7 @@ export default function CRMPricingPage() {
                         Simple, Transparent Pricing
                     </h1>
                     <p className="text-xl text-slate-600 max-w-2xl mx-auto mb-8">
-                        Choose a plan that scales with your business. All plans include mobile app access and 14-day free trial.
+                        Choose a plan that scales with your business. Contact our sales team to get started.
                     </p>
 
                     {/* Billing Toggle */}
@@ -215,15 +222,15 @@ export default function CRMPricingPage() {
                                     </li>
                                 </ul>
 
-                                <a
-                                    href="#contact"
+                                <button
+                                    onClick={() => handleContactClick(tier.name)}
                                     className={`block w-full py-3 px-4 rounded-lg font-semibold text-center transition-colors ${tier.popular
                                         ? 'bg-blue-600 text-white hover:bg-blue-700'
                                         : 'bg-slate-100 text-slate-900 hover:bg-slate-200'
                                         }`}
                                 >
                                     {tier.cta}
-                                </a>
+                                </button>
                             </div>
                         ))}
                     </div>
@@ -354,8 +361,8 @@ export default function CRMPricingPage() {
                     <div className="space-y-4">
                         {[
                             {
-                                q: 'Is there a free trial?',
-                                a: 'Yes! All plans come with a 14-day free trial. No credit card required to start.'
+                                q: 'How do I get started?',
+                                a: 'Contact our sales team and we\'ll set up your account within 24 hours. We\'ll guide you through the onboarding process.'
                             },
                             {
                                 q: 'Can I upgrade or downgrade anytime?',
@@ -401,24 +408,146 @@ export default function CRMPricingPage() {
                         Ready to Grow Your Business?
                     </h2>
                     <p className="text-xl text-blue-100 mb-8">
-                        Start your 14-day free trial today. No credit card required.
+                        Get in touch with our sales team to find the perfect plan for your needs.
                     </p>
                     <div className="flex flex-col sm:flex-row gap-4 justify-center">
-                        <a
-                            href="#contact"
+                        <button
+                            onClick={() => handleContactClick('')}
                             className="px-8 py-4 bg-white text-blue-600 rounded-lg font-semibold hover:bg-blue-50 transition-colors"
                         >
-                            Start Free Trial
-                        </a>
+                            Contact Sales
+                        </button>
                         <a
-                            href="#contact"
+                            href="/contact"
                             className="px-8 py-4 border-2 border-white text-white rounded-lg font-semibold hover:bg-white/10 transition-colors"
                         >
-                            Talk to Sales
+                            Learn More
                         </a>
                     </div>
                 </div>
             </section>
+
+            {/* Contact Modal */}
+            {showContactModal && (
+                <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-black/50 backdrop-blur-sm">
+                    <div className="bg-white rounded-2xl shadow-2xl max-w-lg w-full p-6 relative max-h-[90vh] overflow-y-auto">
+                        <button
+                            onClick={() => setShowContactModal(false)}
+                            className="absolute top-4 right-4 text-slate-400 hover:text-slate-600"
+                        >
+                            <svg className="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M6 18L18 6M6 6l12 12" />
+                            </svg>
+                        </button>
+
+                        <div className="text-center mb-6">
+                            <div className="w-14 h-14 bg-blue-100 rounded-full flex items-center justify-center mx-auto mb-4">
+                                <svg className="w-7 h-7 text-blue-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M3 8l7.89 5.26a2 2 0 002.22 0L21 8M5 19h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v10a2 2 0 002 2z" />
+                                </svg>
+                            </div>
+                            <h3 className="text-2xl font-bold text-slate-900 mb-1">
+                                Contact Sales{selectedPlan && ` - ${selectedPlan} Plan`}
+                            </h3>
+                            <p className="text-slate-500 text-sm">
+                                Fill out the form and we'll get back to you within 24 hours.
+                            </p>
+                        </div>
+
+                        <form
+                            className="space-y-4"
+                            onSubmit={(e) => {
+                                e.preventDefault();
+                                const formData = new FormData(e.target);
+                                const data = Object.fromEntries(formData);
+                                // You can integrate with your backend API here
+                                alert(`Thank you ${data.name}! We'll contact you shortly about the ${selectedPlan || 'NexCRM'} plan.`);
+                                setShowContactModal(false);
+                            }}
+                        >
+                            <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
+                                <div>
+                                    <label className="block text-sm font-medium text-slate-700 mb-1">Name *</label>
+                                    <input
+                                        type="text"
+                                        name="name"
+                                        required
+                                        className="w-full px-4 py-2.5 border border-slate-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500 outline-none transition-colors"
+                                        placeholder="Your name"
+                                    />
+                                </div>
+                                <div>
+                                    <label className="block text-sm font-medium text-slate-700 mb-1">Email *</label>
+                                    <input
+                                        type="email"
+                                        name="email"
+                                        required
+                                        className="w-full px-4 py-2.5 border border-slate-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500 outline-none transition-colors"
+                                        placeholder="you@company.com"
+                                    />
+                                </div>
+                            </div>
+
+                            <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
+                                <div>
+                                    <label className="block text-sm font-medium text-slate-700 mb-1">Phone</label>
+                                    <input
+                                        type="tel"
+                                        name="phone"
+                                        className="w-full px-4 py-2.5 border border-slate-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500 outline-none transition-colors"
+                                        placeholder="+91 98765 43210"
+                                    />
+                                </div>
+                                <div>
+                                    <label className="block text-sm font-medium text-slate-700 mb-1">Company</label>
+                                    <input
+                                        type="text"
+                                        name="company"
+                                        className="w-full px-4 py-2.5 border border-slate-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500 outline-none transition-colors"
+                                        placeholder="Your company"
+                                    />
+                                </div>
+                            </div>
+
+                            <div>
+                                <label className="block text-sm font-medium text-slate-700 mb-1">Interested Plan</label>
+                                <select
+                                    name="plan"
+                                    defaultValue={selectedPlan}
+                                    className="w-full px-4 py-2.5 border border-slate-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500 outline-none transition-colors"
+                                >
+                                    <option value="">Select a plan</option>
+                                    <option value="Starter">Starter - ₹999/mo</option>
+                                    <option value="Growth">Growth - ₹2,499/mo</option>
+                                    <option value="Business">Business - ₹5,999/mo</option>
+                                    <option value="Enterprise">Enterprise - ₹14,999/mo</option>
+                                </select>
+                            </div>
+
+                            <div>
+                                <label className="block text-sm font-medium text-slate-700 mb-1">Message</label>
+                                <textarea
+                                    name="message"
+                                    rows={3}
+                                    className="w-full px-4 py-2.5 border border-slate-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500 outline-none transition-colors resize-none"
+                                    placeholder="Tell us about your requirements..."
+                                />
+                            </div>
+
+                            <button
+                                type="submit"
+                                className="w-full py-3 px-4 bg-blue-600 text-white font-semibold rounded-lg hover:bg-blue-700 transition-colors"
+                            >
+                                Submit Request
+                            </button>
+
+                            <p className="text-center text-xs text-slate-500">
+                                By submitting, you agree to our <a href="/privacy" className="text-blue-600 hover:underline">Privacy Policy</a>
+                            </p>
+                        </form>
+                    </div>
+                </div>
+            )}
         </div>
     );
 }
