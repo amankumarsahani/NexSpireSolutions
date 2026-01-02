@@ -1,4 +1,4 @@
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
 import { Helmet } from 'react-helmet-async';
 
 const CheckIcon = () => (
@@ -136,6 +136,39 @@ export default function CRMPricingPage() {
     const [submitting, setSubmitting] = useState(false);
     const [submitted, setSubmitted] = useState(false);
 
+    // Load reCAPTCHA v3 script
+    useEffect(() => {
+        const siteKey = import.meta.env.VITE_RECAPTCHA_SITE_KEY;
+        if (!siteKey || document.getElementById('recaptcha-script')) return;
+
+        const script = document.createElement('script');
+        script.id = 'recaptcha-script';
+        script.src = `https://www.google.com/recaptcha/api.js?render=${siteKey}`;
+        script.async = true;
+        document.head.appendChild(script);
+    }, []);
+
+    const getCaptchaToken = async () => {
+        const siteKey = import.meta.env.VITE_RECAPTCHA_SITE_KEY;
+        if (!siteKey || !window.grecaptcha) return null;
+
+        try {
+            await new Promise(resolve => window.grecaptcha.ready(resolve));
+            return await window.grecaptcha.execute(siteKey, { action: 'inquiry' });
+        } catch (err) {
+            console.warn('reCAPTCHA error:', err);
+            return null;
+        }
+    };
+
+    // Toast notification state
+    const [toast, setToast] = useState({ show: false, message: '', type: 'error' });
+
+    const showToast = (message, type = 'error') => {
+        setToast({ show: true, message, type });
+        setTimeout(() => setToast({ show: false, message: '', type: 'error' }), 4000);
+    };
+
     const handleContactClick = (planName) => {
         setSelectedPlan(planName);
         setShowContactModal(true);
@@ -148,6 +181,26 @@ export default function CRMPricingPage() {
                 <title>NexCRM Pricing - Affordable Plans for Every Business | Nexspire Solutions</title>
                 <meta name="description" content="Choose the perfect NexCRM plan for your business. Starter from ₹999/month. Leads, E-commerce, Team Chat, Mobile App - all included." />
             </Helmet>
+
+            {/* Toast Notification */}
+            {toast.show && (
+                <div className={`fixed top-4 right-4 z-[100] px-4 py-3 rounded-lg shadow-lg flex items-center gap-3 animate-fade-in ${toast.type === 'error' ? 'bg-red-500 text-white' : 'bg-emerald-500 text-white'
+                    }`}>
+                    <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        {toast.type === 'error' ? (
+                            <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 8v4m0 4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z" />
+                        ) : (
+                            <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M5 13l4 4L19 7" />
+                        )}
+                    </svg>
+                    <span className="font-medium">{toast.message}</span>
+                    <button onClick={() => setToast({ show: false, message: '', type: 'error' })} className="ml-2 hover:opacity-70">
+                        <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                            <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M6 18L18 6M6 6l12 12" />
+                        </svg>
+                    </button>
+                </div>
+            )}
 
             {/* Hero */}
             <section className="pt-32 pb-16 px-4">
@@ -493,13 +546,18 @@ export default function CRMPricingPage() {
                                 onSubmit={async (e) => {
                                     e.preventDefault();
                                     setSubmitting(true);
+
+                                    // Get CAPTCHA token
+                                    const captchaToken = await getCaptchaToken();
+
                                     const formData = new FormData(e.target);
                                     const data = {
                                         name: formData.get('name'),
                                         email: formData.get('email'),
                                         phone: formData.get('phone'),
                                         company: formData.get('company'),
-                                        message: `[NexCRM ${formData.get('plan') || selectedPlan || 'General'} Plan Inquiry]\n\n${formData.get('message') || 'Interested in learning more.'}`
+                                        message: `[NexCRM ${formData.get('plan') || selectedPlan || 'General'} Plan Inquiry]\n\n${formData.get('message') || 'Interested in learning more.'}`,
+                                        captchaToken
                                     };
 
                                     try {
@@ -512,10 +570,11 @@ export default function CRMPricingPage() {
                                         if (response.ok) {
                                             setSubmitted(true);
                                         } else {
-                                            alert('Something went wrong. Please try again.');
+                                            const err = await response.json().catch(() => ({}));
+                                            showToast(err.error || 'Something went wrong. Please try again.', 'error');
                                         }
                                     } catch (err) {
-                                        alert('Network error. Please try again.');
+                                        showToast('Network error. Please try again.', 'error');
                                     } finally {
                                         setSubmitting(false);
                                     }
