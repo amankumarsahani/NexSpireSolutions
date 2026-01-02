@@ -13,6 +13,7 @@ const Header = () => {
     { label: 'About', path: '/about' },
     { label: 'Portfolio', path: '/portfolio' },
     { label: 'Blog', path: '/blog' },
+    { label: 'NexCRM', path: '/nexcrm' },
     { label: 'Contact', path: '/contact' },
   ];
 
@@ -48,8 +49,8 @@ const Header = () => {
       {/* Gradient glass morphism background */}
       <div className="absolute inset-0">
         <div className={`absolute inset-0 transition-all duration-700 ${scrolled
-            ? 'bg-gradient-to-r from-white/85 via-blue-50/80 to-purple-50/85 backdrop-blur-2xl'
-            : 'bg-gradient-to-r from-white/70 via-blue-50/60 to-purple-50/70 backdrop-blur-xl'
+          ? 'bg-gradient-to-r from-white/85 via-blue-50/80 to-purple-50/85 backdrop-blur-2xl'
+          : 'bg-gradient-to-r from-white/70 via-blue-50/60 to-purple-50/70 backdrop-blur-xl'
           }`}></div>
 
         {/* Enhanced ambient lighting with multiple gradients */}
@@ -88,8 +89,8 @@ const Header = () => {
                   to={item.path}
                   onClick={(e) => handleNavClick(e, item.path)}
                   className={`relative z-10 px-4 py-2 text-sm font-semibold rounded-full transition-all duration-300 ${isActive(item.path)
-                      ? 'bg-gradient-to-r from-blue-500 to-purple-500 text-white shadow-lg shadow-blue-500/25'
-                      : 'text-slate-700 hover:text-white hover:bg-gradient-to-r hover:from-blue-400 hover:to-purple-400 hover:shadow-md hover:shadow-blue-400/20'
+                    ? 'bg-gradient-to-r from-blue-500 to-purple-500 text-white shadow-lg shadow-blue-500/25'
+                    : 'text-slate-700 hover:text-white hover:bg-gradient-to-r hover:from-blue-400 hover:to-purple-400 hover:shadow-md hover:shadow-blue-400/20'
                     }`}
                 >
                   {item.label}
@@ -140,8 +141,8 @@ const Header = () => {
                     to={item.path}
                     onClick={(e) => handleNavClick(e, item.path)}
                     className={`relative z-10 block px-4 py-3 text-base font-semibold rounded-xl transition-all duration-300 ${isActive(item.path)
-                        ? 'text-white bg-gradient-to-r from-blue-500 to-purple-500 shadow-lg shadow-blue-500/25'
-                        : 'text-slate-700 hover:text-white hover:bg-gradient-to-r hover:from-blue-400 hover:to-purple-400 hover:shadow-md hover:shadow-blue-400/20'
+                      ? 'text-white bg-gradient-to-r from-blue-500 to-purple-500 shadow-lg shadow-blue-500/25'
+                      : 'text-slate-700 hover:text-white hover:bg-gradient-to-r hover:from-blue-400 hover:to-purple-400 hover:shadow-md hover:shadow-blue-400/20'
                       }`}
                   >
                     <div className="flex items-center justify-between">
