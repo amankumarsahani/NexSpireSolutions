@@ -1,15 +1,27 @@
 const express = require('express');
 const cors = require('cors');
 const morgan = require('morgan');
+const helmet = require('helmet');
 require('dotenv').config();
 
 const { testConnection } = require('./config/database');
+const { validateEnv } = require('./config/validateEnv');
+
+// Validate environment variables
+validateEnv();
 
 const app = express();
 const PORT = process.env.PORT || 5000;
 
 // Middleware
 app.use(morgan('dev')); // Logging
+
+// Security headers
+app.use(helmet({
+    contentSecurityPolicy: false, // Disable CSP for API
+    crossOriginEmbedderPolicy: false
+}));
+
 app.use(express.json()); // Parse JSON bodies
 app.use(express.urlencoded({ extended: true })); // Parse URL-encoded bodies
 
