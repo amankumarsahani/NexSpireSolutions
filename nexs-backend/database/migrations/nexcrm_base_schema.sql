@@ -1,6 +1,7 @@
 -- NexCRM Base Schema
 -- This schema is applied to each tenant's database during provisioning
 -- Last Updated: 2026-01-11
+-- STANDARD: All column names use snake_case
 
 -- ============================================
 -- USERS TABLE
@@ -9,15 +10,15 @@ CREATE TABLE IF NOT EXISTS users (
     id INT PRIMARY KEY AUTO_INCREMENT,
     email VARCHAR(255) UNIQUE NOT NULL,
     password VARCHAR(255) NOT NULL,
-    firstName VARCHAR(100),
-    lastName VARCHAR(100),
+    first_name VARCHAR(100),
+    last_name VARCHAR(100),
     phone VARCHAR(20),
     role ENUM('admin', 'manager', 'sales_operator', 'user') DEFAULT 'user',
     status ENUM('active', 'inactive', 'pending') DEFAULT 'active',
     avatar_url VARCHAR(500),
     department VARCHAR(100),
     position VARCHAR(100),
-    joinDate DATE,
+    join_date DATE,
     created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
     updated_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
     
@@ -30,23 +31,23 @@ CREATE TABLE IF NOT EXISTS users (
 -- ============================================
 CREATE TABLE IF NOT EXISTS leads (
     id INT PRIMARY KEY AUTO_INCREMENT,
-    contactName VARCHAR(255) NOT NULL,
+    contact_name VARCHAR(255) NOT NULL,
     company VARCHAR(255),
     email VARCHAR(255),
     phone VARCHAR(20),
     status ENUM('new', 'contacted', 'qualified', 'negotiation', 'won', 'lost') DEFAULT 'new',
-    leadSource VARCHAR(100),
-    estimatedValue DECIMAL(15,2),
+    lead_source VARCHAR(100),
+    estimated_value DECIMAL(15,2),
     score INT DEFAULT 0,
     notes TEXT,
-    assignedTo INT,
-    customerId INT,
+    assigned_to INT,
+    customer_id INT,
     created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
     updated_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
     
     INDEX idx_status (status),
-    INDEX idx_assigned (assignedTo),
-    FOREIGN KEY (assignedTo) REFERENCES users(id) ON DELETE SET NULL
+    INDEX idx_assigned (assigned_to),
+    FOREIGN KEY (assigned_to) REFERENCES users(id) ON DELETE SET NULL
 );
 
 -- ============================================
@@ -63,15 +64,15 @@ CREATE TABLE IF NOT EXISTS clients (
     industry VARCHAR(100),
     status ENUM('active', 'inactive', 'churned') DEFAULT 'active',
     notes TEXT,
-    assignedTo INT,
-    convertedFromLead INT,
+    assigned_to INT,
+    converted_from_lead INT,
     created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
     updated_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
     
     INDEX idx_status (status),
-    INDEX idx_assigned (assignedTo),
-    FOREIGN KEY (assignedTo) REFERENCES users(id) ON DELETE SET NULL,
-    FOREIGN KEY (convertedFromLead) REFERENCES leads(id) ON DELETE SET NULL
+    INDEX idx_assigned (assigned_to),
+    FOREIGN KEY (assigned_to) REFERENCES users(id) ON DELETE SET NULL,
+    FOREIGN KEY (converted_from_lead) REFERENCES leads(id) ON DELETE SET NULL
 );
 
 -- ============================================
@@ -81,21 +82,21 @@ CREATE TABLE IF NOT EXISTS projects (
     id INT PRIMARY KEY AUTO_INCREMENT,
     name VARCHAR(255) NOT NULL,
     description TEXT,
-    clientId INT,
+    client_id INT,
     status ENUM('pending', 'in_progress', 'completed', 'on_hold', 'cancelled', 'draft', 'active') DEFAULT 'pending',
     priority ENUM('low', 'medium', 'high', 'urgent') DEFAULT 'medium',
     budget DECIMAL(15,2),
-    startDate DATE,
-    endDate DATE,
+    start_date DATE,
+    end_date DATE,
     progress INT DEFAULT 0,
-    assignedTo INT,
+    assigned_to INT,
     created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
     updated_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
     
-    INDEX idx_client (clientId),
+    INDEX idx_client (client_id),
     INDEX idx_status (status),
-    FOREIGN KEY (clientId) REFERENCES clients(id) ON DELETE SET NULL,
-    FOREIGN KEY (assignedTo) REFERENCES users(id) ON DELETE SET NULL
+    FOREIGN KEY (client_id) REFERENCES clients(id) ON DELETE SET NULL,
+    FOREIGN KEY (assigned_to) REFERENCES users(id) ON DELETE SET NULL
 );
 
 -- ============================================
@@ -110,30 +111,30 @@ CREATE TABLE IF NOT EXISTS inquiries (
     message TEXT,
     source VARCHAR(100),
     status ENUM('new', 'contacted', 'resolved', 'spam', 'converted', 'in_progress', 'closed') DEFAULT 'new',
-    assignedTo INT,
+    assigned_to INT,
     created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
     updated_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
     
     INDEX idx_status (status),
-    INDEX idx_assigned (assignedTo),
-    FOREIGN KEY (assignedTo) REFERENCES users(id) ON DELETE SET NULL
+    INDEX idx_assigned (assigned_to),
+    FOREIGN KEY (assigned_to) REFERENCES users(id) ON DELETE SET NULL
 );
 
 -- ============================================
--- ACTIVITIES TABLE (Fixed: using relatedType/relatedId)
+-- ACTIVITIES TABLE
 -- ============================================
 CREATE TABLE IF NOT EXISTS activities (
     id INT PRIMARY KEY AUTO_INCREMENT,
     type VARCHAR(50) NOT NULL,
     description TEXT,
-    relatedType VARCHAR(50),
-    relatedId INT,
-    userId INT,
+    related_type VARCHAR(50),
+    related_id INT,
+    user_id INT,
     created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
     
     INDEX idx_type (type),
-    INDEX idx_relatedType (relatedType, relatedId),
-    FOREIGN KEY (userId) REFERENCES users(id) ON DELETE SET NULL
+    INDEX idx_related (related_type, related_id),
+    FOREIGN KEY (user_id) REFERENCES users(id) ON DELETE SET NULL
 );
 
 -- ============================================
@@ -178,21 +179,21 @@ CREATE TABLE IF NOT EXISTS team_members (
     department VARCHAR(100),
     workload INT DEFAULT 0,
     status ENUM('active', 'inactive', 'on_leave') DEFAULT 'active',
-    joinDate DATE,
-    userId INT,
+    join_date DATE,
+    user_id INT,
     created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
     updated_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
     
-    FOREIGN KEY (userId) REFERENCES users(id) ON DELETE SET NULL
+    FOREIGN KEY (user_id) REFERENCES users(id) ON DELETE SET NULL
 );
 
 -- ============================================
 -- ASSIGNMENT TRACKER (for round-robin)
 -- ============================================
 CREATE TABLE IF NOT EXISTS assignment_tracker (
-    entityType VARCHAR(50) PRIMARY KEY,
-    lastAssignedUserId INT,
-    lastAssignedIndex INT DEFAULT 0,
+    entity_type VARCHAR(50) PRIMARY KEY,
+    last_assigned_user_id INT,
+    last_assigned_index INT DEFAULT 0,
     updated_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP
 );
 
@@ -555,8 +556,7 @@ CREATE TABLE IF NOT EXISTS products (
 -- ============================================
 CREATE TABLE IF NOT EXISTS orders (
     id INT AUTO_INCREMENT PRIMARY KEY,
-    orderNumber VARCHAR(50) UNIQUE NOT NULL,
-    clientId INT,
+    order_number VARCHAR(50) UNIQUE NOT NULL,
     client_id INT,
     guest_email VARCHAR(255),
     guest_name VARCHAR(255),
@@ -566,13 +566,13 @@ CREATE TABLE IF NOT EXISTS orders (
     tax DECIMAL(15,2) DEFAULT 0,
     shipping DECIMAL(15,2) DEFAULT 0,
     total DECIMAL(15,2) DEFAULT 0,
-    shippingAddress TEXT,
-    billingAddress TEXT,
+    shipping_address TEXT,
+    billing_address TEXT,
     notes TEXT,
     created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
     updated_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
-    FOREIGN KEY (clientId) REFERENCES clients(id) ON DELETE SET NULL,
-    INDEX idx_orderNumber (orderNumber),
+    FOREIGN KEY (client_id) REFERENCES clients(id) ON DELETE SET NULL,
+    INDEX idx_order_number (order_number),
     INDEX idx_status (status)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4;
 
@@ -581,15 +581,15 @@ CREATE TABLE IF NOT EXISTS orders (
 -- ============================================
 CREATE TABLE IF NOT EXISTS order_items (
     id INT AUTO_INCREMENT PRIMARY KEY,
-    orderId INT NOT NULL,
-    productId INT,
-    productName VARCHAR(255),
+    order_id INT NOT NULL,
+    product_id INT,
+    product_name VARCHAR(255),
     product_image VARCHAR(500),
     quantity INT DEFAULT 1,
     price DECIMAL(15,2),
     total DECIMAL(15,2),
-    FOREIGN KEY (orderId) REFERENCES orders(id) ON DELETE CASCADE,
-    FOREIGN KEY (productId) REFERENCES products(id) ON DELETE SET NULL
+    FOREIGN KEY (order_id) REFERENCES orders(id) ON DELETE CASCADE,
+    FOREIGN KEY (product_id) REFERENCES products(id) ON DELETE SET NULL
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4;
 
 -- ============================================
