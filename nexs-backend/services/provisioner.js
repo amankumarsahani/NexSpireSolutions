@@ -841,6 +841,39 @@ class Provisioner {
     }
 
     /**
+     * Unregister all emails for a tenant from registry service
+     * Called during tenant deletion to clean up registry entries
+     */
+    async unregisterFromRegistry(tenantSlug) {
+        if (!this.registryUrl || !this.registryApiKey) {
+            console.log('[Provisioner] Registry service not configured, skipping unregistration');
+            return false;
+        }
+
+        try {
+            const response = await fetch(`${this.registryUrl}/unregister-tenant/${tenantSlug}`, {
+                method: 'DELETE',
+                headers: {
+                    'X-API-Key': this.registryApiKey
+                }
+            });
+
+            const data = await response.json();
+
+            if (response.ok && data.success) {
+                console.log(`[Provisioner] Unregistered ${data.deleted} emails from registry for tenant: ${tenantSlug}`);
+                return true;
+            } else {
+                console.warn('[Provisioner] Registry unregistration failed:', data.error || 'Unknown error');
+                return false;
+            }
+        } catch (error) {
+            console.warn('[Provisioner] Could not unregister from registry:', error.message);
+            return false;
+        }
+    }
+
+    /**
      * Get PM2 logs for a tenant process
      */
     async getProcessLogs(tenant, lines = 100) {
@@ -1101,7 +1134,8 @@ class Provisioner {
             pagesDomainsRemoved: false,
             tunnelConfigUpdated: false,
             ecosystemUpdated: false,
-            databaseDropped: false
+            databaseDropped: false,
+            registryCleanedUp: false
         };
 
         const processName = tenant.process_name || `tenant-${tenant.slug}`;
@@ -1179,6 +1213,14 @@ class Provisioner {
             } catch (e) {
                 console.warn('[Provisioner] Database drop failed:', e.message);
             }
+        }
+
+        // 9. Unregister from registry service (remove all email mappings)
+        try {
+            const unregistered = await this.unregisterFromRegistry(tenant.slug);
+            results.registryCleanedUp = unregistered;
+        } catch (e) {
+            console.warn('[Provisioner] Registry cleanup failed:', e.message);
         }
 
         console.log(`[Provisioner] Full cleanup complete for: ${tenant.slug}`, results);
