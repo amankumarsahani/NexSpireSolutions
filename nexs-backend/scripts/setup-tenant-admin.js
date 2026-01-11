@@ -64,7 +64,7 @@ async function setupTenantAdmin(tenantSlug, resetPassword = false) {
         const superAdminHash = await bcrypt.hash(superAdminPassword, 10);
 
         await tenantDb.query(
-            `INSERT INTO users (email, password, firstName, lastName, role, status) 
+            `INSERT INTO users (email, password, first_name, last_name, role, status) 
              VALUES (?, ?, 'NexSpire', 'Admin', 'admin', 'active')
              ON DUPLICATE KEY UPDATE password = ?, role = 'admin'`,
             [superAdminEmail, superAdminHash, superAdminHash]
@@ -101,7 +101,7 @@ async function setupTenantAdmin(tenantSlug, resetPassword = false) {
 
         // Show all users in tenant
         const [users] = await tenantDb.query(
-            'SELECT id, email, firstName, lastName, role, status FROM users'
+            'SELECT id, email, first_name, last_name, role, status FROM users'
         );
         console.log(`\n👥 All users in tenant:`);
         users.forEach(u => {

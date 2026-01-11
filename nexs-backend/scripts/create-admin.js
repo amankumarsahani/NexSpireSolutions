@@ -5,8 +5,8 @@ async function createAdmin() {
     try {
         const email = 'admin@nexspiresolutions.co.in';
         const password = 'admin123';
-        const firstName = 'Admin';
-        const lastName = 'User';
+        const first_name = 'Admin';
+        const last_name = 'User';
         const role = 'admin';
 
         // Hash password
@@ -23,9 +23,9 @@ async function createAdmin() {
 
         // Insert new admin user
         const [result] = await pool.query(
-            `INSERT INTO users (email, password, firstName, lastName, role, status) 
+            `INSERT INTO users (email, password, first_name, last_name, role, status) 
              VALUES (?, ?, ?, ?, ?, 'active')`,
-            [email, hashedPassword, firstName, lastName, role]
+            [email, hashedPassword, first_name, last_name, role]
         );
 
         console.log('Admin user created successfully!');

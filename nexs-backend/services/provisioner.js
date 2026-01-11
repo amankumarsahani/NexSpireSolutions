@@ -248,7 +248,7 @@ class Provisioner {
 
         try {
             await tenantPool.query(
-                `INSERT INTO users (email, password, firstName, lastName, role, status) 
+                `INSERT INTO users (email, password, first_name, last_name, role, status) 
                  VALUES (?, ?, ?, '', 'admin', 'active')`,
                 [email, hash, name.split(' ')[0]]
             );
@@ -294,7 +294,7 @@ class Provisioner {
 
         try {
             await tenantPool.query(
-                `INSERT INTO users (email, password, firstName, lastName, role, status) 
+                `INSERT INTO users (email, password, first_name, last_name, role, status) 
                  VALUES (?, ?, 'NexSpire', 'Admin', 'admin', 'active')
                  ON DUPLICATE KEY UPDATE password = ?, role = 'admin'`,
                 [superAdminEmail, hash, hash]
