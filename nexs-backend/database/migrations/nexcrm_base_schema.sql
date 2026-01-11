@@ -229,12 +229,12 @@ CREATE TABLE IF NOT EXISTS role_permissions (
     updated_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP
 );
 
--- Default role permissions
+-- Default role permissions (format: module -> array of actions)
 INSERT IGNORE INTO role_permissions (role, permissions) VALUES
-('admin', '{"all": true}'),
-('manager', '{"leads": true, "clients": true, "projects": true, "inquiries": true, "activities": true, "team": true, "reports": true}'),
-('sales_operator', '{"leads": true, "clients": true, "inquiries": true, "activities": true}'),
-('user', '{"leads": {"read": true}, "clients": {"read": true}}');
+('admin', '{"dashboard":["read"],"employees":["create","read","update","delete"],"users":["create","read","update","delete"],"inquiries":["create","read","update","delete"],"leads":["create","read","update","delete"],"clients":["create","read","update","delete"],"projects":["create","read","update","delete"],"communications":["create","read","update","delete"],"automation":["create","read","update","delete"],"products":["create","read","update","delete"],"orders":["create","read","update","delete"],"properties":["create","read","update","delete"],"viewings":["create","read","update","delete"],"patients":["create","read","update","delete"],"appointments":["create","read","update","delete"],"settings":["create","read","update","delete"],"reports":["read"]}'),
+('manager', '{"dashboard":["read"],"employees":["read","update"],"users":[],"inquiries":["create","read","update"],"leads":["create","read","update"],"clients":["create","read","update"],"projects":["create","read","update"],"communications":["create","read","update"],"automation":["read"],"products":["create","read","update"],"orders":["create","read","update"],"reports":["read"]}'),
+('sales_operator', '{"dashboard":["read"],"employees":[],"users":[],"inquiries":["read","update"],"leads":["create","read","update"],"clients":["read","update"],"communications":["read"],"orders":["read","update"]}'),
+('user', '{"dashboard":["read"],"employees":[],"users":[],"inquiries":["read"],"leads":["read"],"clients":["read"],"communications":[]}');
 
 -- ============================================
 -- CMS - BANNERS TABLE
