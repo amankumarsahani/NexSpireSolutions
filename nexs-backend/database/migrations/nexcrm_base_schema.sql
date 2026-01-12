@@ -65,6 +65,7 @@ CREATE TABLE IF NOT EXISTS clients (
     industry VARCHAR(100),
     status ENUM('active', 'inactive', 'churned') DEFAULT 'active',
     notes TEXT,
+    total_value DECIMAL(15,2) DEFAULT 0,
     assigned_to INT,
     converted_from_lead INT,
     created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
