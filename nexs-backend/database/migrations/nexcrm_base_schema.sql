@@ -18,6 +18,7 @@ CREATE TABLE IF NOT EXISTS users (
     avatar_url VARCHAR(500),
     department VARCHAR(100),
     position VARCHAR(100),
+    bio TEXT,
     join_date DATE,
     created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
     updated_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
@@ -151,6 +152,48 @@ CREATE TABLE IF NOT EXISTS email_templates (
     created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
     updated_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP
 );
+
+-- ============================================
+-- EMAIL CAMPAIGNS TABLE
+-- ============================================
+CREATE TABLE IF NOT EXISTS email_campaigns (
+    id INT PRIMARY KEY AUTO_INCREMENT,
+    name VARCHAR(255) NOT NULL,
+    template_id INT,
+    subject VARCHAR(500),
+    html_content TEXT,
+    recipients_type ENUM('all_customers', 'all_leads', 'segment', 'manual') DEFAULT 'all_customers',
+    recipients_filter JSON,
+    status ENUM('draft', 'scheduled', 'active', 'paused', 'completed', 'failed') DEFAULT 'draft',
+    scheduled_at DATETIME,
+    sent_at DATETIME,
+    created_by INT,
+    created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+    updated_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
+    FOREIGN KEY (template_id) REFERENCES email_templates(id) ON DELETE SET NULL,
+    FOREIGN KEY (created_by) REFERENCES users(id) ON DELETE SET NULL,
+    INDEX idx_status (status)
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4;
+
+-- ============================================
+-- EMAIL CAMPAIGN LOGS TABLE
+-- ============================================
+CREATE TABLE IF NOT EXISTS email_campaign_logs (
+    id INT PRIMARY KEY AUTO_INCREMENT,
+    campaign_id INT NOT NULL,
+    recipient_email VARCHAR(255) NOT NULL,
+    recipient_name VARCHAR(255),
+    status ENUM('pending', 'sent', 'opened', 'clicked', 'bounced', 'failed') DEFAULT 'pending',
+    sent_at DATETIME,
+    opened_at DATETIME,
+    clicked_at DATETIME,
+    error_message TEXT,
+    created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+    FOREIGN KEY (campaign_id) REFERENCES email_campaigns(id) ON DELETE CASCADE,
+    UNIQUE KEY unique_recipient (campaign_id, recipient_email),
+    INDEX idx_campaign (campaign_id),
+    INDEX idx_status (status)
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4;
 
 -- ============================================
 -- DOCUMENT TEMPLATES TABLE
@@ -497,6 +540,41 @@ CREATE TABLE IF NOT EXISTS chat_messages (
 );
 
 -- ============================================
+-- CHAT CHANNELS TABLES (alternative naming - used by some routes)
+-- ============================================
+CREATE TABLE IF NOT EXISTS chat_channels (
+    id INT PRIMARY KEY AUTO_INCREMENT,
+    name VARCHAR(100) NOT NULL,
+    description VARCHAR(255),
+    type ENUM('channel', 'dm') DEFAULT 'channel',
+    created_by INT,
+    is_default BOOLEAN DEFAULT FALSE,
+    created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+    updated_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
+    FOREIGN KEY (created_by) REFERENCES users(id) ON DELETE SET NULL
+) ENGINE=InnoDB;
+
+CREATE TABLE IF NOT EXISTS chat_channel_members (
+    id INT PRIMARY KEY AUTO_INCREMENT,
+    channel_id INT NOT NULL,
+    user_id INT NOT NULL,
+    last_read_at TIMESTAMP NULL,
+    joined_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+    UNIQUE KEY unique_member (channel_id, user_id),
+    FOREIGN KEY (channel_id) REFERENCES chat_channels(id) ON DELETE CASCADE,
+    FOREIGN KEY (user_id) REFERENCES users(id) ON DELETE CASCADE
+) ENGINE=InnoDB;
+
+-- Add channel_id reference to chat_messages for chat_channels system
+ALTER TABLE chat_messages ADD COLUMN IF NOT EXISTS channel_id INT AFTER id;
+
+-- Default chat channels
+INSERT IGNORE INTO chat_channels (name, description, type, is_default) VALUES 
+('General', 'General discussion for all team members', 'channel', TRUE),
+('Sales Team', 'Sales team discussions and updates', 'channel', FALSE),
+('Support', 'Customer support discussions', 'channel', FALSE);
+
+-- ============================================
 -- SMTP ACCOUNTS TABLE
 -- ============================================
 CREATE TABLE IF NOT EXISTS smtp_accounts (
@@ -538,6 +616,7 @@ CREATE TABLE IF NOT EXISTS products (
     weight DECIMAL(8,2),
     dimensions VARCHAR(50),
     images LONGTEXT,
+    vendor_id INT,
     status TINYINT NOT NULL DEFAULT 0 COMMENT '0=draft,1=active,2=archived,3=out_of_stock',
     is_featured TINYINT(1) DEFAULT 0,
     tax_rate DECIMAL(5,2) DEFAULT 0.00,
@@ -548,7 +627,50 @@ CREATE TABLE IF NOT EXISTS products (
     INDEX idx_sku (sku),
     INDEX idx_category (category),
     INDEX idx_status (status),
-    INDEX idx_featured (is_featured)
+    INDEX idx_featured (is_featured),
+    INDEX idx_vendor (vendor_id)
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4;
+
+-- ============================================
+-- E-COMMERCE: CUSTOMERS TABLE (Storefront Auth)
+-- ============================================
+CREATE TABLE IF NOT EXISTS customers (
+    id INT PRIMARY KEY AUTO_INCREMENT,
+    first_name VARCHAR(100) NOT NULL,
+    last_name VARCHAR(100) NOT NULL,
+    email VARCHAR(255) UNIQUE NOT NULL,
+    phone VARCHAR(20),
+    password VARCHAR(255) NOT NULL,
+    reset_token VARCHAR(255),
+    reset_expires DATETIME,
+    email_verified BOOLEAN DEFAULT FALSE,
+    unsubscribed BOOLEAN DEFAULT FALSE,
+    created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+    updated_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
+    INDEX idx_email (email),
+    INDEX idx_reset_token (reset_token)
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4;
+
+-- ============================================
+-- E-COMMERCE: CUSTOMER ADDRESSES TABLE
+-- ============================================
+CREATE TABLE IF NOT EXISTS customer_addresses (
+    id INT PRIMARY KEY AUTO_INCREMENT,
+    customer_id INT NOT NULL,
+    name VARCHAR(100) NOT NULL,
+    phone VARCHAR(20) NOT NULL,
+    address_line1 VARCHAR(255) NOT NULL,
+    address_line2 VARCHAR(255),
+    city VARCHAR(100) NOT NULL,
+    state VARCHAR(100) NOT NULL,
+    pincode VARCHAR(10) NOT NULL,
+    country VARCHAR(100) DEFAULT 'India',
+    is_default BOOLEAN DEFAULT FALSE,
+    created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+    updated_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
+    FOREIGN KEY (customer_id) REFERENCES customers(id) ON DELETE CASCADE,
+    INDEX idx_customer (customer_id),
+    INDEX idx_default (customer_id, is_default)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4;
 
 -- ============================================
@@ -593,38 +715,147 @@ CREATE TABLE IF NOT EXISTS order_items (
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4;
 
 -- ============================================
+-- E-COMMERCE: REFUND TRANSACTIONS TABLE
+-- ============================================
+CREATE TABLE IF NOT EXISTS refund_transactions (
+    id INT AUTO_INCREMENT PRIMARY KEY,
+    order_id INT NOT NULL,
+    amount DECIMAL(15,2) NOT NULL,
+    reason TEXT,
+    status ENUM('pending', 'processing', 'processed', 'failed') DEFAULT 'pending',
+    refund_method VARCHAR(50),
+    reference_number VARCHAR(100),
+    processed_at DATETIME,
+    processed_by INT,
+    created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+    FOREIGN KEY (order_id) REFERENCES orders(id) ON DELETE CASCADE,
+    INDEX idx_order (order_id),
+    INDEX idx_status (status)
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4;
+
+-- ============================================
 -- E-COMMERCE: COUPONS TABLE
 -- ============================================
 CREATE TABLE IF NOT EXISTS coupons (
     id INT AUTO_INCREMENT PRIMARY KEY,
     code VARCHAR(50) UNIQUE NOT NULL,
+    name VARCHAR(100),
     description TEXT,
-    discount_type ENUM('percentage', 'fixed') DEFAULT 'percentage',
-    discount_value DECIMAL(10,2) NOT NULL,
-    min_order_amount DECIMAL(15,2) DEFAULT 0,
-    max_uses INT DEFAULT NULL,
+    type ENUM('percentage', 'fixed') DEFAULT 'percentage',
+    value DECIMAL(10,2) NOT NULL,
+    min_order_value DECIMAL(15,2) DEFAULT 0,
+    max_discount DECIMAL(10,2),
+    usage_limit INT DEFAULT NULL,
+    per_user_limit INT DEFAULT 1,
     used_count INT DEFAULT 0,
-    valid_from DATETIME,
-    valid_until DATETIME,
+    start_date DATETIME,
+    end_date DATETIME,
+    applies_to ENUM('all', 'products', 'categories') DEFAULT 'all',
+    product_ids JSON,
+    category_ids JSON,
     is_active BOOLEAN DEFAULT TRUE,
     created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
     updated_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4;
 
 -- ============================================
--- E-COMMERCE: VENDORS TABLE
+-- E-COMMERCE: COUPON USAGE TABLE
+-- ============================================
+CREATE TABLE IF NOT EXISTS coupon_usage (
+    id INT AUTO_INCREMENT PRIMARY KEY,
+    coupon_id INT NOT NULL,
+    order_id INT,
+    customer_id INT,
+    discount_amount DECIMAL(10,2),
+    used_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+    FOREIGN KEY (coupon_id) REFERENCES coupons(id) ON DELETE CASCADE,
+    INDEX idx_coupon (coupon_id),
+    INDEX idx_customer (customer_id)
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4;
+
+-- ============================================
+-- E-COMMERCE: FLASH SALES TABLE
+-- ============================================
+CREATE TABLE IF NOT EXISTS flash_sales (
+    id INT AUTO_INCREMENT PRIMARY KEY,
+    name VARCHAR(200) NOT NULL,
+    description TEXT,
+    discount_type ENUM('percentage', 'fixed') DEFAULT 'percentage',
+    discount_value DECIMAL(10,2),
+    start_time DATETIME NOT NULL,
+    end_time DATETIME NOT NULL,
+    is_active BOOLEAN DEFAULT TRUE,
+    created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+    updated_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4;
+
+-- ============================================
+-- E-COMMERCE: FLASH SALE PRODUCTS TABLE
+-- ============================================
+CREATE TABLE IF NOT EXISTS flash_sale_products (
+    id INT AUTO_INCREMENT PRIMARY KEY,
+    flash_sale_id INT NOT NULL,
+    product_id INT NOT NULL,
+    sale_price DECIMAL(10,2),
+    quantity_limit INT,
+    sold_count INT DEFAULT 0,
+    FOREIGN KEY (flash_sale_id) REFERENCES flash_sales(id) ON DELETE CASCADE,
+    FOREIGN KEY (product_id) REFERENCES products(id) ON DELETE CASCADE,
+    INDEX idx_flash_sale (flash_sale_id),
+    INDEX idx_product (product_id)
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4;
+
+-- ============================================
+-- E-COMMERCE: VENDORS TABLE (Marketplace)
 -- ============================================
 CREATE TABLE IF NOT EXISTS vendors (
     id INT AUTO_INCREMENT PRIMARY KEY,
-    name VARCHAR(200) NOT NULL,
+    user_id INT,
+    company_name VARCHAR(200) NOT NULL,
+    slug VARCHAR(200) UNIQUE,
     email VARCHAR(255),
     phone VARCHAR(20),
+    description TEXT,
     address TEXT,
-    contact_person VARCHAR(100),
-    status ENUM('active', 'inactive') DEFAULT 'active',
+    city VARCHAR(100),
+    state VARCHAR(100),
+    pincode VARCHAR(10),
+    logo VARCHAR(500),
+    gst_number VARCHAR(20),
+    pan_number VARCHAR(20),
+    bank_name VARCHAR(100),
+    bank_account VARCHAR(50),
+    bank_ifsc VARCHAR(20),
+    commission_rate DECIMAL(5,2) DEFAULT 10.00,
+    total_sales DECIMAL(15,2) DEFAULT 0,
+    status ENUM('pending', 'approved', 'active', 'inactive', 'rejected', 'suspended') DEFAULT 'pending',
     notes TEXT,
     created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
-    updated_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP
+    updated_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
+    FOREIGN KEY (user_id) REFERENCES users(id) ON DELETE SET NULL,
+    INDEX idx_status (status),
+    INDEX idx_slug (slug)
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4;
+
+-- ============================================
+-- E-COMMERCE: VENDOR PAYOUTS TABLE
+-- ============================================
+CREATE TABLE IF NOT EXISTS vendor_payouts (
+    id INT AUTO_INCREMENT PRIMARY KEY,
+    vendor_id INT NOT NULL,
+    amount DECIMAL(15,2) NOT NULL,
+    commission DECIMAL(15,2) DEFAULT 0,
+    net_amount DECIMAL(15,2) NOT NULL,
+    period_start DATE,
+    period_end DATE,
+    payment_method VARCHAR(50),
+    reference_number VARCHAR(100),
+    status ENUM('pending', 'processing', 'completed', 'failed') DEFAULT 'pending',
+    processed_at DATETIME,
+    created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+    FOREIGN KEY (vendor_id) REFERENCES vendors(id) ON DELETE CASCADE,
+    INDEX idx_vendor (vendor_id),
+    INDEX idx_status (status)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4;
 
 -- ============================================
@@ -652,15 +883,142 @@ CREATE TABLE IF NOT EXISTS product_categories (
 CREATE TABLE IF NOT EXISTS product_reviews (
     id INT AUTO_INCREMENT PRIMARY KEY,
     product_id INT NOT NULL,
+    client_id INT,
+    customer_id INT,
     customer_name VARCHAR(100),
     customer_email VARCHAR(255),
     rating INT NOT NULL DEFAULT 5,
     title VARCHAR(200),
     review TEXT,
+    pros TEXT,
+    cons TEXT,
+    status ENUM('pending', 'approved', 'rejected', 'flagged') DEFAULT 'pending',
     is_verified BOOLEAN DEFAULT FALSE,
     is_approved BOOLEAN DEFAULT FALSE,
+    helpful_count INT DEFAULT 0,
     created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
     INDEX idx_product (product_id),
+    INDEX idx_status (status),
     INDEX idx_approved (is_approved),
-    FOREIGN KEY (product_id) REFERENCES products(id) ON DELETE CASCADE
+    FOREIGN KEY (product_id) REFERENCES products(id) ON DELETE CASCADE,
+    FOREIGN KEY (client_id) REFERENCES clients(id) ON DELETE SET NULL
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4;
+
+-- ============================================
+-- E-COMMERCE: SHIPPING PROVIDERS TABLE
+-- ============================================
+CREATE TABLE IF NOT EXISTS shipping_providers (
+    id INT AUTO_INCREMENT PRIMARY KEY,
+    name VARCHAR(100) NOT NULL,
+    code VARCHAR(50) NOT NULL UNIQUE,
+    logo VARCHAR(500),
+    api_key VARCHAR(255),
+    api_secret VARCHAR(255),
+    api_endpoint VARCHAR(500),
+    is_active BOOLEAN DEFAULT TRUE,
+    settings JSON,
+    created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+    updated_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
+    INDEX idx_code (code),
+    INDEX idx_active (is_active)
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4;
+
+-- ============================================
+-- E-COMMERCE: SHIPPING RATES TABLE
+-- ============================================
+CREATE TABLE IF NOT EXISTS shipping_rates (
+    id INT AUTO_INCREMENT PRIMARY KEY,
+    provider_id INT,
+    name VARCHAR(100) NOT NULL,
+    description TEXT,
+    base_rate DECIMAL(10,2) NOT NULL DEFAULT 0,
+    per_kg_rate DECIMAL(10,2) DEFAULT 0,
+    min_weight DECIMAL(8,2) DEFAULT 0,
+    max_weight DECIMAL(8,2),
+    delivery_days VARCHAR(50),
+    is_active BOOLEAN DEFAULT TRUE,
+    created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+    updated_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
+    FOREIGN KEY (provider_id) REFERENCES shipping_providers(id) ON DELETE SET NULL,
+    INDEX idx_provider (provider_id),
+    INDEX idx_active (is_active)
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4;
+
+-- ============================================
+-- E-COMMERCE: DELIVERY ZONES TABLE
+-- ============================================
+CREATE TABLE IF NOT EXISTS delivery_zones (
+    id INT AUTO_INCREMENT PRIMARY KEY,
+    name VARCHAR(100) NOT NULL,
+    pincodes JSON,
+    states JSON,
+    cities JSON,
+    is_serviceable BOOLEAN DEFAULT TRUE,
+    cod_available BOOLEAN DEFAULT TRUE,
+    delivery_charge DECIMAL(10,2) DEFAULT 0,
+    free_delivery_above DECIMAL(10,2),
+    estimated_days VARCHAR(50),
+    created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+    updated_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
+    INDEX idx_serviceable (is_serviceable)
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4;
+
+-- ============================================
+-- E-COMMERCE: SHIPMENTS TABLE
+-- ============================================
+CREATE TABLE IF NOT EXISTS shipments (
+    id INT AUTO_INCREMENT PRIMARY KEY,
+    order_id INT NOT NULL,
+    provider_id INT,
+    tracking_number VARCHAR(100),
+    awb_number VARCHAR(100),
+    status ENUM('pending', 'picked_up', 'in_transit', 'out_for_delivery', 'delivered', 'failed', 'rto', 'cancelled') DEFAULT 'pending',
+    weight DECIMAL(8,2),
+    dimensions VARCHAR(100),
+    shipping_cost DECIMAL(10,2),
+    estimated_delivery DATE,
+    actual_delivery DATE,
+    pickup_address TEXT,
+    delivery_address TEXT,
+    notes TEXT,
+    created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+    updated_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
+    FOREIGN KEY (order_id) REFERENCES orders(id) ON DELETE CASCADE,
+    FOREIGN KEY (provider_id) REFERENCES shipping_providers(id) ON DELETE SET NULL,
+    INDEX idx_order (order_id),
+    INDEX idx_tracking (tracking_number),
+    INDEX idx_awb (awb_number),
+    INDEX idx_status (status)
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4;
+
+-- ============================================
+-- E-COMMERCE: SHIPMENT TRACKING TABLE
+-- ============================================
+CREATE TABLE IF NOT EXISTS shipment_tracking (
+    id INT AUTO_INCREMENT PRIMARY KEY,
+    shipment_id INT NOT NULL,
+    status VARCHAR(100) NOT NULL,
+    location VARCHAR(255),
+    description TEXT,
+    timestamp DATETIME DEFAULT CURRENT_TIMESTAMP,
+    raw_data JSON,
+    FOREIGN KEY (shipment_id) REFERENCES shipments(id) ON DELETE CASCADE,
+    INDEX idx_shipment (shipment_id),
+    INDEX idx_timestamp (timestamp)
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4;
+
+-- Default shipping providers
+INSERT IGNORE INTO shipping_providers (name, code, is_active) VALUES
+('Manual / Self Delivery', 'manual', TRUE),
+('Delhivery', 'delhivery', FALSE),
+('Shiprocket', 'shiprocket', FALSE),
+('Blue Dart', 'bluedart', FALSE),
+('DTDC', 'dtdc', FALSE),
+('India Post', 'indiapost', FALSE);
+
+-- Default delivery zones
+INSERT IGNORE INTO delivery_zones (name, is_serviceable, cod_available, delivery_charge, free_delivery_above, estimated_days) VALUES
+('Local (Same City)', TRUE, TRUE, 30.00, 500.00, '1-2 days'),
+('Metro Cities', TRUE, TRUE, 50.00, 1000.00, '2-3 days'),
+('Rest of India', TRUE, TRUE, 80.00, 1500.00, '4-7 days'),
+('Remote Areas', TRUE, FALSE, 150.00, 2000.00, '7-10 days');
