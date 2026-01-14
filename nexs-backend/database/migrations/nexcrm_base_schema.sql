@@ -64,6 +64,7 @@ CREATE TABLE IF NOT EXISTS clients (
     website VARCHAR(255),
     industry VARCHAR(100),
     status ENUM('active', 'inactive', 'churned') DEFAULT 'active',
+    source VARCHAR(100),
     notes TEXT,
     total_value DECIMAL(15,2) DEFAULT 0,
     assigned_to INT,
@@ -714,6 +715,7 @@ CREATE TABLE IF NOT EXISTS orders (
     id INT AUTO_INCREMENT PRIMARY KEY,
     order_number VARCHAR(50) UNIQUE NOT NULL,
     client_id INT,
+    customer_id INT,
     guest_email VARCHAR(255),
     guest_name VARCHAR(255),
     guest_phone VARCHAR(20),
@@ -721,15 +723,23 @@ CREATE TABLE IF NOT EXISTS orders (
     subtotal DECIMAL(15,2) DEFAULT 0,
     tax DECIMAL(15,2) DEFAULT 0,
     shipping DECIMAL(15,2) DEFAULT 0,
+    shipping_cost DECIMAL(15,2) DEFAULT 0,
+    discount DECIMAL(15,2) DEFAULT 0,
+    coupon_code VARCHAR(50),
+    coupon_discount DECIMAL(15,2) DEFAULT 0,
     total DECIMAL(15,2) DEFAULT 0,
     shipping_address TEXT,
     billing_address TEXT,
+    payment_method VARCHAR(50),
+    payment_status ENUM('pending', 'paid', 'failed', 'refunded') DEFAULT 'pending',
     notes TEXT,
     created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
     updated_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
     FOREIGN KEY (client_id) REFERENCES clients(id) ON DELETE SET NULL,
+    FOREIGN KEY (customer_id) REFERENCES customers(id) ON DELETE SET NULL,
     INDEX idx_order_number (order_number),
-    INDEX idx_status (status)
+    INDEX idx_status (status),
+    INDEX idx_customer (customer_id)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4;
 
 -- ============================================
