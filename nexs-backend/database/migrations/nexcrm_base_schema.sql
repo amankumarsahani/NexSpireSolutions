@@ -150,6 +150,7 @@ CREATE TABLE IF NOT EXISTS email_templates (
     type VARCHAR(50) DEFAULT 'custom',
     variables JSON,
     is_active BOOLEAN DEFAULT TRUE,
+    is_system BOOLEAN DEFAULT FALSE,
     created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
     updated_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP
 );
@@ -354,6 +355,24 @@ CREATE TABLE IF NOT EXISTS homepage_sections (
     created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
     INDEX idx_type (type),
     INDEX idx_order (sort_order)
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4;
+
+-- ============================================
+-- CMS - SECTIONS TABLE (for homepage categories, deals, collections etc)
+-- ============================================
+CREATE TABLE IF NOT EXISTS cms_sections (
+    id INT PRIMARY KEY AUTO_INCREMENT,
+    section_type VARCHAR(50) NOT NULL,
+    title VARCHAR(255),
+    subtitle TEXT,
+    items JSON,
+    position INT DEFAULT 0,
+    active TINYINT(1) DEFAULT 1,
+    created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+    updated_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
+    INDEX idx_type (section_type),
+    INDEX idx_position (position),
+    INDEX idx_active (active)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4;
 
 -- ============================================
@@ -644,12 +663,15 @@ CREATE TABLE IF NOT EXISTS customers (
     password VARCHAR(255) NOT NULL,
     reset_token VARCHAR(255),
     reset_expires DATETIME,
+    verification_token VARCHAR(255),
+    verification_expires DATETIME,
     email_verified BOOLEAN DEFAULT FALSE,
     unsubscribed BOOLEAN DEFAULT FALSE,
     created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
     updated_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
     INDEX idx_email (email),
-    INDEX idx_reset_token (reset_token)
+    INDEX idx_reset_token (reset_token),
+    INDEX idx_verification_token (verification_token)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4;
 
 -- ============================================
