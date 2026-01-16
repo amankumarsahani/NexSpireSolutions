@@ -645,7 +645,8 @@ class Provisioner {
             --port ${assigned_port} \
             --db ${db_name} \
             --industry ${industry_type} \
-            --plan ${plan_slug}`;
+            --plan ${plan_slug} \
+            --slug ${slug}`;
 
         try {
             await execAsync(cmd);
@@ -1135,7 +1136,8 @@ class Provisioner {
             tunnelConfigUpdated: false,
             ecosystemUpdated: false,
             databaseDropped: false,
-            registryCleanedUp: false
+            registryCleanedUp: false,
+            storageCleanedUp: false
         };
 
         const processName = tenant.process_name || `tenant-${tenant.slug}`;
@@ -1148,6 +1150,25 @@ class Provisioner {
             results.pm2Deleted = true;
         } catch (e) {
             console.warn('[Provisioner] PM2 delete failed:', e.message);
+        }
+
+        // 1b. Cleanup tenant storage
+        try {
+            const fs = require('fs');
+            const path = require('path');
+            const uploadsDir = path.join(this.nexcrmBackendPath, 'uploads');
+            const tenantDir = path.join(uploadsDir, tenant.slug);
+
+            if (fs.existsSync(tenantDir)) {
+                fs.rmSync(tenantDir, { recursive: true, force: true });
+                results.storageCleanedUp = true;
+                console.log(`[Provisioner] Storage cleaned up for tenant: ${tenant.slug}`);
+            } else {
+                results.storageCleanedUp = true; // Nothing to delete
+                console.log(`[Provisioner] No storage directory found for tenant: ${tenant.slug}`);
+            }
+        } catch (e) {
+            console.warn('[Provisioner] Storage cleanup failed:', e.message);
         }
 
         // 2. Remove API DNS record
