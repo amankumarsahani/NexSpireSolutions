@@ -111,9 +111,17 @@ app.use('/api/dashboard', require('./routes/dashboard.routes'));
 app.use('/api/tenants', require('./routes/tenant.routes'));
 app.use('/api/plans', require('./routes/plan.routes'));
 
+// Email Campaigns & Marketing
+app.use('/api/campaigns', require('./routes/campaign.routes'));
+app.use('/api/track', require('./routes/tracking.routes'));
+
 // Billing & Webhooks
 app.use('/api/billing', require('./routes/billing.routes'));
 app.use('/webhooks', require('./routes/webhook.routes'));
+
+// Start email worker (after routes are set up)
+const emailWorker = require('./workers/emailWorker');
+emailWorker.start(30000); // Process queue every 30 seconds
 
 // 404 Handler
 app.use((req, res) => {
