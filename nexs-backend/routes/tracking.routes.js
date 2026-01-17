@@ -22,25 +22,25 @@ router.get('/open/:trackingId', async (req, res) => {
 
         // Update queue item
         await db.query(
-            'UPDATE email_queue SET opened_at = COALESCE(opened_at, NOW()) WHERE tracking_id = ? AND opened_at IS NULL',
+            'UPDATE email_queue SET openedAt = COALESCE(openedAt, NOW()) WHERE trackingId = ? AND openedAt IS NULL',
             [trackingId]
         );
 
         // Get queue item for campaign update
-        const [[queueItem]] = await db.query('SELECT * FROM email_queue WHERE tracking_id = ?', [trackingId]);
+        const [[queueItem]] = await db.query('SELECT * FROM email_queue WHERE trackingId = ?', [trackingId]);
 
         if (queueItem) {
             // Log tracking event
             await db.query(
-                'INSERT INTO email_tracking (queue_id, campaign_id, tracking_id, event_type, ip_address, user_agent) VALUES (?, ?, ?, ?, ?, ?)',
-                [queueItem.id, queueItem.campaign_id, trackingId, 'opened', req.ip, req.get('User-Agent')]
+                'INSERT INTO email_tracking (queueId, campaignId, trackingId, eventType, ipAddress, userAgent) VALUES (?, ?, ?, ?, ?, ?)',
+                [queueItem.id, queueItem.campaignId, trackingId, 'opened', req.ip, req.get('User-Agent')]
             );
 
             // Update campaign open count (only first open counts)
-            if (!queueItem.opened_at) {
+            if (!queueItem.openedAt) {
                 await db.query(
-                    'UPDATE email_campaigns SET opened_count = opened_count + 1 WHERE id = ?',
-                    [queueItem.campaign_id]
+                    'UPDATE email_campaigns SET openedCount = openedCount + 1 WHERE id = ?',
+                    [queueItem.campaignId]
                 );
             }
         }
@@ -73,25 +73,25 @@ router.get('/click/:trackingId', async (req, res) => {
 
         // Update queue item
         await db.query(
-            'UPDATE email_queue SET clicked_at = COALESCE(clicked_at, NOW()) WHERE tracking_id = ?',
+            'UPDATE email_queue SET clickedAt = COALESCE(clickedAt, NOW()) WHERE trackingId = ?',
             [trackingId]
         );
 
         // Get queue item for campaign update
-        const [[queueItem]] = await db.query('SELECT * FROM email_queue WHERE tracking_id = ?', [trackingId]);
+        const [[queueItem]] = await db.query('SELECT * FROM email_queue WHERE trackingId = ?', [trackingId]);
 
         if (queueItem) {
             // Log tracking event
             await db.query(
-                'INSERT INTO email_tracking (queue_id, campaign_id, tracking_id, event_type, ip_address, user_agent, link_url) VALUES (?, ?, ?, ?, ?, ?, ?)',
-                [queueItem.id, queueItem.campaign_id, trackingId, 'clicked', req.ip, req.get('User-Agent'), decodedUrl]
+                'INSERT INTO email_tracking (queueId, campaignId, trackingId, eventType, ipAddress, userAgent, linkUrl) VALUES (?, ?, ?, ?, ?, ?, ?)',
+                [queueItem.id, queueItem.campaignId, trackingId, 'clicked', req.ip, req.get('User-Agent'), decodedUrl]
             );
 
             // Update campaign click count (only first click counts)
-            if (!queueItem.clicked_at) {
+            if (!queueItem.clickedAt) {
                 await db.query(
-                    'UPDATE email_campaigns SET clicked_count = clicked_count + 1 WHERE id = ?',
-                    [queueItem.campaign_id]
+                    'UPDATE email_campaigns SET clickedCount = clickedCount + 1 WHERE id = ?',
+                    [queueItem.campaignId]
                 );
             }
         }
@@ -117,25 +117,25 @@ router.get('/unsubscribe', async (req, res) => {
 
         // Add to unsubscribe list
         await db.query(
-            'INSERT IGNORE INTO email_unsubscribes (email, campaign_id, ip_address) VALUES (?, ?, ?)',
+            'INSERT IGNORE INTO email_unsubscribes (email, campaignId, ipAddress) VALUES (?, ?, ?)',
             [email, campaign || null, req.ip]
         );
 
         // Log tracking event if we have campaign info
         if (campaign) {
             const [[queueItem]] = await db.query(
-                'SELECT * FROM email_queue WHERE campaign_id = ? AND recipient_email = ?',
+                'SELECT * FROM email_queue WHERE campaignId = ? AND recipientEmail = ?',
                 [campaign, email]
             );
 
             if (queueItem) {
                 await db.query(
-                    'INSERT INTO email_tracking (queue_id, campaign_id, tracking_id, event_type, ip_address) VALUES (?, ?, ?, ?, ?)',
-                    [queueItem.id, campaign, queueItem.tracking_id, 'unsubscribed', req.ip]
+                    'INSERT INTO email_tracking (queueId, campaignId, trackingId, eventType, ipAddress) VALUES (?, ?, ?, ?, ?)',
+                    [queueItem.id, campaign, queueItem.trackingId, 'unsubscribed', req.ip]
                 );
 
                 await db.query(
-                    'UPDATE email_campaigns SET unsubscribed_count = unsubscribed_count + 1 WHERE id = ?',
+                    'UPDATE email_campaigns SET unsubscribedCount = unsubscribedCount + 1 WHERE id = ?',
                     [campaign]
                 );
             }
@@ -173,7 +173,7 @@ router.get('/unsubscribe', async (req, res) => {
  */
 router.post('/bounce', async (req, res) => {
     try {
-        const { email, type, reason, campaign_id } = req.body;
+        const { email, type, reason, campaignId } = req.body;
 
         if (!email) {
             return res.status(400).json({ error: 'Email required' });
@@ -185,25 +185,25 @@ router.post('/bounce', async (req, res) => {
         const [[existing]] = await db.query('SELECT * FROM email_bounces WHERE email = ?', [email]);
 
         if (existing) {
-            const newCount = existing.bounce_count + 1;
+            const newCount = existing.bounceCount + 1;
             const isDisabled = newCount >= 3 || bounceType === 'hard';
 
             await db.query(
-                'UPDATE email_bounces SET bounce_count = ?, bounce_type = ?, last_bounce_reason = ?, is_disabled = ? WHERE email = ?',
+                'UPDATE email_bounces SET bounceCount = ?, bounceType = ?, lastBounceReason = ?, isDisabled = ? WHERE email = ?',
                 [newCount, bounceType, reason, isDisabled, email]
             );
         } else {
             await db.query(
-                'INSERT INTO email_bounces (email, bounce_type, last_bounce_reason, is_disabled) VALUES (?, ?, ?, ?)',
+                'INSERT INTO email_bounces (email, bounceType, lastBounceReason, isDisabled) VALUES (?, ?, ?, ?)',
                 [email, bounceType, reason, bounceType === 'hard']
             );
         }
 
-        // Update campaign stats if campaign_id provided
-        if (campaign_id) {
+        // Update campaign stats if campaignId provided
+        if (campaignId) {
             await db.query(
-                'UPDATE email_campaigns SET bounced_count = bounced_count + 1 WHERE id = ?',
-                [campaign_id]
+                'UPDATE email_campaigns SET bouncedCount = bouncedCount + 1 WHERE id = ?',
+                [campaignId]
             );
         }
 

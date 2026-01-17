@@ -113,6 +113,7 @@ app.use('/api/plans', require('./routes/plan.routes'));
 
 // Email Campaigns & Marketing
 app.use('/api/campaigns', require('./routes/campaign.routes'));
+app.use('/api/smtp-accounts', require('./routes/smtp.routes'));
 app.use('/api/track', require('./routes/tracking.routes'));
 
 // Billing & Webhooks
