@@ -19,7 +19,7 @@ class EmailQueueWorker {
     async initializeTransporters() {
         try {
             const [accounts] = await db.query(
-                'SELECT * FROM smtp_accounts WHERE isActive = TRUE ORDER BY priority ASC'
+                'SELECT * FROM smtp_accounts WHERE is_active = TRUE ORDER BY priority ASC'
             );
 
             this.transporters.clear();
@@ -59,13 +59,13 @@ class EmailQueueWorker {
         // Reset hourly counters if needed
         const now = new Date();
         for (const { config } of accounts) {
-            const lastReset = config.lastHourReset ? new Date(config.lastHourReset) : null;
+            const lastReset = config.last_hour_reset ? new Date(config.last_hour_reset) : null;
             if (!lastReset || now.getTime() - lastReset.getTime() > 3600000) {
                 await db.query(
-                    'UPDATE smtp_accounts SET sentThisHour = 0, lastHourReset = NOW() WHERE id = ?',
+                    'UPDATE smtp_accounts SET sent_this_hour = 0, last_hour_reset = NOW() WHERE id = ?',
                     [config.id]
                 );
-                config.sentThisHour = 0;
+                config.sent_this_hour = 0;
             }
         }
 
@@ -74,7 +74,7 @@ class EmailQueueWorker {
             const index = (this.currentSmtpIndex + i) % accounts.length;
             const account = accounts[index];
 
-            if (account.config.sentThisHour < account.config.hourlyLimit) {
+            if (account.config.sent_this_hour < account.config.hourly_limit) {
                 this.currentSmtpIndex = (index + 1) % accounts.length;
                 return account;
             }
@@ -139,82 +139,82 @@ class EmailQueueWorker {
 
         try {
             // Mark as sending
-            await db.query('UPDATE email_queue SET status = ?, smtpAccountId = ? WHERE id = ?',
+            await db.query('UPDATE email_queue SET status = ?, smtp_account_id = ? WHERE id = ?',
                 ['sending', smtpAccount.config.id, queueItem.id]);
 
             // Prepare email content
-            let htmlContent = campaign.htmlContent || '';
+            let htmlContent = campaign.html_content || '';
 
             // Add tracking pixel
-            htmlContent = this.addUnsubscribeLink(htmlContent, queueItem.recipientEmail, campaign.id);
-            htmlContent = this.wrapLinksWithTracking(htmlContent, queueItem.trackingId);
-            htmlContent += this.generateTrackingPixel(queueItem.trackingId);
+            htmlContent = this.addUnsubscribeLink(htmlContent, queueItem.recipient_email, campaign.id);
+            htmlContent = this.wrapLinksWithTracking(htmlContent, queueItem.tracking_id);
+            htmlContent += this.generateTrackingPixel(queueItem.tracking_id);
 
             // Personalize content
             htmlContent = htmlContent
-                .replace(/{{name}}/g, queueItem.recipientName || 'there')
-                .replace(/{{email}}/g, queueItem.recipientEmail)
-                .replace(/{{first_name}}/g, (queueItem.recipientName || '').split(' ')[0] || 'there');
+                .replace(/{{name}}/g, queueItem.recipient_name || 'there')
+                .replace(/{{email}}/g, queueItem.recipient_email)
+                .replace(/{{first_name}}/g, (queueItem.recipient_name || '').split(' ')[0] || 'there');
 
             // Send email
             await smtpAccount.transporter.sendMail({
-                from: `"${smtpAccount.config.fromName}" <${smtpAccount.config.fromEmail}>`,
-                to: queueItem.recipientEmail,
-                subject: campaign.subject.replace(/{{name}}/g, queueItem.recipientName || 'there'),
+                from: `"${smtpAccount.config.from_name}" <${smtpAccount.config.from_email}>`,
+                to: queueItem.recipient_email,
+                subject: campaign.subject.replace(/{{name}}/g, queueItem.recipient_name || 'there'),
                 html: htmlContent,
-                text: campaign.textContent || htmlContent.replace(/<[^>]*>/g, '')
+                text: campaign.text_content || htmlContent.replace(/<[^>]*>/g, '')
             });
 
             // Update queue item
             await db.query(
-                'UPDATE email_queue SET status = ?, sentAt = NOW() WHERE id = ?',
+                'UPDATE email_queue SET status = ?, sent_at = NOW() WHERE id = ?',
                 ['sent', queueItem.id]
             );
 
             // Update SMTP counter
             await db.query(
-                'UPDATE smtp_accounts SET sentThisHour = sentThisHour + 1, sentToday = sentToday + 1 WHERE id = ?',
+                'UPDATE smtp_accounts SET sent_this_hour = sent_this_hour + 1, sent_today = sent_today + 1 WHERE id = ?',
                 [smtpAccount.config.id]
             );
-            smtpAccount.config.sentThisHour++;
+            smtpAccount.config.sent_this_hour++;
 
             // Update campaign counter
             await db.query(
-                'UPDATE email_campaigns SET sentCount = sentCount + 1 WHERE id = ?',
+                'UPDATE email_campaigns SET sent_count = sent_count + 1 WHERE id = ?',
                 [campaign.id]
             );
 
             // Log tracking event
             await db.query(
-                'INSERT INTO email_tracking (queueId, campaignId, trackingId, eventType) VALUES (?, ?, ?, ?)',
-                [queueItem.id, campaign.id, queueItem.trackingId, 'sent']
+                'INSERT INTO email_tracking (queue_id, campaign_id, tracking_id, event_type) VALUES (?, ?, ?, ?)',
+                [queueItem.id, campaign.id, queueItem.tracking_id, 'sent']
             );
 
-            console.log(`[EmailWorker] Sent to ${queueItem.recipientEmail}`);
+            console.log(`[EmailWorker] Sent to ${queueItem.recipient_email}`);
             return true;
 
         } catch (error) {
-            console.error(`[EmailWorker] Failed to send to ${queueItem.recipientEmail}:`, error.message);
+            console.error(`[EmailWorker] Failed to send to ${queueItem.recipient_email}:`, error.message);
 
             // Update queue with error
             const attempts = queueItem.attempts + 1;
-            const status = attempts >= queueItem.maxAttempts ? 'failed' : 'pending';
+            const status = attempts >= queueItem.max_attempts ? 'failed' : 'pending';
             const nextRetry = new Date(Date.now() + Math.pow(2, attempts) * 60000); // Exponential backoff
 
             await db.query(
-                'UPDATE email_queue SET status = ?, attempts = ?, errorMessage = ?, nextRetryAt = ? WHERE id = ?',
+                'UPDATE email_queue SET status = ?, attempts = ?, error_message = ?, next_retry_at = ? WHERE id = ?',
                 [status, attempts, error.message, status === 'pending' ? nextRetry : null, queueItem.id]
             );
 
             if (status === 'failed') {
                 await db.query(
-                    'UPDATE email_campaigns SET failedCount = failedCount + 1 WHERE id = ?',
+                    'UPDATE email_campaigns SET failed_count = failed_count + 1 WHERE id = ?',
                     [campaign.id]
                 );
 
                 // Check for bounce
                 if (error.message.includes('bounce') || error.responseCode === 550) {
-                    await this.recordBounce(queueItem.recipientEmail, 'hard', error.message);
+                    await this.recordBounce(queueItem.recipient_email, 'hard', error.message);
                 }
             }
 
@@ -230,16 +230,16 @@ class EmailQueueWorker {
             const [[existing]] = await db.query('SELECT * FROM email_bounces WHERE email = ?', [email]);
 
             if (existing) {
-                const newCount = existing.bounceCount + 1;
+                const newCount = existing.bounce_count + 1;
                 const isDisabled = newCount >= 3 || type === 'hard';
 
                 await db.query(
-                    'UPDATE email_bounces SET bounceCount = ?, bounceType = ?, lastBounceReason = ?, isDisabled = ? WHERE email = ?',
+                    'UPDATE email_bounces SET bounce_count = ?, bounce_type = ?, last_bounce_reason = ?, is_disabled = ? WHERE email = ?',
                     [newCount, type, reason, isDisabled, email]
                 );
             } else {
                 await db.query(
-                    'INSERT INTO email_bounces (email, bounceType, lastBounceReason, isDisabled) VALUES (?, ?, ?, ?)',
+                    'INSERT INTO email_bounces (email, bounce_type, last_bounce_reason, is_disabled) VALUES (?, ?, ?, ?)',
                     [email, type, reason, type === 'hard']
                 );
             }
@@ -270,11 +270,11 @@ class EmailQueueWorker {
                 // Get pending emails for this campaign
                 const [pending] = await db.query(
                     `SELECT * FROM email_queue 
-                     WHERE campaignId = ? AND status = 'pending' 
-                     AND (nextRetryAt IS NULL OR nextRetryAt <= NOW())
+                     WHERE campaign_id = ? AND status = 'pending' 
+                     AND (next_retry_at IS NULL OR next_retry_at <= NOW())
                      ORDER BY id ASC
                      LIMIT ?`,
-                    [campaign.id, campaign.rateLimitPerHour]
+                    [campaign.id, campaign.rate_limit_per_hour]
                 );
 
                 console.log(`[EmailWorker] Processing ${pending.length} emails for campaign ${campaign.id}`);
@@ -283,18 +283,18 @@ class EmailQueueWorker {
                     await this.processEmail(item, campaign);
 
                     // Delay between emails (anti-spam)
-                    await new Promise(resolve => setTimeout(resolve, campaign.delayBetweenEmails * 1000));
+                    await new Promise(resolve => setTimeout(resolve, campaign.delay_between_emails * 1000));
                 }
 
                 // Check if campaign is complete
                 const [[remaining]] = await db.query(
-                    "SELECT COUNT(*) as count FROM email_queue WHERE campaignId = ? AND status = 'pending'",
+                    "SELECT COUNT(*) as count FROM email_queue WHERE campaign_id = ? AND status = 'pending'",
                     [campaign.id]
                 );
 
                 if (remaining.count === 0) {
                     await db.query(
-                        "UPDATE email_campaigns SET status = 'completed', completedAt = NOW() WHERE id = ?",
+                        "UPDATE email_campaigns SET status = 'completed', completed_at = NOW() WHERE id = ?",
                         [campaign.id]
                     );
                     console.log(`[EmailWorker] Campaign ${campaign.id} completed`);

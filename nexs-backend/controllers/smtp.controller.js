@@ -9,10 +9,10 @@ const db = require('../config/database');
 exports.getAllAccounts = async (req, res) => {
     try {
         const [accounts] = await db.query(
-            `SELECT id, name, host, port, secure, username, fromName, fromEmail, 
-                    dailyLimit, hourlyLimit, sentToday, sentThisHour, isActive, priority, createdAt
+            `SELECT id, name, host, port, secure, username, from_name, from_email, 
+                    daily_limit, hourly_limit, sent_today, sent_this_hour, is_active, priority, created_at
              FROM smtp_accounts
-             ORDER BY priority ASC, createdAt DESC`
+             ORDER BY priority ASC, created_at DESC`
         );
 
         // Don't expose passwords
@@ -28,8 +28,8 @@ exports.getAccountById = async (req, res) => {
     try {
         const { id } = req.params;
         const [[account]] = await db.query(
-            `SELECT id, name, host, port, secure, username, fromName, fromEmail, 
-                    dailyLimit, hourlyLimit, sentToday, sentThisHour, isActive, priority, createdAt
+            `SELECT id, name, host, port, secure, username, from_name, from_email, 
+                    daily_limit, hourly_limit, sent_today, sent_this_hour, is_active, priority, created_at
              FROM smtp_accounts WHERE id = ?`,
             [id]
         );
@@ -55,29 +55,29 @@ exports.createAccount = async (req, res) => {
             secure = false,
             username,
             password,
-            fromName,
-            fromEmail,
-            dailyLimit = 500,
-            hourlyLimit = 50,
+            from_name,
+            from_email,
+            daily_limit = 500,
+            hourly_limit = 50,
             priority = 1
         } = req.body;
 
-        if (!name || !host || !username || !password || !fromName || !fromEmail) {
+        if (!name || !host || !username || !password || !from_name || !from_email) {
             return res.status(400).json({
                 success: false,
-                error: 'Name, host, username, password, fromName and fromEmail are required'
+                error: 'Name, host, username, password, from_name and from_email are required'
             });
         }
 
         const [result] = await db.query(
             `INSERT INTO smtp_accounts 
-             (name, host, port, secure, username, password, fromName, fromEmail, dailyLimit, hourlyLimit, priority)
+             (name, host, port, secure, username, password, from_name, from_email, daily_limit, hourly_limit, priority)
              VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)`,
-            [name, host, port, secure, username, password, fromName, fromEmail, dailyLimit, hourlyLimit, priority]
+            [name, host, port, secure, username, password, from_name, from_email, daily_limit, hourly_limit, priority]
         );
 
         const [[newAccount]] = await db.query(
-            'SELECT id, name, host, port, secure, username, fromName, fromEmail, dailyLimit, hourlyLimit, isActive, priority FROM smtp_accounts WHERE id = ?',
+            'SELECT id, name, host, port, secure, username, from_name, from_email, daily_limit, hourly_limit, is_active, priority FROM smtp_accounts WHERE id = ?',
             [result.insertId]
         );
 
@@ -94,7 +94,7 @@ exports.updateAccount = async (req, res) => {
         const { id } = req.params;
         const allowedFields = [
             'name', 'host', 'port', 'secure', 'username', 'password',
-            'fromName', 'fromEmail', 'dailyLimit', 'hourlyLimit', 'isActive', 'priority'
+            'from_name', 'from_email', 'daily_limit', 'hourly_limit', 'is_active', 'priority'
         ];
 
         const updates = [];
@@ -115,7 +115,7 @@ exports.updateAccount = async (req, res) => {
         await db.query(`UPDATE smtp_accounts SET ${updates.join(', ')} WHERE id = ?`, values);
 
         const [[updated]] = await db.query(
-            'SELECT id, name, host, port, secure, username, fromName, fromEmail, dailyLimit, hourlyLimit, isActive, priority FROM smtp_accounts WHERE id = ?',
+            'SELECT id, name, host, port, secure, username, from_name, from_email, daily_limit, hourly_limit, is_active, priority FROM smtp_accounts WHERE id = ?',
             [id]
         );
 
@@ -170,7 +170,7 @@ exports.testConnection = async (req, res) => {
 // Reset daily/hourly counters (can be called manually or via cron)
 exports.resetCounters = async (req, res) => {
     try {
-        await db.query('UPDATE smtp_accounts SET sentThisHour = 0, lastHourReset = NOW()');
+        await db.query('UPDATE smtp_accounts SET sent_this_hour = 0, last_hour_reset = NOW()');
         res.json({ success: true, message: 'Hourly counters reset' });
     } catch (error) {
         console.error('Reset counters error:', error);

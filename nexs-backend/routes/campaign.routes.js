@@ -9,6 +9,9 @@ router.use(auth);
 // Dashboard stats
 router.get('/stats', campaignController.getDashboardStats);
 
+// Get available templates
+router.get('/templates', campaignController.getTemplates);
+
 // Campaign CRUD
 router.get('/', campaignController.getAllCampaigns);
 router.get('/:id', campaignController.getCampaignById);

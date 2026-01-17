@@ -169,10 +169,3 @@ CREATE TABLE IF NOT EXISTS email_bounces (
     
     UNIQUE INDEX idx_email (email)
 );
-
--- ============================================
--- Insert default SMTP from environment (placeholder)
--- ============================================
-INSERT INTO smtp_accounts (name, host, port, secure, username, password, from_name, from_email, daily_limit, hourly_limit, priority)
-VALUES ('Primary SMTP', 'smtp.gmail.com', 587, FALSE, 'placeholder', 'placeholder', 'NexSpire Solutions', 'noreply@nexspiresolutions.co.in', 500, 50, 1)
-ON DUPLICATE KEY UPDATE name = name;

@@ -21,11 +21,11 @@ exports.getAllCampaigns = async (req, res) => {
         }
 
         const [campaigns] = await db.query(
-            `SELECT c.*, CONCAT(u.firstName, ' ', u.lastName) as createdByName
+            `SELECT c.*, CONCAT(u.firstName, ' ', u.lastName) as created_by_name
              FROM email_campaigns c
-             LEFT JOIN users u ON c.createdBy = u.id
+             LEFT JOIN users u ON c.created_by = u.id
              ${whereClause}
-             ORDER BY c.createdAt DESC
+             ORDER BY c.created_at DESC
              LIMIT ? OFFSET ?`,
             [...params, parseInt(limit), parseInt(offset)]
         );
@@ -57,9 +57,9 @@ exports.getCampaignById = async (req, res) => {
         const { id } = req.params;
 
         const [[campaign]] = await db.query(
-            `SELECT c.*, CONCAT(u.firstName, ' ', u.lastName) as createdByName
+            `SELECT c.*, CONCAT(u.firstName, ' ', u.lastName) as created_by_name
              FROM email_campaigns c
-             LEFT JOIN users u ON c.createdBy = u.id
+             LEFT JOIN users u ON c.created_by = u.id
              WHERE c.id = ?`,
             [id]
         );
@@ -81,16 +81,16 @@ exports.createCampaign = async (req, res) => {
         const {
             name,
             subject,
-            previewText,
-            htmlContent,
-            textContent,
-            templateId,
-            audienceType,
-            audienceFilter,
-            customEmails,
-            scheduledAt,
-            rateLimitPerHour = 50,
-            delayBetweenEmails = 3
+            preview_text,
+            html_content,
+            text_content,
+            template_id,
+            audience_type,
+            audience_filter,
+            custom_emails,
+            scheduled_at,
+            rate_limit_per_hour = 50,
+            delay_between_emails = 3
         } = req.body;
 
         if (!name || !subject) {
@@ -99,18 +99,18 @@ exports.createCampaign = async (req, res) => {
 
         const [result] = await db.query(
             `INSERT INTO email_campaigns 
-             (name, subject, previewText, htmlContent, textContent, templateId, 
-              audienceType, audienceFilter, customEmails, scheduledAt, 
-              rateLimitPerHour, delayBetweenEmails, createdBy)
+             (name, subject, preview_text, html_content, text_content, template_id, 
+              audience_type, audience_filter, custom_emails, scheduled_at, 
+              rate_limit_per_hour, delay_between_emails, created_by)
              VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)`,
             [
-                name, subject, previewText, htmlContent, textContent, templateId,
-                audienceType || 'all_leads',
-                audienceFilter ? JSON.stringify(audienceFilter) : null,
-                customEmails,
-                scheduledAt,
-                rateLimitPerHour,
-                delayBetweenEmails,
+                name, subject, preview_text, html_content, text_content, template_id,
+                audience_type || 'all_leads',
+                audience_filter ? JSON.stringify(audience_filter) : null,
+                custom_emails,
+                scheduled_at,
+                rate_limit_per_hour,
+                delay_between_emails,
                 req.user?.id
             ]
         );
@@ -129,9 +129,9 @@ exports.updateCampaign = async (req, res) => {
     try {
         const { id } = req.params;
         const allowedFields = [
-            'name', 'subject', 'previewText', 'htmlContent', 'textContent',
-            'templateId', 'audienceType', 'audienceFilter', 'customEmails',
-            'scheduledAt', 'rateLimitPerHour', 'delayBetweenEmails', 'status'
+            'name', 'subject', 'preview_text', 'html_content', 'text_content',
+            'template_id', 'audience_type', 'audience_filter', 'custom_emails',
+            'scheduled_at', 'rate_limit_per_hour', 'delay_between_emails', 'status'
         ];
 
         const updates = [];
@@ -140,7 +140,7 @@ exports.updateCampaign = async (req, res) => {
         for (const field of allowedFields) {
             if (req.body[field] !== undefined) {
                 updates.push(`${field} = ?`);
-                values.push(field === 'audienceFilter' ? JSON.stringify(req.body[field]) : req.body[field]);
+                values.push(field === 'audience_filter' ? JSON.stringify(req.body[field]) : req.body[field]);
             }
         }
 
@@ -178,7 +178,7 @@ exports.getCampaignStats = async (req, res) => {
         const { id } = req.params;
 
         const [[campaign]] = await db.query(
-            'SELECT sentCount, failedCount, openedCount, clickedCount, bouncedCount, unsubscribedCount, totalRecipients FROM email_campaigns WHERE id = ?',
+            'SELECT sent_count, failed_count, opened_count, clicked_count, bounced_count, unsubscribed_count, total_recipients FROM email_campaigns WHERE id = ?',
             [id]
         );
 
@@ -188,9 +188,9 @@ exports.getCampaignStats = async (req, res) => {
 
         const stats = {
             ...campaign,
-            openRate: campaign.sentCount > 0 ? ((campaign.openedCount / campaign.sentCount) * 100).toFixed(2) : 0,
-            clickRate: campaign.openedCount > 0 ? ((campaign.clickedCount / campaign.openedCount) * 100).toFixed(2) : 0,
-            bounceRate: campaign.sentCount > 0 ? ((campaign.bouncedCount / campaign.sentCount) * 100).toFixed(2) : 0
+            open_rate: campaign.sent_count > 0 ? ((campaign.opened_count / campaign.sent_count) * 100).toFixed(2) : 0,
+            click_rate: campaign.opened_count > 0 ? ((campaign.clicked_count / campaign.opened_count) * 100).toFixed(2) : 0,
+            bounce_rate: campaign.sent_count > 0 ? ((campaign.bounced_count / campaign.sent_count) * 100).toFixed(2) : 0
         };
 
         res.json({ success: true, data: stats });
@@ -207,7 +207,7 @@ exports.getCampaignRecipients = async (req, res) => {
         const { status, page = 1, limit = 50 } = req.query;
         const offset = (page - 1) * limit;
 
-        let whereClause = 'WHERE campaignId = ?';
+        let whereClause = 'WHERE campaign_id = ?';
         const params = [id];
 
         if (status) {
@@ -216,7 +216,7 @@ exports.getCampaignRecipients = async (req, res) => {
         }
 
         const [recipients] = await db.query(
-            `SELECT id, recipientEmail, recipientName, status, sentAt, openedAt, clickedAt, errorMessage
+            `SELECT id, recipient_email, recipient_name, status, sent_at, opened_at, clicked_at, error_message
              FROM email_queue
              ${whereClause}
              ORDER BY id DESC
@@ -258,16 +258,16 @@ exports.startCampaign = async (req, res) => {
         // Build recipient list based on audience type
         let recipients = [];
 
-        if (campaign.audienceType === 'all_leads') {
+        if (campaign.audience_type === 'all_leads') {
             const [leads] = await db.query('SELECT id, contactName as name, email FROM leads WHERE email IS NOT NULL');
             recipients = leads.map(l => ({ id: l.id, type: 'lead', email: l.email, name: l.name }));
-        } else if (campaign.audienceType === 'all_clients') {
+        } else if (campaign.audience_type === 'all_clients') {
             const [clients] = await db.query('SELECT id, contactName as name, email FROM clients WHERE email IS NOT NULL');
             recipients = clients.map(c => ({ id: c.id, type: 'client', email: c.email, name: c.name }));
-        } else if (campaign.audienceType === 'filtered' && campaign.audienceFilter) {
-            const filter = typeof campaign.audienceFilter === 'string'
-                ? JSON.parse(campaign.audienceFilter)
-                : campaign.audienceFilter;
+        } else if (campaign.audience_type === 'filtered' && campaign.audience_filter) {
+            const filter = typeof campaign.audience_filter === 'string'
+                ? JSON.parse(campaign.audience_filter)
+                : campaign.audience_filter;
 
             let table = filter.source === 'clients' ? 'clients' : 'leads';
             let whereClause = 'WHERE email IS NOT NULL';
@@ -280,8 +280,8 @@ exports.startCampaign = async (req, res) => {
 
             const [filtered] = await db.query(`SELECT id, contactName as name, email FROM ${table} ${whereClause}`, params);
             recipients = filtered.map(r => ({ id: r.id, type: filter.source || 'lead', email: r.email, name: r.name }));
-        } else if (campaign.audienceType === 'custom' && campaign.customEmails) {
-            const emails = campaign.customEmails.split(/[,\n]/).map(e => e.trim()).filter(e => e);
+        } else if (campaign.audience_type === 'custom' && campaign.custom_emails) {
+            const emails = campaign.custom_emails.split(/[,\n]/).map(e => e.trim()).filter(e => e);
             recipients = emails.map(email => ({ id: null, type: 'custom', email, name: email.split('@')[0] }));
         }
 
@@ -291,7 +291,7 @@ exports.startCampaign = async (req, res) => {
         recipients = recipients.filter(r => !unsubSet.has(r.email.toLowerCase()));
 
         // Filter out bounced emails
-        const [bounced] = await db.query('SELECT email FROM email_bounces WHERE isDisabled = TRUE');
+        const [bounced] = await db.query('SELECT email FROM email_bounces WHERE is_disabled = TRUE');
         const bouncedSet = new Set(bounced.map(b => b.email.toLowerCase()));
         recipients = recipients.filter(r => !bouncedSet.has(r.email.toLowerCase()));
 
@@ -305,7 +305,7 @@ exports.startCampaign = async (req, res) => {
             const trackingId = crypto.randomBytes(16).toString('hex');
             await db.query(
                 `INSERT INTO email_queue 
-                 (campaignId, recipientEmail, recipientName, recipientType, recipientId, trackingId, status)
+                 (campaign_id, recipient_email, recipient_name, recipient_type, recipient_id, tracking_id, status)
                  VALUES (?, ?, ?, ?, ?, ?, 'pending')`,
                 [id, recipient.email, recipient.name, recipient.type, recipient.id, trackingId]
             );
@@ -313,14 +313,14 @@ exports.startCampaign = async (req, res) => {
 
         // Update campaign status
         await db.query(
-            'UPDATE email_campaigns SET status = ?, totalRecipients = ?, startedAt = NOW() WHERE id = ?',
+            'UPDATE email_campaigns SET status = ?, total_recipients = ?, started_at = NOW() WHERE id = ?',
             ['sending', recipients.length, id]
         );
 
         res.json({
             success: true,
             message: `Campaign started. ${recipients.length} emails queued.`,
-            totalQueued: recipients.length
+            total_queued: recipients.length
         });
     } catch (error) {
         console.error('Start campaign error:', error);
@@ -357,17 +357,17 @@ exports.getDashboardStats = async (req, res) => {
     try {
         const [[stats]] = await db.query(`
             SELECT 
-                COUNT(*) as totalCampaigns,
-                SUM(CASE WHEN status = 'sending' THEN 1 ELSE 0 END) as activeCampaigns,
-                SUM(CASE WHEN status = 'completed' THEN 1 ELSE 0 END) as completedCampaigns,
-                SUM(sentCount) as totalSent,
-                SUM(openedCount) as totalOpened,
-                SUM(clickedCount) as totalClicked
+                COUNT(*) as total_campaigns,
+                SUM(CASE WHEN status = 'sending' THEN 1 ELSE 0 END) as active_campaigns,
+                SUM(CASE WHEN status = 'completed' THEN 1 ELSE 0 END) as completed_campaigns,
+                SUM(sent_count) as total_sent,
+                SUM(opened_count) as total_opened,
+                SUM(clicked_count) as total_clicked
             FROM email_campaigns
         `);
 
         const [[unsubCount]] = await db.query('SELECT COUNT(*) as count FROM email_unsubscribes');
-        const [[bounceCount]] = await db.query('SELECT COUNT(*) as count FROM email_bounces WHERE isDisabled = TRUE');
+        const [[bounceCount]] = await db.query('SELECT COUNT(*) as count FROM email_bounces WHERE is_disabled = TRUE');
 
         res.json({
             success: true,
@@ -375,13 +375,26 @@ exports.getDashboardStats = async (req, res) => {
                 ...stats,
                 unsubscribed: unsubCount.count,
                 bounced: bounceCount.count,
-                overallOpenRate: stats.totalSent > 0
-                    ? ((stats.totalOpened / stats.totalSent) * 100).toFixed(2)
+                overall_open_rate: stats.total_sent > 0
+                    ? ((stats.total_opened / stats.total_sent) * 100).toFixed(2)
                     : 0
             }
         });
     } catch (error) {
         console.error('Dashboard stats error:', error);
         res.status(500).json({ success: false, error: 'Failed to fetch stats' });
+    }
+};
+
+// Get available templates for campaign
+exports.getTemplates = async (req, res) => {
+    try {
+        const [templates] = await db.query(
+            'SELECT id, name, subject, category FROM email_templates ORDER BY name ASC'
+        );
+        res.json({ success: true, data: templates });
+    } catch (error) {
+        console.error('Get templates error:', error);
+        res.status(500).json({ success: false, error: 'Failed to fetch templates' });
     }
 };
