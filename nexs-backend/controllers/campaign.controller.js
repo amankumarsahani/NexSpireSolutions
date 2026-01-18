@@ -165,17 +165,30 @@ exports.updateCampaign = async (req, res) => {
         const allowedFields = [
             'name', 'subject', 'preview_text', 'html_content', 'text_content',
             'template_id', 'audience_type', 'audience_filter', 'custom_emails',
-            'scheduled_at', 'rate_limit_per_hour', 'delay_between_emails', 'status'
+            'scheduled_at', 'rate_limit_per_hour', 'delay_between_emails', 'status', 'auto_enroll'
         ];
+
+        // Get current campaign status
+        const [[currentCampaign]] = await db.query('SELECT status, auto_enroll FROM email_campaigns WHERE id = ?', [id]);
 
         const updates = [];
         const values = [];
 
         for (const field of allowedFields) {
             if (req.body[field] !== undefined) {
+                let value = req.body[field];
+                if (field === 'audience_filter') value = JSON.stringify(value);
+                if (field === 'auto_enroll') value = value ? 1 : 0;
                 updates.push(`${field} = ?`);
-                values.push(field === 'audience_filter' ? JSON.stringify(req.body[field]) : req.body[field]);
+                values.push(value);
             }
+        }
+
+        // If auto_enroll is being enabled on a completed campaign, restart it as 'sending'
+        if (req.body.auto_enroll === true && currentCampaign?.status === 'completed') {
+            updates.push('status = ?');
+            values.push('sending');
+            console.log(`[Campaign] Restarting completed campaign ${id} due to auto_enroll enabled`);
         }
 
         if (updates.length === 0) {
