@@ -122,7 +122,8 @@ exports.createCampaign = async (req, res) => {
             custom_emails,
             scheduled_at,
             rate_limit_per_hour = 50,
-            delay_between_emails = 3
+            delay_between_emails = 3,
+            auto_enroll = false
         } = req.body;
 
         if (!name || !subject) {
@@ -133,8 +134,8 @@ exports.createCampaign = async (req, res) => {
             `INSERT INTO email_campaigns 
              (name, subject, preview_text, html_content, text_content, template_id, 
               audience_type, audience_filter, custom_emails, scheduled_at, 
-              rate_limit_per_hour, delay_between_emails, created_by)
-             VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)`,
+              rate_limit_per_hour, delay_between_emails, auto_enroll, created_by)
+             VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)`,
             [
                 name, subject, preview_text, html_content, text_content, template_id,
                 audience_type || 'all_leads',
@@ -143,6 +144,7 @@ exports.createCampaign = async (req, res) => {
                 scheduled_at,
                 rate_limit_per_hour,
                 delay_between_emails,
+                auto_enroll ? 1 : 0,
                 req.user?.id
             ]
         );

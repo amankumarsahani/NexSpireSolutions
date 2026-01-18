@@ -1,4 +1,5 @@
 const ClientModel = require('../models/client.model');
+const autoEnrollService = require('../services/autoEnrollService');
 
 const ClientController = {
     // Get all clients
@@ -63,6 +64,13 @@ const ClientController = {
 
             const clientId = await ClientModel.create(clientData);
             const client = await ClientModel.findById(clientId);
+
+            // Auto-enroll new client into active campaigns (async, don't wait)
+            if (client.email) {
+                autoEnrollService.enrollClient(clientId, client.email, client.contact_name || client.company_name).catch(err => {
+                    console.error('Auto-enroll failed:', err);
+                });
+            }
 
             res.status(201).json({
                 message: 'Client created successfully',

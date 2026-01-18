@@ -1,5 +1,6 @@
 const LeadModel = require('../models/lead.model');
 const AssignmentService = require('../services/assignment.service');
+const autoEnrollService = require('../services/autoEnrollService');
 
 const LeadController = {
     async getAll(req, res) {
@@ -52,6 +53,13 @@ const LeadController = {
             const leadData = { ...req.body, assignedTo };
             const leadId = await LeadModel.create(leadData);
             const lead = await LeadModel.findById(leadId);
+
+            // Auto-enroll new lead into active campaigns (async, don't wait)
+            if (lead.email) {
+                autoEnrollService.enrollLead(leadId, lead.email, lead.contact_name).catch(err => {
+                    console.error('Auto-enroll failed:', err);
+                });
+            }
 
             res.status(201).json({ message: 'Lead created successfully', lead });
         } catch (error) {
