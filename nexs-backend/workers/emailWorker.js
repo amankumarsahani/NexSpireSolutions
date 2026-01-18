@@ -337,12 +337,15 @@ class EmailQueueWorker {
                     [campaign.id]
                 );
 
-                if (remaining.count === 0) {
+                if (remaining.count === 0 && !campaign.auto_enroll) {
+                    // Only mark as completed if NOT an auto-enroll campaign
                     await db.query(
                         "UPDATE email_campaigns SET status = 'completed', completed_at = NOW() WHERE id = ?",
                         [campaign.id]
                     );
                     console.log(`[EmailWorker] Campaign ${campaign.id} completed`);
+                } else if (remaining.count === 0 && campaign.auto_enroll) {
+                    console.log(`[EmailWorker] Campaign ${campaign.id} queue empty but auto-enroll ON - staying active`);
                 }
             }
         } catch (error) {
