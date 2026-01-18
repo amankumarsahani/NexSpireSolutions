@@ -116,6 +116,9 @@ app.use('/api/campaigns', require('./routes/campaign.routes'));
 app.use('/api/smtp-accounts', require('./routes/smtp.routes'));
 app.use('/api/track', require('./routes/tracking.routes'));
 
+// Automation Workflows
+app.use('/api/workflows', require('./routes/workflow.routes'));
+
 // Billing & Webhooks
 app.use('/api/billing', require('./routes/billing.routes'));
 app.use('/webhooks', require('./routes/webhook.routes'));
@@ -123,6 +126,10 @@ app.use('/webhooks', require('./routes/webhook.routes'));
 // Start email worker (after routes are set up)
 const emailWorker = require('./workers/emailWorker');
 emailWorker.start(30000); // Process queue every 30 seconds
+
+// Start workflow worker for delayed executions
+const workflowWorker = require('./workers/workflowWorker');
+workflowWorker.start(60000); // Check every 60 seconds
 
 // 404 Handler
 app.use((req, res) => {

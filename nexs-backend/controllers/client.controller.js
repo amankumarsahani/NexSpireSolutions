@@ -1,5 +1,6 @@
 const ClientModel = require('../models/client.model');
 const autoEnrollService = require('../services/autoEnrollService');
+const workflowEngine = require('../services/workflowEngine');
 
 const ClientController = {
     // Get all clients
@@ -72,6 +73,14 @@ const ClientController = {
                 });
             }
 
+            // Trigger workflow automations for client_created
+            workflowEngine.trigger('client_created', 'client', clientId, {
+                ...client,
+                entity_type: 'client'
+            }).catch(err => {
+                console.error('Workflow trigger failed:', err);
+            });
+
             res.status(201).json({
                 message: 'Client created successfully',
                 client
@@ -91,7 +100,22 @@ const ClientController = {
                 return res.status(404).json({ error: 'Client not found' });
             }
 
+            const oldStatus = client.status;
+            const newStatus = req.body.status;
+
             const updatedClient = await ClientModel.update(req.params.id, req.body);
+
+            // Trigger workflow automations for client_status_changed
+            if (newStatus && oldStatus !== newStatus) {
+                workflowEngine.trigger('client_status_changed', 'client', parseInt(req.params.id), {
+                    ...updatedClient,
+                    entity_type: 'client',
+                    old_status: oldStatus,
+                    new_status: newStatus
+                }).catch(err => {
+                    console.error('Workflow trigger failed:', err);
+                });
+            }
 
             res.json({
                 message: 'Client updated successfully',

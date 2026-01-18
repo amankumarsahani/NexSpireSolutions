@@ -1,6 +1,7 @@
 const LeadModel = require('../models/lead.model');
 const AssignmentService = require('../services/assignment.service');
 const autoEnrollService = require('../services/autoEnrollService');
+const workflowEngine = require('../services/workflowEngine');
 
 const LeadController = {
     async getAll(req, res) {
@@ -61,6 +62,14 @@ const LeadController = {
                 });
             }
 
+            // Trigger workflow automations for lead_created
+            workflowEngine.trigger('lead_created', 'lead', leadId, {
+                ...lead,
+                entity_type: 'lead'
+            }).catch(err => {
+                console.error('Workflow trigger failed:', err);
+            });
+
             res.status(201).json({ message: 'Lead created successfully', lead });
         } catch (error) {
             console.error('Create lead error:', error);
@@ -113,8 +122,17 @@ const LeadController = {
                     });
                 } catch (activityErr) {
                     console.error('Failed to log activity:', activityErr);
-                    // Don't fail the main request if activity logging fails
                 }
+
+                // Trigger workflow automations for lead_status_changed
+                workflowEngine.trigger('lead_status_changed', 'lead', parseInt(req.params.id), {
+                    ...updated,
+                    entity_type: 'lead',
+                    old_status: oldStatus,
+                    new_status: newStatus
+                }).catch(err => {
+                    console.error('Workflow trigger failed:', err);
+                });
             }
 
             res.json({ message: 'Lead updated successfully', lead: updated });
