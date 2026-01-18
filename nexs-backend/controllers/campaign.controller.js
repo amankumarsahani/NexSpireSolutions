@@ -398,3 +398,91 @@ exports.getTemplates = async (req, res) => {
         res.status(500).json({ success: false, error: 'Failed to fetch templates' });
     }
 };
+
+// Parse uploaded email file (CSV/Excel)
+exports.parseEmailFile = async (req, res) => {
+    try {
+        if (!req.file) {
+            return res.status(400).json({ success: false, error: 'No file uploaded' });
+        }
+
+        const fileBuffer = req.file.buffer;
+        const fileName = req.file.originalname.toLowerCase();
+        let emails = [];
+
+        if (fileName.endsWith('.csv')) {
+            // Parse CSV
+            const content = fileBuffer.toString('utf-8');
+            const lines = content.split(/\r?\n/).filter(line => line.trim());
+
+            // Try to detect if first row is header
+            const firstLine = lines[0].toLowerCase();
+            const hasHeader = firstLine.includes('email') || firstLine.includes('name') || firstLine.includes('mail');
+            const startIndex = hasHeader ? 1 : 0;
+
+            for (let i = startIndex; i < lines.length; i++) {
+                const parts = lines[i].split(/[,;\t]/).map(p => p.trim().replace(/"/g, ''));
+                const emailMatch = parts.find(p => p.match(/^[^\s@]+@[^\s@]+\.[^\s@]+$/));
+                if (emailMatch) {
+                    const name = parts.find(p => p !== emailMatch && p.length > 0 && !p.match(/@/)) || '';
+                    emails.push({ email: emailMatch.toLowerCase(), name: name });
+                }
+            }
+        } else if (fileName.endsWith('.xlsx') || fileName.endsWith('.xls')) {
+            // Parse Excel using xlsx library
+            try {
+                const XLSX = require('xlsx');
+                const workbook = XLSX.read(fileBuffer, { type: 'buffer' });
+                const sheetName = workbook.SheetNames[0];
+                const sheet = workbook.Sheets[sheetName];
+                const data = XLSX.utils.sheet_to_json(sheet, { header: 1 });
+
+                // Try to find email column
+                const headers = data[0] || [];
+                let emailColIndex = headers.findIndex(h =>
+                    String(h).toLowerCase().includes('email') || String(h).toLowerCase().includes('mail')
+                );
+                let nameColIndex = headers.findIndex(h =>
+                    String(h).toLowerCase().includes('name') && !String(h).toLowerCase().includes('email')
+                );
+
+                // If no headers found, assume first column is email
+                if (emailColIndex === -1) emailColIndex = 0;
+
+                const startRow = headers.length > 0 && typeof headers[0] === 'string' ? 1 : 0;
+
+                for (let i = startRow; i < data.length; i++) {
+                    const row = data[i];
+                    const email = String(row[emailColIndex] || '').trim().toLowerCase();
+                    const name = nameColIndex >= 0 ? String(row[nameColIndex] || '').trim() : '';
+
+                    if (email.match(/^[^\s@]+@[^\s@]+\.[^\s@]+$/)) {
+                        emails.push({ email, name });
+                    }
+                }
+            } catch (xlsxError) {
+                console.error('Excel parse error:', xlsxError);
+                return res.status(400).json({
+                    success: false,
+                    error: 'Failed to parse Excel file. Make sure xlsx package is installed.'
+                });
+            }
+        }
+
+        // Remove duplicates
+        const uniqueEmails = [...new Map(emails.map(e => [e.email, e])).values()];
+
+        res.json({
+            success: true,
+            data: {
+                total: uniqueEmails.length,
+                emails: uniqueEmails,
+                // Also return as plain text for the custom_emails field
+                emailsText: uniqueEmails.map(e => e.name ? `${e.name} <${e.email}>` : e.email).join('\n')
+            }
+        });
+    } catch (error) {
+        console.error('Parse email file error:', error);
+        res.status(500).json({ success: false, error: 'Failed to parse file' });
+    }
+};

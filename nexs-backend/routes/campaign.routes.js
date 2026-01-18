@@ -2,6 +2,25 @@ const express = require('express');
 const router = express.Router();
 const campaignController = require('../controllers/campaign.controller');
 const { auth } = require('../middleware/auth');
+const multer = require('multer');
+
+// Configure multer for file upload
+const upload = multer({
+    storage: multer.memoryStorage(),
+    limits: { fileSize: 5 * 1024 * 1024 }, // 5MB limit
+    fileFilter: (req, file, cb) => {
+        const allowedTypes = [
+            'text/csv',
+            'application/vnd.ms-excel',
+            'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet'
+        ];
+        if (allowedTypes.includes(file.mimetype) || file.originalname.match(/\.(csv|xlsx|xls)$/)) {
+            cb(null, true);
+        } else {
+            cb(new Error('Only CSV and Excel files are allowed'));
+        }
+    }
+});
 
 // All routes require authentication
 router.use(auth);
@@ -11,6 +30,9 @@ router.get('/stats', campaignController.getDashboardStats);
 
 // Get available templates
 router.get('/templates', campaignController.getTemplates);
+
+// Parse uploaded email file (CSV/Excel)
+router.post('/parse-emails', upload.single('file'), campaignController.parseEmailFile);
 
 // Campaign CRUD
 router.get('/', campaignController.getAllCampaigns);
