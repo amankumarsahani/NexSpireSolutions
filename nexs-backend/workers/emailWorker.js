@@ -129,7 +129,7 @@ class EmailQueueWorker {
      * Generate tracking pixel HTML
      */
     generateTrackingPixel(trackingId) {
-        const baseUrl = process.env.APP_URL || 'https://api.nexspiresolutions.co.in';
+        const baseUrl = process.env.API_URL || 'https://api.nexspiresolutions.co.in';
         return `<img src="${baseUrl}/api/track/open/${trackingId}" width="1" height="1" style="display:none" alt="" />`;
     }
 
@@ -137,7 +137,7 @@ class EmailQueueWorker {
      * Wrap links with click tracking
      */
     wrapLinksWithTracking(html, trackingId) {
-        const baseUrl = process.env.APP_URL || 'https://api.nexspiresolutions.co.in';
+        const baseUrl = process.env.API_URL || 'https://api.nexspiresolutions.co.in';
         return html.replace(
             /href="(https?:\/\/[^"]+)"/g,
             (match, url) => {
@@ -151,7 +151,7 @@ class EmailQueueWorker {
      * Add unsubscribe link to email
      */
     addUnsubscribeLink(html, email, campaignId) {
-        const baseUrl = process.env.APP_URL || 'https://api.nexspiresolutions.co.in';
+        const baseUrl = process.env.API_URL || 'https://api.nexspiresolutions.co.in';
         const unsubUrl = `${baseUrl}/api/track/unsubscribe?email=${encodeURIComponent(email)}&campaign=${campaignId}`;
 
         const unsubscribeHtml = `

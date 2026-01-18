@@ -13,11 +13,11 @@ class ActivityModel {
 
     static async getByEntity(entityType, entityId) {
         const sql = `
-      SELECT a.*, u.firstName, u.lastName 
+      SELECT a.*, u.first_name, u.last_name 
       FROM activities a
       LEFT JOIN users u ON a.performedBy = u.id
       WHERE a.entityType = ? AND a.entityId = ?
-      ORDER BY a.created_at DESC
+      ORDER BY a.createdAt DESC
     `;
         const [rows] = await pool.query(sql, [entityType, entityId]);
         return rows;
