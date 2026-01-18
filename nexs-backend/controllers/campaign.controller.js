@@ -390,7 +390,7 @@ exports.getDashboardStats = async (req, res) => {
 exports.getTemplates = async (req, res) => {
     try {
         const [templates] = await db.query(
-            'SELECT id, name, subject, category FROM email_templates ORDER BY name ASC'
+            'SELECT id, name, subject, category, description FROM email_templates WHERE is_active = TRUE ORDER BY name ASC'
         );
         res.json({ success: true, data: templates });
     } catch (error) {
