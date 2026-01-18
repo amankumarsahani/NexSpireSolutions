@@ -14,7 +14,7 @@ class EmailQueueWorker {
     }
 
     /**
-     * Initialize SMTP transporters from database
+     * Initialize SMTP transporters from database or .env fallback
      */
     async initializeTransporters() {
         try {
@@ -23,6 +23,39 @@ class EmailQueueWorker {
             );
 
             this.transporters.clear();
+
+            // If no DB accounts, try .env fallback
+            if (accounts.length === 0 && process.env.SMTP_HOST) {
+                console.log('[EmailWorker] No DB accounts, using .env SMTP fallback');
+
+                const envTransporter = nodemailer.createTransport({
+                    host: process.env.SMTP_HOST,
+                    port: parseInt(process.env.SMTP_PORT) || 587,
+                    secure: process.env.SMTP_SECURE === 'true',
+                    auth: {
+                        user: process.env.SMTP_USER,
+                        pass: process.env.SMTP_PASS
+                    }
+                });
+
+                this.transporters.set('env', {
+                    transporter: envTransporter,
+                    config: {
+                        id: 'env',
+                        name: 'Environment SMTP',
+                        host: process.env.SMTP_HOST,
+                        port: parseInt(process.env.SMTP_PORT) || 587,
+                        secure: process.env.SMTP_SECURE === 'true',
+                        from_name: process.env.SMTP_FROM_NAME || 'NexSpire',
+                        from_email: process.env.SMTP_FROM_EMAIL || process.env.SMTP_USER,
+                        hourly_limit: parseInt(process.env.SMTP_HOURLY_LIMIT) || 100,
+                        sent_this_hour: 0
+                    }
+                });
+
+                console.log('[EmailWorker] Initialized 1 SMTP account from .env');
+                return true;
+            }
 
             for (const account of accounts) {
                 const transporter = nodemailer.createTransport({
@@ -59,6 +92,15 @@ class EmailQueueWorker {
         // Reset hourly counters if needed
         const now = new Date();
         for (const { config } of accounts) {
+            // Skip DB update for .env fallback account
+            if (config.id === 'env') {
+                if (!config.last_hour_reset || now.getTime() - new Date(config.last_hour_reset).getTime() > 3600000) {
+                    config.sent_this_hour = 0;
+                    config.last_hour_reset = now;
+                }
+                continue;
+            }
+
             const lastReset = config.last_hour_reset ? new Date(config.last_hour_reset) : null;
             if (!lastReset || now.getTime() - lastReset.getTime() > 3600000) {
                 await db.query(
@@ -171,11 +213,13 @@ class EmailQueueWorker {
                 ['sent', queueItem.id]
             );
 
-            // Update SMTP counter
-            await db.query(
-                'UPDATE smtp_accounts SET sent_this_hour = sent_this_hour + 1, sent_today = sent_today + 1 WHERE id = ?',
-                [smtpAccount.config.id]
-            );
+            // Update SMTP counter (skip DB for env fallback)
+            if (smtpAccount.config.id !== 'env') {
+                await db.query(
+                    'UPDATE smtp_accounts SET sent_this_hour = sent_this_hour + 1, sent_today = sent_today + 1 WHERE id = ?',
+                    [smtpAccount.config.id]
+                );
+            }
             smtpAccount.config.sent_this_hour++;
 
             // Update campaign counter
