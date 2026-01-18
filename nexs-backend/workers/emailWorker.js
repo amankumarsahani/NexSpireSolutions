@@ -180,9 +180,10 @@ class EmailQueueWorker {
         }
 
         try {
-            // Mark as sending
+            // Mark as sending (use NULL for env fallback since smtp_account_id is INT)
+            const smtpId = smtpAccount.config.id === 'env' ? null : smtpAccount.config.id;
             await db.query('UPDATE email_queue SET status = ?, smtp_account_id = ? WHERE id = ?',
-                ['sending', smtpAccount.config.id, queueItem.id]);
+                ['sending', smtpId, queueItem.id]);
 
             // Prepare email content
             let htmlContent = campaign.html_content || '';
