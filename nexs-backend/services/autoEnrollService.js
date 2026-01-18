@@ -4,7 +4,7 @@
  */
 
 const db = require('../config/database');
-const { v4: uuidv4 } = require('uuid');
+const crypto = require('crypto');
 
 class AutoEnrollService {
     /**
@@ -84,7 +84,7 @@ class AutoEnrollService {
                 }
 
                 // Add to queue
-                const trackingId = uuidv4();
+                const trackingId = crypto.randomUUID();
                 await db.query(
                     `INSERT INTO email_queue 
                      (campaign_id, recipient_email, recipient_name, recipient_type, recipient_id, tracking_id, status)
