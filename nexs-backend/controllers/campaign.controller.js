@@ -51,7 +51,7 @@ exports.getAllCampaigns = async (req, res) => {
     }
 };
 
-// Get campaign by ID
+// Get campaign by ID with full stats
 exports.getCampaignById = async (req, res) => {
     try {
         const { id } = req.params;
@@ -68,7 +68,39 @@ exports.getCampaignById = async (req, res) => {
             return res.status(404).json({ success: false, error: 'Campaign not found' });
         }
 
-        res.json({ success: true, data: campaign });
+        // Get detailed stats from email_queue
+        const [[stats]] = await db.query(
+            `SELECT 
+                COUNT(*) as total_recipients,
+                SUM(CASE WHEN status = 'sent' THEN 1 ELSE 0 END) as sent_count,
+                SUM(CASE WHEN status = 'failed' THEN 1 ELSE 0 END) as failed_count,
+                SUM(CASE WHEN status = 'bounced' THEN 1 ELSE 0 END) as bounced_count,
+                SUM(CASE WHEN opened_at IS NOT NULL THEN 1 ELSE 0 END) as opened_count,
+                SUM(CASE WHEN clicked_at IS NOT NULL THEN 1 ELSE 0 END) as clicked_count
+             FROM email_queue WHERE campaign_id = ?`,
+            [id]
+        );
+
+        // Get unsubscribed count
+        const [[unsub]] = await db.query(
+            `SELECT COUNT(*) as unsubscribed_count 
+             FROM email_unsubscribes WHERE campaign_id = ?`,
+            [id]
+        );
+
+        res.json({
+            success: true,
+            data: {
+                ...campaign,
+                total_recipients: stats?.total_recipients || campaign.total_recipients || 0,
+                sent_count: stats?.sent_count || campaign.sent_count || 0,
+                failed_count: stats?.failed_count || 0,
+                bounced_count: stats?.bounced_count || 0,
+                opened_count: stats?.opened_count || campaign.opened_count || 0,
+                clicked_count: stats?.clicked_count || campaign.clicked_count || 0,
+                unsubscribed_count: unsub?.unsubscribed_count || 0
+            }
+        });
     } catch (error) {
         console.error('Get campaign error:', error);
         res.status(500).json({ success: false, error: 'Failed to fetch campaign' });
@@ -232,7 +264,12 @@ exports.getCampaignRecipients = async (req, res) => {
         res.json({
             success: true,
             data: recipients,
-            pagination: { page: parseInt(page), limit: parseInt(limit), total }
+            pagination: {
+                page: parseInt(page),
+                limit: parseInt(limit),
+                total,
+                pages: Math.ceil(total / limit)
+            }
         });
     } catch (error) {
         console.error('Get recipients error:', error);
