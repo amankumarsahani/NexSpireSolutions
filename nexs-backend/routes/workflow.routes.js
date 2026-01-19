@@ -118,7 +118,11 @@ router.post('/', isAdmin, async (req, res) => {
         }
 
         const [[newWorkflow]] = await db.query('SELECT * FROM workflows WHERE id = ?', [workflowId]);
-        res.status(201).json({ success: true, data: newWorkflow });
+        res.status(201).json({
+            success: true,
+            data: newWorkflow,
+            workflowId: workflowId // Added for frontend compatibility
+        });
     } catch (error) {
         console.error('Create workflow error:', error);
         res.status(500).json({ success: false, error: 'Failed to create workflow' });
@@ -129,13 +133,36 @@ router.post('/', isAdmin, async (req, res) => {
 router.put('/:id', isAdmin, async (req, res) => {
     try {
         const { id } = req.params;
-        const { name, description, trigger_type, trigger_config, is_active, nodes, connections } = req.body;
 
-        // Update workflow metadata
+        if (id === 'undefined') {
+            return res.status(400).json({ success: false, error: 'Invalid workflow ID' });
+        }
+
+        let { name, description, trigger_type, trigger_config, is_active, nodes, connections, canvas_data } = req.body;
+
+        // Support for frontend canvas_data structure
+        if (canvas_data && !nodes) {
+            nodes = canvas_data.nodes;
+            connections = canvas_data.edges; // connections = edges in frontend
+        }
+
+        // Update workflow metadata (using COALESCE to avoid overwriting with null)
         await db.query(
-            `UPDATE workflows SET name = ?, description = ?, trigger_type = ?, trigger_config = ?, is_active = ?
+            `UPDATE workflows SET 
+                name = COALESCE(?, name), 
+                description = COALESCE(?, description), 
+                trigger_type = COALESCE(?, trigger_type), 
+                trigger_config = COALESCE(?, trigger_config), 
+                is_active = COALESCE(?, is_active)
              WHERE id = ?`,
-            [name, description, trigger_type, JSON.stringify(trigger_config || {}), is_active ? 1 : 0, id]
+            [
+                name || null,
+                description || null,
+                trigger_type || null,
+                trigger_config ? JSON.stringify(trigger_config) : null,
+                is_active !== undefined ? (is_active ? 1 : 0) : null,
+                id
+            ]
         );
 
         // If nodes provided, recreate them
