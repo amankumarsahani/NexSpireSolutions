@@ -38,6 +38,8 @@ const ProjectDetail = lazy(() => import('./pages/ProjectDetail'));
 const LeadDetail = lazy(() => import('./pages/LeadDetail'));
 const EmailTemplates = lazy(() => import('./pages/EmailTemplates'));
 const ApiDocs = lazy(() => import('./pages/ApiDocs'));
+const Workflows = lazy(() => import('./pages/Workflows'));
+const WorkflowBuilder = lazy(() => import('./pages/WorkflowBuilder'));
 const DashboardLayout = lazy(() => import('./components/DashboardLayout'));
 
 // Loading spinner component
@@ -160,6 +162,8 @@ function App() {
               <Route path="leads/:id" element={<LeadDetail />} />
               <Route path="email-templates" element={<EmailTemplates />} />
               <Route path="api-docs" element={<ApiDocs />} />
+              <Route path="workflows" element={<Workflows />} />
+              <Route path="workflows/:id" element={<WorkflowBuilder />} />
             </Route>
           </Routes>
         </Suspense>

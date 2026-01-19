@@ -130,4 +130,18 @@ export const emailTemplateAPI = {
     getStats: () => api.get('/email-templates/stats')
 };
 
+// Workflow Automation
+export const workflowAPI = {
+    getAll: () => api.get('/workflows'),
+    getById: (id) => api.get(`/workflows/${id}`),
+    create: (data) => api.post('/workflows', data),
+    update: (id, data) => api.put(`/workflows/${id}`, data),
+    delete: (id) => api.delete(`/workflows/${id}`),
+    toggle: (id) => api.patch(`/workflows/${id}/toggle`),
+    run: (id, testData) => api.post(`/workflows/${id}/test`, { testData }),
+    getExecutions: (id, limit = 20) => api.get(`/workflows/${id}/executions`, { params: { limit } }),
+    getNodeTypes: () => api.get('/workflows/meta/node-types')
+};
+
 export default api;
+
