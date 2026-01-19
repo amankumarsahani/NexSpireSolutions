@@ -13,8 +13,18 @@ validateEnv();
 const app = express();
 const PORT = process.env.PORT || 5000;
 
+// Trust proxy for accurate IP detection behind Nginx/PM2
+app.set('trust proxy', 1);
+
 // Middleware
 app.use(morgan('dev')); // Logging
+
+// Rate Limiting & Rogue Path Protection
+const { generalRateLimit } = require('./middleware/rateLimit');
+const { roguePathBlocker } = require('./middleware/security');
+
+app.use(roguePathBlocker); // Block rogue paths first
+app.use(generalRateLimit); // Then apply global rate limit
 
 // Security headers
 app.use(helmet({

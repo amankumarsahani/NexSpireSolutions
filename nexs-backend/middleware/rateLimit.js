@@ -19,11 +19,11 @@ const inquiryRateLimit = rateLimit({
 
 /**
  * General API rate limiter
- * Limits to 100 requests per 15 minutes per IP
+ * Limits to 200 requests per 15 minutes per IP
  */
 const generalRateLimit = rateLimit({
     windowMs: 15 * 60 * 1000,
-    max: 100,
+    max: 200,
     message: {
         error: 'Too many requests. Please slow down.',
         retryAfter: 15
@@ -33,7 +33,25 @@ const generalRateLimit = rateLimit({
     validate: { xForwardedForHeader: false, default: true }
 });
 
+/**
+ * Authentication rate limiter
+ * Prevents brute force on login/register
+ * Limits to 10 requests per 15 minutes per IP
+ */
+const authRateLimit = rateLimit({
+    windowMs: 15 * 60 * 1000,
+    max: 10,
+    message: {
+        error: 'Too many login attempts. Please try again after 15 minutes.',
+        retryAfter: 15
+    },
+    standardHeaders: true,
+    legacyHeaders: false,
+    validate: { xForwardedForHeader: false, default: true }
+});
+
 module.exports = {
     inquiryRateLimit,
-    generalRateLimit
+    generalRateLimit,
+    authRateLimit
 };
