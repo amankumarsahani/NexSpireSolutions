@@ -17,7 +17,7 @@ const PORT = process.env.PORT || 5000;
 app.set('trust proxy', 1);
 
 // Middleware
-app.use(morgan('dev')); // Logging
+app.use(morgan(':remote-addr - :method :url :status :response-time ms - :res[content-length]')); // Enhanced logging with IP
 
 // Rate Limiting & Rogue Path Protection
 const { generalRateLimit } = require('./middleware/rateLimit');
@@ -120,6 +120,16 @@ app.use('/api/dashboard', require('./routes/dashboard.routes'));
 // NexCRM Master Routes (Tenant Management)
 app.use('/api/tenants', require('./routes/tenant.routes'));
 app.use('/api/plans', require('./routes/plan.routes'));
+
+// Security Monitoring
+app.get('/api/security/banned-ips', (req, res) => {
+    const { getBannedIPs } = require('./middleware/security');
+    res.json({
+        success: true,
+        count: getBannedIPs().length,
+        bannedIPs: getBannedIPs()
+    });
+});
 
 // Email Campaigns & Marketing
 app.use('/api/campaigns', require('./routes/campaign.routes'));

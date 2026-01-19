@@ -84,6 +84,23 @@ const roguePathBlocker = (req, res, next) => {
     next();
 };
 
+const getBannedIPs = () => {
+    const list = [];
+    const now = Date.now();
+    for (const [ip, info] of bannedIPs.entries()) {
+        if (now < info.expiry) {
+            list.push({
+                ip,
+                hits: info.hits,
+                expiresIn: Math.round((info.expiry - now) / 1000 / 60) + ' minutes',
+                lastPath: info.lastPath
+            });
+        }
+    }
+    return list;
+};
+
 module.exports = {
-    roguePathBlocker
+    roguePathBlocker,
+    getBannedIPs
 };
