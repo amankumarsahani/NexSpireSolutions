@@ -12,9 +12,10 @@ class AutoEnrollService {
      * @param {number} leadId - The lead's ID
      * @param {string} email - Lead's email address
      * @param {string} name - Lead's name
+     * @param {string} company - Lead's company
      */
-    async enrollLead(leadId, email, name) {
-        return this.enrollContact('lead', leadId, email, name, ['all_leads']);
+    async enrollLead(leadId, email, name, company) {
+        return this.enrollContact('lead', leadId, email, name, company, ['all_leads']);
     }
 
     /**
@@ -22,15 +23,16 @@ class AutoEnrollService {
      * @param {number} clientId - The client's ID
      * @param {string} email - Client's email address
      * @param {string} name - Client's name
+     * @param {string} company - Client's company
      */
-    async enrollClient(clientId, email, name) {
-        return this.enrollContact('client', clientId, email, name, ['all_clients']);
+    async enrollClient(clientId, email, name, company) {
+        return this.enrollContact('client', clientId, email, name, company, ['all_clients']);
     }
 
     /**
      * Generic enrollment for any contact type
      */
-    async enrollContact(type, recipientId, email, name, audienceTypes) {
+    async enrollContact(type, recipientId, email, name, company, audienceTypes) {
         if (!email) {
             console.log(`[AutoEnroll] Skipping ${type} ${recipientId}: no email`);
             return;
@@ -87,9 +89,9 @@ class AutoEnrollService {
                 const trackingId = crypto.randomUUID();
                 await db.query(
                     `INSERT INTO email_queue 
-                     (campaign_id, recipient_email, recipient_name, recipient_type, recipient_id, tracking_id, status)
-                     VALUES (?, ?, ?, ?, ?, ?, 'pending')`,
-                    [campaign.id, email, name, type, recipientId, trackingId]
+                     (campaign_id, recipient_email, recipient_name, recipient_company, recipient_type, recipient_id, tracking_id, status)
+                     VALUES (?, ?, ?, ?, ?, ?, ?, 'pending')`,
+                    [campaign.id, email, name, company, type, recipientId, trackingId]
                 );
 
                 // Update campaign total_recipients

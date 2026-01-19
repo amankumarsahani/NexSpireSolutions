@@ -311,11 +311,11 @@ exports.startCampaign = async (req, res) => {
         let recipients = [];
 
         if (campaign.audience_type === 'all_leads') {
-            const [leads] = await db.query('SELECT id, contactName as name, email FROM leads WHERE email IS NOT NULL');
-            recipients = leads.map(l => ({ id: l.id, type: 'lead', email: l.email, name: l.name }));
+            const [leads] = await db.query('SELECT id, contactName as name, email, company FROM leads WHERE email IS NOT NULL');
+            recipients = leads.map(l => ({ id: l.id, type: 'lead', email: l.email, name: l.name, company: l.company }));
         } else if (campaign.audience_type === 'all_clients') {
-            const [clients] = await db.query('SELECT id, contactName as name, email FROM clients WHERE email IS NOT NULL');
-            recipients = clients.map(c => ({ id: c.id, type: 'client', email: c.email, name: c.name }));
+            const [clients] = await db.query('SELECT id, contactName as name, email, companyName as company FROM clients WHERE email IS NOT NULL');
+            recipients = clients.map(c => ({ id: c.id, type: 'client', email: c.email, name: c.name, company: c.company }));
         } else if (campaign.audience_type === 'filtered' && campaign.audience_filter) {
             const filter = typeof campaign.audience_filter === 'string'
                 ? JSON.parse(campaign.audience_filter)
@@ -330,11 +330,11 @@ exports.startCampaign = async (req, res) => {
                 params.push(filter.status);
             }
 
-            const [filtered] = await db.query(`SELECT id, contactName as name, email FROM ${table} ${whereClause}`, params);
-            recipients = filtered.map(r => ({ id: r.id, type: filter.source || 'lead', email: r.email, name: r.name }));
+            const [filtered] = await db.query(`SELECT id, contactName as name, email, ${table === 'clients' ? 'companyName as company' : 'company'} FROM ${table} ${whereClause}`, params);
+            recipients = filtered.map(r => ({ id: r.id, type: filter.source || 'lead', email: r.email, name: r.name, company: r.company }));
         } else if (campaign.audience_type === 'custom' && campaign.custom_emails) {
             const emails = campaign.custom_emails.split(/[,\n]/).map(e => e.trim()).filter(e => e);
-            recipients = emails.map(email => ({ id: null, type: 'custom', email, name: email.split('@')[0] }));
+            recipients = emails.map(email => ({ id: null, type: 'custom', email, name: email.split('@')[0], company: '' }));
         }
 
         // Filter out unsubscribed emails
@@ -357,9 +357,9 @@ exports.startCampaign = async (req, res) => {
             const trackingId = crypto.randomBytes(16).toString('hex');
             await db.query(
                 `INSERT INTO email_queue 
-                 (campaign_id, recipient_email, recipient_name, recipient_type, recipient_id, tracking_id, status)
-                 VALUES (?, ?, ?, ?, ?, ?, 'pending')`,
-                [id, recipient.email, recipient.name, recipient.type, recipient.id, trackingId]
+                 (campaign_id, recipient_email, recipient_name, recipient_company, recipient_type, recipient_id, tracking_id, status)
+                 VALUES (?, ?, ?, ?, ?, ?, ?, 'pending')`,
+                [id, recipient.email, recipient.name, recipient.company, recipient.type, recipient.id, trackingId]
             );
         }
 

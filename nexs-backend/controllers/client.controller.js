@@ -68,7 +68,7 @@ const ClientController = {
 
             // Auto-enroll new client into active campaigns (async, don't wait)
             if (client.email) {
-                autoEnrollService.enrollClient(clientId, client.email, client.contact_name || client.company_name).catch(err => {
+                autoEnrollService.enrollClient(clientId, client.email, client.contactName, client.companyName).catch(err => {
                     console.error('Auto-enroll failed:', err);
                 });
             }

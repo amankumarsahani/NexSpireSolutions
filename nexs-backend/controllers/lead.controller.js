@@ -57,7 +57,7 @@ const LeadController = {
 
             // Auto-enroll new lead into active campaigns (async, don't wait)
             if (lead.email) {
-                autoEnrollService.enrollLead(leadId, lead.email, lead.contact_name).catch(err => {
+                autoEnrollService.enrollLead(leadId, lead.email, lead.contactName, lead.company).catch(err => {
                     console.error('Auto-enroll failed:', err);
                 });
             }

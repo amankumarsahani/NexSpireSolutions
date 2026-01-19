@@ -138,8 +138,9 @@ class EmailQueueWorker {
      */
     wrapLinksWithTracking(html, trackingId) {
         const baseUrl = process.env.API_URL || 'https://api.nexspiresolutions.co.in';
+        // Improved regex to handle both single and double quotes, and avoid wrapping internal anchors or already tracked links
         return html.replace(
-            /href="(https?:\/\/[^"]+)"/g,
+            /href=["'](https?:\/\/(?!api\.nexspiresolutions\.co\.in\/api\/track\/)[^"']+)["']/g,
             (match, url) => {
                 const encodedUrl = encodeURIComponent(url);
                 return `href="${baseUrl}/api/track/click/${trackingId}?url=${encodedUrl}"`;
@@ -194,10 +195,13 @@ class EmailQueueWorker {
             htmlContent += this.generateTrackingPixel(queueItem.tracking_id);
 
             // Personalize content
+            const vars = typeof queueItem.variables === 'string' ? JSON.parse(queueItem.variables || '{}') : (queueItem.variables || {});
+
             htmlContent = htmlContent
-                .replace(/{{name}}/g, queueItem.recipient_name || 'there')
+                .replace(/{{name}}/g, queueItem.recipient_name || vars.name || 'there')
                 .replace(/{{email}}/g, queueItem.recipient_email)
-                .replace(/{{first_name}}/g, (queueItem.recipient_name || '').split(' ')[0] || 'there');
+                .replace(/{{first_name}}/g, (queueItem.recipient_name || vars.name || vars.first_name || '').split(' ')[0] || 'there')
+                .replace(/{{company}}/g, queueItem.recipient_company || vars.company || 'your company');
 
             // Send email
             await smtpAccount.transporter.sendMail({
