@@ -185,8 +185,8 @@ class EmailQueueWorker {
             await db.query('UPDATE email_queue SET status = ?, smtp_account_id = ? WHERE id = ?',
                 ['sending', smtpId, queueItem.id]);
 
-            // Prepare email content
-            let htmlContent = campaign.html_content || '';
+            // Prepare email content - use campaign html_content OR template html_content
+            let htmlContent = campaign.html_content || campaign.template_html_content || '';
 
             // Add tracking pixel
             htmlContent = this.addUnsubscribeLink(htmlContent, queueItem.recipient_email, campaign.id);
@@ -306,9 +306,12 @@ class EmailQueueWorker {
         console.log('[EmailWorker] Starting queue processing...');
 
         try {
-            // Get active campaigns
+            // Get active campaigns with template content
             const [campaigns] = await db.query(
-                "SELECT * FROM email_campaigns WHERE status = 'sending'"
+                `SELECT c.*, t.html_content as template_html_content 
+                 FROM email_campaigns c 
+                 LEFT JOIN email_templates t ON c.template_id = t.id 
+                 WHERE c.status = 'sending'`
             );
 
             for (const campaign of campaigns) {
