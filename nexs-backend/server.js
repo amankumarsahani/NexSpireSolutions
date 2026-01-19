@@ -26,23 +26,7 @@ morgan.token('real-ip', (req) => {
 // Middleware
 app.use(morgan(':real-ip - :method :url :status :response-time ms - :res[content-length]')); // Enhanced logging with normalized IP
 
-// Rate Limiting & Rogue Path Protection
-const { generalRateLimit } = require('./middleware/rateLimit');
-const { roguePathBlocker } = require('./middleware/security');
-
-app.use(roguePathBlocker); // Block rogue paths first
-app.use(generalRateLimit); // Then apply global rate limit
-
-// Security headers
-app.use(helmet({
-    contentSecurityPolicy: false, // Disable CSP for API
-    crossOriginEmbedderPolicy: false
-}));
-
-app.use(express.json()); // Parse JSON bodies
-app.use(express.urlencoded({ extended: true })); // Parse URL-encoded bodies
-
-// CORS Configuration
+// CORS Configuration - MUST be before rate limiting to handle preflight requests
 const corsOptions = {
     origin: function (origin, callback) {
         const allowedOrigins = [
@@ -63,10 +47,30 @@ const corsOptions = {
         }
     },
     credentials: true,
+    methods: ['GET', 'POST', 'PUT', 'DELETE', 'PATCH', 'OPTIONS'],
+    allowedHeaders: ['Content-Type', 'Authorization', 'X-Requested-With', 'Accept', 'Origin'],
     optionsSuccessStatus: 200
 };
 
+// Handle preflight requests explicitly BEFORE other middleware
+app.options('*', cors(corsOptions));
 app.use(cors(corsOptions));
+
+// Rate Limiting & Rogue Path Protection (AFTER CORS)
+const { generalRateLimit } = require('./middleware/rateLimit');
+const { roguePathBlocker } = require('./middleware/security');
+
+app.use(roguePathBlocker); // Block rogue paths
+app.use(generalRateLimit); // Then apply global rate limit
+
+// Security headers
+app.use(helmet({
+    contentSecurityPolicy: false, // Disable CSP for API
+    crossOriginEmbedderPolicy: false
+}));
+
+app.use(express.json()); // Parse JSON bodies
+app.use(express.urlencoded({ extended: true })); // Parse URL-encoded bodies
 
 // Static files (for uploaded documents)
 app.use('/uploads', express.static('uploads'));
