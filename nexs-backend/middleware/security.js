@@ -38,7 +38,9 @@ const BAN_DURATION = 1000 * 60 * 60 * 24; // 24 hours
  * Middleware to block IPs that hit known malicious paths
  */
 const roguePathBlocker = (req, res, next) => {
-    const ip = req.ip || req.connection.remoteAddress;
+    let ip = req.ip || req.connection.remoteAddress || '';
+    // Normalize: strip ::ffff: prefix for IPv4-mapped IPv6
+    ip = ip.replace(/^.*:ffff:/, '');
     const url = req.originalUrl || req.url;
 
     // Check if IP is already banned

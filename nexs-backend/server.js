@@ -16,8 +16,15 @@ const PORT = process.env.PORT || 5000;
 // Trust proxy for accurate IP detection behind Nginx/PM2
 app.set('trust proxy', 1);
 
+// Custom Morgan Token for Dual IP Visibility (IPv4 and IPv6)
+morgan.token('real-ip', (req) => {
+    const ip = req.ip || req.connection.remoteAddress || req.headers['x-forwarded-for'] || '';
+    // Normalize: strip ::ffff: prefix if present (IPv4-mapped IPv6)
+    return ip.replace(/^.*:ffff:/, '');
+});
+
 // Middleware
-app.use(morgan(':remote-addr - :method :url :status :response-time ms - :res[content-length]')); // Enhanced logging with IP
+app.use(morgan(':real-ip - :method :url :status :response-time ms - :res[content-length]')); // Enhanced logging with normalized IP
 
 // Rate Limiting & Rogue Path Protection
 const { generalRateLimit } = require('./middleware/rateLimit');
