@@ -210,28 +210,52 @@ class WorkflowEngine {
      * Check if entity matches trigger filter
      */
     matchesTriggerFilter(config, entityData) {
-        if (!config.filters || config.filters.length === 0) return true;
-
-        for (const filter of config.filters) {
-            const value = entityData[filter.field];
-            switch (filter.operator) {
-                case 'equals':
-                    if (value !== filter.value) return false;
-                    break;
-                case 'not_equals':
-                    if (value === filter.value) return false;
-                    break;
-                case 'contains':
-                    if (!String(value).includes(filter.value)) return false;
-                    break;
-                case 'greater_than':
-                    if (Number(value) <= Number(filter.value)) return false;
-                    break;
-                case 'less_than':
-                    if (Number(value) >= Number(filter.value)) return false;
-                    break;
+        // Handle new simplified filter format (source_filter, status_filter, client_type_filter)
+        if (config.source_filter && config.source_filter !== '') {
+            if (entityData.source !== config.source_filter) {
+                console.log(`[WorkflowEngine] Source filter mismatch: ${entityData.source} !== ${config.source_filter}`);
+                return false;
             }
         }
+
+        if (config.status_filter && config.status_filter !== '') {
+            if (entityData.status !== config.status_filter) {
+                console.log(`[WorkflowEngine] Status filter mismatch: ${entityData.status} !== ${config.status_filter}`);
+                return false;
+            }
+        }
+
+        if (config.client_type_filter && config.client_type_filter !== '') {
+            if (entityData.client_type !== config.client_type_filter && entityData.type !== config.client_type_filter) {
+                console.log(`[WorkflowEngine] Client type filter mismatch`);
+                return false;
+            }
+        }
+
+        // Handle legacy filters array format
+        if (config.filters && config.filters.length > 0) {
+            for (const filter of config.filters) {
+                const value = entityData[filter.field];
+                switch (filter.operator) {
+                    case 'equals':
+                        if (value !== filter.value) return false;
+                        break;
+                    case 'not_equals':
+                        if (value === filter.value) return false;
+                        break;
+                    case 'contains':
+                        if (!String(value).includes(filter.value)) return false;
+                        break;
+                    case 'greater_than':
+                        if (Number(value) <= Number(filter.value)) return false;
+                        break;
+                    case 'less_than':
+                        if (Number(value) >= Number(filter.value)) return false;
+                        break;
+                }
+            }
+        }
+
         return true;
     }
 

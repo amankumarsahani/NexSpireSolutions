@@ -147,6 +147,16 @@ router.put('/:id', isAdmin, async (req, res) => {
             connections = canvas_data.edges; // connections = edges in frontend
         }
 
+        // Extract trigger config from trigger node if nodes provided
+        if (nodes && nodes.length > 0 && !trigger_config) {
+            const triggerNode = nodes.find(n =>
+                (n.node_type === 'trigger' || n.type === 'trigger')
+            );
+            if (triggerNode) {
+                trigger_config = triggerNode.config || triggerNode.data?.config || {};
+            }
+        }
+
         // Update workflow metadata (using COALESCE to avoid overwriting with null)
         await db.query(
             `UPDATE workflows SET 
