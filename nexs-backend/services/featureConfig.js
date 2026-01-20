@@ -69,6 +69,15 @@ const INDUSTRY_MODULES = {
         'housekeeping'
     ],
 
+    // Travel specific
+    travel: [
+        'tours',
+        'tour_bookings',
+        'destinations',
+        'itineraries',
+        'guests'
+    ],
+
     // Fitness/Gym specific
     fitness: [
         'gym_members',
@@ -174,7 +183,7 @@ const DEFAULT_PLAN_CONFIGS = {
             documents: 50
         },
         // Allow all industries on starter plan for basic usage
-        industries: ['general', 'ecommerce', 'services', 'realestate', 'education', 'healthcare', 'hospitality', 'fitness', 'legal', 'manufacturing', 'logistics', 'restaurant', 'salon'],
+        industries: ['general', 'ecommerce', 'services', 'realestate', 'education', 'healthcare', 'hospitality', 'travel', 'fitness', 'legal', 'manufacturing', 'logistics', 'restaurant', 'salon'],
         communication: {
             emails_per_month: 500,
             email_templates: 5,
