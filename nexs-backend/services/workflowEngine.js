@@ -232,6 +232,21 @@ class WorkflowEngine {
             }
         }
 
+        // Handle from_status and to_status for status change triggers
+        if (config.from_status && config.from_status !== '') {
+            if (entityData.old_status !== config.from_status && entityData.from_status !== config.from_status) {
+                console.log(`[WorkflowEngine] From status filter mismatch: ${entityData.old_status || entityData.from_status} !== ${config.from_status}`);
+                return false;
+            }
+        }
+
+        if (config.to_status && config.to_status !== '') {
+            if (entityData.new_status !== config.to_status && entityData.to_status !== config.to_status && entityData.status !== config.to_status) {
+                console.log(`[WorkflowEngine] To status filter mismatch: ${entityData.new_status || entityData.to_status || entityData.status} !== ${config.to_status}`);
+                return false;
+            }
+        }
+
         // Handle legacy filters array format
         if (config.filters && config.filters.length > 0) {
             for (const filter of config.filters) {
