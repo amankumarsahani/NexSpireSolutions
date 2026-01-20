@@ -265,14 +265,31 @@ exports.getCampaignRecipients = async (req, res) => {
             params.push(status);
         }
 
-        const [recipients] = await db.query(
-            `SELECT id, recipient_email, recipient_name, recipient_company, status, sent_at, opened_at, clicked_at, open_ip, click_ip, error_message
-             FROM email_queue
-             ${whereClause}
-             ORDER BY id DESC
-             LIMIT ? OFFSET ?`,
-            [...params, parseInt(limit), parseInt(offset)]
-        );
+        let recipients;
+        try {
+            [recipients] = await db.query(
+                `SELECT id, recipient_email, recipient_name, recipient_company, status, sent_at, opened_at, clicked_at, open_ip, click_ip, error_message
+                 FROM email_queue
+                 ${whereClause}
+                 ORDER BY id DESC
+                 LIMIT ? OFFSET ?`,
+                [...params, parseInt(limit), parseInt(offset)]
+            );
+        } catch (error) {
+            if (error.code === 'ER_BAD_FIELD_ERROR') {
+                // Fallback for missing tracking columns (open_ip, click_ip might not exist in older schemas)
+                [recipients] = await db.query(
+                    `SELECT id, recipient_email, recipient_name, recipient_company, status, sent_at, opened_at, clicked_at, error_message
+                     FROM email_queue
+                     ${whereClause}
+                     ORDER BY id DESC
+                     LIMIT ? OFFSET ?`,
+                    [...params, parseInt(limit), parseInt(offset)]
+                );
+            } else {
+                throw error;
+            }
+        }
 
         const [[{ total }]] = await db.query(
             `SELECT COUNT(*) as total FROM email_queue ${whereClause}`,

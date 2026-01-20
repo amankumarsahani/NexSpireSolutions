@@ -3,7 +3,7 @@
  * Description: Adds open_ip and click_ip columns to email_queue for tracking originating IPs of email events.
  */
 
-const db = require('../../config/database');
+const db = require('../../../config/database');
 
 async function up() {
     try {
