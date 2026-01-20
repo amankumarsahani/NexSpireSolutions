@@ -81,30 +81,30 @@ const PortfolioPage = () => {
     const projects = [
         {
             id: 1,
-            title: "NeoBank Finance",
-            category: "Mobile App",
+            title: "E-commerce Platform (US Retailer)",
+            category: "Web Platform",
             image: "https://images.unsplash.com/photo-1563986768609-322da13575f3?w=1200&q=80",
             size: "large",
-            description: "A next-generation banking interface focusing on clarity, security, and speed.",
-            tags: ["React Native", "Node.js", "Security"]
+            description: "Custom Magento store with UX redesign resulting in a 45% increase in sales.",
+            tags: ["Magento", "UX/UI Design", "E-commerce"]
         },
         {
             id: 2,
-            title: "Luxe Interiors",
-            category: "Web Platform",
-            image: "https://images.unsplash.com/photo-1618221195710-dd6b41faaea6?w=800&q=80",
+            title: "HealthTech Mobile App (UK)",
+            category: "Mobile App",
+            image: "https://images.unsplash.com/photo-1576091160399-112ba8d25d1d?w=800&q=80",
             size: "small",
-            description: "E-commerce platform for high-end furniture with AR visualization.",
-            tags: ["Next.js", "WebGL", "Shopify"]
+            description: "Flutter-based app with real-time analytics achieving 50k downloads in 2 months.",
+            tags: ["Flutter", "Healthcare", "Analytics"]
         },
         {
             id: 3,
-            title: "HealthTrack AI",
+            title: "AI-Powered CRM (Australia)",
             category: "Dashboard",
-            image: "https://images.unsplash.com/photo-1576091160399-112ba8d25d1d?w=800&q=80",
+            image: "https://images.unsplash.com/photo-1551288049-bebda4e38f71?w=800&q=80",
             size: "small",
-            description: "Medical analytics dashboard for tracking patient vitals in real-time.",
-            tags: ["React", "D3.js", "Python"]
+            description: "Custom CRM with AI predictions increasing sales efficiency by 30%.",
+            tags: ["AI/ML", "Python", "React"]
         },
         {
             id: 4,
@@ -144,12 +144,12 @@ const PortfolioPage = () => {
     return (
         <div className="min-h-screen bg-white font-sans text-gray-900 selection:bg-blue-600 selection:text-white">
             <Helmet>
-                <title>Our Portfolio - Case Studies & Success Stories | Nexspire Solutions</title>
-                <meta name="description" content="Browse our portfolio of successful projects. See how we've helped startups and enterprises launch award-winning web and mobile applications. Real results, real impact." />
-                <meta name="keywords" content="software portfolio, case studies, web development projects, mobile app examples, fintech apps, healthcare software, e-commerce solutions, nexspire work, client success stories" />
+                <title>Portfolio - Custom Software Case Studies | Nexspire Solutions</title>
+                <meta name="description" content="Explore our portfolio of successful projects including E-commerce platforms, HealthTech apps, and AI-Powered CRM systems. See how Nexspire Solutions delivers measurable results for global clients." />
+                <meta name="keywords" content="software portfolio, case studies, web development projects, mobile app examples, AI CRM case study, healthtech app development, e-commerce success stories, nexspire portfolio" />
                 <link rel="canonical" href="https://nexspiresolutions.co.in/portfolio" />
-                <meta property="og:title" content="Our Work - Digital Legacies We've Built" />
-                <meta property="og:description" content="Explore our curated selection of high-impact digital products and transformations." />
+                <meta property="og:title" content="Portfolio - Custom Software Case Studies | Nexspire Solutions" />
+                <meta property="og:description" content="See how we've helped businesses worldwide with custom E-commerce, Mobile, and AI solutions." />
                 <meta property="og:url" content="https://nexspiresolutions.co.in/portfolio" />
             </Helmet>
 

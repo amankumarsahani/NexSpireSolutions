@@ -9,11 +9,21 @@ const Header = () => {
 
   const navItems = [
     { label: 'Home', path: '/' },
-    { label: 'Services', path: '/services' },
+    {
+      label: 'Services',
+      path: '/services',
+      children: [
+        { label: 'Web Development', path: '/services/custom-web-development' },
+        { label: 'Mobile Apps', path: '/services/mobile-app-development' },
+        { label: 'AI & Machine Learning', path: '/services/ai-machine-learning' },
+        { label: 'Cloud Solutions', path: '/services/cloud-solutions' },
+        { label: 'E-commerce', path: '/services/ecommerce-development' },
+      ]
+    },
+    { label: 'NexCRM', path: '/nexcrm' },
     { label: 'About', path: '/about' },
     { label: 'Portfolio', path: '/portfolio' },
     { label: 'Blog', path: '/blog' },
-    { label: 'NexCRM', path: '/nexcrm' },
     { label: 'Contact', path: '/contact' },
   ];
 
@@ -84,17 +94,39 @@ const Header = () => {
             <div className="relative flex items-center space-x-1 bg-gradient-to-r from-white/80 via-blue-50/70 to-purple-50/80 backdrop-blur-md rounded-full px-3 py-2 shadow-lg">
               <div className="absolute inset-0 bg-gradient-to-r from-blue-100/20 via-purple-100/20 to-pink-100/20 rounded-full"></div>
               {navItems.map((item) => (
-                <Link
-                  key={item.label}
-                  to={item.path}
-                  onClick={(e) => handleNavClick(e, item.path)}
-                  className={`relative z-10 px-4 py-2 text-sm font-semibold rounded-full transition-all duration-300 ${isActive(item.path)
-                    ? 'bg-gradient-to-r from-blue-500 to-purple-500 text-white shadow-lg shadow-blue-500/25'
-                    : 'text-slate-700 hover:text-white hover:bg-gradient-to-r hover:from-blue-400 hover:to-purple-400 hover:shadow-md hover:shadow-blue-400/20'
-                    }`}
-                >
-                  {item.label}
-                </Link>
+                <div key={item.label} className="relative group">
+                  <Link
+                    to={item.path}
+                    onClick={(e) => handleNavClick(e, item.path)}
+                    className={`relative z-10 px-4 py-2 text-sm font-semibold rounded-full transition-all duration-300 inline-flex items-center gap-1 ${isActive(item.path)
+                      ? 'bg-gradient-to-r from-blue-500 to-purple-500 text-white shadow-lg shadow-blue-500/25'
+                      : 'text-slate-700 hover:text-white hover:bg-gradient-to-r hover:from-blue-400 hover:to-purple-400 hover:shadow-md hover:shadow-blue-400/20'
+                      }`}
+                  >
+                    {item.label}
+                    {item.children && <i className="ri-arrow-down-s-line text-xs font-bold mt-0.5"></i>}
+                  </Link>
+
+                  {/* Dropdown Menu */}
+                  {item.children && (
+                    <div className="absolute top-full left-1/2 -translate-x-1/2 pt-4 opacity-0 invisible group-hover:opacity-100 group-hover:visible transition-all duration-300 w-64 transform translate-y-2 group-hover:translate-y-0">
+                      <div className="bg-white/90 backdrop-blur-xl rounded-2xl shadow-xl border border-white/20 overflow-hidden p-2">
+                        <div className="flex flex-col gap-1">
+                          {item.children.map((child) => (
+                            <Link
+                              key={child.label}
+                              to={child.path}
+                              className="px-4 py-3 text-sm font-medium text-slate-700 hover:bg-blue-50 hover:text-blue-600 rounded-xl transition-colors text-left flex items-center justify-between group/item"
+                            >
+                              {child.label}
+                              <i className="ri-arrow-right-line opacity-0 group-hover/item:opacity-100 -translate-x-2 group-hover/item:translate-x-0 transition-all text-xs"></i>
+                            </Link>
+                          ))}
+                        </div>
+                      </div>
+                    </div>
+                  )}
+                </div>
               ))}
             </div>
           </nav>
@@ -136,22 +168,38 @@ const Header = () => {
             <nav className="py-4">
               <div className="px-4 space-y-1">
                 {navItems.map((item) => (
-                  <Link
-                    key={item.label}
-                    to={item.path}
-                    onClick={(e) => handleNavClick(e, item.path)}
-                    className={`relative z-10 block px-4 py-3 text-base font-semibold rounded-xl transition-all duration-300 ${isActive(item.path)
-                      ? 'text-white bg-gradient-to-r from-blue-500 to-purple-500 shadow-lg shadow-blue-500/25'
-                      : 'text-slate-700 hover:text-white hover:bg-gradient-to-r hover:from-blue-400 hover:to-purple-400 hover:shadow-md hover:shadow-blue-400/20'
-                      }`}
-                  >
-                    <div className="flex items-center justify-between">
-                      <span>{item.label}</span>
-                      {isActive(item.path) && (
-                        <div className="w-2 h-2 bg-gradient-to-r from-purple-400 to-pink-400 rounded-full animate-pulse shadow-sm"></div>
-                      )}
-                    </div>
-                  </Link>
+                  <div key={item.label}>
+                    <Link
+                      to={item.path}
+                      onClick={(e) => !item.children && handleNavClick(e, item.path)}
+                      className={`relative z-10 block px-4 py-2 text-base font-semibold rounded-xl transition-all duration-300 ${isActive(item.path)
+                        ? 'text-white bg-gradient-to-r from-blue-500 to-purple-500 shadow-lg shadow-blue-500/25'
+                        : 'text-slate-700 hover:text-white hover:bg-gradient-to-r hover:from-blue-400 hover:to-purple-400 hover:shadow-md hover:shadow-blue-400/20'
+                        }`}
+                    >
+                      <div className="flex items-center justify-between">
+                        <span>{item.label}</span>
+                        {isActive(item.path) && (
+                          <div className="w-2 h-2 bg-gradient-to-r from-purple-400 to-pink-400 rounded-full animate-pulse shadow-sm"></div>
+                        )}
+                      </div>
+                    </Link>
+
+                    {item.children && (
+                      <div className="pl-6 pr-2 space-y-1 mt-1 border-l-2 border-slate-100 ml-4">
+                        {item.children.map(child => (
+                          <Link
+                            key={child.label}
+                            to={child.path}
+                            onClick={() => setIsMenuOpen(false)}
+                            className="block px-4 py-2 text-sm font-medium text-slate-600 hover:text-blue-600"
+                          >
+                            {child.label}
+                          </Link>
+                        ))}
+                      </div>
+                    )}
+                  </div>
                 ))}
               </div>
 

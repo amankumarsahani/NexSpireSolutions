@@ -2,98 +2,119 @@ import { useEffect, useState } from 'react';
 import { Link } from 'react-router-dom';
 import { Helmet } from 'react-helmet-async';
 import { motion, useScroll, useSpring, AnimatePresence } from 'framer-motion';
-import { clsx } from 'clsx';
-import { twMerge } from 'tailwind-merge';
+import RelatedServices from '../components/seo/RelatedServices';
+import AreasWeServe from '../components/seo/AreasWeServe';
 
-// Utility for tailwind class merging
-function cn(...inputs) {
-    return twMerge(clsx(inputs));
-}
-
-const FadeIn = ({ children, className, delay = 0 }) => {
-    return (
-        <motion.div
-            initial={{ opacity: 0, y: 20 }}
-            whileInView={{ opacity: 1, y: 0 }}
-            viewport={{ once: true, margin: "-50px" }}
-            transition={{ duration: 0.7, delay, ease: [0.21, 0.47, 0.32, 0.98] }}
-            className={className}
-        >
-            {children}
-        </motion.div>
-    );
+// Refined Premium Styles
+const serviceStyles = {
+    blue: {
+        gradient: "from-blue-500 to-indigo-600",
+        shadow: "shadow-blue-500/20",
+        text: "text-blue-600",
+        bg: "bg-blue-50",
+        icon: "text-blue-500"
+    },
+    purple: {
+        gradient: "from-purple-500 to-fuchsia-600",
+        shadow: "shadow-purple-500/20",
+        text: "text-purple-600",
+        bg: "bg-purple-50",
+        icon: "text-purple-500"
+    },
+    emerald: {
+        gradient: "from-emerald-500 to-teal-600",
+        shadow: "shadow-emerald-500/20",
+        text: "text-emerald-600",
+        bg: "bg-emerald-50",
+        icon: "text-emerald-500"
+    },
+    orange: {
+        gradient: "from-orange-500 to-red-600",
+        shadow: "shadow-orange-500/20",
+        text: "text-orange-600",
+        bg: "bg-orange-50",
+        icon: "text-orange-500"
+    },
+    cyan: {
+        gradient: "from-cyan-500 to-blue-500",
+        shadow: "shadow-cyan-500/20",
+        text: "text-cyan-600",
+        bg: "bg-cyan-50",
+        icon: "text-cyan-500"
+    }
 };
+
+const FadeIn = ({ children, className, delay = 0 }) => (
+    <motion.div
+        initial={{ opacity: 0, y: 20 }}
+        whileInView={{ opacity: 1, y: 0 }}
+        viewport={{ once: true, margin: "-50px" }}
+        transition={{ duration: 0.6, delay, ease: "easeOut" }}
+        className={className}
+    >
+        {children}
+    </motion.div>
+);
 
 const ServiceCard = ({ service, index }) => {
-    return (
-        <motion.div
-            initial={{ opacity: 0, y: 30 }}
-            whileInView={{ opacity: 1, y: 0 }}
-            viewport={{ once: true }}
-            transition={{ duration: 0.5, delay: index * 0.1 }}
-            className="group relative rounded-[2rem] bg-white border border-gray-100 hover:border-blue-100 shadow-sm hover:shadow-2xl hover:shadow-blue-500/10 transition-all duration-500 overflow-hidden flex flex-col"
-        >
-            {/* Image Header */}
-            <div className="h-48 overflow-hidden relative">
-                <div className={`absolute inset-0 bg-${service.color}-600/10 group-hover:bg-${service.color}-600/0 transition-colors duration-500 z-10`}></div>
-                <img
-                    src={service.image}
-                    alt={service.title}
-                    className="w-full h-full object-cover transform group-hover:scale-110 transition-transform duration-700"
-                />
-            </div>
+    const styles = serviceStyles[service.color] || serviceStyles.blue;
 
-            <div className="p-8 flex-1 flex flex-col relative z-20 bg-white">
-                <div className={`w-14 h-14 rounded-2xl bg-${service.color}-50 flex items-center justify-center mb-6 text-2xl text-${service.color}-600 group-hover:scale-110 transition-transform duration-500 -mt-16 shadow-lg border-4 border-white`}>
-                    <i className={service.icon}></i>
+    return (
+        <Link to={service.link} className="block h-full group perspective-1000">
+            <motion.div
+                initial={{ opacity: 0, y: 30 }}
+                whileInView={{ opacity: 1, y: 0 }}
+                viewport={{ once: true }}
+                transition={{ duration: 0.5, delay: index * 0.1 }}
+                className="relative h-full bg-white rounded-[2rem] p-8 transition-all duration-500 hover:shadow-2xl hover:-translate-y-2 border border-slate-100 overflow-hidden"
+            >
+                {/* Gradient Blob Background Effect */}
+                <div className={`absolute -top-20 -right-20 w-60 h-60 bg-gradient-to-br ${styles.gradient} opacity-[0.08] blur-3xl rounded-full group-hover:opacity-15 transition-opacity duration-500`}></div>
+
+                {/* Icon Container */}
+                <div className="relative mb-8 inline-block">
+                    <div className={`relative z-10 w-20 h-20 rounded-2xl ${styles.bg} flex items-center justify-center text-3xl ${styles.icon} transition-transform duration-500 group-hover:scale-110 group-hover:rotate-3 shadow-sm`}>
+                        <i className={service.icon}></i>
+                    </div>
+                    <div className={`absolute inset-0 bg-gradient-to-br ${styles.gradient} opacity-20 blur-xl rounded-2xl transform scale-0 group-hover:scale-125 transition-transform duration-500`}></div>
                 </div>
 
-                <h3 className="text-2xl font-bold mb-4 group-hover:text-blue-600 transition-colors">{service.title}</h3>
-                <p className="text-gray-600 mb-8 leading-relaxed flex-1">{service.description}</p>
+                {/* Content */}
+                <div className="relative z-10">
+                    <h3 className="text-2xl font-bold text-gray-900 mb-4 group-hover:text-transparent group-hover:bg-clip-text group-hover:bg-gradient-to-r group-hover:scale-[1.02] origin-left transition-all duration-300" style={{ backgroundImage: `linear-gradient(to right, var(--tw-gradient-stops))` }}>
+                        <span className={`bg-gradient-to-r ${styles.gradient} bg-clip-text`}>
+                            {service.title}
+                        </span>
+                    </h3>
 
-                <ul className="space-y-3 mt-auto">
-                    {service.features.map((feature, idx) => (
-                        <li key={idx} className="flex items-center gap-3 text-sm font-medium text-gray-500">
-                            <span className={`w-1.5 h-1.5 rounded-full bg-${service.color}-500`}></span>
-                            {feature}
-                        </li>
-                    ))}
-                </ul>
-            </div>
-        </motion.div>
-    );
-};
+                    <p className="text-gray-600 leading-relaxed mb-8 min-h-[4.5rem]">
+                        {service.description}
+                    </p>
 
-const AccordionItem = ({ question, answer, isOpen, onClick }) => {
-    return (
-        <div className="border-b border-gray-100 last:border-0">
-            <button
-                className="w-full py-6 flex items-center justify-between text-left focus:outline-none group"
-                onClick={onClick}
-            >
-                <span className={cn("text-lg font-bold transition-colors", isOpen ? "text-blue-600" : "text-gray-900 group-hover:text-blue-600")}>
-                    {question}
-                </span>
-                <span className={cn("w-8 h-8 rounded-full flex items-center justify-center transition-all duration-300", isOpen ? "bg-blue-100 text-blue-600 rotate-180" : "bg-gray-100 text-gray-500 group-hover:bg-blue-50")}>
-                    <i className="ri-arrow-down-s-line text-xl"></i>
-                </span>
-            </button>
-            <AnimatePresence>
-                {isOpen && (
-                    <motion.div
-                        initial={{ height: 0, opacity: 0 }}
-                        animate={{ height: "auto", opacity: 1 }}
-                        exit={{ height: 0, opacity: 0 }}
-                        transition={{ duration: 0.3, ease: "easeInOut" }}
-                        className="overflow-hidden"
-                    >
-                        <p className="pb-6 text-gray-600 leading-relaxed">
-                            {answer}
-                        </p>
-                    </motion.div>
-                )}
-            </AnimatePresence>
-        </div>
+                    {/* Features List */}
+                    <div className="space-y-4 mb-8">
+                        {service.features.map((feature, idx) => (
+                            <div key={idx} className="flex items-center gap-3">
+                                <div className={`w-1.5 h-1.5 rounded-full bg-gradient-to-r ${styles.gradient}`}></div>
+                                <span className="text-sm font-medium text-gray-500 group-hover:text-gray-700 transition-colors">
+                                    {feature}
+                                </span>
+                            </div>
+                        ))}
+                    </div>
+
+                    {/* CTA Button */}
+                    <div className="flex items-center text-sm font-bold mt-auto group/btn">
+                        <span className={`bg-gradient-to-r ${styles.gradient} bg-clip-text text-transparent mr-2`}>
+                            Explore Service
+                        </span>
+                        <div className={`w-8 h-8 rounded-full flex items-center justify-center bg-gray-50 group-hover/btn:bg-gray-100 transition-colors`}>
+                            <i className={`ri-arrow-right-line ${styles.text} group-hover/btn:translate-x-1 transition-transform`}></i>
+                        </div>
+                    </div>
+                </div>
+            </motion.div>
+        </Link>
     );
 };
 
@@ -109,194 +130,144 @@ const ServicesPage = () => {
         restDelta: 0.001
     });
 
-    const [openFaqIndex, setOpenFaqIndex] = useState(0);
-
     const services = [
         {
             title: "Custom Web Development",
-            description: "We build scalable, high-performance web applications tailored to your business needs using the latest technologies.",
-            icon: "ri-code-s-slash-line",
+            description: "Enterprise-grade web applications built with React, Next.js, and scaling architectures for maximum performance.",
+            icon: "ri-layout-masonry-line",
             color: "blue",
-            image: "https://images.unsplash.com/photo-1498050108023-c5249f4df085?auto=format&fit=crop&q=80&w=800",
-            features: ["React & Next.js", "Progressive Web Apps", "Enterprise Solutions", "API Integration"]
+            link: "/services/custom-web-development",
+            features: ["Scalable SaaS Platforms", "Progressive Web Apps (PWA)", "High-Performance APIs"]
         },
         {
             title: "Mobile App Development",
-            description: "Create engaging native and cross-platform mobile experiences that users love and retain.",
+            description: "Native and cross-platform mobile experiences that engage users and drive retention across iOS and Android.",
             icon: "ri-smartphone-line",
             color: "purple",
-            image: "https://images.unsplash.com/photo-1512941937669-90a1b58e7e9c?auto=format&fit=crop&q=80&w=800",
-            features: ["iOS & Android", "Flutter & React Native", "App Store Optimization", "UI/UX Design"]
-        },
-        {
-            title: "Cloud Infrastructure",
-            description: "Secure, scalable, and cost-effective cloud solutions to power your digital transformation journey.",
-            icon: "ri-cloud-line",
-            color: "cyan",
-            image: "https://images.unsplash.com/photo-1451187580459-43490279c0fa?auto=format&fit=crop&q=80&w=800",
-            features: ["AWS & Azure", "DevOps Automation", "Cloud Migration", "Serverless Architecture"]
+            link: "/services/mobile-app-development",
+            features: ["iOS & Android Native", "Flutter & React Native", "App Store Optimization"]
         },
         {
             title: "AI & Machine Learning",
-            description: "Leverage the power of Artificial Intelligence to automate processes and gain actionable insights.",
+            description: "Intelligent solutions that automate workflows, predict trends, and unlock deep insights from your data.",
             icon: "ri-brain-line",
             color: "emerald",
-            image: "https://images.unsplash.com/photo-1677442136019-21780ecad995?auto=format&fit=crop&q=80&w=800",
-            features: ["Predictive Analytics", "NLP & Chatbots", "Computer Vision", "Data Mining"]
+            link: "/services/ai-machine-learning",
+            features: ["Predictive Analytics", "NLP / Chatbots", "Computer Vision Systems"]
         },
         {
-            title: "UI/UX Design",
-            description: "User-centric design that combines aesthetics with functionality to create intuitive digital experiences.",
-            icon: "ri-palette-line",
-            color: "purple",
-            image: "https://images.unsplash.com/photo-1561070791-2526d30994b5?auto=format&fit=crop&q=80&w=800",
-            features: ["User Research", "Wireframing", "Prototyping", "Design Systems"]
+            title: "Cloud Solutions",
+            description: "Secure, scalable cloud infrastructure design and DevOps automation to accelerate your shipment cycles.",
+            icon: "ri-cloud-windy-line",
+            color: "cyan",
+            link: "/services/cloud-solutions",
+            features: ["AWS/Azure Architecture", "Cloud Migration Strategy", "DevOps & CI/CD Pipelines"]
         },
         {
-            title: "E-Commerce Solutions",
-            description: "Robust online stores that drive sales and provide seamless shopping experiences for your customers.",
-            icon: "ri-shopping-bag-3-line",
+            title: "E-Commerce",
+            description: "High-conversion online stores and marketplaces designed to maximize sales and simplify management.",
+            icon: "ri-shopping-cart-2-line",
             color: "orange",
-            image: "https://images.unsplash.com/photo-1556742049-0cfed4f7a07d?auto=format&fit=crop&q=80&w=800",
-            features: ["Shopify & WooCommerce", "Custom Payment Gateways", "Inventory Management", "Conversion Optimization"]
+            link: "/services/ecommerce-development",
+            features: ["Shopify & WooCommerce", "Multi-vendor Marketplaces", "Secure Payment Gateways"]
         }
     ];
 
-    const process = [
-        { step: "01", title: "Discovery", description: "Understanding your goals and requirements." },
-        { step: "02", title: "Strategy", description: "Creating a roadmap and technical architecture." },
-        { step: "03", title: "Design", description: "Crafting intuitive and beautiful interfaces." },
-        { step: "04", title: "Development", description: "Building with clean, scalable code." },
-        { step: "05", title: "Launch", description: "Testing, deployment, and ongoing support." }
-    ];
-
-    // Tech Stack Icons (using Devicon URLs)
-    const techStack = [
-        { name: "React", icon: "https://cdn.jsdelivr.net/gh/devicons/devicon/icons/react/react-original.svg" },
-        { name: "Next.js", icon: "https://cdn.jsdelivr.net/gh/devicons/devicon/icons/nextjs/nextjs-original.svg" },
-        { name: "Node.js", icon: "https://cdn.jsdelivr.net/gh/devicons/devicon/icons/nodejs/nodejs-original.svg" },
-        { name: "TypeScript", icon: "https://cdn.jsdelivr.net/gh/devicons/devicon/icons/typescript/typescript-original.svg" },
-        { name: "Python", icon: "https://cdn.jsdelivr.net/gh/devicons/devicon/icons/python/python-original.svg" },
-        { name: "AWS", icon: "https://cdn.jsdelivr.net/gh/devicons/devicon/icons/amazonwebservices/amazonwebservices-original-wordmark.svg" },
-        { name: "Docker", icon: "https://cdn.jsdelivr.net/gh/devicons/devicon/icons/docker/docker-original.svg" },
-        { name: "Kubernetes", icon: "https://cdn.jsdelivr.net/gh/devicons/devicon/icons/kubernetes/kubernetes-plain.svg" },
-        { name: "Flutter", icon: "https://cdn.jsdelivr.net/gh/devicons/devicon/icons/flutter/flutter-original.svg" },
-        { name: "GraphQL", icon: "https://cdn.jsdelivr.net/gh/devicons/devicon/icons/graphql/graphql-plain.svg" },
-        { name: "PostgreSQL", icon: "https://cdn.jsdelivr.net/gh/devicons/devicon/icons/postgresql/postgresql-original.svg" },
-        { name: "MongoDB", icon: "https://cdn.jsdelivr.net/gh/devicons/devicon/icons/mongodb/mongodb-original.svg" },
-        { name: "Redis", icon: "https://cdn.jsdelivr.net/gh/devicons/devicon/icons/redis/redis-original.svg" },
-        { name: "Figma", icon: "https://cdn.jsdelivr.net/gh/devicons/devicon/icons/figma/figma-original.svg" }
-    ];
-
-    const testimonials = [
-        {
-            quote: "Nexspire transformed our outdated platform into a modern, high-speed application. Their attention to detail is unmatched.",
-            author: "Sarah Jenkins",
-            role: "CTO, FinTech Global",
-            company: "FinTech Global"
-        },
-        {
-            quote: "The team's ability to understand our complex requirements and deliver a scalable solution was impressive. Highly recommended.",
-            author: "Michael Chen",
-            role: "Founder, HealthAI",
-            company: "HealthAI"
-        },
-        {
-            quote: "From design to deployment, the process was seamless. They truly care about the product's success.",
-            author: "Emily Rodriguez",
-            role: "VP of Product, EcoComm",
-            company: "EcoComm"
-        },
-        {
-            quote: "A true partner in every sense. They anticipated our needs and delivered beyond expectations.",
-            author: "David Kim",
-            role: "CEO, StartUp Inc",
-            company: "StartUp Inc"
-        }
-    ];
-
-    const faqs = [
-        {
-            question: "How do you ensure project quality?",
-            answer: "We follow strict coding standards, conduct thorough code reviews, and implement automated testing pipelines (CI/CD). Our QA team rigorously tests every feature before deployment."
-        },
-        {
-            question: "What is your typical project timeline?",
-            answer: "Timelines vary based on complexity. A simple MVP might take 4-6 weeks, while a complex enterprise platform could take 3-6 months. We provide detailed roadmaps during the discovery phase."
-        },
-        {
-            question: "Do you provide post-launch support?",
-            answer: "Yes, we offer various support and maintenance packages to ensure your application remains secure, up-to-date, and performs optimally after launch."
-        },
-        {
-            question: "Can you work with our existing team?",
-            answer: "Absolutely. We often augment existing teams, providing specialized expertise or additional capacity to help meet deadlines and goals."
-        }
+    const stats = [
+        { label: "Projects Delivered", value: "150+" },
+        { label: "Client Retention", value: "95%" },
+        { label: "Years Experience", value: "5+" },
+        { label: "Global Clients", value: "12+" }
     ];
 
     return (
-        <div className="min-h-screen bg-white font-sans text-gray-900 selection:bg-blue-600 selection:text-white overflow-hidden">
+        <div className="min-h-screen bg-[#FDFDFD] font-sans text-gray-900 selection:bg-blue-600 selection:text-white">
             <Helmet>
-                <title>Web, Mobile & AI Development Services | Mohali & Global</title>
-                <meta name="description" content="Premium software services: Custom Web Development, Mobile Apps, and AI Solutions. Top-rated freelance experts in Mohali & Chandigarh delivering enterprise-grade quality." />
-                <meta name="keywords" content="web development services, mobile app development mohali, custom software agency, freelance web designer chandigarh, AI solutions, cloud infrastructure, enterprise software, best it company mohali" />
+                <title>Our Services - Web, Mobile, AI & Cloud | Nexspire Solutions</title>
+                <meta name="description" content="Explore our comprehensive software development services. From custom web and mobile apps to AI integration and cloud solutions." />
                 <link rel="canonical" href="https://nexspiresolutions.co.in/services" />
-                <meta property="og:title" content="Premium Dev Services - Mohali Experts, Global Quality" />
-                <meta property="og:description" content="From MVP to Enterprise. World-class engineering services, locally available in Tricity." />
-                <meta property="og:url" content="https://nexspiresolutions.co.in/services" />
             </Helmet>
 
             {/* Scroll Progress Bar */}
             <motion.div
-                className="fixed top-0 left-0 right-0 h-1 bg-blue-600 origin-left z-50"
+                className="fixed top-0 left-0 right-0 h-1 bg-gradient-to-r from-blue-600 via-purple-600 to-pink-600 origin-left z-50"
                 style={{ scaleX }}
             />
 
-            {/* Hero Section - 3D Gradient Mesh Style */}
-            <section className="relative min-h-[85vh] flex items-center pt-20 overflow-hidden bg-gray-950 text-white">
-                {/* CSS-based Animated Background */}
+            {/* Hero Section */}
+            <section className="relative pt-32 pb-24 overflow-hidden bg-slate-900 text-white rounded-b-[3rem] shadow-2xl z-20">
+                {/* Background Image */}
                 <div className="absolute inset-0 z-0">
-                    <div className="absolute inset-0 bg-gradient-to-br from-gray-900 via-blue-950 to-purple-950"></div>
-                    <div className="absolute inset-0 bg-[url('https://grainy-gradients.vercel.app/noise.svg')] opacity-10 mix-blend-overlay"></div>
-                    <div className="absolute inset-0 bg-[url('https://plus.unsplash.com/premium_photo-1682124651258-410b25fa9dc0?q=80&w=1621&auto=format&fit=crop&ixlib=rb-4.1.0&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D')] bg-cover bg-center opacity-30 mix-blend-soft-light"></div>
+                    <img
+                        src="https://images.unsplash.com/photo-1518770660439-4636190af475?q=80&w=2070&auto=format&fit=crop"
+                        alt="Services Hero"
+                        className="w-full h-full object-cover opacity-50 transform scale-105"
+                    />
+                    <div className="absolute inset-0 bg-gradient-to-b from-slate-900/50 via-slate-900/80 to-slate-900"></div>
                 </div>
 
-                <div className="container-custom relative z-10">
+                <div className="absolute inset-0 bg-[url('https://grainy-gradients.vercel.app/noise.svg')] opacity-20 mix-blend-soft-light"></div>
+                <div className="absolute top-0 right-0 w-[600px] h-[600px] bg-blue-600/20 rounded-full blur-[120px] -translate-y-1/2 translate-x-1/2 animate-pulse"></div>
+                <div className="absolute bottom-0 left-0 w-[500px] h-[500px] bg-purple-600/20 rounded-full blur-[100px] translate-y-1/2 -translate-x-1/2"></div>
+
+                <div className="container-custom relative z-10 text-center">
                     <motion.div
-                        initial={{ opacity: 0, y: 50 }}
+                        initial={{ opacity: 0, y: 20 }}
                         animate={{ opacity: 1, y: 0 }}
-                        transition={{ duration: 1, ease: "easeOut" }}
-                        className="max-w-4xl mx-auto text-center"
+                        className="inline-flex items-center gap-2 px-4 py-2 rounded-full bg-white/5 border border-white/10 backdrop-blur-md mb-8"
                     >
-                        <span className="inline-block py-2 px-6 rounded-full bg-white/5 border border-white/10 backdrop-blur-md text-blue-300 font-medium mb-8">
-                            World-Class Engineering
-                        </span>
-                        <h1 className="text-6xl md:text-8xl font-bold tracking-tighter leading-tight mb-8">
-                            We Craft <br />
-                            <span className="text-transparent bg-clip-text bg-gradient-to-r from-blue-400 via-purple-400 to-pink-400">Digital Excellence.</span>
-                        </h1>
-                        <p className="text-xl text-gray-400 max-w-2xl mx-auto leading-relaxed">
-                            From complex enterprise platforms to stunning mobile apps, we deliver software that defines the future of your business.
-                        </p>
+                        <span className="w-2 h-2 rounded-full bg-green-400 animate-pulse"></span>
+                        <span className="text-sm font-medium text-blue-100">Engineering Excellence</span>
                     </motion.div>
+
+                    <motion.h1
+                        initial={{ opacity: 0, y: 30 }}
+                        animate={{ opacity: 1, y: 0 }}
+                        transition={{ delay: 0.1 }}
+                        className="text-5xl md:text-7xl font-bold mb-8 tracking-tight leading-tight"
+                    >
+                        We Engineer <span className="text-transparent bg-clip-text bg-gradient-to-r from-blue-400 via-purple-400 to-pink-400">Digital Growth</span> <br className="hidden md:block" />
+                        For Global Brands.
+                    </motion.h1>
+
+                    <motion.p
+                        initial={{ opacity: 0, y: 30 }}
+                        animate={{ opacity: 1, y: 0 }}
+                        transition={{ delay: 0.2 }}
+                        className="max-w-2xl mx-auto text-xl text-gray-400 leading-relaxed mb-12"
+                    >
+                        Strategic software solutions that solve complex business problems. Built for scale, security, and performance.
+                    </motion.p>
                 </div>
             </section>
 
-            {/* Tech Stack Marquee - Icons */}
-            <section className="py-8 bg-gray-900 border-t border-gray-800 overflow-hidden">
-                <div className="flex gap-16 animate-marquee whitespace-nowrap items-center">
-                    {[...techStack, ...techStack].map((tech, i) => (
-                        <div key={i} className="flex flex-col items-center gap-2 group opacity-50 hover:opacity-100 transition-opacity duration-300">
-                            <img src={tech.icon} alt={tech.name} className="h-12 w-auto grayscale group-hover:grayscale-0 transition-all duration-300" />
-                            <span className="text-xs font-medium text-gray-500 uppercase tracking-wider opacity-0 group-hover:opacity-100 transition-opacity">{tech.name}</span>
-                        </div>
-                    ))}
-                </div>
-            </section>
-
-            {/* Services Grid - With Images */}
-            <section className="py-32 bg-gray-50 relative">
+            {/* Stats Bar */}
+            <section className="relative -mt-12 z-30 px-6 mb-20">
                 <div className="container-custom">
+                    <div className="bg-white rounded-2xl shadow-xl shadow-slate-200/50 p-8 md:p-10 border border-slate-100 grid grid-cols-2 md:grid-cols-4 gap-8 backdrop-blur-xl">
+                        {stats.map((stat, i) => (
+                            <div key={i} className="text-center group cursor-default">
+                                <div className="text-4xl md:text-5xl font-bold text-slate-900 group-hover:text-blue-600 transition-colors duration-300 mb-2 font-display">
+                                    {stat.value}
+                                </div>
+                                <div className="text-gray-500 font-medium text-xs md:text-sm uppercase tracking-widest">
+                                    {stat.label}
+                                </div>
+                            </div>
+                        ))}
+                    </div>
+                </div>
+            </section>
+
+            {/* Services Grid */}
+            <section className="py-20 relative">
+                <div className="absolute top-1/2 left-0 w-full h-px bg-gradient-to-r from-transparent via-slate-200 to-transparent"></div>
+                <div className="container-custom relative z-10">
+                    <div className="text-center mb-16">
+                        <h2 className="text-3xl md:text-4xl font-bold text-gray-900 mb-4">Our Core Capabilities</h2>
+                        <p className="text-gray-500 max-w-2xl mx-auto">Providing end-to-end development services to help you scale your business.</p>
+                    </div>
+
                     <div className="grid md:grid-cols-2 lg:grid-cols-3 gap-8">
                         {services.map((service, index) => (
                             <ServiceCard key={index} service={service} index={index} />
@@ -305,105 +276,60 @@ const ServicesPage = () => {
                 </div>
             </section>
 
-            {/* Process Section */}
-            <section className="py-32 bg-white overflow-hidden">
+            {/* Tech Stack Marquee */}
+            <section className="py-20 bg-slate-50 border-y border-slate-100 overflow-hidden">
+                <div className="text-center mb-10">
+                    <h2 className="text-lg font-semibold text-gray-400 uppercase tracking-widest">Trusted Technology Stack</h2>
+                </div>
+                <div className="flex animate-marquee gap-16 whitespace-nowrap opacity-50 hover:opacity-80 transition-opacity">
+                    {[
+                        "React", "Next.js", "Node.js", "Python", "AWS", "Docker", "Kubernetes", "Flutter",
+                        "React", "Next.js", "Node.js", "Python", "AWS", "Docker", "Kubernetes", "Flutter"
+                    ].map((tech, i) => (
+                        <span key={i} className="text-5xl font-bold text-slate-300 pointer-events-none select-none font-display">
+                            {tech}
+                        </span>
+                    ))}
+                </div>
+            </section>
+
+            {/* SEO Internal Linking Components */}
+            <div className="bg-white py-24">
                 <div className="container-custom">
-                    <div className="flex flex-col md:flex-row gap-16 items-center">
-                        <div className="md:w-1/2">
-                            <FadeIn>
-                                <h2 className="text-5xl font-bold tracking-tight mb-8">Our Process</h2>
-                                <p className="text-xl text-gray-500 leading-relaxed mb-12">
-                                    We follow a rigorous, agile methodology to ensure every project is delivered on time, within budget, and to the highest standards of quality.
-                                </p>
-                                <div className="space-y-8">
-                                    {process.map((step, i) => (
-                                        <div key={i} className="flex gap-6 group">
-                                            <div className="text-4xl font-bold text-gray-200 group-hover:text-blue-600 transition-colors duration-300">
-                                                {step.step}
-                                            </div>
-                                            <div>
-                                                <h3 className="text-xl font-bold mb-2 text-gray-900">{step.title}</h3>
-                                                <p className="text-gray-500">{step.description}</p>
-                                            </div>
-                                        </div>
-                                    ))}
-                                </div>
-                            </FadeIn>
+                    <div className="mb-20">
+                        <div className="flex items-center justify-between mb-8">
+                            <h2 className="text-2xl font-bold">Related Capabilities</h2>
+                            <Link to="/services" className="text-blue-600 font-medium hover:underline">View All Services</Link>
                         </div>
-                        <div className="md:w-1/2 relative">
-                            <div className="absolute inset-0 bg-gradient-to-tr from-blue-600 to-purple-600 rounded-[3rem] rotate-3 opacity-10"></div>
-                            <div className="relative bg-gray-900 rounded-[3rem] p-8 shadow-2xl rotate-[-3deg] hover:rotate-0 transition-all duration-500 aspect-square flex items-center justify-center overflow-hidden">
-                                <div className="absolute inset-0 bg-[url('https://images.unsplash.com/photo-1522071820081-009f0129c71c?auto=format&fit=crop&q=80&w=800')] bg-cover bg-center opacity-20"></div>
-                                <div className="text-center text-white relative z-10">
-                                    <div className="text-6xl mb-4">🚀</div>
-                                    <h3 className="text-3xl font-bold mb-2">Ready to Launch?</h3>
-                                    <p className="text-gray-400">Let's turn your vision into reality.</p>
-                                </div>
-                            </div>
-                        </div>
+                        <RelatedServices currentService="Services Overview" />
                     </div>
                 </div>
-            </section>
+            </div>
 
-            {/* Testimonials Slider */}
-            <section className="py-32 bg-gray-900 text-white overflow-hidden relative">
-                <div className="absolute inset-0 bg-[url('https://grainy-gradients.vercel.app/noise.svg')] opacity-10"></div>
+            {/* Global Markets Section - Full Width */}
+            <AreasWeServe />
+
+            {/* Lead Magnet Section */}
+            <div className="bg-white">
+                <LeadMagnet />
+            </div>
+
+            {/* CTA */}
+            <section className="py-32 bg-slate-900 text-white text-center relative overflow-hidden">
+                <div className="absolute inset-0 bg-[url('https://grainy-gradients.vercel.app/noise.svg')] opacity-20"></div>
+                {/* Animated Rings */}
+                <div className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-[600px] h-[600px] border border-white/5 rounded-full animate-[spin_10s_linear_infinite]"></div>
+                <div className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-[800px] h-[800px] border border-white/5 rounded-full animate-[spin_15s_linear_infinite_reverse]"></div>
+
                 <div className="container-custom relative z-10">
-                    <FadeIn>
-                        <h2 className="text-4xl md:text-5xl font-bold text-center mb-20">Trusted by Innovators</h2>
-                    </FadeIn>
-
-                    {/* Infinite Slider */}
-                    <div className="relative w-full overflow-hidden">
-                        <div className="flex animate-marquee gap-8 w-max">
-                            {[...testimonials, ...testimonials, ...testimonials].map((t, i) => (
-                                <div key={i} className="w-[400px] bg-white/5 backdrop-blur-md p-8 rounded-3xl border border-white/10 hover:bg-white/10 transition-colors flex-shrink-0">
-                                    <div className="text-blue-400 text-4xl mb-6">"</div>
-                                    <p className="text-lg text-gray-300 mb-8 leading-relaxed italic">
-                                        {t.quote}
-                                    </p>
-                                    <div>
-                                        <div className="font-bold text-white">{t.author}</div>
-                                        <div className="text-sm text-gray-500">{t.role}</div>
-                                        <div className="text-xs text-blue-400 mt-1">{t.company}</div>
-                                    </div>
-                                </div>
-                            ))}
-                        </div>
-                    </div>
-                </div>
-            </section>
-
-            {/* FAQ Section */}
-            <section className="py-32 bg-gray-50">
-                <div className="container-custom max-w-4xl">
-                    <FadeIn>
-                        <h2 className="text-4xl font-bold text-center mb-16">Frequently Asked Questions</h2>
-                        <div className="bg-white rounded-[2rem] p-8 md:p-12 shadow-xl border border-gray-100">
-                            {faqs.map((faq, index) => (
-                                <AccordionItem
-                                    key={index}
-                                    question={faq.question}
-                                    answer={faq.answer}
-                                    isOpen={openFaqIndex === index}
-                                    onClick={() => setOpenFaqIndex(index === openFaqIndex ? -1 : index)}
-                                />
-                            ))}
-                        </div>
-                    </FadeIn>
-                </div>
-            </section>
-
-            {/* CTA - Minimalist */}
-            <section className="py-32 bg-white text-center relative overflow-hidden">
-                <div className="container-custom relative z-10">
-                    <FadeIn>
-                        <h2 className="text-5xl md:text-7xl font-bold mb-12 tracking-tighter text-gray-900">Start Your Journey</h2>
-                        <Link to="/contact" className="inline-flex items-center gap-4 px-12 py-6 bg-gray-900 text-white rounded-full text-xl font-bold hover:bg-blue-600 transition-all duration-300 group shadow-2xl">
-                            Book Consultation
-                            <i className="ri-arrow-right-line group-hover:translate-x-2 transition-transform"></i>
-                        </Link>
-                    </FadeIn>
+                    <h2 className="text-5xl md:text-7xl font-bold mb-8 tracking-tight">Ready to Scale?</h2>
+                    <p className="text-xl text-gray-400 mb-12 max-w-2xl mx-auto">
+                        Book a free 30-minute consultation with our technical team.
+                    </p>
+                    <Link to="/contact" className="group inline-flex items-center gap-3 px-10 py-5 bg-white text-slate-900 rounded-full text-lg font-bold transition-all hover:scale-105 shadow-2xl hover:shadow-white/20">
+                        Get Your Free Quote
+                        <i className="ri-arrow-right-line group-hover:translate-x-1 transition-transform"></i>
+                    </Link>
                 </div>
             </section>
         </div>

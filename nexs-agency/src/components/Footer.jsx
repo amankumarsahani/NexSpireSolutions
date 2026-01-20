@@ -5,22 +5,27 @@ const Footer = () => {
 
   const footerLinks = {
     Services: [
-      { name: "Web Development", href: "/services" },
-      { name: "Mobile Apps", href: "/services" },
-      { name: "Cloud Solutions", href: "/services" },
-      { name: "UI/UX Design", href: "/services" }
+      { name: "Custom Web Development", href: "/services/custom-web-development" },
+      { name: "Mobile App Development", href: "/services/mobile-app-development" },
+      { name: "AI & Machine Learning", href: "/services/ai-machine-learning" },
+      { name: "Cloud Solutions", href: "/services/cloud-solutions" },
+      { name: "E-commerce Solutions", href: "/services/ecommerce-development" }
+    ],
+    Locations: [
+      { name: "Web Dev in London", href: "/software-development-company/london" },
+      { name: "Web Dev in New York", href: "/software-development-company/new-york" },
+      { name: "Web Dev in Dubai", href: "/software-development-company/dubai" },
+      { name: "Web Dev in Sydney", href: "/software-development-company/sydney" },
+      { name: "Web Dev in Toronto", href: "/software-development-company/toronto" },
+      { name: "Web Dev in Bangalore", href: "/software-development-company/bangalore" }
     ],
     Company: [
       { name: "About Us", href: "/about" },
       { name: "Our Team", href: "/about" },
       { name: "Portfolio", href: "/portfolio" },
-      { name: "Contact", href: "/contact" }
-    ],
-    Resources: [
+      { name: "Contact", href: "/contact" },
       { name: "Blog", href: "/blog" },
-      { name: "Case Studies", href: "/blog" },
-      { name: "Documentation", href: "/blog" },
-      { name: "Support", href: "/contact" }
+      { name: "NexCRM", href: "/nexcrm" }
     ]
   };
 
@@ -32,7 +37,7 @@ const Footer = () => {
   ];
 
   return (
-    <footer className="bg-gray-900 text-white">
+    <footer className="bg-gray-900 text-white" >
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
         {/* Main Footer Content */}
         <div className="py-16">
@@ -128,7 +133,7 @@ const Footer = () => {
       </div>
 
       {/* Scroll to Top Button */}
-      <div className="fixed bottom-6 right-4 sm:right-6 z-50">
+      <div className="fixed bottom-6 right-4 sm:right-6 z-50" >
         <button
           onClick={() => window.scrollTo({ top: 0, behavior: 'smooth' })}
           className="w-14 h-14 sm:w-12 sm:h-12 bg-blue-600 rounded-full flex items-center justify-center shadow-xl hover:bg-blue-700 active:bg-blue-800 transition-all duration-300 hover:scale-105 active:scale-95"
@@ -136,8 +141,8 @@ const Footer = () => {
         >
           <i className="ri-arrow-up-line text-xl sm:text-lg text-white"></i>
         </button>
-      </div>
-    </footer>
+      </div >
+    </footer >
   );
 };
 

@@ -4,6 +4,7 @@ import { Helmet } from 'react-helmet-async';
 import { motion, AnimatePresence } from 'framer-motion';
 import { clsx } from 'clsx';
 import { twMerge } from 'tailwind-merge';
+import LeadMagnet from '../components/LeadMagnet';
 
 // Utility for tailwind class merging
 function cn(...inputs) {
@@ -33,71 +34,65 @@ const BlogPage = () => {
     }, []);
 
     const posts = [
-        // {
-        //     id: 1,
-        //     title: "The Future of AI in Web Development",
-        //     excerpt: "How artificial intelligence is reshaping the way we build and interact with the web. From automated testing to generative UI, the landscape is changing fast.",
-        //     category: "Technology",
-        //     author: "Aman Kumar",
-        //     date: "Mar 15, 2024",
-        //     readTime: "5 min read",
-        //     image: "https://images.unsplash.com/photo-1677442136019-21780ecad995?w=1200&q=80",
-        //     featured: true
-        // },
+        {
+            id: 1,
+            title: "Top 10 AI Trends Shaping Business in 2026",
+            excerpt: "Explore the key AI trends shaping the future of global business, from predictive analytics to generative AI, and how to adopt them.",
+            category: "Technology",
+            author: "Aman Kumar",
+            date: "Mar 15, 2024",
+            readTime: "5 min read",
+            image: "https://images.unsplash.com/photo-1677442136019-21780ecad995?w=1200&q=80",
+            featured: true,
+            slug: "ai-trends-2026"
+        },
         {
             id: 2,
-            title: "Mastering React Server Components",
-            excerpt: "A deep dive into the next generation of React architecture and performance optimization.",
-            category: "Development",
+            title: "React Native vs. Flutter: CEO's Guide for 2026",
+            excerpt: "Deciding between React Native and Flutter? We compare performance, developer cost, and time-to-market to help you choose the right stack.",
+            category: "Mobile",
             author: "Kshitij Bhardwaj",
             date: "Mar 12, 2024",
             readTime: "8 min read",
-            image: "https://images.unsplash.com/photo-1633356122544-f134324a6cee?w=800&q=80",
-            featured: false
+            image: "https://images.unsplash.com/photo-1512941937669-90a1b58e7e9c?w=800&q=80",
+            featured: false,
+            slug: "react-native-vs-flutter"
         },
         {
             id: 3,
-            title: "Designing for Accessibility",
-            excerpt: "Why inclusive design matters and how to implement it in your next project.",
-            category: "Design",
-            author: "Anu Kumar",
-            date: "Mar 10, 2024",
-            readTime: "6 min read",
-            image: "https://images.unsplash.com/photo-1586717791821-3f44a5638d48?w=800&q=80",
-            featured: false
+            title: "Cost of Building a Custom CRM in 2026",
+            excerpt: "How much does it cost to build a custom CRM? We break down the costs for MVPs, mid-sized, and enterprise solutions.",
+            category: "Enterprise",
+            author: "Aman Kumar",
+            date: "Mar 20, 2024",
+            readTime: "7 min read",
+            image: "https://images.unsplash.com/photo-1556742049-0cfed4f7a07d?w=800&q=80",
+            featured: false,
+            slug: "cost-of-custom-crm-2026"
         },
-        // {
-        //     id: 4,
-        //     title: "Cloud Native Architecture Patterns",
-        //     excerpt: "Best practices for building scalable and resilient applications on the cloud.",
-        //     category: "Cloud",
-        //     author: "Aman Kumar",
-        //     date: "Mar 08, 2024",
-        //     readTime: "10 min read",
-        //     image: "https://images.unsplash.com/photo-1451187580459-43490279c0fa?w=800&q=80",
-        //     featured: false
-        // },
+        {
+            id: 4,
+            title: "Migrating Legacy Monoliths to Microservices",
+            excerpt: "Is your legacy monolith slowing you down? Learn the strategic risks and rewards of migrating to a microservices architecture.",
+            category: "Cloud",
+            author: "Aman Kumar",
+            date: "Mar 25, 2024",
+            readTime: "6 min read",
+            image: "https://images.unsplash.com/photo-1451187580459-43490279c0fa?w=800&q=80",
+            featured: false,
+            slug: "monolith-to-microservices"
+        },
         {
             id: 5,
-            title: "The State of Mobile Dev in 2024",
-            excerpt: "Comparing Flutter, React Native, and Native development for modern apps.",
-            category: "Mobile",
+            title: "Why Your Business Needs a Progressive Web App (PWA)",
+            excerpt: "PWAs offer the best of mobile and web. Learn how they boost conversion rates, improve SEO, and cut development costs.",
+            category: "Web",
             author: "Kshitij Bhardwaj",
-            date: "Mar 05, 2024",
-            readTime: "7 min read",
-            image: "https://images.unsplash.com/photo-1512941937669-90a1b58e7e9c?w=800&q=80",
-            featured: false
-        },
-        {
-            id: 6,
-            title: "UI Trends to Watch",
-            excerpt: "From glassmorphism to bento grids, exploring the visual styles defining this year.",
-            category: "Design",
-            author: "Anu Kumar",
-            date: "Mar 01, 2024",
-            readTime: "4 min read",
-            image: "https://images.unsplash.com/photo-1561070791-2526d30994b5?w=800&q=80",
-            featured: false
+            date: "Mar 30, 2024",
+            readTime: "5 min read",
+            image: "https://images.unsplash.com/photo-1498050108023-c5249f4df085?w=800&q=80",
+            featured: false,
+            slug: "why-business-needs-pwa"
         }
     ];
 
@@ -115,18 +110,18 @@ const BlogPage = () => {
     return (
         <div className="min-h-screen bg-white font-sans text-gray-900 selection:bg-blue-600 selection:text-white">
             <Helmet>
-                <title>Tech Insights & Blog - Software Development Trends 2024 | Nexspire</title>
-                <meta name="description" content="Stay ahead of the curve with our expert insights on AI, Web Development, Cloud Computing, and Mobile Tech. Tutorials, trends, and thought leadership from Nexspire engineers." />
-                <meta name="keywords" content="tech blog, software development trends, react tutorials, AI insights, cloud computing articles, mobile dev tips, nexspire blog, engineering best practices" />
+                <title>Blog - Tech Insights & Trends | Nexspire Solutions</title>
+                <meta name="description" content="Stay updated with the latest trends in AI, Web Development, Mobile Apps, and Enterprise Software. Expert insights from Nexspire Solutions." />
+                <meta name="keywords" content="tech blog, AI trends 2026, React vs Angular, mobile app development trends, software development insights, nexspire blog" />
                 <link rel="canonical" href="https://nexspiresolutions.co.in/blog" />
-                <meta property="og:title" content="Nexspire Insights - The Future of Tech" />
-                <meta property="og:description" content="Deep dives into the technologies shaping our world. Read our latest articles." />
+                <meta property="og:title" content="Blog - Tech Insights & Trends | Nexspire Solutions" />
+                <meta property="og:description" content="Read expert articles on AI, Cloud, and Software Development." />
                 <meta property="og:url" content="https://nexspiresolutions.co.in/blog" />
             </Helmet>
 
             {/* Featured Post Hero */}
             {featuredPost && (
-                <section className="relative h-[90vh] flex items-end pb-24 group cursor-pointer overflow-hidden">
+                <Link to={`/blog/${featuredPost.slug}`} className="relative h-[90vh] flex items-end pb-24 group cursor-pointer overflow-hidden block">
                     <div className="absolute inset-0 z-0">
                         <motion.img
                             initial={{ scale: 1 }}
@@ -174,7 +169,7 @@ const BlogPage = () => {
                             </div>
                         </motion.div>
                     </div>
-                </section>
+                </Link>
             )}
 
             {/* Main Content */}
@@ -222,52 +217,53 @@ const BlogPage = () => {
                 >
                     <AnimatePresence>
                         {filteredPosts.filter(p => !p.featured).map((post, index) => (
-                            <motion.article
-                                layout
-                                initial={{ opacity: 0, scale: 0.9 }}
-                                animate={{ opacity: 1, scale: 1 }}
-                                exit={{ opacity: 0, scale: 0.9 }}
-                                transition={{ duration: 0.3 }}
-                                key={post.id}
-                                className="bg-white rounded-[2rem] overflow-hidden shadow-sm hover:shadow-2xl transition-all duration-500 group border border-gray-100 flex flex-col h-full hover:-translate-y-2"
-                            >
-                                <div className="relative h-64 overflow-hidden">
-                                    <img
-                                        src={post.image}
-                                        alt={post.title}
-                                        className="w-full h-full object-cover transition-transform duration-700 group-hover:scale-110"
-                                    />
-                                    <div className="absolute top-4 left-4">
-                                        <span className="px-3 py-1 bg-white/90 backdrop-blur-md text-gray-900 text-xs font-bold rounded-full shadow-sm">
-                                            {post.category}
-                                        </span>
-                                    </div>
-                                </div>
-                                <div className="p-8 flex-1 flex flex-col">
-                                    <div className="flex items-center gap-3 text-xs text-gray-500 mb-4 font-medium uppercase tracking-wider">
-                                        <span>{post.date}</span>
-                                        <span className="w-1 h-1 bg-gray-300 rounded-full"></span>
-                                        <span>{post.readTime}</span>
-                                    </div>
-                                    <h3 className="text-2xl font-bold text-gray-900 mb-4 group-hover:text-blue-600 transition-colors leading-tight">
-                                        {post.title}
-                                    </h3>
-                                    <p className="text-gray-600 mb-6 line-clamp-3 flex-1 leading-relaxed">
-                                        {post.excerpt}
-                                    </p>
-                                    <div className="flex items-center justify-between pt-6 border-t border-gray-100 mt-auto">
-                                        <div className="flex items-center gap-2">
-                                            <div className="w-8 h-8 rounded-full bg-gray-100 flex items-center justify-center text-gray-600 font-bold text-xs">
-                                                {post.author.charAt(0)}
-                                            </div>
-                                            <span className="text-sm font-bold text-gray-900">{post.author}</span>
+                            <Link key={post.id} to={`/blog/${post.slug}`} className="h-full block">
+                                <motion.article
+                                    layout
+                                    initial={{ opacity: 0, scale: 0.9 }}
+                                    animate={{ opacity: 1, scale: 1 }}
+                                    exit={{ opacity: 0, scale: 0.9 }}
+                                    transition={{ duration: 0.3 }}
+                                    className="bg-white rounded-[2rem] overflow-hidden shadow-sm hover:shadow-2xl transition-all duration-500 group border border-gray-100 flex flex-col h-full hover:-translate-y-2"
+                                >
+                                    <div className="relative h-64 overflow-hidden">
+                                        <img
+                                            src={post.image}
+                                            alt={post.title}
+                                            className="w-full h-full object-cover transition-transform duration-700 group-hover:scale-110"
+                                        />
+                                        <div className="absolute top-4 left-4">
+                                            <span className="px-3 py-1 bg-white/90 backdrop-blur-md text-gray-900 text-xs font-bold rounded-full shadow-sm">
+                                                {post.category}
+                                            </span>
                                         </div>
-                                        <button className="text-blue-600 font-bold text-sm group-hover:translate-x-1 transition-transform flex items-center gap-1">
-                                            Read Article <i className="ri-arrow-right-line"></i>
-                                        </button>
                                     </div>
-                                </div>
-                            </motion.article>
+                                    <div className="p-8 flex-1 flex flex-col">
+                                        <div className="flex items-center gap-3 text-xs text-gray-500 mb-4 font-medium uppercase tracking-wider">
+                                            <span>{post.date}</span>
+                                            <span className="w-1 h-1 bg-gray-300 rounded-full"></span>
+                                            <span>{post.readTime}</span>
+                                        </div>
+                                        <h3 className="text-2xl font-bold text-gray-900 mb-4 group-hover:text-blue-600 transition-colors leading-tight">
+                                            {post.title}
+                                        </h3>
+                                        <p className="text-gray-600 mb-6 line-clamp-3 flex-1 leading-relaxed">
+                                            {post.excerpt}
+                                        </p>
+                                        <div className="flex items-center justify-between pt-6 border-t border-gray-100 mt-auto">
+                                            <div className="flex items-center gap-2">
+                                                <div className="w-8 h-8 rounded-full bg-gray-100 flex items-center justify-center text-gray-600 font-bold text-xs">
+                                                    {post.author.charAt(0)}
+                                                </div>
+                                                <span className="text-sm font-bold text-gray-900">{post.author}</span>
+                                            </div>
+                                            <button className="text-blue-600 font-bold text-sm group-hover:translate-x-1 transition-transform flex items-center gap-1">
+                                                Read Article <i className="ri-arrow-right-line"></i>
+                                            </button>
+                                        </div>
+                                    </div>
+                                </motion.article>
+                            </Link>
                         ))}
                     </AnimatePresence>
                 </motion.div>

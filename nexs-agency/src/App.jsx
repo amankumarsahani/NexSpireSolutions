@@ -28,6 +28,19 @@ const BlogPage = lazy(() => import('./pages/BlogPage'));
 const CRMPricingPage = lazy(() => import('./pages/CRMPricingPage'));
 const PrivacyPolicy = lazy(() => import('./pages/PrivacyPolicy'));
 const TermsOfService = lazy(() => import('./pages/TermsOfService'));
+const FAQPage = lazy(() => import('./pages/FAQPage'));
+const CityLandingPage = lazy(() => import('./pages/seo/CityLandingPage'));
+const CustomWebDevelopment = lazy(() => import('./pages/services/CustomWebDevelopment'));
+const MobileAppDevelopment = lazy(() => import('./pages/services/MobileAppDevelopment'));
+const AiMachineLearning = lazy(() => import('./pages/services/AiMachineLearning'));
+const CloudSolutions = lazy(() => import('./pages/services/CloudSolutions'));
+const EcommerceDevelopment = lazy(() => import('./pages/services/EcommerceDevelopment'));
+const AiTrends2026 = lazy(() => import('./pages/blog/AiTrends2026'));
+const ReactVsFlutter = lazy(() => import('./pages/blog/ReactVsFlutter'));
+const CostOfCustomCrm = lazy(() => import('./pages/blog/CostOfCustomCrm'));
+const MonolithToMicroservices = lazy(() => import('./pages/blog/MonolithToMicroservices'));
+const PwaBenefits = lazy(() => import('./pages/blog/PwaBenefits'));
+const NotFound = lazy(() => import('./pages/NotFound'));
 
 // Lazy load admin (rarely accessed by most users)
 const AdminLogin = lazy(() => import('./pages/AdminLogin'));
@@ -144,6 +157,19 @@ function App() {
               <Route path="/nexcrm" element={<CRMPricingPage />} />
               <Route path="/privacy-policy" element={<PrivacyPolicy />} />
               <Route path="/terms" element={<TermsOfService />} />
+              <Route path="/faq" element={<FAQPage />} />
+              <Route path="/software-development-company/:city" element={<CityLandingPage />} />
+              <Route path="/services/custom-web-development" element={<CustomWebDevelopment />} />
+              <Route path="/services/mobile-app-development" element={<MobileAppDevelopment />} />
+              <Route path="/services/ai-machine-learning" element={<AiMachineLearning />} />
+              <Route path="/services/cloud-solutions" element={<CloudSolutions />} />
+              <Route path="/services/ecommerce-development" element={<EcommerceDevelopment />} />
+              <Route path="/blog/ai-trends-2026" element={<AiTrends2026 />} />
+              <Route path="/blog/react-native-vs-flutter" element={<ReactVsFlutter />} />
+              <Route path="/blog/cost-of-custom-crm-2026" element={<CostOfCustomCrm />} />
+              <Route path="/blog/monolith-to-microservices" element={<MonolithToMicroservices />} />
+              <Route path="/blog/why-business-needs-pwa" element={<PwaBenefits />} />
+              <Route path="*" element={<NotFound />} />
             </Route>
 
             <Route path="/admin/login" element={<AdminLogin />} />

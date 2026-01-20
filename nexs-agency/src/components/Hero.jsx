@@ -6,10 +6,10 @@ const Hero = () => {
 
   const rotatingTexts = [
     "AI-Powered Software Solutions",
-    "Next.js & React Development",
-    "Mobile-First Applications",
+    "Web & Mobile App Development",
+    "CRM & ERP Enterprise Solutions",
     "Cloud-Native Architecture",
-    "Digital Transformation 2024"
+    "E-commerce & Digital Transformation"
   ]
 
   const technologies = [
@@ -52,7 +52,7 @@ const Hero = () => {
         <div
           className="absolute inset-0 bg-cover bg-center bg-no-repeat"
           style={{
-            backgroundImage: `url('/assets/hero-bg.jpg')`,
+            backgroundImage: `url('https://images.unsplash.com/photo-1519389950473-47ba0277781c?q=80&w=1920&auto=format&fit=crop')`,
           }}
         ></div>
 
@@ -78,8 +78,8 @@ const Hero = () => {
             {/* Main Heading */}
             <div className="space-y-4">
               <h1 className="font-bold text-white leading-tight drop-shadow-lg">
-                <span className="block mb-1 text-2xl sm:text-3xl md:text-4xl lg:text-5xl font-extrabold">Empowering Businesses</span>
-                <span className="block mb-1 text-2xl sm:text-3xl md:text-4xl lg:text-5xl font-extrabold">Through</span>
+                <span className="block mb-1 text-2xl sm:text-3xl md:text-4xl lg:text-5xl font-extrabold">Engineering Scalable</span>
+                <span className="block mb-1 text-2xl sm:text-3xl md:text-4xl lg:text-5xl font-extrabold">Digital Ecosystems for</span>
                 <span className="block relative text-3xl sm:text-4xl md:text-5xl lg:text-6xl xl:text-7xl">
                   <span className="relative font-extrabold">
                     <span
@@ -96,9 +96,10 @@ const Hero = () => {
                 </span>
               </h1>
 
-              <p className="text-base sm:text-lg lg:text-xl text-white/90 leading-relaxed max-w-2xl mx-auto drop-shadow-md font-medium">
-                At <span className="font-bold text-cyan-300">Nexspire Solution</span>, we leverage <span className="font-semibold text-blue-300">AI and modern tech stacks</span> to build scalable, high-performance applications.
-                Trusted by <span className="font-bold text-green-300">150+ companies worldwide</span> for digital transformation and innovation.
+              <p className="text-base sm:text-lg lg:text-xl text-white/90 leading-relaxed max-w-6xl mx-auto drop-shadow-md font-medium">
+                We don't just write code; we build <span className="font-bold text-cyan-300">high-performance engines</span> for your business growth.
+                From <span className="font-semibold text-blue-300">disruptive startups in London</span> to <span className="font-semibold text-purple-300">enterprises in New York</span>,
+                Nexspire Solutions delivers the technical edge you need to dominate your market.
               </p>
             </div>
 

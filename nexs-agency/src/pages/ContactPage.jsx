@@ -99,12 +99,12 @@ const ContactPage = () => {
     return (
         <div className="min-h-screen bg-white font-sans text-gray-900 selection:bg-blue-600 selection:text-white overflow-hidden">
             <Helmet>
-                <title>Contact Nexspire - Hire Top Freelance Developers (Mohali & Global)</title>
-                <meta name="description" content="Ready to start your project? Contact Nexspire Solutions for expert software development. Whether you need a local agency in Mohali/Chandigarh or remote freelance experts, we're here to help." />
-                <meta name="keywords" content="hire developers mohali, contact software agency, freelance web developer chandigarh, hire react developers, software consultation, app development quote, it company mohali address, nexspire contact" />
+                <title>Contact Nexspire - Hire Experts in Mohali, London, NYC & Dubai</title>
+                <meta name="description" content="Ready to innovate? Contact Nexspire Solutions. We have a physical presence in Mohali (India) and serve clients globally in London, New York, Dubai, Toronto, and Sydney. Hire top-tier software developers today." />
+                <meta name="keywords" content="contact software company, hire developers mohali, software agency london, tech partners new york, dubai software company, freelance experts india, global software team" />
                 <link rel="canonical" href="https://nexspiresolutions.co.in/contact" />
-                <meta property="og:title" content="Hire Top Developers - Local Presence, Global Standards" />
-                <meta property="og:description" content="Connect with the best software team in Mohali. Custom solutions for ambitious businesses worldwide." />
+                <meta property="og:title" content="Contact Nexspire - Global Reach, Local Presence" />
+                <meta property="og:description" content="Connect with our global team. Offices in Mohali, serving the world." />
                 <meta property="og:url" content="https://nexspiresolutions.co.in/contact" />
             </Helmet>
 
@@ -148,14 +148,14 @@ const ContactPage = () => {
                         transition={{ duration: 0.8 }}
                     >
                         <span className="inline-block py-2 px-6 rounded-full bg-white/5 border border-white/10 backdrop-blur-md text-blue-300 font-medium mb-8">
-                            Get in Touch
+                            Global Reach, Local Presence
                         </span>
                         <h1 className="text-5xl md:text-7xl font-bold mb-6 tracking-tight">
                             Let's Build <br />
                             <span className="text-transparent bg-clip-text bg-gradient-to-r from-blue-400 to-purple-400">Something Great.</span>
                         </h1>
                         <p className="text-xl text-blue-100/80 max-w-2xl mx-auto">
-                            Ready to transform your business? We're here to help you every step of the way.
+                            From Mohali to the World. We build software that empowers businesses everywhere.
                         </p>
                     </motion.div>
                 </div>
