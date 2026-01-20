@@ -133,9 +133,10 @@ router.post('/', isAdmin, async (req, res) => {
 router.put('/:id', isAdmin, async (req, res) => {
     try {
         const { id } = req.params;
+        const workflowId = parseInt(id);
 
-        if (id === 'undefined') {
-            return res.status(400).json({ success: false, error: 'Invalid workflow ID' });
+        if (isNaN(workflowId) || id === 'undefined') {
+            return res.status(400).json({ success: false, error: 'Invalid workflow ID provided: ' + id });
         }
 
         let { name, description, trigger_type, trigger_config, is_active, nodes, connections, canvas_data } = req.body;
