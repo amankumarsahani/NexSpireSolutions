@@ -440,21 +440,36 @@ class EmailService {
     }
 
     /**
-     * Verify SMTP connection
+     * Verify SMTP connection for all active accounts
      * @returns {Promise<boolean>} Connection status
      */
     async verifyConnection() {
-        if (!this.transporter) {
-            return false;
-        }
-
+        const db = require('../config/database');
         try {
-            await this.transporter.verify();
-            console.log('✓ SMTP connection verified');
+            const [accounts] = await db.query('SELECT * FROM smtp_accounts WHERE is_active = TRUE');
+            if (accounts.length === 0) {
+                // Fallback to default transporter if no accounts configured
+                if (!this.transporter) return false;
+                await this.transporter.verify();
+                return true;
+            }
+
+            for (const account of accounts) {
+                const testTransporter = nodemailer.createTransport({
+                    host: account.host,
+                    port: account.port,
+                    secure: account.secure,
+                    auth: {
+                        user: account.username,
+                        pass: account.password
+                    }
+                });
+                await testTransporter.verify();
+            }
             return true;
         } catch (error) {
-            console.error('✗ SMTP connection failed:', error.message);
-            return false;
+            console.error('✗ SMTP connection verification failed:', error.message);
+            throw new Error(`SMTP validation failed: ${error.message}`);
         }
     }
 }

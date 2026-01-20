@@ -69,6 +69,26 @@ exports.createAccount = async (req, res) => {
             });
         }
 
+        // Host validation (Domain or IP)
+        const hostRegex = /^(([a-zA-Z0-9]|[a-zA-Z0-9][a-zA-Z0-9\-]*[a-zA-Z0-9])\.)*([A-Za-z0-9]|[A-Za-z0-9][A-Za-z0-9\-]*[A-Za-z0-9])|(\d{1,3}\.){3}\d{1,3}$/;
+        if (!hostRegex.test(host)) {
+            return res.status(400).json({ success: false, error: 'Invalid SMTP host format' });
+        }
+
+        // Port validation
+        if (port < 1 || port > 65535) {
+            return res.status(400).json({ success: false, error: 'Port must be between 1 and 65535' });
+        }
+
+        // Email validation
+        const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+        if (!emailRegex.test(from_email)) {
+            return res.status(400).json({ success: false, error: 'Invalid From Email format' });
+        }
+        if (username.includes('@') && !emailRegex.test(username)) {
+            return res.status(400).json({ success: false, error: 'Invalid Username format (should be an email)' });
+        }
+
         const [result] = await db.query(
             `INSERT INTO smtp_accounts 
              (name, host, port, secure, username, password, from_name, from_email, daily_limit, hourly_limit, priority)
@@ -109,6 +129,23 @@ exports.updateAccount = async (req, res) => {
 
         if (updates.length === 0) {
             return res.status(400).json({ success: false, error: 'No valid fields to update' });
+        }
+
+        // Validation for updates
+        const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+        const hostRegex = /^(([a-zA-Z0-9]|[a-zA-Z0-9][a-zA-Z0-9\-]*[a-zA-Z0-9])\.)*([A-Za-z0-9]|[A-Za-z0-9][A-Za-z0-9\-]*[A-Za-z0-9])|(\d{1,3}\.){3}\d{1,3}$/;
+
+        if (req.body.host && !hostRegex.test(req.body.host)) {
+            return res.status(400).json({ success: false, error: 'Invalid SMTP host format' });
+        }
+        if (req.body.port && (req.body.port < 1 || req.body.port > 65535)) {
+            return res.status(400).json({ success: false, error: 'Port must be between 1 and 65535' });
+        }
+        if (req.body.from_email && !emailRegex.test(req.body.from_email)) {
+            return res.status(400).json({ success: false, error: 'Invalid From Email format' });
+        }
+        if (req.body.username && req.body.username.includes('@') && !emailRegex.test(req.body.username)) {
+            return res.status(400).json({ success: false, error: 'Invalid Username format' });
         }
 
         values.push(id);
