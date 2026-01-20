@@ -21,23 +21,23 @@ const About = () => {
   }, [])
 
   const teamMembers = [
-    // {
-    //   name: "Aman Kumar Sahani",
-    //   role: "Full Stack Developer",
-    //   image: "https://media.licdn.com/dms/image/v2/D5635AQH5ci5Ugk1vTw/profile-framedphoto-shrink_400_400/B56ZfvUFh9GUAc-/0/1752066710244?e=1764432000&v=beta&t=tKuFhdqPPrrcdpFEn9N8hDVCx1MTK5HeqUAbZ_ise8I",
-    //   skills: ["React", "Node.js", "Python", "AWS"],
-    //   gradient: "from-blue-500 to-blue-600"
-    // },
+    {
+      name: "Aman Kumar Sahani",
+      role: "Founder & Lead Developer",
+      image: "https://media.licdn.com/dms/image/v2/D5635AQH5ci5Ugk1vTw/profile-framedphoto-shrink_400_400/B56ZfvUFh9GUAc-/0/1752066710244?e=1764432000&v=beta&t=tKuFhdqPPrrcdpFEn9N8hDVCx1MTK5HeqUAbZ_ise8I",
+      skills: ["React", "Node.js", "Python", "AWS"],
+      gradient: "from-blue-500 to-blue-600"
+    },
     {
       name: "Anu Kumar",
-      role: "Full Stack Developer",
+      role: "Senior UI/UX Designer",
       image: "https://media.licdn.com/dms/image/v2/D5635AQHiirkL_Zj4Kg/profile-framedphoto-shrink_400_400/profile-framedphoto-shrink_400_400/0/1712624046763?e=1764432000&v=beta&t=8cpHTXKwpXe6DU-Gvd8Vf9kdWqGg2TJofno2wUZAVLs",
-      skills: ["React", "Node.js", "Python", "AWS"],
+      skills: ["Figma", "React", "Design Systems"],
       gradient: "from-purple-500 to-purple-600"
     },
     {
       name: "Kshitij Bhardwaj",
-      role: "Full Stack Developer",
+      role: "Backend Architect",
       image: "https://media.licdn.com/dms/image/v2/D5635AQFLeeMkFr5TQw/profile-framedphoto-shrink_400_400/B56Zitq2hlH0Ak-/0/1755260348813?e=1764432000&v=beta&t=r4fL3zagpQbN7L5-ubGA70k3szERV5yeJM0cLZTno-E",
       skills: ["Vue.js", "Django", "PostgreSQL", "Docker"],
       gradient: "from-green-500 to-green-600"
@@ -121,19 +121,18 @@ const About = () => {
           }`}>
           <div className="inline-flex items-center bg-blue-100/80 backdrop-blur-sm border border-blue-200/60 text-blue-700 text-sm font-semibold px-6 py-3 rounded-full mb-6 shadow-lg">
             <div className="w-2 h-2 bg-blue-600 rounded-full mr-2 animate-pulse"></div>
-            About Nexspire Solution
+            More Than An Agency
           </div>
 
           <h2 className="text-4xl md:text-5xl lg:text-6xl font-bold text-gray-900 mb-6 leading-tight">
-            Building the Future Through
+            We Are Your Technical
             <span className="block bg-gradient-to-r from-blue-600 to-purple-600 bg-clip-text text-transparent mt-2">
-              Technology Excellence
+              Co-Founders & Partners
             </span>
           </h2>
 
           <p className="text-xl text-gray-600 max-w-3xl mx-auto leading-relaxed">
-            We are a team of passionate developers, designers, and strategists dedicated to delivering
-            innovative software solutions that drive business growth and digital transformation.
+            Most agencies just take tickets. We take ownership. We build the infrastructure that allows visionary companies to scale without limits.
           </p>
         </div>
 
@@ -195,7 +194,7 @@ const About = () => {
                     Our Mission
                   </h4>
                   <p className="text-sm text-gray-600">
-                    To empower businesses with innovative technology solutions that drive growth and efficiency.
+                    To eliminate technical debt and accelerate go-to-market speed for ambitious global brands.
                   </p>
                 </div>
                 <div>
@@ -204,7 +203,7 @@ const About = () => {
                     Our Vision
                   </h4>
                   <p className="text-sm text-gray-600">
-                    To be the leading technology partner that transforms ideas into digital realities.
+                    To be the infrastructure partner behind the next generation of Fortune 500 digital products.
                   </p>
                 </div>
               </div>
@@ -396,7 +395,7 @@ const About = () => {
           </div>
         </div>
 
-        {/* Ultra Modern Team Section - COMMENTED OUT
+        {/* Ultra Modern Team Section */}
         <div className={`transition-all duration-1000 delay-900 transform ${isVisible ? 'translate-y-0 opacity-100' : 'translate-y-8 opacity-0'
           }`}>
           <div className="text-center mb-16">
@@ -431,7 +430,7 @@ const About = () => {
                   onMouseLeave={() => setHoveredMember(null)}
                   className="group relative w-80"
                 >
-                  <div className={`absolute -inset-3 bg-gradient-to-r ${memberColors[index].bg} rounded-3xl blur-2xl opacity-60 transition-all duration-700`}></div>
+                  <div className={`absolute -inset-3 bg-gradient-to-r ${memberColors[index % 4].bg} rounded-3xl blur-2xl opacity-60 transition-all duration-700`}></div>
 
                   <div className="relative bg-white/5 backdrop-blur-2xl rounded-3xl p-8 border border-white/30 transition-all duration-500 transform -translate-y-3 shadow-2xl">
 
@@ -447,21 +446,21 @@ const About = () => {
                           <div
                             className="absolute inset-0 rounded-3xl opacity-20 transition-all duration-300"
                             style={{
-                              background: `linear-gradient(135deg, ${memberColors[index].primary}40, ${memberColors[index].secondary}40)`
+                              background: `linear-gradient(135deg, ${memberColors[index % 4].primary}40, ${memberColors[index % 4].secondary}40)`
                             }}
                           ></div>
                         </div>
 
                         <div
                           className="absolute -bottom-2 -right-2 w-8 h-8 rounded-2xl border-4 border-white shadow-xl flex items-center justify-center"
-                          style={{ backgroundColor: memberColors[index].primary }}
+                          style={{ backgroundColor: memberColors[index % 4].primary }}
                         >
                           <div className="text-white text-sm">✓</div>
                         </div>
 
                         <div
                           className="absolute -top-2 -left-2 w-6 h-6 rounded-full opacity-80 transition-all duration-500 animate-bounce"
-                          style={{ backgroundColor: memberColors[index].secondary }}
+                          style={{ backgroundColor: memberColors[index % 4].secondary }}
                         ></div>
                       </div>
 
@@ -472,7 +471,7 @@ const About = () => {
                         <p
                           className="text-sm font-bold"
                           style={{
-                            background: `linear-gradient(135deg, ${memberColors[index].primary}, ${memberColors[index].secondary})`,
+                            background: `linear-gradient(135deg, ${memberColors[index % 4].primary}, ${memberColors[index % 4].secondary})`,
                             WebkitBackgroundClip: 'text',
                             WebkitTextFillColor: 'transparent',
                             backgroundClip: 'text'
@@ -498,31 +497,16 @@ const About = () => {
                       <div
                         className="h-full w-full transition-all duration-700 ease-out"
                         style={{
-                          background: `linear-gradient(90deg, ${memberColors[index].primary}, ${memberColors[index].secondary})`
+                          background: `linear-gradient(90deg, ${memberColors[index % 4].primary}, ${memberColors[index % 4].secondary})`
                         }}
                       ></div>
                     </div>
-
-                    <div
-                      className="absolute top-4 right-4 w-3 h-3 rounded-full opacity-60 transition-all duration-500 animate-pulse"
-                      style={{ backgroundColor: memberColors[index].primary }}
-                    ></div>
                   </div>
-
-                  {hoveredMember === member.name && (
-                    <div
-                      className="absolute -inset-4 rounded-4xl blur-2xl animate-pulse opacity-30"
-                      style={{
-                        background: `linear-gradient(135deg, ${memberColors[index].primary}30, ${memberColors[index].secondary}30)`
-                      }}
-                    ></div>
-                  )}
                 </div>
               )
             })}
           </div>
-        </div>
-        */}
+        </div>}
       </div>
     </section >
   );

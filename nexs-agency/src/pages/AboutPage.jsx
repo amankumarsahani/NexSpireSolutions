@@ -100,12 +100,12 @@ const AboutPage = () => {
   return (
     <div className="min-h-screen bg-white font-sans text-gray-900 selection:bg-blue-600 selection:text-white overflow-hidden">
       <Helmet>
-        <title>About Nexspire - Leading Tech Agency in Mohali & Global Innovators</title>
-        <meta name="description" content="Nexspire Solutions is a premier software agency based in Mohali, founded by expert freelancers. We bring Silicon Valley quality to Chandigarh's tech ecosystem and serve clients worldwide." />
-        <meta name="keywords" content="about nexspire solutions, software company mohali, tech experts chandigarh, freelance team india, digital transformation partners, best startup mohali, software development experts" />
+        <title>About Nexspire Solutions – Global Software Agency</title>
+        <meta name="description" content="Discover Nexspire Solutions, a top software development agency delivering web, mobile, AI, cloud, and enterprise solutions to clients globally. Founded in 2020, serving startups, SMEs, and enterprises across North America, Europe, Middle East, and Asia-Pacific." />
+        <meta name="keywords" content="global software agency, top software company worldwide, international software solutions, AI software development, about nexspire solutions, software company india, tech experts usa uk, digital transformation partners" />
         <link rel="canonical" href="https://nexspiresolutions.co.in/about" />
-        <meta property="og:title" content="About Nexspire - Mohali's Tech Innovators & Global Partners" />
-        <meta property="og:description" content="Building the future of tech from the heart of Mohali. Expert engineers, global impact." />
+        <meta property="og:title" content="About Nexspire Solutions – Global Software Agency" />
+        <meta property="og:description" content="Top software development agency delivering web, mobile, AI, cloud, and enterprise solutions to clients globally." />
         <meta property="og:url" content="https://nexspiresolutions.co.in/about" />
       </Helmet>
 
