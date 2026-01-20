@@ -5,6 +5,7 @@
 
 const db = require('../config/database');
 const EmailService = require('./email.service');
+const AIService = require('./ai.service');
 
 class WorkflowEngine {
     constructor() {
@@ -23,7 +24,8 @@ class WorkflowEngine {
             condition: this.handleCondition.bind(this),
 
             // Delays
-            delay: this.handleDelay.bind(this)
+            delay: this.handleDelay.bind(this),
+            ai_assistant: this.handleAIAssistant.bind(this)
         };
     }
 
@@ -591,6 +593,50 @@ class WorkflowEngine {
             "UPDATE workflow_executions SET status = 'completed', completed_at = NOW() WHERE id = ?",
             [executionId]
         );
+    }
+
+    /**
+     * Handle AI Assistant Action
+     */
+    async handleAIAssistant(node, execution, workflow, entityData) {
+        console.log(`[WorkflowEngine] Executing AI Assistant node: ${node.node_uid}`);
+
+        try {
+            const config = node.config || {};
+            const promptTemplate = config.prompt || 'Analyze this lead: {{name}} from {{company}}';
+            const systemMessage = config.system_message || 'You are a helpful CRM assistant.';
+            const model = config.model || null;
+            const outputVariable = config.output_variable || 'ai_response';
+
+            // Render prompt with variables
+            const prompt = AIService.renderPrompt(promptTemplate, entityData);
+
+            // Call AI Service
+            const response = await AIService.generateContent(prompt, systemMessage, model);
+
+            // Store response in execution context
+            const updatedData = {
+                ...entityData,
+                [outputVariable]: response
+            };
+
+            await this.logNodeExecution(execution.id, node.node_uid, 'success', {
+                prompt_used: prompt,
+                ai_response: response,
+                variable_stored: outputVariable
+            });
+
+            return { status: 'success', entityData: updatedData };
+        } catch (error) {
+            console.error(`[WorkflowEngine] AI Assistant handler error:`, error);
+            await this.logNodeExecution(execution.id, node.node_uid, 'error', { error: error.message });
+
+            // Optionally continue or fail based on config (strict mode)
+            if (node.config?.strict_mode) {
+                return { status: 'failed', error: error.message };
+            }
+            return { status: 'success', entityData }; // Continue with original data on non-strict failure
+        }
     }
 }
 
