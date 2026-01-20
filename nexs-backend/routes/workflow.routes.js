@@ -43,7 +43,14 @@ router.get('/:id', async (req, res) => {
         }
 
         const [nodes] = await db.query('SELECT * FROM workflow_nodes WHERE workflow_id = ?', [req.params.id]);
-        const [connections] = await db.query('SELECT * FROM workflow_connections WHERE workflow_id = ?', [req.params.id]);
+        const [connections] = await db.query(
+            `SELECT c.*, sn.node_uid as source, tn.node_uid as target 
+             FROM workflow_connections c
+             JOIN workflow_nodes sn ON c.source_node_id = sn.id
+             JOIN workflow_nodes tn ON c.target_node_id = tn.id
+             WHERE c.workflow_id = ?`,
+            [req.params.id]
+        );
 
         res.json({
             success: true,
@@ -92,8 +99,8 @@ router.post('/', isAdmin, async (req, res) => {
                         node.action_type || node.data?.action_type,
                         node.label || node.data?.label,
                         JSON.stringify(node.config || node.data?.config || {}),
-                        node.position?.x || 0,
-                        node.position?.y || 0
+                        node.position_x !== undefined ? node.position_x : (node.position?.x || 0),
+                        node.position_y !== undefined ? node.position_y : (node.position?.y || 0)
                     ]
                 );
                 nodeIdMap.set(node.id || node.node_uid, nodeResult.insertId);
@@ -195,8 +202,8 @@ router.put('/:id', isAdmin, async (req, res) => {
                         node.action_type || node.data?.action_type,
                         node.label || node.data?.label,
                         JSON.stringify(node.config || node.data?.config || {}),
-                        node.position?.x || 0,
-                        node.position?.y || 0
+                        node.position_x !== undefined ? node.position_x : (node.position?.x || 0),
+                        node.position_y !== undefined ? node.position_y : (node.position?.y || 0)
                     ]
                 );
                 nodeIdMap.set(node.id || node.node_uid, nodeResult.insertId);
