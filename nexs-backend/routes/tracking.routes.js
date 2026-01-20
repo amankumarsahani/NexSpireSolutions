@@ -22,8 +22,8 @@ router.get('/open/:trackingId', async (req, res) => {
 
         // Update queue item
         await db.query(
-            'UPDATE email_queue SET opened_at = COALESCE(opened_at, NOW()) WHERE tracking_id = ? AND opened_at IS NULL',
-            [trackingId]
+            'UPDATE email_queue SET opened_at = COALESCE(opened_at, NOW()), open_ip = COALESCE(open_ip, ?) WHERE tracking_id = ? AND opened_at IS NULL',
+            [req.ip.replace(/^.*:ffff:/, ''), trackingId]
         );
 
         // Get queue item for campaign update
@@ -73,8 +73,8 @@ router.get('/click/:trackingId', async (req, res) => {
 
         // Update queue item
         await db.query(
-            'UPDATE email_queue SET clicked_at = COALESCE(clicked_at, NOW()) WHERE tracking_id = ?',
-            [trackingId]
+            'UPDATE email_queue SET clicked_at = COALESCE(clicked_at, NOW()), click_ip = COALESCE(click_ip, ?) WHERE tracking_id = ?',
+            [req.ip.replace(/^.*:ffff:/, ''), trackingId]
         );
 
         // Get queue item for campaign update

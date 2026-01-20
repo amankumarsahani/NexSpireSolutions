@@ -21,7 +21,10 @@ exports.getAllCampaigns = async (req, res) => {
         }
 
         const [campaigns] = await db.query(
-            `SELECT c.*, CONCAT(u.firstName, ' ', u.lastName) as created_by_name
+            `SELECT c.*, CONCAT(u.firstName, ' ', u.lastName) as created_by_name,
+                (SELECT COUNT(*) FROM email_queue WHERE campaign_id = c.id AND status = 'sent') as total_sent,
+                (SELECT COUNT(*) FROM email_queue WHERE campaign_id = c.id AND opened_at IS NOT NULL) as total_opened,
+                (SELECT COUNT(*) FROM email_queue WHERE campaign_id = c.id AND clicked_at IS NOT NULL) as total_clicked
              FROM email_campaigns c
              LEFT JOIN users u ON c.created_by = u.id
              ${whereClause}
@@ -262,14 +265,31 @@ exports.getCampaignRecipients = async (req, res) => {
             params.push(status);
         }
 
-        const [recipients] = await db.query(
-            `SELECT id, recipient_email, recipient_name, status, sent_at, opened_at, clicked_at, error_message
-             FROM email_queue
-             ${whereClause}
-             ORDER BY id DESC
-             LIMIT ? OFFSET ?`,
-            [...params, parseInt(limit), parseInt(offset)]
-        );
+        let recipients;
+        try {
+            [recipients] = await db.query(
+                `SELECT id, recipient_email, recipient_name, recipient_company, status, sent_at, opened_at, clicked_at, open_ip, click_ip, error_message
+                 FROM email_queue
+                 ${whereClause}
+                 ORDER BY id DESC
+                 LIMIT ? OFFSET ?`,
+                [...params, parseInt(limit), parseInt(offset)]
+            );
+        } catch (error) {
+            if (error.code === 'ER_BAD_FIELD_ERROR') {
+                // Fallback for missing tracking columns (open_ip, click_ip might not exist in older schemas)
+                [recipients] = await db.query(
+                    `SELECT id, recipient_email, recipient_name, recipient_company, status, sent_at, opened_at, clicked_at, error_message
+                     FROM email_queue
+                     ${whereClause}
+                     ORDER BY id DESC
+                     LIMIT ? OFFSET ?`,
+                    [...params, parseInt(limit), parseInt(offset)]
+                );
+            } else {
+                throw error;
+            }
+        }
 
         const [[{ total }]] = await db.query(
             `SELECT COUNT(*) as total FROM email_queue ${whereClause}`,
@@ -305,6 +325,13 @@ exports.startCampaign = async (req, res) => {
 
         if (campaign.status === 'sending') {
             return res.status(400).json({ success: false, error: 'Campaign is already sending' });
+        }
+
+        // Pre-send SMTP validation
+        try {
+            await emailService.verifyConnection();
+        } catch (error) {
+            return res.status(400).json({ success: false, error: `SMTP Validation Failed: ${error.message}` });
         }
 
         // Build recipient list based on audience type
@@ -412,9 +439,9 @@ exports.getDashboardStats = async (req, res) => {
                 COUNT(*) as total_campaigns,
                 SUM(CASE WHEN status = 'sending' THEN 1 ELSE 0 END) as active_campaigns,
                 SUM(CASE WHEN status = 'completed' THEN 1 ELSE 0 END) as completed_campaigns,
-                SUM(sent_count) as total_sent,
-                SUM(opened_count) as total_opened,
-                SUM(clicked_count) as total_clicked
+                (SELECT COUNT(*) FROM email_queue WHERE status = 'sent') as total_sent,
+                (SELECT COUNT(*) FROM email_queue WHERE opened_at IS NOT NULL) as total_opened,
+                (SELECT COUNT(*) FROM email_queue WHERE clicked_at IS NOT NULL) as total_clicked
             FROM email_campaigns
         `);
 
