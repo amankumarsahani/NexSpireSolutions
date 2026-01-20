@@ -118,7 +118,7 @@ router.post('/', isAdmin, async (req, res) => {
                         `INSERT INTO workflow_connections 
                          (workflow_id, source_node_id, target_node_id, source_handle)
                          VALUES (?, ?, ?, ?)`,
-                        [workflowId, sourceId, targetId, conn.sourceHandle || 'default']
+                        [workflowId, sourceId, targetId, conn.source_handle || 'default']
                     );
                 }
             }
@@ -220,7 +220,7 @@ router.put('/:id', isAdmin, async (req, res) => {
                             `INSERT INTO workflow_connections 
                              (workflow_id, source_node_id, target_node_id, source_handle)
                              VALUES (?, ?, ?, ?)`,
-                            [id, sourceId, targetId, conn.sourceHandle || 'default']
+                            [id, sourceId, targetId, conn.source_handle || 'default']
                         );
                     }
                 }
