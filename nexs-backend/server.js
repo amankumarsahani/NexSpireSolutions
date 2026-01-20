@@ -69,8 +69,8 @@ app.use(helmet({
     crossOriginEmbedderPolicy: false
 }));
 
-app.use(express.json()); // Parse JSON bodies
-app.use(express.urlencoded({ extended: true })); // Parse URL-encoded bodies
+app.use(express.json({ limit: '10mb' })); // Parse JSON bodies with increased limit
+app.use(express.urlencoded({ limit: '10mb', extended: true })); // Parse URL-encoded bodies with increased limit
 
 // Static files (for uploaded documents)
 app.use('/uploads', express.static('uploads'));
