@@ -69,7 +69,7 @@ router.get('/:id', async (req, res) => {
 // Create workflow
 router.post('/', isAdmin, async (req, res) => {
     try {
-        const { name, description, trigger_type, trigger_config, nodes, connections } = req.body;
+        const { name, description, trigger_type, trigger_config, is_active, nodes, connections } = req.body;
 
         if (!name || !trigger_type) {
             return res.status(400).json({ success: false, error: 'Name and trigger type are required' });
@@ -77,9 +77,16 @@ router.post('/', isAdmin, async (req, res) => {
 
         // Create workflow
         const [result] = await db.query(
-            `INSERT INTO workflows (name, description, trigger_type, trigger_config, created_by)
-             VALUES (?, ?, ?, ?, ?)`,
-            [name, description, trigger_type, JSON.stringify(trigger_config || {}), req.user?.id]
+            `INSERT INTO workflows (name, description, trigger_type, trigger_config, is_active, created_by)
+             VALUES (?, ?, ?, ?, ?, ?)`,
+            [
+                name,
+                description,
+                trigger_type,
+                JSON.stringify(trigger_config || {}),
+                is_active ? 1 : 0,
+                req.user?.id
+            ]
         );
 
         const workflowId = result.insertId;
