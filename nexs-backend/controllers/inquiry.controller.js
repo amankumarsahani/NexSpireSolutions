@@ -1,6 +1,7 @@
 const InquiryModel = require('../models/inquiry.model');
 const emailService = require('../services/email.service');
 const AssignmentService = require('../services/assignment.service');
+const WorkflowEngine = require('../services/workflowEngine');
 
 class InquiryController {
     // Get all inquiries (filtered by role)
@@ -88,6 +89,18 @@ class InquiryController {
                 name, email, phone, company, message, inquiryId
             }).catch(err => console.error('Email notification failed:', err));
 
+            // Trigger workflow
+            WorkflowEngine.trigger('inquiry_created', 'inquiry', inquiryId, {
+                id: inquiryId,
+                name,
+                email,
+                phone,
+                company,
+                message,
+                assignedTo,
+                entity_type: 'inquiry'
+            }).catch(err => console.error('Workflow trigger failed:', err));
+
             res.status(201).json({
                 success: true,
                 message: 'Inquiry submitted successfully',
@@ -116,6 +129,7 @@ class InquiryController {
                 });
             }
 
+            const inquiryBefore = await InquiryModel.findById(id);
             const affected = await InquiryModel.updateStatus(id, status);
 
             if (affected === 0) {
@@ -123,6 +137,15 @@ class InquiryController {
                     error: 'Inquiry not found'
                 });
             }
+
+            // Trigger workflow
+            WorkflowEngine.trigger('inquiry_status_updated', 'inquiry', id, {
+                ...inquiryBefore,
+                old_status: inquiryBefore.status,
+                new_status: status,
+                status: status,
+                entity_type: 'inquiry'
+            }).catch(err => console.error('Workflow trigger failed:', err));
 
             res.json({
                 success: true,
@@ -222,6 +245,14 @@ class InquiryController {
 
             // Update inquiry status to converted
             await InquiryModel.updateStatus(id, 'converted');
+
+            // Trigger workflow
+            WorkflowEngine.trigger('inquiry_converted', 'inquiry', id, {
+                ...inquiry,
+                lead_id: leadId,
+                status: 'converted',
+                entity_type: 'inquiry'
+            }).catch(err => console.error('Workflow trigger failed:', err));
 
             // Get the created lead
             const lead = await LeadModel.findById(leadId);

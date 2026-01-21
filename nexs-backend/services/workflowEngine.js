@@ -25,7 +25,9 @@ class WorkflowEngine {
 
             // Delays
             delay: this.handleDelay.bind(this),
-            ai_assistant: this.handleAIAssistant.bind(this)
+            ai_assistant: this.handleAIAssistant.bind(this),
+            update_inquiry: this.handleUpdateInquiry.bind(this),
+            assign_inquiry: this.handleAssignUser.bind(this)
         };
     }
 
@@ -348,6 +350,27 @@ class WorkflowEngine {
         return { ...contextData, ...updates };
     }
 
+    async handleUpdateInquiry(node, contextData) {
+        const config = typeof node.config === 'string' ? JSON.parse(node.config) : node.config;
+        const inquiryId = contextData.id || contextData.inquiry_id;
+
+        if (!inquiryId) throw new Error('No inquiry ID in context');
+
+        const updates = config.updates || {};
+        if (Object.keys(updates).length === 0) return contextData;
+
+        const fields = Object.keys(updates).map(k => `${k} = ?`).join(', ');
+        const values = Object.values(updates);
+
+        await db.query(
+            `UPDATE inquiries SET ${fields} WHERE id = ?`,
+            [...values, inquiryId]
+        );
+
+        console.log(`[WorkflowEngine] Updated inquiry ${inquiryId}`);
+        return { ...contextData, ...updates };
+    }
+
     async handleCreateTask(node, contextData) {
         const config = typeof node.config === 'string' ? JSON.parse(node.config) : node.config;
 
@@ -389,7 +412,14 @@ class WorkflowEngine {
 
         if (!entityId) throw new Error('No entity ID in context');
 
-        const table = entityType === 'lead' ? 'leads' : 'clients';
+        const tableMap = {
+            'lead': 'leads',
+            'client': 'clients',
+            'inquiry': 'inquiries'
+        };
+
+        const table = tableMap[entityType] || 'leads';
+
         await db.query(
             `UPDATE ${table} SET assignedTo = ? WHERE id = ?`,
             [config.user_id, entityId]
