@@ -636,10 +636,15 @@ class WorkflowEngine {
             const safeEntityData = entityData || {};
 
             const config = node.config || {};
+            console.log(`[WorkflowEngine] AI Assistant config:`, JSON.stringify(config));
+
             const promptTemplate = config.prompt || 'Analyze this lead: {{name}} from {{company}}';
             const systemMessage = config.system_message || 'You are a helpful CRM assistant.';
             const model = config.model || null;
             const outputVariable = config.output_variable || 'ai_response';
+
+            console.log(`[WorkflowEngine] Using model from config: ${model || 'DEFAULT'}`);
+
 
             // Render prompt with variables
             const prompt = AIService.renderPrompt(promptTemplate, safeEntityData);
