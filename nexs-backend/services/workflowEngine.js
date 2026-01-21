@@ -709,11 +709,15 @@ class WorkflowEngine {
 
             console.log(`[WorkflowEngine] AI Assistant using model: ${model || 'DEFAULT'}`);
 
-            // Render prompt with variables
-            const prompt = AIService.renderPrompt(promptTemplate, safeData);
+            // Render prompt and system message with variables
+            const renderedPrompt = AIService.renderPrompt(promptTemplate, safeData);
+            const renderedSystemMessage = AIService.renderPrompt(systemMessage, safeData);
 
             // Call AI Service
-            const response = await AIService.generateContent(prompt, systemMessage, model);
+            let response = await AIService.generateContent(renderedPrompt, renderedSystemMessage, model);
+
+            // Final pass: if AI produced tags, try to replace them with data from context
+            response = AIService.renderPrompt(response, safeData);
 
             // Return flat data strictly for variable substitution
             return {
