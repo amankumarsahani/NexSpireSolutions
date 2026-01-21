@@ -198,20 +198,28 @@ class WorkflowEngine {
                 connectionMap.get(conn.source_node_id).push(conn);
             }
 
-            // Get the last execution log to recover output data
-            const [lastLogs] = await db.query(
-                'SELECT output_data FROM workflow_execution_logs WHERE execution_id = ? ORDER BY id DESC LIMIT 1',
+            // Get ALL execution logs to recover output data from all nodes (including AI Assistant)
+            const [allLogs] = await db.query(
+                'SELECT output_data FROM workflow_execution_logs WHERE execution_id = ? AND output_data IS NOT NULL ORDER BY id ASC',
                 [executionId]
             );
 
-            if (lastLogs.length > 0 && lastLogs[0].output_data) {
-                try {
-                    const lastOutput = JSON.parse(lastLogs[0].output_data);
-                    contextData = { ...contextData, ...lastOutput };
-                } catch (e) {
-                    // Keep existing contextData
+            // Merge all output data to build complete context
+            for (const log of allLogs) {
+                if (log.output_data) {
+                    try {
+                        const logOutput = typeof log.output_data === 'string'
+                            ? JSON.parse(log.output_data)
+                            : log.output_data;
+                        contextData = { ...contextData, ...logOutput };
+                    } catch (e) {
+                        // Skip invalid JSON
+                    }
                 }
             }
+
+            console.log(`[WorkflowEngine] Resumed with context keys:`, Object.keys(contextData));
+
 
             // Find connections from current node and execute next nodes
             const currentConnections = connectionMap.get(currentNodeId) || [];
