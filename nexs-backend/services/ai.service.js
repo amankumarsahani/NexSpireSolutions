@@ -66,38 +66,48 @@ class AIService {
      */
     async generateContent(prompt, systemMessage = 'You are a helpful CRM assistant.', model = null) {
         const config = await this.getApiConfig();
-        const selectedModel = model || (config.openai ? this.models.openai : this.models.gemini);
+        const selectedModel = model || (config.openai ? this.models.openai : (config.gemini ? this.models.gemini : 'gemini-1.5-flash'));
+
+        console.log(`[AIService] Generating content with model: ${selectedModel}`);
+        console.log(`[AIService] Available providers: ${Object.keys(config).join(', ') || 'NONE'}`);
+
+        // Check if any provider is configured
+        if (Object.keys(config).length === 0) {
+            throw new Error('No AI provider configured. Please add an API key in Settings > AI Integration.');
+        }
 
         try {
             // Route based on model prefix
             if (selectedModel.startsWith('gpt-') || selectedModel.startsWith('o1-')) {
-                if (!config.openai) throw new Error('OpenAI API key not configured');
+                if (!config.openai) throw new Error('OpenAI API key not configured. Add it in Settings > AI Integration.');
                 return await this.callOpenAI(prompt, systemMessage, selectedModel, config.openai);
             }
 
             if (selectedModel.startsWith('gemini-')) {
-                if (!config.gemini) throw new Error('Gemini API key not configured');
+                if (!config.gemini) throw new Error('Gemini API key not configured. Add it in Settings > AI Integration.');
                 return await this.callGemini(prompt, systemMessage, selectedModel, config.gemini);
             }
 
             if (selectedModel.includes('llama') || selectedModel.includes('mixtral')) {
-                if (!config.groq) throw new Error('Groq API key not configured');
+                if (!config.groq) throw new Error('Groq API key not configured. Add it in Settings > AI Integration.');
                 return await this.callGroq(prompt, systemMessage, selectedModel, config.groq);
             }
 
             if (selectedModel.startsWith('grok-')) {
-                if (!config.grok) throw new Error('Grok API key not configured');
+                if (!config.grok) throw new Error('xAI Grok API key not configured. Add it in Settings > AI Integration.');
                 return await this.callGrok(prompt, systemMessage, selectedModel, config.grok);
             }
 
             // Default fallback based on what's configured
-            if (config.openai) return await this.callOpenAI(prompt, systemMessage, selectedModel, config.openai);
-            if (config.gemini) return await this.callGemini(prompt, systemMessage, selectedModel, config.gemini);
+            if (config.openai) return await this.callOpenAI(prompt, systemMessage, this.models.openai, config.openai);
+            if (config.gemini) return await this.callGemini(prompt, systemMessage, this.models.gemini, config.gemini);
+            if (config.groq) return await this.callGroq(prompt, systemMessage, this.models.groq, config.groq);
 
-            throw new Error('No compatible AI provider configured for this model');
+            throw new Error(`No compatible AI provider configured for model: ${selectedModel}`);
         } catch (error) {
             console.error('[AIService] Generation error:', error.message);
             throw new Error(`AI generation failed: ${error.message}`);
+
         }
     }
 
