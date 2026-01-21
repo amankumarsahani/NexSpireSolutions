@@ -15,10 +15,11 @@ class AIService {
         // Model configurations
         this.models = {
             openai: 'gpt-4o-mini',
-            gemini: 'gemini-1.5-flash',
+            gemini: 'gemini-2.0-flash',
             groq: 'llama-3.3-70b-versatile',
             grok: 'grok-beta'
         };
+
     }
 
     /**
@@ -140,21 +141,37 @@ class AIService {
      * Call Google Gemini API
      */
     async callGemini(prompt, systemMessage, model, key) {
-        const url = `https://generativelanguage.googleapis.com/v1beta/models/${model}:generateContent?key=${key}`;
+        // Ensure correct model format (some models need full path)
+        const modelId = model.includes('/') ? model : model;
+        const url = `https://generativelanguage.googleapis.com/v1beta/models/${modelId}:generateContent?key=${key}`;
 
-        const response = await axios.post(url, {
-            contents: [{
-                role: 'user',
-                parts: [{ text: `${systemMessage}\n\nUser Input: ${prompt}` }]
-            }]
-        });
+        console.log(`[AIService] Calling Gemini API: ${modelId}`);
 
-        if (response.data.candidates && response.data.candidates[0].content) {
-            return response.data.candidates[0].content.parts[0].text;
+        try {
+            const response = await axios.post(url, {
+                contents: [{
+                    role: 'user',
+                    parts: [{ text: `${systemMessage}\n\nUser Input: ${prompt}` }]
+                }]
+            });
+
+            if (response.data.candidates && response.data.candidates[0].content) {
+                return response.data.candidates[0].content.parts[0].text;
+            }
+
+            throw new Error('Unexpected Gemini API response structure');
+        } catch (error) {
+            // Log more details about the error
+            if (error.response) {
+                console.error(`[AIService] Gemini API Error ${error.response.status}:`, JSON.stringify(error.response.data));
+                if (error.response.status === 404) {
+                    throw new Error(`Model '${modelId}' not found. Try 'gemini-2.0-flash' or 'gemini-1.5-pro'.`);
+                }
+            }
+            throw error;
         }
-
-        throw new Error('Unexpected Gemini API response structure');
     }
+
 
     /**
      * Call Groq API (OpenAI Compatible)
