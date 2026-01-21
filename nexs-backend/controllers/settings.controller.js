@@ -132,6 +132,15 @@ exports.testAIConnection = async (req, res) => {
             } catch (err) {
                 return res.status(400).json({ success: false, error: `Groq connection failed: ${err.response?.data?.error?.message || err.message}` });
             }
+        } else if (provider === 'grok') {
+            try {
+                await axios.get('https://api.x.ai/v1/models', {
+                    headers: { 'Authorization': `Bearer ${finalApiKey}` }
+                });
+                return res.json({ success: true, message: 'xAI Grok connection successful' });
+            } catch (err) {
+                return res.status(400).json({ success: false, error: `xAI Grok connection failed: ${err.response?.data?.error?.message || err.message}` });
+            }
         } else {
             return res.status(400).json({ success: false, error: 'Unsupported provider' });
         }

@@ -16,7 +16,8 @@ class AIService {
         this.models = {
             openai: 'gpt-4o-mini',
             gemini: 'gemini-1.5-flash',
-            groq: 'llama-3.3-70b-versatile'
+            groq: 'llama-3.3-70b-versatile',
+            grok: 'grok-beta'
         };
     }
 
@@ -26,7 +27,7 @@ class AIService {
     async getApiConfig() {
         try {
             const [settings] = await db.query(
-                "SELECT setting_key, setting_value FROM settings WHERE setting_key IN ('openai_api_key', 'gemini_api_key', 'groq_api_key')"
+                "SELECT setting_key, setting_value FROM settings WHERE setting_key IN ('openai_api_key', 'gemini_api_key', 'groq_api_key', 'grok_api_key')"
             );
 
             const settingsMap = {};
@@ -41,6 +42,9 @@ class AIService {
             }
             if (settingsMap.groq_api_key) {
                 config.groq = settingsMap.groq_api_key;
+            }
+            if (settingsMap.grok_api_key) {
+                config.grok = settingsMap.grok_api_key;
             }
 
             // Fallback for primary/legacy logic if only environment keys exist
@@ -79,6 +83,11 @@ class AIService {
             if (selectedModel.includes('llama') || selectedModel.includes('mixtral')) {
                 if (!config.groq) throw new Error('Groq API key not configured');
                 return await this.callGroq(prompt, systemMessage, selectedModel, config.groq);
+            }
+
+            if (selectedModel.startsWith('grok-')) {
+                if (!config.grok) throw new Error('Grok API key not configured');
+                return await this.callGrok(prompt, systemMessage, selectedModel, config.grok);
             }
 
             // Default fallback based on what's configured
@@ -143,6 +152,31 @@ class AIService {
     async callGroq(prompt, systemMessage, model, key) {
         const response = await axios.post(
             'https://api.groq.com/openai/v1/chat/completions',
+            {
+                model: model,
+                messages: [
+                    { role: 'system', content: systemMessage },
+                    { role: 'user', content: prompt }
+                ],
+                temperature: 0.7
+            },
+            {
+                headers: {
+                    'Authorization': `Bearer ${key}`,
+                    'Content-Type': 'application/json'
+                }
+            }
+        );
+
+        return response.data.choices[0].message.content;
+    }
+
+    /**
+     * Call xAI Grok API (OpenAI Compatible)
+     */
+    async callGrok(prompt, systemMessage, model, key) {
+        const response = await axios.post(
+            'https://api.x.ai/v1/chat/completions',
             {
                 model: model,
                 messages: [
