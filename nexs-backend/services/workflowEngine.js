@@ -680,80 +680,16 @@ class WorkflowEngine {
         return { shouldWait: true, resumeAt };
     }
 
-    /**
-     * Resume a delayed execution
-     */
-    async resumeExecution(executionId) {
-        const [[execution]] = await db.query(
-            'SELECT * FROM workflow_executions WHERE id = ?',
-            [executionId]
-        );
-
-        if (!execution || execution.status !== 'waiting') {
-            return;
-        }
-
-        // Get the node we were waiting on
-        const [[currentNode]] = await db.query(
-            'SELECT * FROM workflow_nodes WHERE id = ?',
-            [execution.current_node_id]
-        );
-
-        // Get all nodes and connections
-        const [nodes] = await db.query(
-            'SELECT * FROM workflow_nodes WHERE workflow_id = ?',
-            [execution.workflow_id]
-        );
-
-        const [connections] = await db.query(
-            'SELECT * FROM workflow_connections WHERE workflow_id = ?',
-            [execution.workflow_id]
-        );
-
-        const nodeMap = new Map(nodes.map(n => [n.id, n]));
-        const connectionMap = new Map();
-        for (const conn of connections) {
-            if (!connectionMap.has(conn.source_node_id)) {
-                connectionMap.set(conn.source_node_id, []);
-            }
-            connectionMap.get(conn.source_node_id).push(conn);
-        }
-
-        // Update status to running
-        await db.query(
-            "UPDATE workflow_executions SET status = 'running' WHERE id = ?",
-            [executionId]
-        );
-
-        // Continue from connected nodes
-        const contextData = typeof execution.trigger_data === 'string'
-            ? JSON.parse(execution.trigger_data)
-            : execution.trigger_data;
-
-        const outConnections = connectionMap.get(currentNode.id) || [];
-        for (const conn of outConnections) {
-            const nextNode = nodeMap.get(conn.target_node_id);
-            if (nextNode) {
-                await this.executeNode(nextNode, executionId, contextData, nodeMap, connectionMap);
-            }
-        }
-
-        // Mark complete
-        await db.query(
-            "UPDATE workflow_executions SET status = 'completed', completed_at = NOW() WHERE id = ?",
-            [executionId]
-        );
-    }
 
     /**
  * Handle AI Assistant Action
  */
-    async handleAIAssistant(node, execution, workflow, entityData) {
+    async handleAIAssistant(node, contextData) {
         console.log(`[WorkflowEngine] Executing AI Assistant node: ${node.node_uid}`);
 
         try {
-            // Ensure entityData is valid
-            const safeEntityData = entityData || {};
+            // Ensure contextData is valid
+            const safeData = contextData || {};
 
             // Parse config - handle cases where it's stored as a JSON string
             let config = node.config || {};
@@ -765,39 +701,29 @@ class WorkflowEngine {
                     config = {};
                 }
             }
-            console.log(`[WorkflowEngine] AI Assistant config (parsed):`, config);
 
             const promptTemplate = config.prompt || 'Analyze this lead: {{name}} from {{company}}';
             const systemMessage = config.system_message || 'You are a helpful CRM assistant.';
             const model = config.model || null;
-            const outputVariable = config.output_variable || 'ai_response';
+            const outputVariable = config.output_variable || 'ai_reply_draft';
 
-            console.log(`[WorkflowEngine] Using model from config: ${model || 'DEFAULT'}`);
-
+            console.log(`[WorkflowEngine] AI Assistant using model: ${model || 'DEFAULT'}`);
 
             // Render prompt with variables
-            const prompt = AIService.renderPrompt(promptTemplate, safeEntityData);
+            const prompt = AIService.renderPrompt(promptTemplate, safeData);
 
             // Call AI Service
             const response = await AIService.generateContent(prompt, systemMessage, model);
 
-            // Store response in execution context
-            const updatedData = {
-                ...safeEntityData,
+            // Return flat data strictly for variable substitution
+            return {
+                ...safeData,
                 [outputVariable]: response
             };
-
-            console.log(`[WorkflowEngine] AI Assistant success: stored response in '${outputVariable}'`);
-
-            return { status: 'success', entityData: updatedData };
         } catch (error) {
             console.error(`[WorkflowEngine] AI Assistant handler error:`, error);
-
-            // Optionally continue or fail based on config (strict mode)
-            if (node.config?.strict_mode) {
-                return { status: 'failed', error: error.message };
-            }
-            return { status: 'success', entityData: entityData || {} }; // Continue with original data on non-strict failure
+            // On failure, continue with existing data
+            return contextData || {};
         }
     }
 }
