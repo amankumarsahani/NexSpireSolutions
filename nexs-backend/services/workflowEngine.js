@@ -635,8 +635,17 @@ class WorkflowEngine {
             // Ensure entityData is valid
             const safeEntityData = entityData || {};
 
-            const config = node.config || {};
-            console.log(`[WorkflowEngine] AI Assistant config:`, JSON.stringify(config));
+            // Parse config - handle cases where it's stored as a JSON string
+            let config = node.config || {};
+            if (typeof config === 'string') {
+                try {
+                    config = JSON.parse(config);
+                } catch (e) {
+                    console.error('[WorkflowEngine] Failed to parse AI Assistant config:', e.message);
+                    config = {};
+                }
+            }
+            console.log(`[WorkflowEngine] AI Assistant config (parsed):`, config);
 
             const promptTemplate = config.prompt || 'Analyze this lead: {{name}} from {{company}}';
             const systemMessage = config.system_message || 'You are a helpful CRM assistant.';
