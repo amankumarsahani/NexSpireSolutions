@@ -706,15 +706,7 @@ class WorkflowEngine {
             }
 
             const promptTemplate = config.prompt || 'Analyze this lead: {{name}} from {{company}}';
-            const systemMessage = config.system_message ||
-                'You are a professional CRM sales assistant. \n' +
-                'TASK: Draft ONLY the middle body content of an email response.\n' +
-                'CRITICAL RULES:\n' +
-                '1. NO GREETING: Do not write "Hi", "Dear", or address the customer by name. Start directly with the first sentence.\n' +
-                '2. NO SIGN-OFF: Do not write "Best regards", "Sincerely", or sign your name.\n' +
-                '3. NO SUBJECT LINE: Do not include a Subject or Re: line.\n' +
-                '4. NO FILLER: Do not include "Here is a draft" or any introductory text.\n' +
-                '5. Output plain text ONLY.';
+            const systemMessage = config.system_message || 'You are a helpful CRM assistant.';
 
             const model = config.model || null;
             const outputVariable = config.output_variable || 'ai_reply_draft';
@@ -728,29 +720,15 @@ class WorkflowEngine {
             // Call AI Service
             let response = await AIService.generateContent(renderedPrompt, renderedSystemMessage, model);
 
-            // Robust Cleaning: Remove Subject lines, conversational filler, and redundant greetings/sign-offs
-            response = response
-                .replace(/^(Subject|Re|Thread|From|To|Date):.*$/im, '') // Remove headers
-                .replace(/^Here's a (polite|helpful|draft|suggested).*$/im, '') // Remove conversational filler
-                .replace(/^(Dear|Hi|Hello|Hey|Greetings|Respected)\s+.*$/im, '') // Remove ANY greeting line
-                .replace(/^(Best regards|Regards|Sincerely|Best|Thank you|Thanks|Cheers|Yours truly|Sincerely yours)[,!.]*\s*.*$/im, '') // Remove sign-offs
-                .trim();
-
-            // Logic Fix: We MUST convert \n to <br /> because standard HTML emails ignore \n.
-            // This is a technical bridge between Text (AI) and HTML (Email).
-
             // Final pass: if AI produced tags, try to replace them with data from context
             response = AIService.renderPrompt(response, safeData);
-
-            // Convert actual newlines AND literal \n strings to HTML line breaks
-            const htmlResponse = response.trim().replace(/\\n/g, '<br />').replace(/\n/g, '<br />');
-
 
             // Return flat data strictly for variable substitution
             return {
                 ...safeData,
-                [outputVariable]: htmlResponse
+                [outputVariable]: response
             };
+
         } catch (error) {
             console.error(`[WorkflowEngine] AI Assistant handler error:`, error);
             // On failure, continue with existing data
