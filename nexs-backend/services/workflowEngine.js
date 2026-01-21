@@ -131,6 +131,103 @@ class WorkflowEngine {
     }
 
     /**
+     * Resume a delayed workflow execution
+     */
+    async resumeExecution(executionId) {
+        try {
+            // Get the execution
+            const [executions] = await db.query(
+                'SELECT * FROM workflow_executions WHERE id = ?',
+                [executionId]
+            );
+
+            if (executions.length === 0) {
+                throw new Error(`Execution ${executionId} not found`);
+            }
+
+            const execution = executions[0];
+            const workflowId = execution.workflow_id;
+            const currentNodeId = execution.current_node_id;
+
+            // Get trigger data
+            let contextData = {};
+            try {
+                contextData = execution.trigger_data ? JSON.parse(execution.trigger_data) : {};
+            } catch (e) {
+                contextData = execution.trigger_data || {};
+            }
+
+            // Mark as running
+            await db.query(
+                "UPDATE workflow_executions SET status = 'running' WHERE id = ?",
+                [executionId]
+            );
+
+            console.log(`[WorkflowEngine] Resuming execution ${executionId} from node ${currentNodeId}`);
+
+            // Get all nodes and connections
+            const [nodes] = await db.query(
+                'SELECT * FROM workflow_nodes WHERE workflow_id = ? ORDER BY id',
+                [workflowId]
+            );
+
+            const [connections] = await db.query(
+                'SELECT * FROM workflow_connections WHERE workflow_id = ?',
+                [workflowId]
+            );
+
+            // Build maps
+            const nodeMap = new Map(nodes.map(n => [n.id, n]));
+            const connectionMap = new Map();
+            for (const conn of connections) {
+                if (!connectionMap.has(conn.source_node_id)) {
+                    connectionMap.set(conn.source_node_id, []);
+                }
+                connectionMap.get(conn.source_node_id).push(conn);
+            }
+
+            // Get the last execution log to recover output data
+            const [lastLogs] = await db.query(
+                'SELECT output_data FROM workflow_execution_logs WHERE execution_id = ? ORDER BY id DESC LIMIT 1',
+                [executionId]
+            );
+
+            if (lastLogs.length > 0 && lastLogs[0].output_data) {
+                try {
+                    const lastOutput = JSON.parse(lastLogs[0].output_data);
+                    contextData = { ...contextData, ...lastOutput };
+                } catch (e) {
+                    // Keep existing contextData
+                }
+            }
+
+            // Find connections from current node and execute next nodes
+            const currentConnections = connectionMap.get(currentNodeId) || [];
+            for (const conn of currentConnections) {
+                const nextNode = nodeMap.get(conn.target_node_id);
+                if (nextNode) {
+                    await this.executeNode(nextNode, executionId, contextData, nodeMap, connectionMap);
+                }
+            }
+
+            // Mark execution complete
+            await db.query(
+                "UPDATE workflow_executions SET status = 'completed', completed_at = NOW() WHERE id = ?",
+                [executionId]
+            );
+
+            console.log(`[WorkflowEngine] Resumed execution ${executionId} completed`);
+        } catch (error) {
+            console.error(`[WorkflowEngine] Resume execution ${executionId} failed:`, error);
+            await db.query(
+                "UPDATE workflow_executions SET status = 'failed', error_message = ?, completed_at = NOW() WHERE id = ?",
+                [error.message, executionId]
+            );
+            throw error;
+        }
+    }
+
+    /**
      * Execute a single node and continue to connected nodes
      */
     async executeNode(node, executionId, contextData, nodeMap, connectionMap) {
