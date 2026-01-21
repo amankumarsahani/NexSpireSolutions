@@ -556,14 +556,24 @@ class WorkflowEngine {
         const config = typeof node.config === 'string' ? JSON.parse(node.config) : node.config;
 
         let content = config.content || '';
+        let summary = config.summary || 'Automated Note';
+
         for (const [key, value] of Object.entries(contextData)) {
-            content = content.replace(new RegExp(`{{${key}}}`, 'g'), value || '');
+            const regex = new RegExp(`{{${key}}}`, 'g');
+            content = content.replace(regex, value || '');
+            summary = summary.replace(regex, value || '');
         }
 
         await db.query(
             `INSERT INTO activities (entityType, entityId, type, summary, details)
-             VALUES (?, ?, 'note', 'Automated Note', ?)`,
-            [contextData.entity_type || 'lead', contextData.id, content]
+             VALUES (?, ?, ?, ?, ?)`,
+            [
+                contextData.entity_type || 'lead',
+                contextData.id,
+                config.note_type || 'note',
+                summary,
+                content
+            ]
         );
 
         console.log(`[WorkflowEngine] Added note to ${contextData.entity_type} ${contextData.id}`);
