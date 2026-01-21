@@ -15,7 +15,8 @@ class AIService {
         // Model configurations
         this.models = {
             openai: 'gpt-4o-mini',
-            gemini: 'gemini-1.5-flash'
+            gemini: 'gemini-1.5-flash',
+            groq: 'llama-3.3-70b-versatile'
         };
     }
 
@@ -25,23 +26,34 @@ class AIService {
     async getApiConfig() {
         try {
             const [settings] = await db.query(
-                "SELECT setting_key, setting_value FROM settings WHERE setting_key IN ('openai_api_key', 'gemini_api_key')"
+                "SELECT setting_key, setting_value FROM settings WHERE setting_key IN ('openai_api_key', 'gemini_api_key', 'groq_api_key')"
             );
 
             const settingsMap = {};
             settings.forEach(s => settingsMap[s.setting_key] = s.setting_value);
 
+            const config = {};
             if (settingsMap.openai_api_key) {
-                return { type: 'openai', key: settingsMap.openai_api_key };
-            } else if (settingsMap.gemini_api_key) {
-                return { type: 'gemini', key: settingsMap.gemini_api_key };
+                config.openai = settingsMap.openai_api_key;
+            }
+            if (settingsMap.gemini_api_key) {
+                config.gemini = settingsMap.gemini_api_key;
+            }
+            if (settingsMap.groq_api_key) {
+                config.groq = settingsMap.groq_api_key;
             }
 
-            // Fallback to environment
-            return { type: this.envApiType, key: this.envApiKey };
+            // Fallback for primary/legacy logic if only environment keys exist
+            if (Object.keys(config).length === 0 && this.envApiKey) {
+                config[this.envApiType] = this.envApiKey;
+            }
+
+            return config;
         } catch (error) {
             console.warn('[AIService] Database config fetch failed, using environment fallback:', error.message);
-            return { type: this.envApiType, key: this.envApiKey };
+            const fallback = {};
+            if (this.envApiKey) fallback[this.envApiType] = this.envApiKey;
+            return fallback;
         }
     }
 
@@ -49,19 +61,31 @@ class AIService {
      * Generate content from a prompt
      */
     async generateContent(prompt, systemMessage = 'You are a helpful CRM assistant.', model = null) {
-        const { type, key } = await this.getApiConfig();
-
-        if (!key) {
-            console.warn('[AIService] No API key found. AI features will be disabled.');
-            return 'AI Service unavailable: Missing API Key.';
-        }
+        const config = await this.getApiConfig();
+        const selectedModel = model || (config.openai ? this.models.openai : this.models.gemini);
 
         try {
-            if (type === 'openai') {
-                return await this.callOpenAI(prompt, systemMessage, model || this.models.openai, key);
-            } else {
-                return await this.callGemini(prompt, systemMessage, model || this.models.gemini, key);
+            // Route based on model prefix
+            if (selectedModel.startsWith('gpt-') || selectedModel.startsWith('o1-')) {
+                if (!config.openai) throw new Error('OpenAI API key not configured');
+                return await this.callOpenAI(prompt, systemMessage, selectedModel, config.openai);
             }
+
+            if (selectedModel.startsWith('gemini-')) {
+                if (!config.gemini) throw new Error('Gemini API key not configured');
+                return await this.callGemini(prompt, systemMessage, selectedModel, config.gemini);
+            }
+
+            if (selectedModel.includes('llama') || selectedModel.includes('mixtral')) {
+                if (!config.groq) throw new Error('Groq API key not configured');
+                return await this.callGroq(prompt, systemMessage, selectedModel, config.groq);
+            }
+
+            // Default fallback based on what's configured
+            if (config.openai) return await this.callOpenAI(prompt, systemMessage, selectedModel, config.openai);
+            if (config.gemini) return await this.callGemini(prompt, systemMessage, selectedModel, config.gemini);
+
+            throw new Error('No compatible AI provider configured for this model');
         } catch (error) {
             console.error('[AIService] Generation error:', error.message);
             throw new Error(`AI generation failed: ${error.message}`);
@@ -111,6 +135,31 @@ class AIService {
         }
 
         throw new Error('Unexpected Gemini API response structure');
+    }
+
+    /**
+     * Call Groq API (OpenAI Compatible)
+     */
+    async callGroq(prompt, systemMessage, model, key) {
+        const response = await axios.post(
+            'https://api.groq.com/openai/v1/chat/completions',
+            {
+                model: model,
+                messages: [
+                    { role: 'system', content: systemMessage },
+                    { role: 'user', content: prompt }
+                ],
+                temperature: 0.7
+            },
+            {
+                headers: {
+                    'Authorization': `Bearer ${key}`,
+                    'Content-Type': 'application/json'
+                }
+            }
+        );
+
+        return response.data.choices[0].message.content;
     }
 
     /**

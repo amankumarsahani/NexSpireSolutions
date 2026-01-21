@@ -123,6 +123,15 @@ exports.testAIConnection = async (req, res) => {
             } catch (err) {
                 return res.status(400).json({ success: false, error: `Gemini connection failed: ${err.response?.data?.error?.message || err.message}` });
             }
+        } else if (provider === 'groq') {
+            try {
+                await axios.get('https://api.groq.com/openai/v1/models', {
+                    headers: { 'Authorization': `Bearer ${finalApiKey}` }
+                });
+                return res.json({ success: true, message: 'Groq connection successful' });
+            } catch (err) {
+                return res.status(400).json({ success: false, error: `Groq connection failed: ${err.response?.data?.error?.message || err.message}` });
+            }
         } else {
             return res.status(400).json({ success: false, error: 'Unsupported provider' });
         }
