@@ -703,7 +703,15 @@ class WorkflowEngine {
             }
 
             const promptTemplate = config.prompt || 'Analyze this lead: {{name}} from {{company}}';
-            const systemMessage = config.system_message || 'You are a helpful CRM assistant.';
+            const systemMessage = config.system_message ||
+                'You are a professional CRM sales assistant. Your task is to draft the internal content for an email response. \n' +
+                'RULES:\n' +
+                '1. Write ONLY the email body content.\n' +
+                '2. Do NOT include a Subject line.\n' +
+                '3. Do NOT include "Dear [Name]" if you are starting with a greeting.\n' +
+                '4. Use a professional, helpful tone.\n' +
+                '5. Output plain text without markdown or conversational filler.';
+
             const model = config.model || null;
             const outputVariable = config.output_variable || 'ai_reply_draft';
 
@@ -716,13 +724,22 @@ class WorkflowEngine {
             // Call AI Service
             let response = await AIService.generateContent(renderedPrompt, renderedSystemMessage, model);
 
+            // Logic Fix: Instead of "finding and fixing" AI mistakes like Subject lines via code, 
+            // we use the prompt above to steer it. 
+            // However, we MUST convert \n to <br /> because standard HTML emails ignore \n.
+            // This is a technical bridge between Text (AI) and HTML (Email).
+
             // Final pass: if AI produced tags, try to replace them with data from context
             response = AIService.renderPrompt(response, safeData);
+
+            // Convert newlines to HTML line breaks for the email node
+            const htmlResponse = response.trim().replace(/\n/g, '<br />');
+
 
             // Return flat data strictly for variable substitution
             return {
                 ...safeData,
-                [outputVariable]: response
+                [outputVariable]: htmlResponse
             };
         } catch (error) {
             console.error(`[WorkflowEngine] AI Assistant handler error:`, error);
