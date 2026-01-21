@@ -113,6 +113,7 @@ const documentRoutes = require('./routes/document.routes');
 const messageRoutes = require('./routes/message.routes');
 const inquiryRoutes = require('./routes/inquiry.routes');
 const emailTemplateRoutes = require('./routes/email-template.routes');
+const settingsRoutes = require('./routes/settings.routes');
 
 // Use routes
 app.use('/api/auth', authRoutes);
@@ -127,6 +128,7 @@ app.use('/api/email-templates', emailTemplateRoutes);
 app.use('/api/document-templates', require('./routes/document-template.routes'));
 app.use('/api/activities', require('./routes/activity.routes'));
 app.use('/api/dashboard', require('./routes/dashboard.routes'));
+app.use('/api/settings', settingsRoutes);
 
 // NexCRM Master Routes (Tenant Management)
 app.use('/api/tenants', require('./routes/tenant.routes'));

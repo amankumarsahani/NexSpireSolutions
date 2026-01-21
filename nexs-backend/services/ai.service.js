@@ -4,11 +4,13 @@
  */
 
 const axios = require('axios');
+const db = require('../config/database');
 
 class AIService {
     constructor() {
-        this.apiKey = process.env.OPENAI_API_KEY || process.env.GEMINI_API_KEY || null;
-        this.apiType = process.env.OPENAI_API_KEY ? 'openai' : 'gemini';
+        // Initial defaults from environment
+        this.envApiKey = process.env.OPENAI_API_KEY || process.env.GEMINI_API_KEY || null;
+        this.envApiType = process.env.OPENAI_API_KEY ? 'openai' : 'gemini';
 
         // Model configurations
         this.models = {
@@ -18,19 +20,47 @@ class AIService {
     }
 
     /**
+     * Get active API configuration for the tenant
+     */
+    async getApiConfig() {
+        try {
+            const [settings] = await db.query(
+                "SELECT setting_key, setting_value FROM settings WHERE setting_key IN ('openai_api_key', 'gemini_api_key')"
+            );
+
+            const settingsMap = {};
+            settings.forEach(s => settingsMap[s.setting_key] = s.setting_value);
+
+            if (settingsMap.openai_api_key) {
+                return { type: 'openai', key: settingsMap.openai_api_key };
+            } else if (settingsMap.gemini_api_key) {
+                return { type: 'gemini', key: settingsMap.gemini_api_key };
+            }
+
+            // Fallback to environment
+            return { type: this.envApiType, key: this.envApiKey };
+        } catch (error) {
+            console.warn('[AIService] Database config fetch failed, using environment fallback:', error.message);
+            return { type: this.envApiType, key: this.envApiKey };
+        }
+    }
+
+    /**
      * Generate content from a prompt
      */
     async generateContent(prompt, systemMessage = 'You are a helpful CRM assistant.', model = null) {
-        if (!this.apiKey) {
-            console.warn('[AIService] No API key found in environment variables. AI features will be disabled.');
+        const { type, key } = await this.getApiConfig();
+
+        if (!key) {
+            console.warn('[AIService] No API key found. AI features will be disabled.');
             return 'AI Service unavailable: Missing API Key.';
         }
 
         try {
-            if (this.apiType === 'openai') {
-                return await this.callOpenAI(prompt, systemMessage, model || this.models.openai);
+            if (type === 'openai') {
+                return await this.callOpenAI(prompt, systemMessage, model || this.models.openai, key);
             } else {
-                return await this.callGemini(prompt, systemMessage, model || this.models.gemini);
+                return await this.callGemini(prompt, systemMessage, model || this.models.gemini, key);
             }
         } catch (error) {
             console.error('[AIService] Generation error:', error.message);
@@ -41,7 +71,7 @@ class AIService {
     /**
      * Call OpenAI API
      */
-    async callOpenAI(prompt, systemMessage, model) {
+    async callOpenAI(prompt, systemMessage, model, key) {
         const response = await axios.post(
             'https://api.openai.com/v1/chat/completions',
             {
@@ -54,7 +84,7 @@ class AIService {
             },
             {
                 headers: {
-                    'Authorization': `Bearer ${this.apiKey}`,
+                    'Authorization': `Bearer ${key}`,
                     'Content-Type': 'application/json'
                 }
             }
@@ -66,8 +96,8 @@ class AIService {
     /**
      * Call Google Gemini API
      */
-    async callGemini(prompt, systemMessage, model) {
-        const url = `https://generativelanguage.googleapis.com/v1beta/models/${model}:generateContent?key=${this.apiKey}`;
+    async callGemini(prompt, systemMessage, model, key) {
+        const url = `https://generativelanguage.googleapis.com/v1beta/models/${model}:generateContent?key=${key}`;
 
         const response = await axios.post(url, {
             contents: [{
