@@ -288,17 +288,20 @@ class WorkflowEngine {
         // Replace variables in template
         let subject = config.subject || '';
         let body = config.body || '';
+        let toEmailConfig = config.to_email || '';
 
         for (const [key, value] of Object.entries(contextData)) {
-            subject = subject.replace(new RegExp(`{{${key}}}`, 'g'), value || '');
-            body = body.replace(new RegExp(`{{${key}}}`, 'g'), value || '');
+            const safeValue = value !== null && value !== undefined ? String(value) : '';
+            subject = subject.replace(new RegExp(`{{${key}}}`, 'g'), safeValue);
+            body = body.replace(new RegExp(`{{${key}}}`, 'g'), safeValue);
+            toEmailConfig = toEmailConfig.replace(new RegExp(`{{${key}}}`, 'g'), safeValue);
         }
 
-        // Get recipient email from context or config
-        const toEmail = config.to_email || contextData.email;
+        // Get recipient email from resolved config or context
+        const toEmail = toEmailConfig || contextData.email;
 
         if (!toEmail) {
-            throw new Error('No recipient email found');
+            throw new Error('No recipient email found. Set "To Email" field or ensure entity has email.');
         }
 
         // Send email
