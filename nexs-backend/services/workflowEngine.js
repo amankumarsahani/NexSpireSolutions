@@ -421,11 +421,14 @@ class WorkflowEngine {
             throw new Error('No recipient email found. Set "To Email" field or ensure entity has email.');
         }
 
+        // Final cleanup for HTML: convert actual newlines AND literal \n strings to <br />
+        const htmlBody = body.replace(/\\n/g, '<br />').replace(/\n/g, '<br />');
+
         // Send email
         await EmailService.sendEmail({
             to: toEmail,
             subject: subject,
-            html: body
+            html: htmlBody
         });
 
         console.log(`[WorkflowEngine] Email sent to ${toEmail}`);
@@ -724,17 +727,22 @@ class WorkflowEngine {
             // Call AI Service
             let response = await AIService.generateContent(renderedPrompt, renderedSystemMessage, model);
 
-            // Logic Fix: Instead of "finding and fixing" AI mistakes like Subject lines via code, 
-            // we use the prompt above to steer it. 
-            // However, we MUST convert \n to <br /> because standard HTML emails ignore \n.
+            // Robust Cleaning: Remove Subject lines, conversational filler, and redundant greetings
+            response = response
+                .replace(/^(Subject|Re|Thread|From|To|Date):.*$/im, '') // Remove headers
+                .replace(/^Here's a (polite|helpful|draft|suggested).*$/im, '') // Remove conversational filler
+                .replace(/^(Dear|Hi|Hello)\s+{{name}}[,!.]*/im, '') // Remove redundant greeting if it matches template
+                .replace(/^(Dear|Hi|Hello)\s+Customer[,!.]*/im, '')
+                .trim();
+
+            // Logic Fix: We MUST convert \n to <br /> because standard HTML emails ignore \n.
             // This is a technical bridge between Text (AI) and HTML (Email).
 
             // Final pass: if AI produced tags, try to replace them with data from context
             response = AIService.renderPrompt(response, safeData);
 
-            // Convert newlines to HTML line breaks for the email node
-            const htmlResponse = response.trim().replace(/\n/g, '<br />');
-
+            // Convert actual newlines AND literal \n strings to HTML line breaks
+            const htmlResponse = response.trim().replace(/\\n/g, '<br />').replace(/\n/g, '<br />');
 
             // Return flat data strictly for variable substitution
             return {
