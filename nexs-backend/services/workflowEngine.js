@@ -114,6 +114,17 @@ class WorkflowEngine {
             // Execute starting from trigger
             await this.executeNode(triggerNode, executionId, contextData, nodeMap, connectionMap);
 
+            // Check if execution is in waiting state (due to delay) - don't mark complete
+            const [execStatus] = await db.query(
+                'SELECT status FROM workflow_executions WHERE id = ?',
+                [executionId]
+            );
+
+            if (execStatus[0]?.status === 'waiting') {
+                console.log(`[WorkflowEngine] Execution ${executionId} paused (waiting for delay)`);
+                return; // Don't mark as completed, worker will resume later
+            }
+
             // Mark execution complete
             await db.query(
                 "UPDATE workflow_executions SET status = 'completed', completed_at = NOW() WHERE id = ?",
@@ -121,6 +132,7 @@ class WorkflowEngine {
             );
 
             console.log(`[WorkflowEngine] Execution ${executionId} completed`);
+
         } catch (error) {
             await db.query(
                 "UPDATE workflow_executions SET status = 'failed', error_message = ?, completed_at = NOW() WHERE id = ?",

@@ -27,12 +27,11 @@ class WorkflowWorker {
                  LIMIT 10`
             );
 
-            if (waiting.length > 0) {
-                console.log(`[WorkflowWorker] Resuming ${waiting.length} delayed executions`);
-            }
+            console.log(`[WorkflowWorker] Checking delayed executions: found ${waiting.length} ready to resume`);
 
             for (const execution of waiting) {
                 try {
+                    console.log(`[WorkflowWorker] Resuming execution ${execution.id}`);
                     await workflowEngine.resumeExecution(execution.id);
                 } catch (error) {
                     console.error(`[WorkflowWorker] Failed to resume execution ${execution.id}:`, error);
@@ -44,6 +43,7 @@ class WorkflowWorker {
             this.isRunning = false;
         }
     }
+
 
     /**
      * Process scheduled workflows (cron-like)
