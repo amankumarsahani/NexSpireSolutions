@@ -368,6 +368,17 @@ class WorkflowEngine {
             }
         }
 
+        // Handle Stripe specific filters (Plan ID)
+        if (config.plan_id && config.plan_id !== '') {
+            const stripeObject = entityData.session || entityData.invoice || entityData.subscription || entityData;
+            const actualPlanId = stripeObject.metadata?.plan_id || entityData.plan_id;
+
+            if (actualPlanId !== config.plan_id) {
+                console.log(`[WorkflowEngine] Plan ID filter mismatch: ${actualPlanId} !== ${config.plan_id}`);
+                return false;
+            }
+        }
+
         // Handle legacy filters array format
         if (config.filters && config.filters.length > 0) {
             for (const filter of config.filters) {

@@ -206,11 +206,11 @@ class BillingController {
      */
     async createPaymentLink(req, res) {
         try {
-            const { planId, successUrl, cancelUrl } = req.body;
+            const { planId, successUrl, cancelUrl, metadata } = req.body;
             if (!planId) {
                 return res.status(400).json({ error: 'planId is required' });
             }
-            const session = await StripeService.createCheckoutSession(planId, successUrl, cancelUrl);
+            const session = await StripeService.createCheckoutSession(planId, successUrl, cancelUrl, metadata);
             // Return the URL to redirect the user
             res.json({ success: true, url: session.url });
         } catch (error) {

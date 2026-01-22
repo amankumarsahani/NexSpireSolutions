@@ -2,7 +2,8 @@
 // Handles Stripe API interactions for the Nexspire admin backend
 // Includes webhook signature verification and basic customer/subscription utilities
 
-const stripe = require('stripe')(process.env.STRIPE_SECRET_KEY);
+const stripeKey = process.env.STRIPE_SECRET_KEY || 'sk_test_placeholder';
+const stripe = require('stripe')(stripeKey);
 const crypto = require('crypto');
 
 class StripeService {
@@ -38,9 +39,10 @@ class StripeService {
      * @param {string} planId - internal plan identifier (used to fetch price ID)
      * @param {string} successUrl - URL to redirect after successful payment
      * @param {string} cancelUrl - URL to redirect if payment is cancelled
+     * @param {object} metadata - optional metadata for tracking/workflows
      * @returns {object} Stripe session object
      */
-    async createCheckoutSession(planId, successUrl, cancelUrl) {
+    async createCheckoutSession(planId, successUrl, cancelUrl, metadata = {}) {
         const priceId = process.env[`STRIPE_PRICE_ID_${planId.toUpperCase()}`];
         if (!priceId) {
             throw new Error(`No Stripe price configured for plan ${planId}`);
@@ -51,6 +53,10 @@ class StripeService {
             mode: 'subscription',
             success_url: successUrl,
             cancel_url: cancelUrl,
+            metadata: {
+                ...metadata,
+                plan_id: planId
+            }
         });
         return session;
     }
