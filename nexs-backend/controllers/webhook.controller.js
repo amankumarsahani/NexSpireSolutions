@@ -4,6 +4,7 @@
  */
 
 const RazorpayService = require('../services/razorpay.service');
+const StripeService = require('../services/stripe.service');
 const TenantModel = require('../models/tenant.model');
 const Provisioner = require('../services/provisioner');
 const { pool } = require('../config/database');
@@ -237,6 +238,64 @@ class WebhookController {
 
         console.log(`[Webhook] Payment failed for tenant ${tenantId}`);
     }
+    // Stripe webhook handler
+    async handleStripeWebhook(req, res) {
+        try {
+            const sig = req.headers['stripe-signature'];
+            const payload = req.body; // raw body buffer
+            if (!StripeService.verifyWebhookSignature(payload, sig)) {
+                console.error('[Webhook] Invalid Stripe signature');
+                return res.status(400).json({ error: 'Invalid signature' });
+            }
+            const event = StripeService.getLastEvent();
+            console.log(`[Webhook] Received Stripe event: ${event.type}`);
+            switch (event.type) {
+                case 'checkout.session.completed':
+                    await this.handleStripeCheckoutSessionCompleted(event);
+                    break;
+                case 'invoice.paid':
+                    await this.handleStripeInvoicePaid(event);
+                    break;
+                case 'customer.subscription.deleted':
+                    await this.handleStripeSubscriptionDeleted(event);
+                    break;
+                default:
+                    console.log(`[Webhook] Unhandled Stripe event: ${event.type}`);
+            }
+            res.json({ received: true });
+        } catch (error) {
+            console.error('[Webhook] Stripe processing error:', error);
+            res.status(500).json({ error: 'Webhook processing failed' });
+        }
+    }
+
+    async handleStripeCheckoutSessionCompleted(event) {
+        const session = event.data.object;
+        const tenantId = session.metadata?.tenant_id;
+        if (!tenantId) return;
+        await TenantModel.update(tenantId, { status: 'active' });
+        const workflowEngine = require('../services/workflowEngine');
+        await workflowEngine.trigger('stripe_payment_received', 'tenant', tenantId, { session });
+    }
+
+    async handleStripeInvoicePaid(event) {
+        const invoice = event.data.object;
+        const tenantId = invoice.metadata?.tenant_id;
+        if (!tenantId) return;
+        console.log(`[Webhook] Invoice paid for tenant ${tenantId}`);
+        const workflowEngine = require('../services/workflowEngine');
+        await workflowEngine.trigger('stripe_invoice_paid', 'tenant', tenantId, { invoice });
+    }
+
+    async handleStripeSubscriptionDeleted(event) {
+        const subscription = event.data.object;
+        const tenantId = subscription.metadata?.tenant_id;
+        if (!tenantId) return;
+        await pool.query(`UPDATE subscriptions SET status = 'cancelled' WHERE stripe_subscription_id = ?`, [subscription.id]);
+        const workflowEngine = require('../services/workflowEngine');
+        await workflowEngine.trigger('stripe_subscription_cancelled', 'tenant', tenantId, { subscription });
+    }
 }
+
 
 module.exports = new WebhookController();

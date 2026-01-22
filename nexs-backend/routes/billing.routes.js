@@ -18,6 +18,6 @@ router.post('/subscriptions/:tenantId/resume', billingController.resumeSubscript
 router.get('/payments/:tenantId', billingController.getPaymentHistory);
 
 // Billing stats
-router.get('/stats', billingController.getBillingStats);
+router.post('/payment-link', billingController.createPaymentLink); // New endpoint to generate Stripe payment link
 
 module.exports = router;

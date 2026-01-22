@@ -4,7 +4,9 @@
  */
 
 const RazorpayService = require('../services/razorpay.service');
+const StripeService = require('../services/stripe.service');
 const TenantModel = require('../models/tenant.model');
+
 const { pool } = require('../config/database');
 
 class BillingController {
@@ -200,8 +202,23 @@ class BillingController {
     }
 
     /**
-     * Get billing stats for dashboard
+     * Create a Stripe payment link (checkout session) for a plan
      */
+    async createPaymentLink(req, res) {
+        try {
+            const { planId, successUrl, cancelUrl } = req.body;
+            if (!planId) {
+                return res.status(400).json({ error: 'planId is required' });
+            }
+            const session = await StripeService.createCheckoutSession(planId, successUrl, cancelUrl);
+            // Return the URL to redirect the user
+            res.json({ success: true, url: session.url });
+        } catch (error) {
+            console.error('Create payment link error:', error);
+            res.status(500).json({ error: error.message || 'Failed to create payment link' });
+        }
+    }
+
     async getBillingStats(req, res) {
         try {
             const [stats] = await pool.query(`
