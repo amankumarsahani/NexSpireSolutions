@@ -432,7 +432,13 @@ class WorkflowEngine {
         });
 
         console.log(`[WorkflowEngine] Email sent to ${toEmail}`);
-        return { ...contextData, email_sent: true, email_to: toEmail };
+        return {
+            ...contextData,
+            email_sent: true,
+            email_to: toEmail,
+            last_email_subject: subject,
+            last_email_body: body
+        };
     }
 
     async handleUpdateLead(node, contextData) {
