@@ -3,7 +3,10 @@ const router = express.Router();
 const billingController = require('../controllers/billing.controller');
 const { auth, isAdmin } = require('../middleware/auth');
 
-// All billing routes require admin authentication
+// Public routes (required for Agency Pricing page)
+router.post('/payment-link', billingController.createPaymentLink); // Generate Stripe checkout link
+
+// All other billing routes require admin authentication
 router.use(auth);
 router.use(isAdmin);
 
@@ -18,6 +21,6 @@ router.post('/subscriptions/:tenantId/resume', billingController.resumeSubscript
 router.get('/payments/:tenantId', billingController.getPaymentHistory);
 
 // Billing stats
-router.post('/payment-link', billingController.createPaymentLink); // New endpoint to generate Stripe payment link
+// router.post('/payment-link', billingController.createPaymentLink); // Moved to public section
 
 module.exports = router;
