@@ -143,5 +143,15 @@ export const workflowAPI = {
     getNodeTypes: () => api.get('/workflows/meta/node-types')
 };
 
+// System Settings
+export const settingsAPI = {
+    getPublicSettings: () => api.get('/settings/public')
+};
+
+// Billing & Payments
+export const billingAPI = {
+    createPaymentLink: (data) => api.post('/billing/payment-link', data)
+};
+
 export default api;
 

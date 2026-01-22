@@ -5,7 +5,7 @@
 
 const db = require('../config/database');
 
-// Get all system settings
+// Get all system settings (Admin only)
 exports.getSettings = async (req, res) => {
     try {
         const [settings] = await db.query('SELECT setting_key, setting_value FROM settings');
@@ -29,6 +29,37 @@ exports.getSettings = async (req, res) => {
         res.json({ success: true, data: settingsMap });
     } catch (error) {
         console.error('Get settings error:', error);
+        res.status(500).json({ success: false, error: 'Failed to fetch settings' });
+    }
+};
+
+// Get public settings (for pricing page, etc.)
+exports.getPublicSettings = async (req, res) => {
+    try {
+        const publicKeys = [
+            'pricing_page_mode',
+            'contact_sales_email',
+            'stripe_price_id_starter',
+            'stripe_price_id_starter_yearly',
+            'stripe_price_id_growth',
+            'stripe_price_id_growth_yearly',
+            'stripe_price_id_business',
+            'stripe_price_id_business_yearly'
+        ];
+
+        const [settings] = await db.query(
+            'SELECT setting_key, setting_value FROM settings WHERE setting_key IN (?)',
+            [publicKeys]
+        );
+
+        const settingsMap = {};
+        settings.forEach(s => {
+            settingsMap[s.setting_key] = s.setting_value;
+        });
+
+        res.json({ success: true, data: settingsMap });
+    } catch (error) {
+        console.error('Get public settings error:', error);
         res.status(500).json({ success: false, error: 'Failed to fetch settings' });
     }
 };

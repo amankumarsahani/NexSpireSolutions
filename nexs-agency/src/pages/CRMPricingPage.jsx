@@ -1,5 +1,6 @@
 import { useState, useEffect } from 'react';
 import { Helmet } from 'react-helmet-async';
+import { settingsAPI, billingAPI } from '../services/api';
 
 const CheckIcon = () => (
     <svg className="w-5 h-5 text-emerald-500 flex-shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24">
@@ -135,12 +136,32 @@ export default function CRMPricingPage() {
     const [selectedPlan, setSelectedPlan] = useState('');
     const [submitting, setSubmitting] = useState(false);
     const [submitted, setSubmitted] = useState(false);
+    const [pricingMode, setPricingMode] = useState('contact_us');
+    const [contactEmail, setContactEmail] = useState('sales@nexspire.com');
+    const [loadingSettings, setLoadingSettings] = useState(true);
 
     // reCAPTCHA site key (same as EnquiryPopup)
     const RECAPTCHA_SITE_KEY = '6LcrNTYsAAAAAAiRJyNE6h2kWSsof7HrIHRx4Z8z';
 
-    // Load reCAPTCHA v3 script
+    // Load reCAPTCHA v3 script and settings
     useEffect(() => {
+        const fetchSettings = async () => {
+            try {
+                const response = await settingsAPI.getPublicSettings();
+                if (response.data.success || response.data) {
+                    const settings = response.data.data || response.data;
+                    if (settings.pricing_page_mode) setPricingMode(settings.pricing_page_mode);
+                    if (settings.contact_sales_email) setContactEmail(settings.contact_sales_email);
+                }
+            } catch (err) {
+                console.error('Failed to fetch pricing settings:', err);
+            } finally {
+                setLoadingSettings(false);
+            }
+        };
+
+        fetchSettings();
+
         if (document.getElementById('recaptcha-script')) return;
 
         const script = document.createElement('script');
@@ -170,10 +191,38 @@ export default function CRMPricingPage() {
         setTimeout(() => setToast({ show: false, message: '', type: 'error' }), 4000);
     };
 
-    const handleContactClick = (planName) => {
-        setSelectedPlan(planName);
-        setShowContactModal(true);
-        setSubmitted(false);
+    const handleAction = async (planName) => {
+        if (pricingMode === 'contact_us' || planName === 'Enterprise') {
+            setSelectedPlan(planName);
+            setShowContactModal(true);
+            setSubmitted(false);
+            return;
+        }
+
+        // Stripe Checkout logic
+        const planId = planName.toLowerCase();
+        const id = showToast('Initiating secure checkout...', 'info');
+        try {
+            const finalPlanId = isYearly ? `${planId}_yearly` : planId;
+            const response = await billingAPI.createPaymentLink({
+                planId: finalPlanId,
+                successUrl: window.location.origin + '/nexcrm?payment=success',
+                cancelUrl: window.location.origin + '/nexcrm/pricing?payment=cancelled',
+                metadata: {
+                    source: 'agency_pricing_page',
+                    billing_cycle: isYearly ? 'yearly' : 'monthly'
+                }
+            });
+
+            if (response.data.success && response.data.url) {
+                window.location.href = response.data.url;
+            } else {
+                showToast(response.data.error || 'Failed to generate checkout link');
+            }
+        } catch (err) {
+            showToast('Failed to initiate checkout. Please contact support.');
+            console.error('Checkout error:', err);
+        }
     };
 
     return (
@@ -185,14 +234,16 @@ export default function CRMPricingPage() {
 
             {/* Toast Notification */}
             {toast.show && (
-                <div className={`fixed top-4 right-4 z-[100] px-4 py-3 rounded-lg shadow-lg flex items-center gap-3 animate-fade-in ${toast.type === 'error' ? 'bg-red-500 text-white' : 'bg-emerald-500 text-white'
+                <div className={`fixed top-4 right-4 z-[100] px-4 py-3 rounded-lg shadow-lg flex items-center gap-3 animate-fade-in ${toast.type === 'error' ? 'bg-red-500 text-white' : (toast.type === 'info' ? 'bg-blue-500 text-white' : 'bg-emerald-500 text-white')
                     }`}>
                     <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                         {toast.type === 'error' ? (
                             <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 8v4m0 4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z" />
+                        ) : (toast.type === 'info' ? (
+                            <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M13 16h-1v-4h-1m1-4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z" />
                         ) : (
                             <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M5 13l4 4L19 7" />
-                        )}
+                        ))}
                     </svg>
                     <span className="font-medium">{toast.message}</span>
                     <button onClick={() => setToast({ show: false, message: '', type: 'error' })} className="ml-2 hover:opacity-70">
@@ -290,13 +341,13 @@ export default function CRMPricingPage() {
                                 </ul>
 
                                 <button
-                                    onClick={() => handleContactClick(tier.name)}
+                                    onClick={() => handleAction(tier.name)}
                                     className={`block w-full py-3 px-4 rounded-lg font-semibold text-center transition-colors ${tier.popular
                                         ? 'bg-blue-600 text-white hover:bg-blue-700'
                                         : 'bg-slate-100 text-slate-900 hover:bg-slate-200'
                                         }`}
                                 >
-                                    {tier.cta}
+                                    {pricingMode === 'payment_link' && tier.name !== 'Enterprise' ? 'Buy Now' : tier.cta}
                                 </button>
                             </div>
                         ))}
