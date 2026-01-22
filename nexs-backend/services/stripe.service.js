@@ -5,6 +5,7 @@
 const stripeKey = process.env.STRIPE_SECRET_KEY || 'sk_test_placeholder';
 const stripe = require('stripe')(stripeKey);
 const crypto = require('crypto');
+const { pool } = require('../config/database');
 
 class StripeService {
     /**
@@ -43,9 +44,27 @@ class StripeService {
      * @returns {object} Stripe session object
      */
     async createCheckoutSession(planId, successUrl, cancelUrl, metadata = {}) {
-        const priceId = process.env[`STRIPE_PRICE_ID_${planId.toUpperCase()}`];
+        // 1. Try to get Price ID from Database settings first
+        let priceId = null;
+        try {
+            const [[setting]] = await pool.query(
+                'SELECT setting_value FROM settings WHERE setting_key = ?',
+                [`stripe_price_id_${planId.toLowerCase()}`]
+            );
+            if (setting && setting.setting_value) {
+                priceId = setting.setting_value;
+            }
+        } catch (err) {
+            console.error('[Stripe] DB lookup failed:', err.message);
+        }
+
+        // 2. Fallback to Environment Variables
         if (!priceId) {
-            throw new Error(`No Stripe price configured for plan ${planId}`);
+            priceId = process.env[`STRIPE_PRICE_ID_${planId.toUpperCase()}`];
+        }
+
+        if (!priceId) {
+            throw new Error(`No Stripe price configured for plan ${planId}. Please check Admin Settings or .env`);
         }
         const session = await stripe.checkout.sessions.create({
             payment_method_types: ['card'],
