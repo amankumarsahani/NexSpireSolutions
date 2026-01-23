@@ -1,10 +1,11 @@
-import { useEffect, useState } from 'react';
+import { useEffect, useState, useRef, useCallback } from 'react';
 import { Link } from 'react-router-dom';
 import { Helmet } from 'react-helmet-async';
 import { motion, AnimatePresence } from 'framer-motion';
 import { clsx } from 'clsx';
 import { twMerge } from 'tailwind-merge';
 import LeadMagnet from '../components/LeadMagnet';
+import { blogAPI } from '../services/api';
 
 // Utility for tailwind class merging
 function cn(...inputs) {
@@ -25,87 +26,127 @@ const FadeIn = ({ children, className, delay = 0 }) => {
     );
 };
 
+const POSTS_PER_PAGE = 6;
+
 const BlogPage = () => {
     const [activeCategory, setActiveCategory] = useState('All');
     const [searchQuery, setSearchQuery] = useState('');
+    const [allPosts, setAllPosts] = useState([]);
+    const [displayedPosts, setDisplayedPosts] = useState([]);
+    const [categories, setCategories] = useState(['All']);
+    const [loading, setLoading] = useState(true);
+    const [loadingMore, setLoadingMore] = useState(false);
+    const [hasMore, setHasMore] = useState(true);
+    const [page, setPage] = useState(1);
+    const loaderRef = useRef(null);
 
     useEffect(() => {
         window.scrollTo(0, 0);
+        loadBlogs();
     }, []);
 
-    const posts = [
-        {
-            id: 1,
-            title: "Top 10 AI Trends Shaping Business in 2026",
-            excerpt: "Explore the key AI trends shaping the future of global business, from predictive analytics to generative AI, and how to adopt them.",
-            category: "Technology",
-            author: "Aman Kumar",
-            date: "Mar 15, 2024",
-            readTime: "5 min read",
-            image: "https://images.unsplash.com/photo-1677442136019-21780ecad995?w=1200&q=80",
-            featured: true,
-            slug: "ai-trends-2026"
-        },
-        {
-            id: 2,
-            title: "React Native vs. Flutter: CEO's Guide for 2026",
-            excerpt: "Deciding between React Native and Flutter? We compare performance, developer cost, and time-to-market to help you choose the right stack.",
-            category: "Mobile",
-            author: "Kshitij Bhardwaj",
-            date: "Mar 12, 2024",
-            readTime: "8 min read",
-            image: "https://images.unsplash.com/photo-1512941937669-90a1b58e7e9c?w=800&q=80",
-            featured: false,
-            slug: "react-native-vs-flutter"
-        },
-        {
-            id: 3,
-            title: "Cost of Building a Custom CRM in 2026",
-            excerpt: "How much does it cost to build a custom CRM? We break down the costs for MVPs, mid-sized, and enterprise solutions.",
-            category: "Enterprise",
-            author: "Aman Kumar",
-            date: "Mar 20, 2024",
-            readTime: "7 min read",
-            image: "https://images.unsplash.com/photo-1556742049-0cfed4f7a07d?w=800&q=80",
-            featured: false,
-            slug: "cost-of-custom-crm-2026"
-        },
-        {
-            id: 4,
-            title: "Migrating Legacy Monoliths to Microservices",
-            excerpt: "Is your legacy monolith slowing you down? Learn the strategic risks and rewards of migrating to a microservices architecture.",
-            category: "Cloud",
-            author: "Aman Kumar",
-            date: "Mar 25, 2024",
-            readTime: "6 min read",
-            image: "https://images.unsplash.com/photo-1451187580459-43490279c0fa?w=800&q=80",
-            featured: false,
-            slug: "monolith-to-microservices"
-        },
-        {
-            id: 5,
-            title: "Why Your Business Needs a Progressive Web App (PWA)",
-            excerpt: "PWAs offer the best of mobile and web. Learn how they boost conversion rates, improve SEO, and cut development costs.",
-            category: "Web",
-            author: "Kshitij Bhardwaj",
-            date: "Mar 30, 2024",
-            readTime: "5 min read",
-            image: "https://images.unsplash.com/photo-1498050108023-c5249f4df085?w=800&q=80",
-            featured: false,
-            slug: "why-business-needs-pwa"
+    const loadBlogs = async () => {
+        try {
+            setLoading(true);
+            const response = await blogAPI.getAll();
+            const blogs = response.data.blogs || [];
+            const apiCategories = response.data.categories || [];
+
+            // Transform API data to match existing format
+            const transformedPosts = blogs.map(blog => ({
+                id: blog.id,
+                title: blog.title,
+                excerpt: blog.excerpt,
+                category: blog.category,
+                author: blog.author,
+                date: new Date(blog.created_at).toLocaleDateString('en-US', {
+                    year: 'numeric',
+                    month: 'short',
+                    day: 'numeric'
+                }),
+                readTime: blog.read_time || '5 min read',
+                image: blog.image,
+                featured: blog.featured,
+                slug: blog.slug
+            }));
+
+            setAllPosts(transformedPosts);
+            setCategories(['All', ...apiCategories]);
+
+            // Initial load - show first batch
+            setDisplayedPosts(transformedPosts.slice(0, POSTS_PER_PAGE));
+            setHasMore(transformedPosts.length > POSTS_PER_PAGE);
+        } catch (error) {
+            console.error('Error loading blogs:', error);
+        } finally {
+            setLoading(false);
         }
-    ];
+    };
 
-    const categories = ["All", "Technology", "Development", "Design", "Cloud", "Mobile"];
+    // Filter posts based on category and search
+    const getFilteredPosts = useCallback(() => {
+        return allPosts.filter(post => {
+            const matchesCategory = activeCategory === 'All' || post.category === activeCategory;
+            const matchesSearch = post.title.toLowerCase().includes(searchQuery.toLowerCase()) ||
+                (post.excerpt || '').toLowerCase().includes(searchQuery.toLowerCase());
+            return matchesCategory && matchesSearch;
+        });
+    }, [allPosts, activeCategory, searchQuery]);
 
-    const filteredPosts = posts.filter(post => {
-        const matchesCategory = activeCategory === 'All' || post.category === activeCategory;
-        const matchesSearch = post.title.toLowerCase().includes(searchQuery.toLowerCase()) ||
-            post.excerpt.toLowerCase().includes(searchQuery.toLowerCase());
-        return matchesCategory && matchesSearch;
-    });
+    // Reset displayed posts when filter changes
+    useEffect(() => {
+        const filtered = getFilteredPosts();
+        setDisplayedPosts(filtered.slice(0, POSTS_PER_PAGE));
+        setPage(1);
+        setHasMore(filtered.length > POSTS_PER_PAGE);
+    }, [activeCategory, searchQuery, getFilteredPosts]);
 
-    const featuredPost = posts.find(p => p.featured);
+    // Load more posts
+    const loadMorePosts = useCallback(() => {
+        if (loadingMore || !hasMore) return;
+
+        setLoadingMore(true);
+        const filtered = getFilteredPosts();
+        const nextPage = page + 1;
+        const start = 0;
+        const end = nextPage * POSTS_PER_PAGE;
+
+        setTimeout(() => {
+            setDisplayedPosts(filtered.slice(start, end));
+            setPage(nextPage);
+            setHasMore(end < filtered.length);
+            setLoadingMore(false);
+        }, 300); // Small delay for smooth UX
+    }, [page, loadingMore, hasMore, getFilteredPosts]);
+
+    // Intersection Observer for infinite scroll
+    useEffect(() => {
+        const observer = new IntersectionObserver(
+            (entries) => {
+                if (entries[0].isIntersecting && hasMore && !loadingMore && !loading) {
+                    loadMorePosts();
+                }
+            },
+            { threshold: 0.1, rootMargin: '100px' }
+        );
+
+        if (loaderRef.current) {
+            observer.observe(loaderRef.current);
+        }
+
+        return () => observer.disconnect();
+    }, [hasMore, loadingMore, loading, loadMorePosts]);
+
+    const featuredPost = allPosts.find(p => p.featured);
+    const nonFeaturedDisplayed = displayedPosts.filter(p => !p.featured);
+
+    if (loading) {
+        return (
+            <div className="min-h-screen flex items-center justify-center bg-white">
+                <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-blue-600"></div>
+            </div>
+        );
+    }
 
     return (
         <div className="min-h-screen bg-white font-sans text-gray-900 selection:bg-blue-600 selection:text-white">
@@ -215,15 +256,15 @@ const BlogPage = () => {
                     layout
                     className="grid md:grid-cols-2 lg:grid-cols-3 gap-8"
                 >
-                    <AnimatePresence>
-                        {filteredPosts.filter(p => !p.featured).map((post, index) => (
+                    <AnimatePresence mode="popLayout">
+                        {nonFeaturedDisplayed.map((post, index) => (
                             <Link key={post.id} to={`/blog/${post.slug}`} className="h-full block">
                                 <motion.article
                                     layout
-                                    initial={{ opacity: 0, scale: 0.9 }}
-                                    animate={{ opacity: 1, scale: 1 }}
+                                    initial={{ opacity: 0, scale: 0.9, y: 20 }}
+                                    animate={{ opacity: 1, scale: 1, y: 0 }}
                                     exit={{ opacity: 0, scale: 0.9 }}
-                                    transition={{ duration: 0.3 }}
+                                    transition={{ duration: 0.4, delay: index % POSTS_PER_PAGE * 0.05 }}
                                     className="bg-white rounded-[2rem] overflow-hidden shadow-sm hover:shadow-2xl transition-all duration-500 group border border-gray-100 flex flex-col h-full hover:-translate-y-2"
                                 >
                                     <div className="relative h-64 overflow-hidden">
@@ -231,6 +272,7 @@ const BlogPage = () => {
                                             src={post.image}
                                             alt={post.title}
                                             className="w-full h-full object-cover transition-transform duration-700 group-hover:scale-110"
+                                            loading="lazy"
                                         />
                                         <div className="absolute top-4 left-4">
                                             <span className="px-3 py-1 bg-white/90 backdrop-blur-md text-gray-900 text-xs font-bold rounded-full shadow-sm">
@@ -268,8 +310,29 @@ const BlogPage = () => {
                     </AnimatePresence>
                 </motion.div>
 
+                {/* Infinite Scroll Loader */}
+                <div ref={loaderRef} className="py-12 flex justify-center">
+                    {loadingMore && (
+                        <div className="flex items-center gap-3">
+                            <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-blue-600"></div>
+                            <span className="text-gray-500 font-medium">Loading more articles...</span>
+                        </div>
+                    )}
+                    {!hasMore && nonFeaturedDisplayed.length > 0 && (
+                        <p className="text-gray-400 text-sm font-medium">
+                            You've reached the end • {nonFeaturedDisplayed.length} articles shown
+                        </p>
+                    )}
+                    {nonFeaturedDisplayed.length === 0 && !loading && (
+                        <div className="text-center py-12">
+                            <i className="ri-article-line text-6xl text-gray-300 mb-4 block"></i>
+                            <p className="text-gray-500 text-lg">No articles found matching your criteria</p>
+                        </div>
+                    )}
+                </div>
+
                 {/* Newsletter */}
-                <div className="mt-32 relative">
+                <div className="mt-16 relative">
                     <div className="absolute inset-0 bg-gradient-to-r from-blue-600 to-purple-600 rounded-[3rem] transform rotate-1 opacity-50 blur-lg"></div>
                     <div className="bg-gray-900 rounded-[3rem] p-12 md:p-24 text-center text-white relative overflow-hidden shadow-2xl">
                         <div className="absolute inset-0 bg-[url('https://grainy-gradients.vercel.app/noise.svg')] opacity-10"></div>

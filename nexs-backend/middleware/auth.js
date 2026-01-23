@@ -32,6 +32,20 @@ const auth = async (req, res, next) => {
     }
 };
 
+// Optional auth - attaches user if token exists, but doesn't require it
+const optionalAuth = async (req, res, next) => {
+    try {
+        const token = req.header('Authorization')?.replace('Bearer ', '');
+        if (token) {
+            const decoded = jwt.verify(token, process.env.JWT_SECRET);
+            req.user = decoded;
+        }
+    } catch (error) {
+        // Token invalid or expired - just continue without user
+    }
+    next();
+};
+
 // Middleware to check if user is admin
 const isAdmin = (req, res, next) => {
     if (req.user.role !== 'admin') {
@@ -81,5 +95,5 @@ const hasRole = (...allowedRoles) => {
 // sales_operator - Can view/manage assigned leads and inquiries, convert inquiries
 // user - Can view and edit assigned items only
 
-module.exports = { auth, isAdmin, isManager, isSalesOperator, hasRole };
+module.exports = { auth, optionalAuth, isAdmin, isManager, isSalesOperator, hasRole };
 

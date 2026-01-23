@@ -155,5 +155,15 @@ export const billingAPI = {
     createPaymentLink: (data) => api.post('/billing/payment-link', data)
 };
 
+// Blog
+export const blogAPI = {
+    getAll: (params) => api.get('/blogs', { params }),
+    getBySlug: (slug) => api.get(`/blogs/slug/${slug}`),
+    getById: (id) => api.get(`/blogs/${id}`),
+    create: (data) => api.post('/blogs', data),
+    update: (id, data) => api.put(`/blogs/${id}`, data),
+    delete: (id) => api.delete(`/blogs/${id}`)
+};
+
 export default api;
 

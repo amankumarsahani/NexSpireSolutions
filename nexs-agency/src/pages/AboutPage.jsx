@@ -7,9 +7,6 @@ import { twMerge } from 'tailwind-merge';
 
 // Import Assets
 import officeImg from '../assets/office_collaboration.png';
-import avatarAman from '../assets/avatar_aman.png';
-import avatarAnu from '../assets/avatar_anu.png';
-import avatarKshitij from '../assets/avatar_kshitij.png';
 
 // Utility for tailwind class merging
 function cn(...inputs) {
@@ -45,7 +42,7 @@ const AboutPage = () => {
   const stats = [
     { label: "Years of Innovation", value: "5+" },
     { label: "Projects Delivered", value: "150+" },
-    { label: "Team Experts", value: "25+" },
+    { label: "Global Clients", value: "50+" },
     { label: "Client Retention", value: "98%" }
   ];
 
@@ -73,27 +70,6 @@ const AboutPage = () => {
       description: "We craft interfaces that are not only beautiful but also intuitive and accessible.",
       icon: "ri-pencil-ruler-2-line",
       color: "pink"
-    }
-  ];
-
-  const team = [
-    // {
-    //   name: "Aman Kumar Sahani",
-    //   role: "Founder & Lead Architect",
-    //   image: avatarAman,
-    //   bio: "Visionary leader with a passion for scalable architecture and AI integration."
-    // },
-    {
-      name: "Anu Kumar",
-      role: "Creative Director",
-      image: avatarAnu,
-      bio: "Award-winning designer who believes in the power of minimalism and user-centric design."
-    },
-    {
-      name: "Kshitij Bhardwaj",
-      role: "Senior Tech Lead",
-      image: avatarKshitij,
-      bio: "Full-stack wizard ensuring code quality and performance across all projects."
     }
   ];
 
@@ -215,45 +191,6 @@ const AboutPage = () => {
         </div>
       </section>
 
-      {/* Team - Standard Cards */}
-      <section className="py-32 bg-white relative">
-        <div className="container-custom">
-          <FadeIn className="text-center mb-20">
-            <h2 className="text-4xl md:text-5xl font-bold tracking-tight mb-6">Meet the Minds</h2>
-            <p className="text-xl text-gray-500 max-w-2xl mx-auto">
-              A diverse team of experts united by a passion for technology and design.
-            </p>
-          </FadeIn>
-
-          <div className="grid md:grid-cols-3 gap-12">
-            {team.map((member, i) => (
-              <FadeIn key={i} delay={i * 0.1} className="group">
-                <div className="relative overflow-hidden rounded-[2rem] mb-8 aspect-[4/5]">
-                  <div className="absolute inset-0 bg-gradient-to-t from-black/80 via-transparent to-transparent opacity-0 group-hover:opacity-100 transition-opacity duration-500 z-10 flex flex-col justify-end p-8">
-                    <p className="text-white/90 translate-y-4 group-hover:translate-y-0 transition-transform duration-500">
-                      {member.bio}
-                    </p>
-                    <div className="flex gap-4 mt-4 text-white">
-                      <a href="#" className="hover:text-blue-400"><i className="ri-linkedin-fill text-xl"></i></a>
-                      <a href="#" className="hover:text-blue-400"><i className="ri-twitter-x-fill text-xl"></i></a>
-                    </div>
-                  </div>
-                  <img
-                    src={member.image}
-                    alt={member.name}
-                    className="w-full h-full object-cover transition-transform duration-700 group-hover:scale-110"
-                  />
-                </div>
-                <div className="text-center">
-                  <h3 className="text-2xl font-bold mb-2">{member.name}</h3>
-                  <p className="text-blue-600 font-medium uppercase tracking-wider text-sm">{member.role}</p>
-                </div>
-              </FadeIn>
-            ))}
-          </div>
-        </div>
-      </section>
-
       {/* CTA Section */}
       <section className="py-32 bg-gray-900 text-white text-center relative overflow-hidden">
         <div className="absolute inset-0 bg-[url('https://grainy-gradients.vercel.app/noise.svg')] opacity-10"></div>
@@ -272,3 +209,4 @@ const AboutPage = () => {
 };
 
 export default AboutPage;
+

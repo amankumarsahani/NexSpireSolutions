@@ -156,6 +156,9 @@ app.use('/api/workflows', require('./routes/workflow.routes'));
 app.use('/api/billing', require('./routes/billing.routes'));
 app.use('/webhooks', require('./routes/webhook.routes'));
 
+// Blog
+app.use('/api/blogs', require('./routes/blog.routes'));
+
 // Start email worker (after routes are set up)
 const emailWorker = require('./workers/emailWorker');
 emailWorker.start(30000); // Process queue every 30 seconds
