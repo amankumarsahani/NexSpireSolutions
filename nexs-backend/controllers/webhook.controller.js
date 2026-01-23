@@ -6,8 +6,12 @@
 const RazorpayService = require('../services/razorpay.service');
 const StripeService = require('../services/stripe.service');
 const TenantModel = require('../models/tenant.model');
+const UserModel = require('../models/user.model');
+const ClientModel = require('../models/client.model');
 const Provisioner = require('../services/provisioner');
 const { pool } = require('../config/database');
+const crypto = require('crypto');
+const bcrypt = require('bcryptjs');
 
 class WebhookController {
     /**
@@ -68,6 +72,40 @@ class WebhookController {
     }
 
     /**
+     * Helper to create client if not exists
+     */
+    async createClientIfNotExist(email, name, phone) {
+        if (!email) return null;
+
+        try {
+            // Check if client exists by email
+            const [existingClient] = await pool.query('SELECT * FROM clients WHERE email = ?', [email]);
+            if (existingClient) {
+                console.log(`[Webhook] Client already exists: ${email}`);
+                return existingClient;
+            }
+
+            // Create client
+            const clientId = await ClientModel.create({
+                companyName: name || 'Unknown Company',
+                contactName: name || 'Unknown',
+                email,
+                phone: phone || '',
+                status: 'active', // Active since they paid
+                industry: 'Other',
+                notes: 'Created via Payment Webhook',
+                createdBy: null // System created
+            });
+
+            console.log(`[Webhook] Created new client: ${email}`);
+            return await ClientModel.findById(clientId);
+        } catch (error) {
+            console.error(`[Webhook] Failed to create client ${email}:`, error);
+            return null;
+        }
+    }
+
+    /**
      * Handle subscription activated
      */
     async handleSubscriptionActivated(payload) {
@@ -100,6 +138,17 @@ class WebhookController {
         }
 
         console.log(`[Webhook] Subscription activated for tenant ${tenantId}`);
+
+        // Auto-create client from subscription email
+        let clientId = null;
+        if (subscription.notes?.email) {
+            const client = await this.createClientIfNotExist(
+                subscription.notes.email,
+                subscription.notes.name,
+                subscription.notes.phone
+            );
+            if (client) clientId = client.id;
+        }
     }
 
     /**
@@ -119,6 +168,10 @@ class WebhookController {
         );
 
         // Record payment
+        // We need client_id if available. 
+        // For recurring payments, we might need to store client_id in subscription or lookup via email.
+        // For now, let's try to find client by tenant email if possible or just use tenant_id
+
         await RazorpayService.recordPayment({
             tenant_id: tenantId,
             subscription_id: subs[0]?.id,
@@ -276,6 +329,14 @@ class WebhookController {
         await TenantModel.update(tenantId, { status: 'active' });
         const workflowEngine = require('../services/workflowEngine');
         await workflowEngine.trigger('stripe_payment_received', 'tenant', tenantId, { session });
+
+        // Auto-create client from Stripe session
+        const email = session.customer_details?.email || session.customer_email;
+        const name = session.customer_details?.name;
+
+        if (email) {
+            await this.createClientIfNotExist(email, name, null);
+        }
     }
 
     async handleStripeInvoicePaid(event) {

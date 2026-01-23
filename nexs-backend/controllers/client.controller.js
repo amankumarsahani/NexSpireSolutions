@@ -1,4 +1,6 @@
 const ClientModel = require('../models/client.model');
+const ActivityModel = require('../models/activity.model');
+const { pool } = require('../config/database');
 const autoEnrollService = require('../services/autoEnrollService');
 const workflowEngine = require('../services/workflowEngine');
 
@@ -153,6 +155,31 @@ const ClientController = {
         } catch (error) {
             console.error('Get stats error:', error);
             res.status(500).json({ error: 'Failed to fetch statistics' });
+        }
+    },
+
+    // Get client activities
+    async getActivities(req, res) {
+        try {
+            const activities = await ActivityModel.getByEntity('client', req.params.id);
+            res.json({ success: true, activities: activities || [] });
+        } catch (error) {
+            console.error('Get client activities error:', error);
+            res.status(500).json({ error: 'Failed to fetch activities' });
+        }
+    },
+
+    // Get client payments
+    async getPayments(req, res) {
+        try {
+            const [payments] = await pool.query(
+                `SELECT * FROM payments WHERE client_id = ? ORDER BY created_at DESC`,
+                [req.params.id]
+            );
+            res.json({ success: true, payments: payments || [] });
+        } catch (error) {
+            console.error('Get client payments error:', error);
+            res.status(500).json({ error: 'Failed to fetch payments' });
         }
     }
 };

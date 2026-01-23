@@ -44,7 +44,9 @@ export const clientAPI = {
     create: (data) => api.post('/clients', data),
     update: (id, data) => api.put(`/clients/${id}`, data),
     delete: (id) => api.delete(`/clients/${id}`),
-    getStats: () => api.get('/clients/stats')
+    getStats: () => api.get('/clients/stats'),
+    getPayments: (id) => api.get(`/clients/${id}/payments`),
+    getActivities: (id) => api.get(`/clients/${id}/activities`)
 };
 
 // Project Management
