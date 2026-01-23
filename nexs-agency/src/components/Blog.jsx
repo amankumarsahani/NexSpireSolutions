@@ -1,83 +1,79 @@
 import { useState, useEffect } from 'react'
+import { blogAPI } from '../services/api'
 
 function Blog() {
   const [activeCategory, setActiveCategory] = useState("All")
   const [isVisible, setIsVisible] = useState(false)
+  const [blogPosts, setBlogPosts] = useState([])
+  const [categories, setCategories] = useState(["All"])
+  const [loading, setLoading] = useState(true)
+  const [error, setError] = useState(null)
 
   useEffect(() => {
     setIsVisible(true)
+    fetchBlogs()
+    fetchCategories()
   }, [])
 
-  const blogPosts = [
-    // {
-    //   title: "The Future of Web Development: Trends to Watch in 2024",
-    //   category: "Web Development",
-    //   image: "https://images.unsplash.com/photo-1517180102446-f3ece451e9d8?w=400&h=250&fit=crop",
-    //   description: "Explore the latest trends shaping the web development landscape, from AI integration to advanced frameworks.",
-    //   tags: ["React", "Next.js", "AI", "Trends"],
-    //   author: "Aman Kumar Sahani",
-    //   date: "March 15, 2025",
-    //   readTime: "5 min read",
-    //   color: "from-blue-500 to-cyan-500"
-    // },
-    {
-      title: "Mobile App Development: Native vs Cross-Platform in 2024",
-      category: "Mobile Development",
-      image: "https://images.unsplash.com/photo-1512941937669-90a1b58e7e9c?w=400&h=250&fit=crop",
-      description: "A comprehensive comparison of native and cross-platform development approaches to help you make the right choice.",
-      tags: ["React Native", "Flutter", "iOS", "Android"],
-      author: "Anu Kumar",
-      date: "March 12, 2025",
-      readTime: "7 min read",
-      color: "from-purple-500 to-pink-500"
-    },
-    // {
-    //   title: "Building Scalable Cloud Architecture: Best Practices",
-    //   category: "Cloud & DevOps",
-    //   image: "https://images.unsplash.com/photo-1451187580459-43490279c0fa?w=400&h=250&fit=crop",
-    //   description: "Learn how to design and implement cloud solutions that grow with your business needs while maintaining performance.",
-    //   tags: ["AWS", "Azure", "Kubernetes", "DevOps"],
-    //   author: "Aman Kumar Sahani",
-    //   date: "March 10, 2025",
-    //   readTime: "8 min read",
-    //   color: "from-green-500 to-emerald-500"
-    // },
-    {
-      title: "UI/UX Design Principles for Modern Web Applications",
-      category: "Design",
-      image: "https://images.unsplash.com/photo-1586717791821-3f44a563fa4c?w=400&h=250&fit=crop",
-      description: "Discover essential design principles that create intuitive and engaging user experiences in modern web applications.",
-      tags: ["UX Design", "UI Design", "Figma", "Prototyping"],
-      author: "Anu Kumar",
-      date: "March 8, 2025",
-      readTime: "6 min read",
-      color: "from-orange-500 to-red-500"
-    },
-    {
-      title: "Cybersecurity Best Practices for Web Applications",
-      category: "Security",
-      image: "https://images.unsplash.com/photo-1555949963-aa79dcee981c?w=400&h=250&fit=crop",
-      description: "Essential security measures every developer should implement to protect web applications from common vulnerabilities.",
-      tags: ["Security", "OWASP", "Authentication", "Encryption"],
-      author: "Anu Kumar",
-      date: "March 5, 2025",
-      readTime: "9 min read",
-      color: "from-red-500 to-pink-500"
-    },
-    // {
-    //   title: "AI Integration in Modern Software Development",
-    //   category: "AI & Technology",
-    //   image: "https://images.unsplash.com/photo-1677442136019-21780ecad995?w=400&h=250&fit=crop",
-    //   description: "How artificial intelligence is revolutionizing software development and what developers need to know about AI integration.",
-    //   tags: ["AI", "Machine Learning", "GPT", "Automation"],
-    //   author: "Aman Kumar Sahani",
-    //   date: "March 3, 2025",
-    //   readTime: "10 min read",
-    //   color: "from-indigo-500 to-purple-500"
-    // }
-  ]
+  const fetchBlogs = async () => {
+    try {
+      setLoading(true)
+      const response = await blogAPI.getPublished()
+      const blogs = response.data?.data || []
 
-  const categories = ["All", "Web Development", "Mobile Development", "Cloud & DevOps", "Design", "Security", "AI & Technology"]
+      // Transform API data to match component format
+      const formattedBlogs = blogs.map(blog => ({
+        title: blog.title,
+        category: blog.category,
+        image: blog.image_url,
+        description: blog.excerpt,
+        tags: blog.tags || [],
+        author: blog.author,
+        date: new Date(blog.created_at).toLocaleDateString('en-US', { year: 'numeric', month: 'long', day: 'numeric' }),
+        readTime: blog.read_time,
+        slug: blog.slug,
+        color: getCategoryColor(blog.category)
+      }))
+
+      setBlogPosts(formattedBlogs)
+      setError(null)
+    } catch (err) {
+      console.error('Error fetching blogs:', err)
+      setError('Failed to load blogs')
+      // Fallback to empty array
+      setBlogPosts([])
+    } finally {
+      setLoading(false)
+    }
+  }
+
+  const fetchCategories = async () => {
+    try {
+      const response = await blogAPI.getCategories()
+      setCategories(response.data?.data || ["All"])
+    } catch (err) {
+      console.error('Error fetching categories:', err)
+      setCategories(["All", "Technology", "Mobile", "Web", "Cloud", "Enterprise"])
+    }
+  }
+
+  // Helper function to assign colors based on category
+  const getCategoryColor = (category) => {
+    const colorMap = {
+      'Technology': 'from-blue-500 to-cyan-500',
+      'Mobile': 'from-purple-500 to-pink-500',
+      'Mobile Development': 'from-purple-500 to-pink-500',
+      'Web': 'from-green-500 to-emerald-500',
+      'Web Development': 'from-green-500 to-emerald-500',
+      'Cloud': 'from-indigo-500 to-purple-500',
+      'Cloud & DevOps': 'from-indigo-500 to-purple-500',
+      'Enterprise': 'from-orange-500 to-red-500',
+      'Design': 'from-orange-500 to-red-500',
+      'Security': 'from-red-500 to-pink-500',
+      'AI & Technology': 'from-indigo-500 to-purple-500'
+    }
+    return colorMap[category] || 'from-blue-500 to-cyan-500'
+  }
 
   const filteredPosts = activeCategory === "All"
     ? blogPosts

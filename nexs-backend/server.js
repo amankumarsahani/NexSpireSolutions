@@ -128,6 +128,9 @@ app.use('/api/document-templates', require('./routes/document-template.routes'))
 app.use('/api/activities', require('./routes/activity.routes'));
 app.use('/api/dashboard', require('./routes/dashboard.routes'));
 
+// Blog Routes (Public + Admin)
+app.use('/api/blogs', require('./routes/blog.routes'));
+
 // NexCRM Master Routes (Tenant Management)
 app.use('/api/tenants', require('./routes/tenant.routes'));
 app.use('/api/plans', require('./routes/plan.routes'));

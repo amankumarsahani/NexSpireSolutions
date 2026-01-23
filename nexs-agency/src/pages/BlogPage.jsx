@@ -5,6 +5,7 @@ import { motion, AnimatePresence } from 'framer-motion';
 import { clsx } from 'clsx';
 import { twMerge } from 'tailwind-merge';
 import LeadMagnet from '../components/LeadMagnet';
+import { blogAPI } from '../services/api';
 
 // Utility for tailwind class merging
 function cn(...inputs) {
@@ -28,75 +29,56 @@ const FadeIn = ({ children, className, delay = 0 }) => {
 const BlogPage = () => {
     const [activeCategory, setActiveCategory] = useState('All');
     const [searchQuery, setSearchQuery] = useState('');
+    const [posts, setPosts] = useState([]);
+    const [categories, setCategories] = useState(["All", "Technology", "Development", "Design", "Cloud", "Mobile"]);
+    const [loading, setLoading] = useState(true);
+    const [error, setError] = useState(null);
 
     useEffect(() => {
         window.scrollTo(0, 0);
+        fetchBlogs();
+        fetchCategories();
     }, []);
 
-    const posts = [
-        {
-            id: 1,
-            title: "Top 10 AI Trends Shaping Business in 2026",
-            excerpt: "Explore the key AI trends shaping the future of global business, from predictive analytics to generative AI, and how to adopt them.",
-            category: "Technology",
-            author: "Aman Kumar",
-            date: "Mar 15, 2024",
-            readTime: "5 min read",
-            image: "https://images.unsplash.com/photo-1677442136019-21780ecad995?w=1200&q=80",
-            featured: true,
-            slug: "ai-trends-2026"
-        },
-        {
-            id: 2,
-            title: "React Native vs. Flutter: CEO's Guide for 2026",
-            excerpt: "Deciding between React Native and Flutter? We compare performance, developer cost, and time-to-market to help you choose the right stack.",
-            category: "Mobile",
-            author: "Kshitij Bhardwaj",
-            date: "Mar 12, 2024",
-            readTime: "8 min read",
-            image: "https://images.unsplash.com/photo-1512941937669-90a1b58e7e9c?w=800&q=80",
-            featured: false,
-            slug: "react-native-vs-flutter"
-        },
-        {
-            id: 3,
-            title: "Cost of Building a Custom CRM in 2026",
-            excerpt: "How much does it cost to build a custom CRM? We break down the costs for MVPs, mid-sized, and enterprise solutions.",
-            category: "Enterprise",
-            author: "Aman Kumar",
-            date: "Mar 20, 2024",
-            readTime: "7 min read",
-            image: "https://images.unsplash.com/photo-1556742049-0cfed4f7a07d?w=800&q=80",
-            featured: false,
-            slug: "cost-of-custom-crm-2026"
-        },
-        {
-            id: 4,
-            title: "Migrating Legacy Monoliths to Microservices",
-            excerpt: "Is your legacy monolith slowing you down? Learn the strategic risks and rewards of migrating to a microservices architecture.",
-            category: "Cloud",
-            author: "Aman Kumar",
-            date: "Mar 25, 2024",
-            readTime: "6 min read",
-            image: "https://images.unsplash.com/photo-1451187580459-43490279c0fa?w=800&q=80",
-            featured: false,
-            slug: "monolith-to-microservices"
-        },
-        {
-            id: 5,
-            title: "Why Your Business Needs a Progressive Web App (PWA)",
-            excerpt: "PWAs offer the best of mobile and web. Learn how they boost conversion rates, improve SEO, and cut development costs.",
-            category: "Web",
-            author: "Kshitij Bhardwaj",
-            date: "Mar 30, 2024",
-            readTime: "5 min read",
-            image: "https://images.unsplash.com/photo-1498050108023-c5249f4df085?w=800&q=80",
-            featured: false,
-            slug: "why-business-needs-pwa"
-        }
-    ];
+    const fetchBlogs = async () => {
+        try {
+            setLoading(true);
+            const response = await blogAPI.getPublished();
+            const blogs = response.data?.data || [];
 
-    const categories = ["All", "Technology", "Development", "Design", "Cloud", "Mobile"];
+            // Transform API data to match component format
+            const formattedBlogs = blogs.map(blog => ({
+                id: blog.id,
+                title: blog.title,
+                excerpt: blog.excerpt,
+                category: blog.category,
+                author: blog.author,
+                date: new Date(blog.created_at).toLocaleDateString('en-US', { year: 'numeric', month: 'short', day: 'numeric' }),
+                readTime: blog.read_time,
+                image: blog.image_url,
+                featured: blog.featured,
+                slug: blog.slug
+            }));
+
+            setPosts(formattedBlogs);
+            setError(null);
+        } catch (err) {
+            console.error('Error fetching blogs:', err);
+            setError('Failed to load blogs');
+            setPosts([]);
+        } finally {
+            setLoading(false);
+        }
+    };
+
+    const fetchCategories = async () => {
+        try {
+            const response = await blogAPI.getCategories();
+            setCategories(response.data?.data || ["All", "Technology", "Development", "Design", "Cloud", "Mobile"]);
+        } catch (err) {
+            console.error('Error fetching categories:', err);
+        }
+    };
 
     const filteredPosts = posts.filter(post => {
         const matchesCategory = activeCategory === 'All' || post.category === activeCategory;

@@ -143,5 +143,19 @@ export const workflowAPI = {
     getNodeTypes: () => api.get('/workflows/meta/node-types')
 };
 
+// Blog Management (Public)
+export const blogAPI = {
+    // Public endpoints
+    getPublished: (category) => api.get('/blogs', { params: { category } }),
+    getBySlug: (slug) => api.get(`/blogs/slug/${slug}`),
+    getCategories: () => api.get('/blogs/categories'),
+    // Admin endpoints
+    getAll: () => api.get('/blogs/admin/all'),
+    getById: (id) => api.get(`/blogs/admin/${id}`),
+    create: (data) => api.post('/blogs', data),
+    update: (id, data) => api.put(`/blogs/${id}`, data),
+    delete: (id) => api.delete(`/blogs/${id}`)
+};
+
 export default api;
 
