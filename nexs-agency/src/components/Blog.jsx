@@ -1,25 +1,15 @@
 import { useState, useEffect } from 'react'
+import { Link } from 'react-router-dom'
+import { blogAPI } from '../services/api'
 
 function Blog() {
   const [activeCategory, setActiveCategory] = useState("All")
   const [isVisible, setIsVisible] = useState(false)
+  const [blogPosts, setBlogPosts] = useState([])
+  const [loading, setLoading] = useState(true)
 
-  useEffect(() => {
-    setIsVisible(true)
-  }, [])
-
-  const blogPosts = [
-    // {
-    //   title: "The Future of Web Development: Trends to Watch in 2024",
-    //   category: "Web Development",
-    //   image: "https://images.unsplash.com/photo-1517180102446-f3ece451e9d8?w=400&h=250&fit=crop",
-    //   description: "Explore the latest trends shaping the web development landscape, from AI integration to advanced frameworks.",
-    //   tags: ["React", "Next.js", "AI", "Trends"],
-    //   author: "Aman Kumar Sahani",
-    //   date: "March 15, 2025",
-    //   readTime: "5 min read",
-    //   color: "from-blue-500 to-cyan-500"
-    // },
+  // Dummy/fallback blog posts when API returns empty or fails
+  const dummyPosts = [
     {
       title: "Mobile App Development: Native vs Cross-Platform in 2024",
       category: "Mobile Development",
@@ -29,19 +19,9 @@ function Blog() {
       author: "Anu Kumar",
       date: "March 12, 2025",
       readTime: "7 min read",
-      color: "from-purple-500 to-pink-500"
+      color: "from-purple-500 to-pink-500",
+      slug: "mobile-app-development-native-vs-cross-platform"
     },
-    // {
-    //   title: "Building Scalable Cloud Architecture: Best Practices",
-    //   category: "Cloud & DevOps",
-    //   image: "https://images.unsplash.com/photo-1451187580459-43490279c0fa?w=400&h=250&fit=crop",
-    //   description: "Learn how to design and implement cloud solutions that grow with your business needs while maintaining performance.",
-    //   tags: ["AWS", "Azure", "Kubernetes", "DevOps"],
-    //   author: "Aman Kumar Sahani",
-    //   date: "March 10, 2025",
-    //   readTime: "8 min read",
-    //   color: "from-green-500 to-emerald-500"
-    // },
     {
       title: "UI/UX Design Principles for Modern Web Applications",
       category: "Design",
@@ -51,7 +31,8 @@ function Blog() {
       author: "Anu Kumar",
       date: "March 8, 2025",
       readTime: "6 min read",
-      color: "from-orange-500 to-red-500"
+      color: "from-orange-500 to-red-500",
+      slug: "ui-ux-design-principles"
     },
     {
       title: "Cybersecurity Best Practices for Web Applications",
@@ -62,20 +43,59 @@ function Blog() {
       author: "Anu Kumar",
       date: "March 5, 2025",
       readTime: "9 min read",
-      color: "from-red-500 to-pink-500"
-    },
-    // {
-    //   title: "AI Integration in Modern Software Development",
-    //   category: "AI & Technology",
-    //   image: "https://images.unsplash.com/photo-1677442136019-21780ecad995?w=400&h=250&fit=crop",
-    //   description: "How artificial intelligence is revolutionizing software development and what developers need to know about AI integration.",
-    //   tags: ["AI", "Machine Learning", "GPT", "Automation"],
-    //   author: "Aman Kumar Sahani",
-    //   date: "March 3, 2025",
-    //   readTime: "10 min read",
-    //   color: "from-indigo-500 to-purple-500"
-    // }
+      color: "from-red-500 to-pink-500",
+      slug: "cybersecurity-best-practices"
+    }
   ]
+
+  useEffect(() => {
+    setIsVisible(true)
+    fetchBlogs()
+  }, [])
+
+  const fetchBlogs = async () => {
+    try {
+      setLoading(true)
+      const response = await blogAPI.getAll({ status: 'published', limit: 6 })
+      const blogs = response.data?.blogs || []
+
+      if (blogs.length > 0) {
+        // Transform API data to match component format
+        const transformedPosts = blogs.map((blog, index) => {
+          const colors = [
+            "from-blue-500 to-cyan-500",
+            "from-purple-500 to-pink-500",
+            "from-green-500 to-emerald-500",
+            "from-orange-500 to-red-500",
+            "from-indigo-500 to-purple-500",
+            "from-red-500 to-pink-500"
+          ]
+          return {
+            title: blog.title,
+            category: blog.category || "Technology",
+            image: blog.image || `https://images.unsplash.com/photo-1517180102446-f3ece451e9d8?w=400&h=250&fit=crop`,
+            description: blog.excerpt || blog.title,
+            tags: blog.category ? [blog.category] : ["Technology"],
+            author: blog.author || "Nexspire Team",
+            date: new Date(blog.created_at).toLocaleDateString('en-US', { month: 'long', day: 'numeric', year: 'numeric' }),
+            readTime: blog.read_time || "5 min read",
+            color: colors[index % colors.length],
+            slug: blog.slug
+          }
+        })
+        setBlogPosts(transformedPosts)
+      } else {
+        // Use dummy posts if API returns empty
+        setBlogPosts(dummyPosts)
+      }
+    } catch (error) {
+      console.error('Error fetching blogs:', error)
+      // Use dummy posts on error
+      setBlogPosts(dummyPosts)
+    } finally {
+      setLoading(false)
+    }
+  }
 
   const categories = ["All", "Web Development", "Mobile Development", "Cloud & DevOps", "Design", "Security", "AI & Technology"]
 
@@ -178,10 +198,10 @@ function Blog() {
 
                     {/* Hover Action Button */}
                     <div className="absolute inset-0 flex items-center justify-center opacity-0 group-hover:opacity-100 transition-all duration-300">
-                      <button className="bg-white/20 backdrop-blur-lg text-white px-6 py-3 rounded-2xl font-semibold border border-white/30 hover:bg-white/30 transition-all duration-300 transform hover:scale-105">
+                      <Link to={`/blog/${post.slug}`} className="bg-white/20 backdrop-blur-lg text-white px-6 py-3 rounded-2xl font-semibold border border-white/30 hover:bg-white/30 transition-all duration-300 transform hover:scale-105">
                         <i className="ri-arrow-right-line mr-2"></i>
                         Read Article
-                      </button>
+                      </Link>
                     </div>
                   </div>
 

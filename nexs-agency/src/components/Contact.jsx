@@ -73,10 +73,9 @@ const Contact = () => {
   ];
 
   const socialLinks = [
-    { icon: "ri-github-line", href: "#", label: "GitHub" },
-    { icon: "ri-twitter-line", href: "#", label: "Twitter" },
-    { icon: "ri-linkedin-line", href: "#", label: "LinkedIn" },
-    { icon: "ri-dribbble-line", href: "#", label: "Dribbble" }
+    { icon: "ri-github-line", href: "https://github.com/orgs/Nexspire-Solutions/repositories", label: "GitHub" },
+    { icon: "ri-linkedin-line", href: "https://www.linkedin.com/company/nexspire-solution", label: "LinkedIn" },
+    { icon: "ri-instagram-line", href: "https://www.instagram.com/nexspire_solutions/", label: "Instagram" }
   ];
 
   return (

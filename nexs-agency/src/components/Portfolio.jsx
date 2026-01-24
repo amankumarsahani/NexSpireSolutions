@@ -1,4 +1,5 @@
 import { useState, useEffect, memo } from 'react'
+import { Link } from 'react-router-dom'
 
 const Portfolio = memo(function Portfolio() {
   const [activeCategory, setActiveCategory] = useState("All")
@@ -11,57 +12,51 @@ const Portfolio = memo(function Portfolio() {
   const projects = [
     {
       title: "E-commerce Platform",
+      slug: "ecommerce-platform",
       category: "Web Development",
       image: "https://images.unsplash.com/photo-1556742049-0cfed4f6a45d?w=400&h=300&fit=crop",
       description: "Modern e-commerce platform with advanced product filtering and secure payment integration.",
-      technologies: ["React", "Node.js", "MongoDB", "Stripe"],
-      liveUrl: "#",
-      githubUrl: "#"
+      technologies: ["React", "Node.js", "MongoDB", "Stripe"]
     },
     {
       title: "Food Delivery App",
+      slug: "food-delivery-app",
       category: "Mobile Development",
       image: "https://plus.unsplash.com/premium_photo-1682130100826-913b21060e4e?q=80&w=1170&auto=format&fit=crop&ixlib=rb-4.1.0&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D?w=400&h=300&fit=crop",
       description: "Mobile app for food delivery with real-time tracking and multiple payment options.",
-      technologies: ["React Native", "Firebase", "Maps API", "PayPal"],
-      liveUrl: "#",
-      githubUrl: "#"
+      technologies: ["React Native", "Firebase", "Maps API", "PayPal"]
     },
     {
       title: "Healthcare Dashboard",
+      slug: "healthcare-dashboard",
       category: "Web Development",
       image: "https://images.unsplash.com/photo-1526628953301-3e589a6a8b74?q=80&w=1106&auto=format&fit=crop&ixlib=rb-4.1.0&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D?w=400&h=300&fit=crop",
       description: "Comprehensive healthcare management system with patient records and appointment scheduling.",
-      technologies: ["Vue.js", "Python", "PostgreSQL", "Docker"],
-      liveUrl: "#",
-      githubUrl: "#"
+      technologies: ["Vue.js", "Python", "PostgreSQL", "Docker"]
     },
     {
       title: "Real Estate Portal",
+      slug: "real-estate-portal",
       category: "Full Stack",
       image: "https://images.unsplash.com/photo-1560518883-ce09059eeffa?w=400&h=300&fit=crop",
       description: "Property listing platform with advanced search filters and virtual tours.",
-      technologies: ["Next.js", "Prisma", "MySQL", "AWS"],
-      liveUrl: "#",
-      githubUrl: "#"
+      technologies: ["Next.js", "Prisma", "MySQL", "AWS"]
     },
     {
       title: "Fitness Tracker",
+      slug: "fitness-tracker",
       category: "Mobile Development",
       image: "https://images.unsplash.com/photo-1571019613454-1cb2f99b2d8b?w=400&h=300&fit=crop",
       description: "Mobile fitness app with workout tracking, nutrition planning, and progress analytics.",
-      technologies: ["Flutter", "Dart", "Firebase", "Charts"],
-      liveUrl: "#",
-      githubUrl: "#"
+      technologies: ["Flutter", "Dart", "Firebase", "Charts"]
     },
     {
       title: "Inventory Management",
+      slug: "inventory-management",
       category: "Enterprise",
       image: "https://images.unsplash.com/photo-1553413077-190dd305871c?w=400&h=300&fit=crop",
       description: "Enterprise inventory management system with analytics and automated reporting.",
-      technologies: ["Angular", "Java", "Spring", "Oracle"],
-      liveUrl: "#",
-      githubUrl: "#"
+      technologies: ["Angular", "Java", "Spring", "Oracle"]
     }
   ];
 
@@ -165,21 +160,13 @@ const Portfolio = memo(function Portfolio() {
 
                     {/* Action Buttons */}
                     <div className="absolute inset-0 flex items-center justify-center opacity-0 group-hover:opacity-100 transition-all duration-300">
-                      <div className="flex space-x-4">
-                        <a
-                          href={project.liveUrl}
-                          className="w-10 h-10 sm:w-12 sm:h-12 bg-white/90 backdrop-blur-sm rounded-full flex items-center justify-center hover:bg-white transition-all duration-300 shadow-lg hover:scale-110"
-                          style={{ color: cardColors[colorIndex].primary }}
-                        >
-                          <i className="ri-external-link-line text-lg sm:text-xl"></i>
-                        </a>
-                        <a
-                          href={project.githubUrl}
-                          className="w-12 h-12 bg-white/90 backdrop-blur-sm rounded-full flex items-center justify-center hover:bg-gray-800 hover:text-white transition-all duration-300 shadow-lg hover:scale-110"
-                        >
-                          <i className="ri-github-line text-xl"></i>
-                        </a>
-                      </div>
+                      <Link
+                        to={`/portfolio/${project.slug}`}
+                        className="w-12 h-12 bg-white/90 backdrop-blur-sm rounded-full flex items-center justify-center hover:bg-white transition-all duration-300 shadow-lg hover:scale-110"
+                        style={{ color: cardColors[colorIndex].primary }}
+                      >
+                        <i className="ri-eye-line text-xl"></i>
+                      </Link>
                     </div>
 
                     {/* Category Badge */}
@@ -242,13 +229,13 @@ const Portfolio = memo(function Portfolio() {
         {/* Enhanced View More Button */}
         <div className={`text-center transition-all duration-1000 delay-700 transform ${isVisible ? 'translate-y-0 opacity-100' : 'translate-y-8 opacity-0'
           }`}>
-          <button className="group relative bg-gradient-to-r from-violet-600 via-purple-600 to-fuchsia-600 text-white px-10 py-4 rounded-2xl font-bold shadow-2xl shadow-violet-500/30 hover:shadow-violet-500/50 transition-all duration-300 transform hover:scale-105 overflow-hidden">
+          <Link to="/portfolio" className="group relative inline-block bg-gradient-to-r from-violet-600 via-purple-600 to-fuchsia-600 text-white px-10 py-4 rounded-2xl font-bold shadow-2xl shadow-violet-500/30 hover:shadow-violet-500/50 transition-all duration-300 transform hover:scale-105 overflow-hidden">
             <span className="relative z-10 flex items-center">
               View More Projects
               <i className="ri-arrow-right-line ml-2 group-hover:translate-x-1 transition-transform duration-300"></i>
             </span>
             <div className="absolute inset-0 bg-gradient-to-r from-fuchsia-600 via-purple-600 to-violet-600 opacity-0 group-hover:opacity-100 transition-opacity duration-300"></div>
-          </button>
+          </Link>
         </div>
       </div>
     </section>
