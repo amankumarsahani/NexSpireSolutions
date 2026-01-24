@@ -4,6 +4,10 @@ import { Helmet } from 'react-helmet-async';
 import { motion, useScroll, useSpring, AnimatePresence } from 'framer-motion';
 import RelatedServices from '../components/seo/RelatedServices';
 import AreasWeServe from '../components/seo/AreasWeServe';
+import ProcessSection from '../components/ProcessSection';
+import ClientLogos from '../components/ClientLogos';
+import Breadcrumbs from '../components/ui/Breadcrumbs';
+import BackToTop from '../components/ui/BackToTop';
 
 // Refined Premium Styles
 const serviceStyles = {
@@ -87,6 +91,12 @@ const ServiceCard = ({ service, index }) => {
                         </span>
                     </h3>
 
+                    <div className="mb-4">
+                        <span className={`inline-block px-3 py-1 rounded-full text-xs font-bold bg-white border border-gray-100 shadow-sm ${styles.text}`}>
+                            Starts from <span className="font-extrabold">{service.price}</span>
+                        </span>
+                    </div>
+
                     <p className="text-gray-600 leading-relaxed mb-8 min-h-[4.5rem]">
                         {service.description}
                     </p>
@@ -137,7 +147,8 @@ const ServicesPage = () => {
             icon: "ri-layout-masonry-line",
             color: "blue",
             link: "/services/custom-web-development",
-            features: ["Scalable SaaS Platforms", "Progressive Web Apps (PWA)", "High-Performance APIs"]
+            features: ["Scalable SaaS Platforms", "Progressive Web Apps (PWA)", "High-Performance APIs"],
+            price: "$2,999"
         },
         {
             title: "Mobile App Development",
@@ -145,7 +156,8 @@ const ServicesPage = () => {
             icon: "ri-smartphone-line",
             color: "purple",
             link: "/services/mobile-app-development",
-            features: ["iOS & Android Native", "Flutter & React Native", "App Store Optimization"]
+            features: ["iOS & Android Native", "Flutter & React Native", "App Store Optimization"],
+            price: "$4,999"
         },
         {
             title: "AI & Machine Learning",
@@ -153,7 +165,8 @@ const ServicesPage = () => {
             icon: "ri-brain-line",
             color: "emerald",
             link: "/services/ai-machine-learning",
-            features: ["Predictive Analytics", "NLP / Chatbots", "Computer Vision Systems"]
+            features: ["Predictive Analytics", "NLP / Chatbots", "Computer Vision Systems"],
+            price: "$5,999"
         },
         {
             title: "Cloud Solutions",
@@ -161,7 +174,8 @@ const ServicesPage = () => {
             icon: "ri-cloud-windy-line",
             color: "cyan",
             link: "/services/cloud-solutions",
-            features: ["AWS/Azure Architecture", "Cloud Migration Strategy", "DevOps & CI/CD Pipelines"]
+            features: ["AWS/Azure Architecture", "Cloud Migration Strategy", "DevOps & CI/CD Pipelines"],
+            price: "$1,999/mo"
         },
         {
             title: "E-Commerce",
@@ -169,7 +183,8 @@ const ServicesPage = () => {
             icon: "ri-shopping-cart-2-line",
             color: "orange",
             link: "/services/ecommerce-development",
-            features: ["Shopify & WooCommerce", "Multi-vendor Marketplaces", "Secure Payment Gateways"]
+            features: ["Shopify & WooCommerce", "Multi-vendor Marketplaces", "Secure Payment Gateways"],
+            price: "$3,499"
         }
     ];
 
@@ -276,6 +291,12 @@ const ServicesPage = () => {
                 </div>
             </section>
 
+            {/* Process Section */}
+            <ProcessSection />
+
+            {/* Client Logos */}
+            <ClientLogos />
+
             {/* Tech Stack Marquee */}
             <section className="py-20 bg-slate-50 border-y border-slate-100 overflow-hidden">
                 <div className="text-center mb-10">
@@ -332,6 +353,9 @@ const ServicesPage = () => {
                     </Link>
                 </div>
             </section>
+
+            {/* Back to Top */}
+            <BackToTop />
         </div>
     );
 };

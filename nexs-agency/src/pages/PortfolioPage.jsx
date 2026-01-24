@@ -1,9 +1,11 @@
 import { useEffect, useState, useRef } from 'react';
 import { Link } from 'react-router-dom';
 import { Helmet } from 'react-helmet-async';
-import { motion, useScroll, useTransform, useSpring, useInView } from 'framer-motion';
+import { motion, useScroll, useTransform, useSpring, useInView, AnimatePresence } from 'framer-motion';
 import { clsx } from 'clsx';
 import { twMerge } from 'tailwind-merge';
+import Breadcrumbs from '../components/ui/Breadcrumbs';
+import BackToTop from '../components/ui/BackToTop';
 
 // Utility for tailwind class merging
 function cn(...inputs) {
@@ -26,42 +28,62 @@ const FadeIn = ({ children, className, delay = 0 }) => {
 
 const ProjectCard = ({ project, index }) => {
     return (
-        <motion.div
-            layout
-            initial={{ opacity: 0, scale: 0.9 }}
-            animate={{ opacity: 1, scale: 1 }}
-            exit={{ opacity: 0, scale: 0.9 }}
-            transition={{ duration: 0.5 }}
-            className={cn(
-                "group relative rounded-[2rem] overflow-hidden cursor-pointer",
-                project.size === 'large' ? 'md:col-span-2 md:row-span-2' :
-                    project.size === 'wide' ? 'md:col-span-2' :
-                        'md:col-span-1'
-            )}
-        >
-            <div className="absolute inset-0 bg-gray-900/20 group-hover:bg-gray-900/0 transition-colors duration-500 z-10" />
-            <img
-                src={project.image}
-                alt={project.title}
-                className="w-full h-full object-cover transform group-hover:scale-110 transition-transform duration-700 ease-out"
-            />
+        <Link to={`/portfolio/${project.title.toLowerCase().replace(/[^a-z0-9]+/g, '-')}`} className="block h-full">
+            <motion.div
+                layout
+                initial={{ opacity: 0, scale: 0.9 }}
+                animate={{ opacity: 1, scale: 1 }}
+                exit={{ opacity: 0, scale: 0.9 }}
+                transition={{ duration: 0.5 }}
+                className={cn(
+                    "group relative rounded-[2rem] overflow-hidden cursor-pointer h-full",
+                    project.size === 'large' ? 'md:col-span-2 md:row-span-2' :
+                        project.size === 'wide' ? 'md:col-span-2' :
+                            'md:col-span-1'
+                )}
+            >
+                <div className="absolute inset-0 bg-gray-900/30 group-hover:bg-gray-900/60 transition-colors duration-500 z-10" />
+                <img
+                    src={project.image}
+                    alt={project.title}
+                    className="w-full h-full object-cover transform group-hover:scale-110 transition-transform duration-700 ease-out"
+                />
 
-            <div className="absolute inset-0 bg-gradient-to-t from-black/90 via-black/40 to-transparent opacity-100 transition-opacity duration-300 z-20 flex flex-col justify-end p-8">
-                <div className="transform translate-y-4 group-hover:translate-y-0 transition-transform duration-500">
-                    <div className="flex flex-wrap gap-2 mb-3">
-                        {project.tags.map((tag, i) => (
-                            <span key={i} className="px-3 py-1 bg-white/10 backdrop-blur-md border border-white/20 rounded-full text-xs font-medium text-white">
-                                {tag}
-                            </span>
-                        ))}
+                {/* Metrics Badge */}
+                {project.metric && (
+                    <div className="absolute top-4 right-4 z-30">
+                        <div className="px-4 py-2 bg-green-500 text-white rounded-full text-sm font-bold shadow-lg flex items-center gap-2">
+                            <i className="ri-arrow-up-line"></i>
+                            {project.metric}
+                        </div>
                     </div>
-                    <h3 className="text-3xl font-bold text-white mb-2">{project.title}</h3>
-                    <p className="text-gray-300 line-clamp-2 opacity-0 group-hover:opacity-100 transition-opacity duration-500 delay-100">
-                        {project.description}
-                    </p>
+                )}
+
+                <div className="absolute inset-0 bg-gradient-to-t from-black/90 via-black/40 to-transparent z-20 flex flex-col justify-end p-8">
+                    <div className="transform translate-y-2 group-hover:translate-y-0 transition-transform duration-500">
+                        <div className="flex flex-wrap gap-2 mb-3">
+                            {project.tags.map((tag, i) => (
+                                <span key={i} className="px-3 py-1 bg-white/10 backdrop-blur-md border border-white/20 rounded-full text-xs font-medium text-white">
+                                    {tag}
+                                </span>
+                            ))}
+                        </div>
+                        <h3 className="text-2xl md:text-3xl font-bold text-white mb-2">{project.title}</h3>
+                        <p className="text-gray-300 line-clamp-2 mb-4 opacity-0 group-hover:opacity-100 transition-opacity duration-500 delay-100">
+                            {project.description}
+                        </p>
+
+                        {/* View Case Study Button */}
+                        <div className="opacity-0 group-hover:opacity-100 transition-opacity duration-300 delay-200">
+                            <span className="inline-flex items-center gap-2 px-5 py-2.5 bg-white text-gray-900 rounded-full text-sm font-bold hover:bg-blue-600 hover:text-white transition-colors">
+                                View Case Study
+                                <i className="ri-arrow-right-line"></i>
+                            </span>
+                        </div>
+                    </div>
                 </div>
-            </div>
-        </motion.div>
+            </motion.div>
+        </Link>
     );
 };
 
@@ -86,6 +108,7 @@ const PortfolioPage = () => {
             image: "https://images.unsplash.com/photo-1563986768609-322da13575f3?w=1200&q=80",
             size: "large",
             description: "Custom Magento store with UX redesign resulting in a 45% increase in sales.",
+            metric: "45% Sales ↑",
             tags: ["Magento", "UX/UI Design", "E-commerce"]
         },
         {
@@ -95,6 +118,7 @@ const PortfolioPage = () => {
             image: "https://images.unsplash.com/photo-1576091160399-112ba8d25d1d?w=800&q=80",
             size: "small",
             description: "Flutter-based app with real-time analytics achieving 50k downloads in 2 months.",
+            metric: "50K Downloads",
             tags: ["Flutter", "Healthcare", "Analytics"]
         },
         {
@@ -104,6 +128,7 @@ const PortfolioPage = () => {
             image: "https://images.unsplash.com/photo-1551288049-bebda4e38f71?w=800&q=80",
             size: "small",
             description: "Custom CRM with AI predictions increasing sales efficiency by 30%.",
+            metric: "30% Efficiency ↑",
             tags: ["AI/ML", "Python", "React"]
         },
         {
@@ -113,6 +138,7 @@ const PortfolioPage = () => {
             image: "https://images.unsplash.com/photo-1480714378408-67cf0d13bc1b?w=1200&q=80",
             size: "wide",
             description: "City guide app with augmented reality navigation and social features.",
+            metric: "4.8★ Rating",
             tags: ["Flutter", "ARKit", "Firebase"]
         },
         {
@@ -122,6 +148,7 @@ const PortfolioPage = () => {
             image: "https://images.unsplash.com/photo-1621761191319-c6fb62004040?w=800&q=80",
             size: "small",
             description: "Secure and fast cryptocurrency trading platform with advanced charting.",
+            metric: "$2M+ Volume",
             tags: ["Vue.js", "WebSockets", "Go"]
         },
         {
@@ -131,6 +158,7 @@ const PortfolioPage = () => {
             image: "https://images.unsplash.com/photo-1473341304170-971dccb5ac1e?w=800&q=80",
             size: "small",
             description: "Smart home energy monitoring dashboard for sustainable living.",
+            metric: "20% Energy Saved",
             tags: ["React", "IoT", "AWS"]
         }
     ];
@@ -140,6 +168,14 @@ const PortfolioPage = () => {
     const filteredProjects = activeFilter === 'All'
         ? projects
         : projects.filter(p => p.category === activeFilter);
+
+    // Stats
+    const stats = [
+        { value: '150+', label: 'Projects Completed' },
+        { value: '95%', label: 'Client Satisfaction' },
+        { value: '12+', label: 'Countries Served' },
+        { value: '5+', label: 'Years Experience' }
+    ];
 
     return (
         <div className="min-h-screen bg-white font-sans text-gray-900 selection:bg-blue-600 selection:text-white">
@@ -162,7 +198,6 @@ const PortfolioPage = () => {
             {/* Hero Section */}
             <section className="relative min-h-[85vh] flex items-center pt-20 overflow-hidden bg-gray-950 text-white">
                 <div className="absolute inset-0 bg-[url('https://grainy-gradients.vercel.app/noise.svg')] opacity-20"></div>
-                <div className="absolute inset-0 bg-[url('https://grainy-gradients.vercel.app/noise.svg')] opacity-20"></div>
                 <div className="absolute inset-0 bg-[url('https://images.unsplash.com/photo-1558655146-d09347e92766?q=80&w=2070&auto=format&fit=crop')] bg-cover bg-center opacity-30 mix-blend-soft-light"></div>
                 <div className="absolute top-0 right-0 w-2/3 h-full bg-gradient-to-l from-blue-900/30 to-transparent"></div>
 
@@ -175,13 +210,35 @@ const PortfolioPage = () => {
                             We Create <br />
                             <span className="text-transparent bg-clip-text bg-gradient-to-r from-blue-400 to-purple-400">Digital Legacies.</span>
                         </h1>
+                        <p className="text-xl text-gray-400 max-w-2xl mb-8">
+                            Real results for real businesses. Explore our portfolio of successful projects across web, mobile, and AI.
+                        </p>
                     </FadeIn>
+                </div>
+            </section>
+
+            {/* Stats Bar */}
+            <section className="relative -mt-16 z-30 px-6 mb-12">
+                <div className="container-custom">
+                    <div className="bg-white rounded-2xl shadow-xl p-8 border border-gray-100 grid grid-cols-2 md:grid-cols-4 gap-8">
+                        {stats.map((stat, i) => (
+                            <div key={i} className="text-center">
+                                <div className="text-3xl md:text-4xl font-bold text-gray-900 mb-1">{stat.value}</div>
+                                <div className="text-sm text-gray-500 font-medium">{stat.label}</div>
+                            </div>
+                        ))}
+                    </div>
                 </div>
             </section>
 
             {/* Filter & Grid */}
             <section className="py-10 bg-gray-50 min-h-screen">
                 <div className="container-custom">
+                    {/* Breadcrumbs */}
+                    <div className="mb-8">
+                        <Breadcrumbs />
+                    </div>
+
                     {/* Filters */}
                     <div className="flex flex-wrap gap-4 mb-16 justify-center md:justify-start">
                         {filters.map(filter => (
@@ -205,9 +262,11 @@ const PortfolioPage = () => {
                         layout
                         className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8 auto-rows-[400px]"
                     >
-                        {filteredProjects.map((project, index) => (
-                            <ProjectCard key={project.id} project={project} index={index} />
-                        ))}
+                        <AnimatePresence mode="popLayout">
+                            {filteredProjects.map((project, index) => (
+                                <ProjectCard key={project.id} project={project} index={index} />
+                            ))}
+                        </AnimatePresence>
                     </motion.div>
                 </div>
             </section>
@@ -227,6 +286,9 @@ const PortfolioPage = () => {
                     </FadeIn>
                 </div>
             </section>
+
+            {/* Back to Top */}
+            <BackToTop />
         </div>
     );
 };

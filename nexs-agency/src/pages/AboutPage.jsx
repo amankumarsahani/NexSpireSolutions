@@ -8,6 +8,12 @@ import { twMerge } from 'tailwind-merge';
 // Import Assets
 import officeImg from '../assets/office_collaboration.png';
 
+// Import Components
+import Timeline from '../components/Timeline';
+import Breadcrumbs from '../components/ui/Breadcrumbs';
+import BackToTop from '../components/ui/BackToTop';
+import TrustBadges from '../components/ui/TrustBadges';
+
 // Utility for tailwind class merging
 function cn(...inputs) {
   return twMerge(clsx(inputs));
@@ -167,6 +173,9 @@ const AboutPage = () => {
         </div>
       </section>
 
+      {/* Timeline */}
+      <Timeline />
+
       {/* Values - Grid Layout */}
       <section className="py-32 bg-gray-50 relative">
         <div className="container-custom">
@@ -191,6 +200,11 @@ const AboutPage = () => {
         </div>
       </section>
 
+      {/* Trust Badges */}
+      <section className="py-12 bg-white border-t border-gray-100">
+        <TrustBadges />
+      </section>
+
       {/* CTA Section */}
       <section className="py-32 bg-gray-900 text-white text-center relative overflow-hidden">
         <div className="absolute inset-0 bg-[url('https://grainy-gradients.vercel.app/noise.svg')] opacity-10"></div>
@@ -204,6 +218,9 @@ const AboutPage = () => {
           </FadeIn>
         </div>
       </section>
+
+      {/* Back to Top */}
+      <BackToTop />
     </div>
   );
 };

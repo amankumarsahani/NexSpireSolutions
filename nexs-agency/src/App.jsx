@@ -40,6 +40,7 @@ const CostOfCustomCrm = lazy(() => import('./pages/blog/CostOfCustomCrm'));
 const MonolithToMicroservices = lazy(() => import('./pages/blog/MonolithToMicroservices'));
 const PwaBenefits = lazy(() => import('./pages/blog/PwaBenefits'));
 const BlogArticle = lazy(() => import('./pages/BlogArticle'));
+const ProjectDetail = lazy(() => import('./pages/ProjectDetail'));
 const NotFound = lazy(() => import('./pages/NotFound'));
 
 // Loading spinner component
@@ -145,6 +146,7 @@ function App() {
             <Route path="/blog/monolith-to-microservices" element={<MonolithToMicroservices />} />
             <Route path="/blog/why-business-needs-pwa" element={<PwaBenefits />} />
             <Route path="/blog/:slug" element={<BlogArticle />} />
+            <Route path="/portfolio/:slug" element={<ProjectDetail />} />
             <Route path="*" element={<NotFound />} />
           </Route>
         </Routes>

@@ -6,6 +6,8 @@ import { clsx } from 'clsx';
 import { twMerge } from 'tailwind-merge';
 import LeadMagnet from '../components/LeadMagnet';
 import { blogAPI } from '../services/api';
+import Breadcrumbs from '../components/ui/Breadcrumbs';
+import BackToTop from '../components/ui/BackToTop';
 
 // Utility for tailwind class merging
 function cn(...inputs) {
@@ -159,6 +161,11 @@ const BlogPage = () => {
                 <meta property="og:description" content="Read expert articles on AI, Cloud, and Software Development." />
                 <meta property="og:url" content="https://nexspiresolutions.co.in/blog" />
             </Helmet>
+
+            {/* Breadcrumbs */}
+            <div className="container-custom pt-8 pb-4">
+                <Breadcrumbs />
+            </div>
 
             {/* Featured Post Hero */}
             {featuredPost && (
@@ -363,6 +370,12 @@ const BlogPage = () => {
                     </div>
                 </div>
             </section>
+            {/* Lead Magnet */}
+            <div className="bg-white">
+                <LeadMagnet />
+            </div>
+
+            <BackToTop />
         </div>
     );
 };
