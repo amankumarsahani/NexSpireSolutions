@@ -78,7 +78,7 @@ class TenantController {
      */
     async createTenant(req, res) {
         try {
-            const { name, slug, email, phone, industry_type, plan_id } = req.body;
+            const { name, slug, email, phone, industry_type, plan_id, server_id } = req.body;
 
             // Validation
             if (!name || !slug || !email) {
@@ -97,7 +97,7 @@ class TenantController {
 
             // Create tenant record
             const tenantId = await TenantModel.create({
-                name, slug, email, phone, industry_type, plan_id
+                name, slug, email, phone, industry_type, plan_id, server_id
             });
 
             // Get plan details for provisioning
@@ -117,8 +117,9 @@ class TenantController {
                     slug,
                     email,
                     industry_type: industry_type || 'general',
-                    plan_slug
-                });
+                    plan_slug,
+                    server_id: server_id // Pass the selected server
+                }, server_id);
 
                 res.status(201).json({
                     success: true,

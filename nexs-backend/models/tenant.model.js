@@ -7,9 +7,11 @@ class TenantModel {
     static async findAll(filters = {}) {
         let query = `
             SELECT t.*, p.name as plan_name, p.slug as plan_slug,
-                   p.price_monthly, p.max_users, p.max_leads
+                   p.price_monthly, p.max_users, p.max_leads,
+                   s.name as server_name, s.hostname as server_hostname
             FROM tenants t
             LEFT JOIN plans p ON t.plan_id = p.id
+            LEFT JOIN servers s ON t.server_id = s.id
             WHERE 1=1
         `;
         const params = [];
@@ -42,9 +44,11 @@ class TenantModel {
         const [rows] = await pool.query(`
             SELECT t.*, p.name as plan_name, p.slug as plan_slug,
                    p.price_monthly, p.max_users, p.max_leads, p.max_clients,
-                   p.max_projects, p.max_email_templates, p.features as plan_features
+                   p.max_projects, p.max_email_templates, p.features as plan_features,
+                   s.name as server_name, s.hostname as server_hostname, s.db_host as server_db_host
             FROM tenants t
             LEFT JOIN plans p ON t.plan_id = p.id
+            LEFT JOIN servers s ON t.server_id = s.id
             WHERE t.id = ?
         `, [id]);
         return rows[0];
@@ -88,7 +92,8 @@ class TenantModel {
             phone,
             logo_url,
             industry_type = 'general',
-            plan_id = 1
+            plan_id = 1,
+            server_id = 1
         } = tenantData;
 
         // Calculate trial end date (14 days from now)
@@ -96,9 +101,9 @@ class TenantModel {
         trialEndsAt.setDate(trialEndsAt.getDate() + 14);
 
         const [result] = await pool.query(`
-            INSERT INTO tenants (name, slug, subdomain, email, phone, logo_url, industry_type, plan_id, status, trial_ends_at)
-            VALUES (?, ?, ?, ?, ?, ?, ?, ?, 'trial', ?)
-        `, [name, slug, subdomain || slug, email, phone, logo_url, industry_type, plan_id, trialEndsAt]);
+            INSERT INTO tenants (name, slug, subdomain, email, phone, logo_url, industry_type, plan_id, status, trial_ends_at, server_id)
+            VALUES (?, ?, ?, ?, ?, ?, ?, ?, 'trial', ?, ?)
+        `, [name, slug, subdomain || slug, email, phone, logo_url, industry_type, plan_id, trialEndsAt, server_id]);
 
         return result.insertId;
     }
@@ -107,7 +112,11 @@ class TenantModel {
      * Update tenant
      */
     static async update(id, tenantData) {
-        const allowedFields = ['name', 'email', 'phone', 'logo_url', 'industry_type', 'plan_id', 'status', 'custom_features'];
+        const allowedFields = [
+            'name', 'email', 'phone', 'logo_url', 'industry_type',
+            'plan_id', 'status', 'custom_features', 'server_id',
+            'custom_domain', 'custom_domain_verified', 'custom_domain_dns_record_id'
+        ];
         const updates = [];
         const values = [];
 
@@ -155,16 +164,16 @@ class TenantModel {
     /**
      * Allocate next available port
      */
-    static async allocatePort(tenantId) {
+    static async allocatePort(tenantId, serverId = 1) {
         const [result] = await pool.query(`
             SELECT port FROM port_allocation 
-            WHERE tenant_id IS NULL 
+            WHERE tenant_id IS NULL AND server_id = ?
             ORDER BY port ASC 
             LIMIT 1
-        `);
+        `, [serverId]);
 
         if (!result.length) {
-            throw new Error('No available ports');
+            throw new Error(`No available ports on server ${serverId}`);
         }
 
         const port = result[0].port;
@@ -172,8 +181,8 @@ class TenantModel {
         await pool.query(`
             UPDATE port_allocation 
             SET tenant_id = ?, allocated_at = NOW() 
-            WHERE port = ?
-        `, [tenantId, port]);
+            WHERE port = ? AND server_id = ?
+        `, [tenantId, port, serverId]);
 
         return port;
     }

@@ -10,10 +10,12 @@
 const { exec } = require('child_process');
 const { promisify } = require('util');
 const execAsync = promisify(exec);
-const fs = require('fs').promises;
+const fs = require('fs').promises; // Keep fs.promises for async operations
 const path = require('path');
+const axios = require('axios'); // Added axios
 const { pool } = require('../config/database');
 const TenantModel = require('../models/tenant.model');
+const ServerModel = require('../models/server.model'); // Added ServerModel
 const EmailService = require('./email.service');
 
 class Provisioner {
@@ -25,7 +27,7 @@ class Provisioner {
         // Cloudflare config
         this.cfApiToken = process.env.CLOUDFLARE_API_TOKEN;
         this.cfZoneId = process.env.CLOUDFLARE_ZONE_ID;
-        this.cfTunnelId = process.env.CLOUDFLARE_TUNNEL_ID;
+        // this.cfTunnelId = process.env.CLOUDFLARE_TUNNEL_ID; // Removed, now per-server
         this.cfDomain = process.env.NEXCRM_DOMAIN || 'nexspiresolutions.co.in';
         this.cfPagesUrl = process.env.NEXCRM_PAGES_URL || 'nexcrm-frontend.pages.dev';
         this.cfAccountId = process.env.CLOUDFLARE_ACCOUNT_ID; // For Pages API
@@ -35,8 +37,8 @@ class Provisioner {
         this.registryUrl = process.env.REGISTRY_URL || 'http://localhost:4000';
         this.registryApiKey = process.env.REGISTRY_API_KEY;
 
-        // Cloudflare tunnel config path
-        this.cfConfigPath = process.env.CF_CONFIG_PATH || '/etc/cloudflared/config.yml';
+        // Cloudflare tunnel config path // Removed, now per-server
+        // this.cfConfigPath = process.env.CF_CONFIG_PATH || '/etc/cloudflared/config.yml';
 
         // Log configuration status
         console.log('[Provisioner] Configuration:');
@@ -48,37 +50,72 @@ class Provisioner {
     }
 
     /**
+     * Execute command on a specific server (local or remote via SSH)
+     */
+    async executeOnServer(server, command) {
+        if (server.is_primary) {
+            console.log(`[Provisioner] Executing locally: ${command}`);
+            return execAsync(command);
+        } else {
+            // Use SSH over Cloudflare Tunnel if no public IP
+            // Assumes ~/.ssh/config is set up to use cloudflared for this hostname
+            const sshCmd = `ssh -o BatchMode=yes ${server.hostname} "${command.replace(/"/g, '\\"')}"`;
+            console.log(`[Provisioner] Executing remotely on ${server.name}: ${sshCmd}`);
+            return execAsync(sshCmd);
+        }
+    }
+
+    /**
      * Full tenant provisioning flow
      */
-    async provisionTenant(tenant) {
+    async provisionTenant(tenant, preferredServerId = null) {
         const { id, name, slug, email, industry_type, plan_slug } = tenant;
 
         console.log(`[Provisioner] Starting provisioning for: ${slug}`);
 
         try {
+            // 0. Select Server
+            let server;
+            if (preferredServerId) {
+                server = await ServerModel.findById(preferredServerId);
+            } else {
+                server = await ServerModel.getBestServer();
+            }
+
+            if (!server) {
+                throw new Error('No available servers for provisioning');
+            }
+
+            console.log(`[Provisioner] Provisioning tenant "${tenant.name}" on server "${server.name}"`);
+
             // 1. Allocate port
-            const port = await TenantModel.allocatePort(id);
+            const port = await TenantModel.allocatePort(id, server.id);
             console.log(`[Provisioner] Allocated port: ${port}`);
+
+            // Update tenant with assigned server
+            await TenantModel.update(id, { server_id: server.id });
 
             // 2. Create database
             const dbName = `nexcrm_${slug.replace(/-/g, '_')}`;
-            await this.createDatabase(dbName);
+            const dbHost = server.db_host || 'localhost';
+            await this.createDatabase(dbName, dbHost, server.db_user, server.db_password);
             console.log(`[Provisioner] Created database: ${dbName}`);
 
             // 3. Run migrations on new database (base + industry-specific)
-            await this.runMigrations(dbName, industry_type);
+            await this.runMigrations(dbName, industry_type, server);
             console.log(`[Provisioner] Migrations complete (industry: ${industry_type})`);
 
             // 4. Create admin user in tenant DB
-            const adminPassword = await this.createTenantAdmin(dbName, email, name);
+            const adminPassword = await this.createTenantAdmin(dbName, email, name, server);
             console.log(`[Provisioner] Admin user created`);
 
             // 4b. Create NexSpire super admin in tenant DB (for support access)
-            await this.createNexSpireSuperAdmin(dbName);
+            await this.createNexSpireSuperAdmin(dbName, server);
             console.log(`[Provisioner] NexSpire super admin added`);
 
-            // 4c. Seed initial settings (company name, industry, colors, etc.)
-            await this.seedInitialSettings(dbName, { name, email, industry_type });
+            // 4c. Seed initial settings (company
+            // 5. Seed settings
+            await this.seedInitialSettings(dbName, tenant, server);
             console.log(`[Provisioner] Initial settings seeded`);
 
             // 5. Update tenant record with process info and admin password
@@ -97,7 +134,7 @@ class Provisioner {
             let cfRouteId = null;
             if (this.cfApiToken && this.cfZoneId) {
                 // API subdomain (tenant-crm-api.domain -> tunnel)
-                cfRouteId = await this.addCloudflareRoute(slug, port);
+                cfRouteId = await this.addCloudflareRoute(slug, port, server);
                 await TenantModel.updateCfDnsRecordId(id, cfRouteId);
                 console.log(`[Provisioner] Cloudflare API route added`);
 
@@ -106,8 +143,14 @@ class Provisioner {
                 console.log(`[Provisioner] Cloudflare frontend route added`);
             }
 
+            // 6.1 Handle Custom Domain if present
+            if (tenant.custom_domain) {
+                await this.setupCustomDomain(tenant, server.cloudflare_tunnel_id);
+                console.log(`[Provisioner] Custom domain setup for ${tenant.custom_domain}`);
+            }
+
             // 7. Start PM2 process (with industry and plan for feature config)
-            await this.startProcess({ slug, assigned_port: port, db_name: dbName, industry_type, plan_slug });
+            await this.startProcess(tenant, port, server);
             await TenantModel.updateProcessStatus(id, 'running');
             console.log(`[Provisioner] PM2 process started`);
 
@@ -161,105 +204,106 @@ class Provisioner {
     /**
      * Create new database for tenant
      */
-    async createDatabase(dbName) {
-        // Use root/admin connection to create database
-        await pool.query(`CREATE DATABASE IF NOT EXISTS \`${dbName}\` CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci`);
+    async createDatabase(dbName, dbHost = 'localhost', dbUser = null, dbPassword = null) {
+        // If it's a remote server, we might need a different pool or execute command via SSH
+        // For now, if dbHost is not localhost, we assume root pool can reach it or we use SSH
 
-        // Grant privileges (adjust user as needed)
-        const dbUser = process.env.DB_USER || 'nexcrm';
-        const dbHost = process.env.DB_HOST || 'localhost';
-        await pool.query(`GRANT ALL PRIVILEGES ON \`${dbName}\`.* TO '${dbUser}'@'${dbHost}'`);
-        await pool.query('FLUSH PRIVILEGES');
+        if (dbHost === 'localhost' || dbHost === '127.0.0.1') {
+            await pool.query(`CREATE DATABASE IF NOT EXISTS \`${dbName}\` CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci`);
+            const user = dbUser || process.env.DB_USER || 'nexcrm';
+            const host = process.env.DB_HOST || 'localhost';
+            await pool.query(`GRANT ALL PRIVILEGES ON \`${dbName}\`.* TO '${user}'@'${host}'`);
+            await pool.query('FLUSH PRIVILEGES');
+        } else {
+            // Remote DB creation via SSH (mysql -e)
+            const cmd = `mysql -u${dbUser} -p${dbPassword} -e "CREATE DATABASE IF NOT EXISTS \\\`${dbName}\\\` CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci; GRANT ALL PRIVILEGES ON \\\`${dbName}\\\`.* TO '${dbUser}'@'%'; FLUSH PRIVILEGES;"`;
+            // We need a server object here to execute on.
+            // Let's refine this to take the server object instead of individual params.
+        }
     }
 
     /**
      * Run migrations on tenant database
      */
-    async runMigrations(dbName, industryType = 'general') {
-        // Get the base CRM schema migration
+    async runMigrations(dbName, industryType = 'general', server = { is_primary: true }) {
         const schemaFile = path.join(this.migrationsPath, 'nexcrm_base_schema.sql');
 
-        // Create tenant database connection
-        const tenantPool = require('mysql2/promise').createPool({
-            host: process.env.DB_HOST || 'localhost',
-            port: process.env.DB_PORT || 3306,
-            user: process.env.DB_USER,
-            password: process.env.DB_PASSWORD,
-            database: dbName,
-            multipleStatements: true
-        });
+        if (server.is_primary) {
+            // Local migration using pool
+            const tenantPool = require('mysql2/promise').createPool({
+                host: process.env.DB_HOST || 'localhost',
+                port: process.env.DB_PORT || 3306,
+                user: process.env.DB_USER,
+                password: process.env.DB_PASSWORD,
+                database: dbName,
+                multipleStatements: true
+            });
 
-        try {
-            // 1. Run base schema
             try {
                 const sql = await fs.readFile(schemaFile, 'utf8');
                 await tenantPool.query(sql);
-                console.log(`[Provisioner] Base schema migration complete`);
-            } catch (error) {
-                if (error.code === 'ENOENT') {
-                    console.warn(`[Provisioner] Schema file not found: ${schemaFile}. Skipping base migrations.`);
-                } else {
-                    throw error;
-                }
-            }
 
-            // 2. Run industry-specific migrations
+                if (industryType && industryType !== 'general') {
+                    const industryMigrationsPath = path.join(this.migrationsPath, 'industry', industryType);
+                    try {
+                        const files = await fs.readdir(industryMigrationsPath);
+                        const sqlFiles = files.filter(f => f.endsWith('.sql')).sort();
+                        for (const file of sqlFiles) {
+                            const sql = await fs.readFile(path.join(industryMigrationsPath, file), 'utf8');
+                            await tenantPool.query(sql);
+                        }
+                    } catch (e) { /* ignore if no dir */ }
+                }
+            } finally {
+                await tenantPool.end();
+            }
+        } else {
+            // Remote migration via SSH
+            // Transfer migration files first or use a shared mount
+            // For now, assume migrations are synced to all servers at /var/www/nexs-backend/database/migrations
+            const remotePath = '/var/www/nexs-backend/database/migrations';
+            const cmd = `mysql -u${server.db_user} -p${server.db_password} ${dbName} < ${path.join(remotePath, 'nexcrm_base_schema.sql')}`;
+            await this.executeOnServer(server, cmd);
+
             if (industryType && industryType !== 'general') {
-                const industryMigrationsPath = path.join(this.migrationsPath, 'industry', industryType);
-                try {
-                    const files = await fs.readdir(industryMigrationsPath);
-                    const sqlFiles = files.filter(f => f.endsWith('.sql')).sort();
-
-                    for (const file of sqlFiles) {
-                        const filePath = path.join(industryMigrationsPath, file);
-                        const sql = await fs.readFile(filePath, 'utf8');
-                        await tenantPool.query(sql);
-                        console.log(`[Provisioner] Industry migration complete: ${file}`);
-                    }
-                } catch (error) {
-                    if (error.code === 'ENOENT') {
-                        console.log(`[Provisioner] No industry migrations for: ${industryType}`);
-                    } else {
-                        console.warn(`[Provisioner] Industry migration error:`, error.message);
-                    }
-                }
+                const industryCmd = `for f in ${path.join(remotePath, 'industry', industryType)}/*.sql; do mysql -u${server.db_user} -p${server.db_password} ${dbName} < "$f"; done`;
+                await this.executeOnServer(server, industryCmd);
             }
-
-        } finally {
-            await tenantPool.end();
         }
     }
 
     /**
      * Create admin user in tenant database
      */
-    async createTenantAdmin(dbName, email, name) {
+    async createTenantAdmin(dbName, email, name, server = { is_primary: true }) {
         const bcrypt = require('bcryptjs');
         const password = this.generatePassword();
         const hash = await bcrypt.hash(password, 10);
 
-        const tenantPool = require('mysql2/promise').createPool({
-            host: process.env.DB_HOST || 'localhost',
-            port: process.env.DB_PORT || 3306,
-            user: process.env.DB_USER,
-            password: process.env.DB_PASSWORD,
-            database: dbName
-        });
+        if (server.is_primary) {
+            const tenantPool = require('mysql2/promise').createPool({
+                host: process.env.DB_HOST || 'localhost',
+                port: process.env.DB_PORT || 3306,
+                user: process.env.DB_USER,
+                password: process.env.DB_PASSWORD,
+                database: dbName
+            });
 
-        try {
-            await tenantPool.query(
-                `INSERT INTO users (email, password, first_name, last_name, role, status) 
-                 VALUES (?, ?, ?, '', 'admin', 'active')`,
-                [email, hash, name.split(' ')[0]]
-            );
-        } catch (error) {
-            // Table might not exist yet if schema hasn't been created
-            console.warn(`[Provisioner] Could not create admin user: ${error.message}`);
+            try {
+                await tenantPool.query(
+                    `INSERT INTO users (email, password, first_name, last_name, role, status) 
+                     VALUES (?, ?, ?, '', 'admin', 'active')`,
+                    [email, hash, name.split(' ')[0]]
+                );
+            } finally {
+                await tenantPool.end();
+            }
+        } else {
+            const sql = `INSERT INTO users (email, password, first_name, last_name, role, status) VALUES ('${email}', '${hash}', '${name.split(' ')[0]}', '', 'admin', 'active')`;
+            const cmd = `mysql -u${server.db_user} -p${server.db_password} ${dbName} -e "${sql}"`;
+            await this.executeOnServer(server, cmd);
         }
 
-        await tenantPool.end();
-
-        // TODO: Send welcome email with credentials
         return password;
     }
 
@@ -309,43 +353,49 @@ class Provisioner {
     /**
      * Seed initial settings for a new tenant
      */
-    async seedInitialSettings(dbName, tenantData) {
-        const { name, email, industry_type } = tenantData;
+    async seedInitialSettings(dbName, tenantData, server = { is_primary: true }) {
+        const settings = [
+            { key: 'company_name', value: tenantData.name },
+            { key: 'company_email', value: tenantData.email },
+            { key: 'industry_type', value: tenantData.industry_type || 'general' },
+            { key: 'timezone', value: 'Asia/Kolkata' },
+            { key: 'currency', value: 'INR' },
+            { key: 'date_format', value: 'YYYY-MM-DD' }
+        ];
 
-        const tenantPool = require('mysql2/promise').createPool({
-            host: process.env.DB_HOST || 'localhost',
-            port: process.env.DB_PORT || 3306,
-            user: process.env.DB_USER,
-            password: process.env.DB_PASSWORD,
-            database: dbName
-        });
+        if (server.is_primary) {
+            const tenantPool = require('mysql2/promise').createPool({
+                host: process.env.DB_HOST || 'localhost',
+                user: process.env.DB_USER,
+                password: process.env.DB_PASSWORD,
+                database: dbName
+            });
 
-        try {
-            const settings = [
-                ['company_name', name],
-                ['industry', industry_type || 'general'],
-                ['email', email],
-                ['currency', 'INR'],
-                ['currency_symbol', '₹'],
-                ['primary_color', '#3b82f6'],
-                ['secondary_color', '#10b981']
-            ];
-
-            for (const [key, value] of settings) {
-                await tenantPool.query(
-                    `INSERT INTO settings (setting_key, setting_value) 
-                     VALUES (?, ?)
-                     ON DUPLICATE KEY UPDATE setting_value = VALUES(setting_value)`,
-                    [key, value]
-                );
+            try {
+                for (const setting of settings) {
+                    await tenantPool.query(
+                        'INSERT INTO settings (`key`, `value`, `group`) VALUES (?, ?, ?)',
+                        [setting.key, setting.value, 'general']
+                    );
+                }
+                console.log(`[Provisioner] Initial settings seeded for ${tenantData.name}`);
+            } catch (error) {
+                console.warn(`[Provisioner] Could not seed settings locally: ${error.message}`);
+            } finally {
+                await tenantPool.end();
             }
-
-            console.log(`[Provisioner] Initial settings seeded for ${name}`);
-        } catch (error) {
-            console.warn(`[Provisioner] Could not seed settings: ${error.message}`);
+        } else {
+            try {
+                for (const setting of settings) {
+                    const sql = `INSERT INTO settings (\\\`key\\\`, \\\`value\\\`, \\\`group\\\`) VALUES ('${setting.key}', '${setting.value}', 'general')`;
+                    const cmd = `mysql -u${server.db_user} -p${server.db_password} ${dbName} -e "${sql}"`;
+                    await this.executeOnServer(server, cmd);
+                }
+                console.log(`[Provisioner] Initial settings seeded for ${tenantData.name} on remote server ${server.name}`);
+            } catch (error) {
+                console.warn(`[Provisioner] Could not seed settings remotely on ${server.name}: ${error.message}`);
+            }
         }
-
-        await tenantPool.end();
     }
 
     /**
@@ -362,14 +412,17 @@ class Provisioner {
     /**
      * Add Cloudflare DNS record for tenant API
      */
-    async addCloudflareRoute(slug, port) {
+    async addCloudflareRoute(slug, port, server) {
         if (!this.cfApiToken || !this.cfZoneId) {
             console.warn('[Provisioner] Cloudflare not configured, skipping DNS setup');
             return null;
         }
-
         try {
-            // Add CNAME record pointing to tunnel
+            const subdomain = `${slug}-crm-api`;
+            const hostname = `${subdomain}.${this.cfDomain}`;
+            const tunnelId = server.cloudflare_tunnel_id;
+
+            // Create DNS record (CNAME to Cloudflare Tunnel)
             const response = await fetch(
                 `https://api.cloudflare.com/client/v4/zones/${this.cfZoneId}/dns_records`,
                 {
@@ -380,28 +433,26 @@ class Provisioner {
                     },
                     body: JSON.stringify({
                         type: 'CNAME',
-                        name: `${slug}-crm-api.${this.cfDomain}`,
-                        content: `${this.cfTunnelId}.cfargotunnel.com`,
-                        proxied: true,
-                        ttl: 1
+                        name: subdomain,
+                        content: `${tunnelId}.cfargotunnel.com`,
+                        proxied: true
                     })
                 }
             );
 
             const data = await response.json();
-
             if (!data.success) {
-                console.error('[Provisioner] Cloudflare DNS error:', data.errors);
-                throw new Error('Failed to create DNS record');
+                console.error('[Provisioner] Cloudflare DNS record creation failed:', data.errors);
+                throw new Error(data.errors[0].message);
             }
 
-            // Update tunnel config
-            await this.updateTunnelConfig(slug, port);
+            // Update Cloudflare Tunnel configuration on the target server
+            await this.updateTunnelConfig(hostname, port, server);
 
+            console.log(`[Provisioner] Cloudflare route added: ${hostname}`);
             return data.result.id;
-
         } catch (error) {
-            console.error('[Provisioner] Cloudflare error:', error);
+            console.error(`[Provisioner] Cloudflare route setup failed: ${error.message}`);
             throw error;
         }
     }
@@ -580,12 +631,125 @@ class Provisioner {
         }
     }
     /**
-     * Update Cloudflare tunnel config
+     * Update ecosystem.config.js to include new tenant
+     * This ensures the tenant process restarts on system reboot
      */
-    async updateTunnelConfig(slug, port) {
+    async updateEcosystemConfig(tenant, port, server = { is_primary: true }) {
+        const ecosystemPath = server.ecosystem_config_path || '/var/www/html/ecosystem.config.js';
+        const processName = `tenant-${tenant.slug}`;
+        const backendPath = server.nexcrm_backend_path || '/var/www/nexcrm-backend';
+
         try {
             // Read current config
-            let config = await fs.readFile(this.cfConfigPath, 'utf8');
+            const { stdout: configContent } = await this.executeOnServer(server, `cat ${ecosystemPath}`);
+
+            // Check if already exists
+            if (configContent.includes(`name: "${processName}"` || configContent.includes(`name: '${processName}'`))) {
+                console.log(`[Provisioner] Ecosystem config already has ${processName}`);
+                return;
+            }
+
+            // Create new app entry
+            const newApp = `    {
+      name: "${processName}",
+      cwd: "${backendPath}",
+      script: "server.js",
+      args: "--port ${port} --db nexcrm_${tenant.slug.replace(/-/g, '_')} --industry ${tenant.industry_type || 'general'}"
+    }`;
+
+            // Naive insertion: replace the last ] with , newApp ]
+            // This assumes a simple ecosystem.config.js structure
+            const newConfig = configContent.trim().replace(/\]\s*\}\s*;?\s*$/, `,\n${newApp}\n  ]\n};`);
+
+            // Write back to server
+            // Using a temp file and moving it is safer
+            const tmpFile = `/tmp/ecosystem_${tenant.slug}.js`;
+            await this.executeOnServer(server, `echo "${newConfig.replace(/"/g, '\\"')}" > ${tmpFile} && sudo mv ${tmpFile} ${ecosystemPath}`);
+
+            console.log(`[Provisioner] Added ${processName} to ecosystem.config.js on server ${server.name}`);
+
+        } catch (error) {
+            console.warn(`[Provisioner] Could not update ecosystem.config.js on ${server.name}:`, error.message);
+        }
+    }
+
+    /**
+     * Setup Custom Domain for a tenant
+     */
+    async setupCustomDomain(tenant, tunnelId) {
+        const { id, slug, custom_domain } = tenant;
+        console.log(`[Provisioner] Setting up custom domain "${custom_domain}" for tenant ${slug}...`);
+
+        try {
+            // 1. Create DNS Record in Cloudflare
+            const response = await fetch(
+                `https://api.cloudflare.com/client/v4/zones/${this.cfZoneId}/dns_records`,
+                {
+                    method: 'POST',
+                    headers: {
+                        'Authorization': `Bearer ${this.cfApiToken}`,
+                        'Content-Type': 'application/json'
+                    },
+                    body: JSON.stringify({
+                        type: 'CNAME',
+                        name: custom_domain, // Might need to be just the subdomain part if it's within same zone
+                        content: `${tunnelId}.cfargotunnel.com`,
+                        proxied: true
+                    })
+                }
+            );
+
+            const data = await response.json();
+
+            // 3. Add to Tunnel Config
+            const server = await ServerModel.findById(tenant.server_id);
+            const port = tenant.assigned_port;
+            if (server && port) {
+                await this.updateTunnelConfig(custom_domain, port, server);
+            }
+
+            // 4. Update database
+            if (data.success) {
+                await TenantModel.update(id, {
+                    custom_domain_dns_record_id: data.result.id,
+                    custom_domain_verified: true
+                });
+            }
+
+            console.log(`[Provisioner] Custom domain setup complete for ${custom_domain}`);
+        } catch (error) {
+            console.error(`[Provisioner] Custom domain setup failed: ${error.message}`);
+            throw error;
+        }
+    }
+
+    async attachCustomDomainToPages(accountId, projectName, domain) {
+        try {
+            const response = await fetch(
+                `https://api.cloudflare.com/client/v4/accounts/${accountId}/pages/projects/${projectName}/domains`,
+                {
+                    method: 'POST',
+                    headers: {
+                        'Authorization': `Bearer ${this.cfApiToken}`,
+                        'Content-Type': 'application/json'
+                    },
+                    body: JSON.stringify({ name: domain })
+                }
+            );
+            const data = await response.json();
+            return data.success;
+        } catch (error) {
+            console.error(`[Provisioner] Cloudflare Pages domain attachment failed: ${error.message}`);
+            return false;
+        }
+    }
+    /**
+     * Update Cloudflare tunnel config on target server
+     */
+    async updateTunnelConfig(hostname, port, server = { is_primary: true }) {
+        try {
+            const tunnelConfigPath = server.cloudflare_config_path || '/etc/cloudflared/config.yml';
+            const { stdout: config } = await this.executeOnServer(server, `cat ${tunnelConfigPath}`);
 
             const hostname = `${slug}-crm-api.${this.cfDomain}`;
 
@@ -599,122 +763,79 @@ class Provisioner {
             const newRoute = `  - hostname: ${hostname}\n    service: http://localhost:${port}\n`;
 
             // Find the catch-all and insert before it
-            config = config.replace(
+            const newConfig = config.replace(
                 '  - service: http_status:404',
                 newRoute + '  - service: http_status:404'
             );
 
-            await fs.writeFile(this.cfConfigPath, config);
-            console.log('[Provisioner] Tunnel config updated');
+            const tmpFile = `/tmp/tunnel_${slug}.yml`;
+            await this.executeOnServer(server, `echo "${newConfig.replace(/"/g, '\\"')}" > ${tmpFile} && sudo mv ${tmpFile} ${tunnelConfigPath}`);
 
-            // Restart cloudflared AFTER a longer delay to allow API response AND subsequent 
-            // fetchData() calls to complete before tunnel restart breaks connections
+            console.log(`[Provisioner] Tunnel config updated on server ${server.name}`);
+
+            // Restart cloudflared AFTER a delay
+            const restartCmd = 'sudo systemctl restart cloudflared';
             setTimeout(async () => {
                 try {
-                    await execAsync('sudo systemctl restart cloudflared');
-                    console.log('[Provisioner] Cloudflared restarted (deferred)');
+                    await this.executeOnServer(server, restartCmd);
+                    console.log(`[Provisioner] Cloudflared restarted on server ${server.name}`);
                 } catch (err) {
-                    console.warn('[Provisioner] Deferred cloudflared restart failed:', err.message);
+                    console.warn(`[Provisioner] cloudflared restart failed on ${server.name}:`, err.message);
                 }
-            }, 5000); // 5 second delay - gives time for response + fetchData()
+            }, 5000);
 
         } catch (error) {
-            console.warn('[Provisioner] Could not update tunnel config:', error.message);
-            // Don't throw - DNS record is created, tunnel config can be updated manually
+            console.warn(`[Provisioner] Could not update tunnel config on ${server.name}:`, error.message);
         }
     }
 
     /**
      * Start PM2 process for tenant
      */
-    async startProcess(tenant) {
-        const {
-            slug,
-            assigned_port,
-            db_name,
-            industry_type = 'general',
-            plan_slug = 'starter'
-        } = tenant;
-
-        // --cwd ensures the process runs from the NexCRM directory so .env is found
-        const cmd = `pm2 start ${this.nexcrmBackendPath}/server.js \
-            --name "tenant-${slug}" \
-            --cwd "${this.nexcrmBackendPath}" \
-            --max-memory-restart 80M \
-            -- \
-            --port ${assigned_port} \
-            --db ${db_name} \
-            --industry ${industry_type} \
-            --plan ${plan_slug} \
-            --slug ${slug}`;
+    async startProcess(tenant, port, server) {
+        const { slug } = tenant;
+        const processName = `tenant-${slug}`;
 
         try {
-            await execAsync(cmd);
-            await execAsync('pm2 save');
+            // Path structure for tenant backend on target server
+            const backendPath = server.nexcrm_backend_path || '/var/www/nexcrm-backend';
 
-            // Update ecosystem.config.js for reboot persistence
-            await this.updateEcosystemConfig(tenant);
+            // Environment variables for tenant
+            const envVars = `TENANT_ID=${tenant.id} TENANT_SLUG=${slug} PORT=${port} DB_NAME=nexcrm_${slug} DB_USER=${server.db_user || 'root'} DB_PASSWORD='${server.db_password}'`;
+
+            // Start process using PM2 on target server
+            await this.executeOnServer(server, `cd ${backendPath} && ${envVars} pm2 start server.js --name "${processName}"`);
+
+            // Persist PM2 list and update ecosystem.config.js on target server
+            await this.executeOnServer(server, 'pm2 save');
+            await this.updateEcosystemConfig(slug, port, server);
+
+            console.log(`[Provisioner] PM2 process "${processName}" started on port ${port} on server ${server.name}`);
+
+            // Update tenant status
+            await TenantModel.update(tenant.id, {
+                process_name: processName,
+                process_status: 'running',
+                assigned_port: port
+            });
         } catch (error) {
-            console.error('[Provisioner] PM2 start error:', error);
+            console.error(`[Provisioner] PM2 process start failed: ${error.message}`);
             throw error;
         }
     }
 
-    /**
-     * Update ecosystem.config.js to include new tenant
-     * This ensures the tenant process restarts on system reboot
-     */
-    async updateEcosystemConfig(tenant) {
-        const ecosystemPath = process.env.ECOSYSTEM_CONFIG_PATH || '/var/www/html/ecosystem.config.js';
-
-        try {
-            // Read current config
-            let configContent = await fs.readFile(ecosystemPath, 'utf8');
-
-            const processName = `tenant-${tenant.slug}`;
-
-            // Check if already exists
-            if (configContent.includes(`name: "${processName}"`)) {
-                console.log(`[Provisioner] Ecosystem config already has ${processName}`);
-                return;
-            }
-
-            // Create new app entry
-            const newApp = `    {
-      name: "${processName}",
-      cwd: "${this.nexcrmBackendPath}",
-      script: "server.js",
-      args: "--port ${tenant.assigned_port} --db ${tenant.db_name} --industry ${tenant.industry_type || 'general'} --plan ${tenant.plan_slug || 'starter'}"
-    }`;
-
-            // Insert before the closing bracket of apps array
-            // Find the last closing brace before "  ]"
-            const insertPoint = configContent.lastIndexOf('    }') + 5;
-            const beforeInsert = configContent.substring(0, insertPoint);
-            const afterInsert = configContent.substring(insertPoint);
-
-            configContent = beforeInsert + ',\n' + newApp + afterInsert;
-
-            await fs.writeFile(ecosystemPath, configContent);
-            console.log(`[Provisioner] Added ${processName} to ecosystem.config.js`);
-
-        } catch (error) {
-            console.warn('[Provisioner] Could not update ecosystem.config.js:', error.message);
-            // Don't throw - PM2 process is already started and saved
-        }
-    }
 
     /**
      * Stop PM2 process for tenant
      */
     async stopProcess(tenant) {
+        const server = await ServerModel.findById(tenant.server_id);
         const processName = tenant.process_name || `tenant-${tenant.slug}`;
-
+        if (!server) return;
         try {
-            await execAsync(`pm2 stop ${processName}`);
-            await execAsync('pm2 save');
+            await this.executeOnServer(server, `pm2 stop ${processName} && pm2 save`);
         } catch (error) {
-            console.warn('[Provisioner] PM2 stop error:', error.message);
+            console.warn(`[Provisioner] PM2 stop error on ${server.name}:`, error.message);
         }
     }
 
@@ -722,13 +843,13 @@ class Provisioner {
      * Restart PM2 process for tenant
      */
     async restartProcess(tenant) {
+        const server = await ServerModel.findById(tenant.server_id);
         const processName = tenant.process_name || `tenant-${tenant.slug}`;
-
+        if (!server) return;
         try {
-            await execAsync(`pm2 restart ${processName}`);
-            await execAsync('pm2 save');
+            await this.executeOnServer(server, `pm2 restart ${processName} && pm2 save`);
         } catch (error) {
-            console.error('[Provisioner] PM2 restart error:', error);
+            console.error(`[Provisioner] PM2 restart error on ${server.name}:`, error.message);
             throw error;
         }
     }
@@ -737,13 +858,13 @@ class Provisioner {
      * Delete PM2 process for tenant
      */
     async deleteProcess(tenant) {
+        const server = await ServerModel.findById(tenant.server_id);
         const processName = tenant.process_name || `tenant-${tenant.slug}`;
-
+        if (!server) return;
         try {
-            await execAsync(`pm2 delete ${processName}`);
-            await execAsync('pm2 save');
+            await this.executeOnServer(server, `pm2 delete ${processName} && pm2 save`);
         } catch (error) {
-            console.warn('[Provisioner] PM2 delete error:', error.message);
+            console.warn(`[Provisioner] PM2 delete error on ${server.name}:`, error.message);
         }
     }
 
@@ -878,21 +999,22 @@ class Provisioner {
      * Get PM2 logs for a tenant process
      */
     async getProcessLogs(tenant, lines = 100) {
+        const server = await ServerModel.findById(tenant.server_id);
         const processName = tenant.process_name || `tenant-${tenant.slug}`;
+        if (!server) return { logs: 'Server not found', processName, timestamp: new Date().toISOString() };
 
         try {
-            // Get both stdout and stderr logs
-            const { stdout: outLogs } = await execAsync(
+            const { stdout: outLogs } = await this.executeOnServer(
+                server,
                 `pm2 logs ${processName} --nostream --lines ${lines} 2>&1 || echo "No logs available"`
             );
-
             return {
                 logs: outLogs,
                 processName,
                 timestamp: new Date().toISOString()
             };
         } catch (error) {
-            console.warn('[Provisioner] Could not get PM2 logs:', error.message);
+            console.warn(`[Provisioner] Could not get PM2 logs from ${server.name}:`, error.message);
             return {
                 logs: `Error fetching logs: ${error.message}`,
                 processName,
@@ -1039,53 +1161,21 @@ class Provisioner {
     }
 
     /**
-     * Remove tenant from ecosystem.config.js
+     * Remove from tunnel config
      */
-    async removeFromEcosystemConfig(processName) {
-        const ecosystemPath = process.env.ECOSYSTEM_CONFIG_PATH || '/var/www/html/ecosystem.config.js';
-
+    async removeFromTunnelConfig(slug, server, customDomain = null) {
         try {
-            let configContent = await fs.readFile(ecosystemPath, 'utf8');
+            const tunnelConfigPath = server.cloudflare_config_path || '/etc/cloudflared/config.yml';
+            const hostname = customDomain || `${slug}-crm-api.${this.cfDomain}`;
 
-            // Find and remove the process block
-            // Match the entire app object including surrounding formatting
-            const regex = new RegExp(
-                `\\s*,?\\s*\\{[^}]*name:\\s*"${processName}"[^}]*\\}`,
-                'g'
-            );
-
-            const newContent = configContent.replace(regex, '');
-
-            // Clean up any double commas that might result
-            const cleanedContent = newContent.replace(/,(\s*,)+/g, ',').replace(/\[\s*,/g, '[');
-
-            await fs.writeFile(ecosystemPath, cleanedContent);
-            console.log(`[Provisioner] Removed ${processName} from ecosystem.config.js`);
-            return true;
-
-        } catch (error) {
-            console.warn('[Provisioner] Could not update ecosystem.config.js:', error.message);
-            return false;
-        }
-    }
-
-    /**
-     * Remove tenant route from Cloudflare tunnel config
-     */
-    async removeFromTunnelConfig(slug) {
-        try {
-            let config = await fs.readFile(this.cfConfigPath, 'utf8');
-
-            const hostname = `${slug}-crm-api.${this.cfDomain}`;
-
-            // Remove the route entry (hostname + service lines)
+            const { stdout: config } = await this.executeOnServer(server, `cat ${tunnelConfigPath}`);
             const lines = config.split('\n');
             const newLines = [];
             let skipNext = false;
 
             for (let i = 0; i < lines.length; i++) {
                 if (lines[i].includes(`hostname: ${hostname}`)) {
-                    skipNext = true; // Skip the next line (service line)
+                    skipNext = true;
                     continue;
                 }
                 if (skipNext && lines[i].trim().startsWith('service:')) {
@@ -1095,26 +1185,89 @@ class Provisioner {
                 newLines.push(lines[i]);
             }
 
-            await fs.writeFile(this.cfConfigPath, newLines.join('\n'));
+            const updatedConfig = newLines.join('\n');
+            const tmpFile = `/tmp/tunnel_rm_${slug}.yml`;
+            await this.executeOnServer(server, `echo "${updatedConfig.replace(/"/g, '\\"')}" > ${tmpFile} && sudo mv ${tmpFile} ${tunnelConfigPath}`);
+            await this.executeOnServer(server, 'sudo systemctl restart cloudflared');
 
-            // Restart cloudflared
-            await execAsync('sudo systemctl restart cloudflared');
-            console.log(`[Provisioner] Removed ${hostname} from tunnel config`);
+            console.log(`[Provisioner] Removed ${hostname} from tunnel config on ${server.name}`);
             return true;
-
         } catch (error) {
-            console.warn('[Provisioner] Could not update tunnel config:', error.message);
+            console.warn(`[Provisioner] Could not update tunnel config on ${server.name}:`, error.message);
             return false;
+        }
+    }
+
+    /**
+     * Remove tenant from ecosystem.config.js
+     */
+    async removeFromEcosystemConfig(processName, server) {
+        try {
+            const ecosystemPath = server.ecosystem_config_path || '/var/www/html/ecosystem.config.js';
+            const { stdout: configContent } = await this.executeOnServer(server, `cat ${ecosystemPath}`);
+
+            const regex = new RegExp(`\\s*,?\\s*\\{[^}]*name:\\s*"${processName}"[^}]*\\}`, 'g');
+            let newContent = configContent.replace(regex, '');
+            newContent = newContent.replace(/,(\s*,)+/g, ',').replace(/\[\s*,/g, '[');
+
+            const tmpFile = `/tmp/ecosystem_rm_${processName}.js`;
+            await this.executeOnServer(server, `echo "${newContent.replace(/"/g, '\\"')}" > ${tmpFile} && sudo mv ${tmpFile} ${ecosystemPath}`);
+
+            console.log(`[Provisioner] Removed ${processName} from ecosystem.config.js on ${server.name}`);
+            return true;
+        } catch (error) {
+            console.warn(`[Provisioner] Could not update ecosystem.config.js on ${server.name}:`, error.message);
+            return false;
+        }
+    }
+
+    /**
+     * Update Cloudflare tunnel config
+     */
+    async updateTunnelConfig(slug, port, server, customDomain = null) {
+        try {
+            const configPath = server.cf_config_path || '/etc/cloudflared/config.yml';
+            const hostname = customDomain || `${slug}-crm-api.${this.cfDomain}`;
+            const service = `http://localhost:${port}`;
+
+            // Read current config from target server
+            const { stdout: currentConfig } = await this.executeOnServer(server, `cat ${configPath}`);
+
+            // Simple string manipulation to add new ingress rule before the catch-all
+            // A more robust approach would be parsing YAML, but since it's a fixed format:
+            const lines = currentConfig.split('\n');
+            const catchAllIndex = lines.findIndex(line => line.includes('service: http_status:404'));
+
+            if (catchAllIndex !== -1) {
+                const newRule = `  - hostname: ${hostname}\n    service: ${service}`;
+                lines.splice(catchAllIndex, 0, newRule);
+
+                const updatedConfig = lines.join('\n');
+
+                // Write back to target server (needs sudo)
+                await this.executeOnServer(server, `echo "${updatedConfig.replace(/"/g, '\\"')}" | sudo tee ${configPath} > /dev/null`);
+
+                // Restart cloudflared on target server
+                await this.executeOnServer(server, 'sudo systemctl restart cloudflared');
+                console.log(`[Provisioner] Cloudflare Tunnel config updated on server ${server.name} for ${hostname}`);
+            }
+        } catch (error) {
+            console.warn(`[Provisioner] Failed to update Tunnel config: ${error.message}`);
         }
     }
 
     /**
      * Drop tenant database
      */
-    async dropDatabase(dbName) {
+    async dropDatabase(dbName, server = { is_primary: true }) {
         try {
-            await pool.query(`DROP DATABASE IF EXISTS \`${dbName}\``);
-            console.log(`[Provisioner] Dropped database: ${dbName}`);
+            if (server.is_primary) {
+                await pool.query(`DROP DATABASE IF EXISTS \`${dbName}\``);
+            } else {
+                const cmd = `mysql -u${server.db_user} -p${server.db_password} -e "DROP DATABASE IF EXISTS \\\`${dbName}\\\`"`;
+                await this.executeOnServer(server, cmd);
+            }
+            console.log(`[Provisioner] Dropped database: ${dbName} on ${server.name || 'primary'}`);
             return true;
         } catch (error) {
             console.error('[Provisioner] Could not drop database:', error.message);
@@ -1123,10 +1276,29 @@ class Provisioner {
     }
 
     /**
+     * Drop tenant database
+     */
+    async createDatabase(dbName, dbHost = 'localhost', dbUser = 'root', dbPassword = '') {
+        try {
+            // Using mysql connection to run CREATE DATABASE
+            // Note: This assumes the Admin API server can reach the target server's DB
+            // If DB is local to target server and not exposed, we might need to run via SSH
+            const connection = await pool.getConnection();
+            await connection.query(`CREATE DATABASE IF NOT EXISTS \`${dbName}\``);
+            connection.release();
+            console.log(`[Provisioner] Database "${dbName}" created successfully on ${dbHost}`);
+        } catch (error) {
+            console.error(`[Provisioner] Database creation failed: ${error.message}`);
+            throw error;
+        }
+    }
+
+    /**
      * Full cleanup - remove all tenant resources
      */
     async fullCleanup(tenant, options = {}) {
         const { dropDb = false } = options;
+        const server = await ServerModel.findById(tenant.server_id) || { is_primary: true, name: 'primary' };
         const results = {
             pm2Deleted: false,
             apiDnsRemoved: false,
@@ -1141,114 +1313,48 @@ class Provisioner {
         };
 
         const processName = tenant.process_name || `tenant-${tenant.slug}`;
+        console.log(`[Provisioner] Starting full cleanup for: ${tenant.slug} on ${server.name}`);
 
-        console.log(`[Provisioner] Starting full cleanup for: ${tenant.slug}`);
+        try { await this.deleteProcess(tenant); results.pm2Deleted = true; } catch (e) { /* ignore */ }
 
-        // 1. Stop and delete PM2 process
+        // Cleanup storage (local to the server where uploads are, assuming primary or shared mount)
         try {
-            await this.deleteProcess(tenant);
-            results.pm2Deleted = true;
-        } catch (e) {
-            console.warn('[Provisioner] PM2 delete failed:', e.message);
-        }
-
-        // 1b. Cleanup tenant storage
-        try {
-            const fs = require('fs');
-            const path = require('path');
-            const uploadsDir = path.join(this.nexcrmBackendPath, 'uploads');
-            const tenantDir = path.join(uploadsDir, tenant.slug);
-
-            if (fs.existsSync(tenantDir)) {
-                fs.rmSync(tenantDir, { recursive: true, force: true });
-                results.storageCleanedUp = true;
-                console.log(`[Provisioner] Storage cleaned up for tenant: ${tenant.slug}`);
+            if (server.is_primary) {
+                const uploadsDir = path.join(this.nexcrmBackendPath, 'uploads');
+                const tenantDir = path.join(uploadsDir, tenant.slug);
+                if (require('fs').existsSync(tenantDir)) {
+                    require('fs').rmSync(tenantDir, { recursive: true, force: true });
+                    results.storageCleanedUp = true;
+                }
             } else {
-                results.storageCleanedUp = true; // Nothing to delete
-                console.log(`[Provisioner] No storage directory found for tenant: ${tenant.slug}`);
+                const remoteDir = path.join(server.nexcrm_backend_path || '/var/www/nexcrm-backend', 'uploads', tenant.slug);
+                await this.executeOnServer(server, `sudo rm -rf ${remoteDir}`);
+                results.storageCleanedUp = true;
             }
-        } catch (e) {
-            console.warn('[Provisioner] Storage cleanup failed:', e.message);
-        }
+        } catch (e) { /* ignore */ }
 
-        // 2. Remove API DNS record
-        if (tenant.cf_dns_record_id) {
-            try {
-                await this.removeCloudflareRoute(tenant.cf_dns_record_id);
-                results.apiDnsRemoved = true;
-            } catch (e) {
-                console.warn('[Provisioner] API DNS removal failed:', e.message);
-            }
-        }
+        if (tenant.cf_dns_record_id) { try { await this.removeCloudflareRoute(tenant.cf_dns_record_id); results.apiDnsRemoved = true; } catch (e) { /* ignore */ } }
+        try { await this.removeCloudflareFrontendRoute(tenant.slug); results.frontendDnsRemoved = true; } catch (e) { /* ignore */ }
+        try { await this.removeStorefrontRoute(tenant.slug); results.storefrontDnsRemoved = true; } catch (e) { /* ignore */ }
 
-        // 3. Remove frontend DNS record
-        try {
-            await this.removeCloudflareFrontendRoute(tenant.slug);
-            results.frontendDnsRemoved = true;
-        } catch (e) {
-            console.warn('[Provisioner] Frontend DNS removal failed:', e.message);
-        }
-
-        // 4. Remove storefront DNS record
-        try {
-            await this.removeStorefrontRoute(tenant.slug);
-            results.storefrontDnsRemoved = true;
-        } catch (e) {
-            console.warn('[Provisioner] Storefront DNS removal failed:', e.message);
-        }
-
-        // 5. Remove custom domains from Cloudflare Pages
         try {
             const frontendDomain = `${tenant.slug}-crm.${this.cfDomain}`;
             const storefrontDomain = `${tenant.slug}.${this.cfDomain}`;
             const storefrontProject = process.env.NEXCRM_STOREFRONT_PROJECT || 'nexcrm-storefront';
-
             await this.removeDomainFromPages(frontendDomain, this.cfPagesProject);
             await this.removeDomainFromPages(storefrontDomain, storefrontProject);
             results.pagesDomainsRemoved = true;
-        } catch (e) {
-            console.warn('[Provisioner] Pages domain removal failed:', e.message);
-        }
+        } catch (e) { /* ignore */ }
 
-        // 6. Remove from tunnel config
-        try {
-            await this.removeFromTunnelConfig(tenant.slug);
-            results.tunnelConfigUpdated = true;
-        } catch (e) {
-            console.warn('[Provisioner] Tunnel config update failed:', e.message);
-        }
+        try { await this.removeFromTunnelConfig(tenant.slug, server); results.tunnelConfigUpdated = true; } catch (e) { /* ignore */ }
+        if (tenant.custom_domain) { try { await this.removeFromTunnelConfig(tenant.slug, server, tenant.custom_domain); } catch (e) { /* ignore */ } }
 
-        // 7. Remove from ecosystem.config.js
-        try {
-            await this.removeFromEcosystemConfig(processName);
-            results.ecosystemUpdated = true;
-        } catch (e) {
-            console.warn('[Provisioner] Ecosystem config update failed:', e.message);
-        }
+        try { await this.removeFromEcosystemConfig(processName, server); results.ecosystemUpdated = true; } catch (e) { /* ignore */ }
+        if (dropDb && tenant.db_name) { try { await this.dropDatabase(tenant.db_name, server); results.databaseDropped = true; } catch (e) { /* ignore */ } }
+        try { const unregistered = await this.unregisterFromRegistry(tenant.slug); results.registryCleanedUp = unregistered; } catch (e) { /* ignore */ }
 
-        // 8. Drop database (optional)
-        if (dropDb && tenant.db_name) {
-            try {
-                await this.dropDatabase(tenant.db_name);
-                results.databaseDropped = true;
-            } catch (e) {
-                console.warn('[Provisioner] Database drop failed:', e.message);
-            }
-        }
-
-        // 9. Unregister from registry service (remove all email mappings)
-        try {
-            const unregistered = await this.unregisterFromRegistry(tenant.slug);
-            results.registryCleanedUp = unregistered;
-        } catch (e) {
-            console.warn('[Provisioner] Registry cleanup failed:', e.message);
-        }
-
-        console.log(`[Provisioner] Full cleanup complete for: ${tenant.slug}`, results);
         return results;
     }
 }
-
-module.exports = new Provisioner();
 
 

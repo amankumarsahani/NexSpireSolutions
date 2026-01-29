@@ -114,6 +114,8 @@ const messageRoutes = require('./routes/message.routes');
 const inquiryRoutes = require('./routes/inquiry.routes');
 const emailTemplateRoutes = require('./routes/email-template.routes');
 const settingsRoutes = require('./routes/settings.routes');
+const tenantRoutes = require('./routes/tenant.routes'); // Moved from below
+const adminRoutes = require('./routes/admin.routes'); // Added
 
 // Use routes
 app.use('/api/auth', authRoutes);
