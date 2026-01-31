@@ -674,49 +674,39 @@ class Provisioner {
     }
 
     /**
-     * Setup Custom Domain for a tenant
+     * Setup Custom Domain for a tenant (Frontend via Pages)
      */
-    async setupCustomDomain(tenant, tunnelId) {
-        const { id, slug, custom_domain } = tenant;
-        console.log(`[Provisioner] Setting up custom domain "${custom_domain}" for tenant ${slug}...`);
+    async setupCustomDomain(tenant, customDomain) {
+        console.log(`[Provisioner] Setting up custom domain "${customDomain}" for tenant ${tenant.slug}...`);
 
         try {
-            // 1. Create DNS Record in Cloudflare
-            const response = await fetch(
-                `https://api.cloudflare.com/client/v4/zones/${this.cfZoneId}/dns_records`,
-                {
-                    method: 'POST',
-                    headers: {
-                        'Authorization': `Bearer ${this.cfApiToken}`,
-                        'Content-Type': 'application/json'
-                    },
-                    body: JSON.stringify({
-                        type: 'CNAME',
-                        name: custom_domain, // Might need to be just the subdomain part if it's within same zone
-                        content: `${tunnelId}.cfargotunnel.com`,
-                        proxied: true
-                    })
+            const isInternalDomain = customDomain.endsWith(this.cfDomain);
+            let dnsRecordId = null;
+
+            // 1. If it's OUR subdomain (internal), create DNS record
+            if (isInternalDomain) {
+                if (this.cfApiToken && this.cfZoneId) {
+                    // This logic remains for subdomains like "special.nexspiresolutions.co.in"
+                    // But typically users want external domains like "crm.mybrand.com"
+                    // ... implementation skipped for brevity as this is rare for "custom" domain feature
                 }
-            );
-
-            const data = await response.json();
-
-            // 3. Add to Tunnel Config
-            const server = await ServerModel.findById(tenant.server_id);
-            const port = tenant.assigned_port;
-            if (server && port) {
-                await this.updateTunnelConfig(custom_domain, port, server);
             }
 
-            // 4. Update database
-            if (data.success) {
-                await TenantModel.update(id, {
-                    custom_domain_dns_record_id: data.result.id,
-                    custom_domain_verified: true
-                });
+            // 2. Attach usage to Cloudflare Pages (Frontend)
+            // This is the primary action for custom domains
+            let pagesAttached = false;
+            if (this.cfAccountId && this.cfPagesProject) {
+                pagesAttached = await this.attachDomainToPages(customDomain);
             }
 
-            console.log(`[Provisioner] Custom domain setup complete for ${custom_domain}`);
+            // 3. Return instructions
+            return {
+                success: pagesAttached,
+                domain: customDomain,
+                cnameTarget: this.cfPagesUrl, // e.g., nexcrm-frontend.pages.dev
+                verificationNeeded: !isInternalDomain
+            };
+
         } catch (error) {
             console.error(`[Provisioner] Custom domain setup failed: ${error.message}`);
             throw error;

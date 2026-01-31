@@ -26,6 +26,9 @@ router.get('/:id/logs', tenantController.getLogs);
 // Full Delete (removes all resources)
 router.delete('/:id/full-delete', tenantController.fullDeleteTenant);
 
+// Custom Domain Setup
+router.post('/:id/custom-domain', tenantController.setupCustomDomain);
+
 // Process Management
 router.post('/:id/provision', tenantController.provisionTenant);
 router.post('/:id/start', tenantController.startTenant);

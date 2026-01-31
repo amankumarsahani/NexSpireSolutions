@@ -356,6 +356,43 @@ class TenantController {
     }
 
     /**
+     * Setup custom domain for tenant
+     */
+    async setupCustomDomain(req, res) {
+        try {
+            const { id } = req.params;
+            const { domain } = req.body;
+
+            if (!domain) {
+                return res.status(400).json({ error: 'Domain is required' });
+            }
+
+            const tenant = await TenantModel.findById(id);
+            if (!tenant) {
+                return res.status(404).json({ error: 'Tenant not found' });
+            }
+
+            // Call provisioner to setup domain on Cloudflare Pages/Tunnel
+            const result = await Provisioner.setupCustomDomain(tenant, domain);
+
+            // Update database
+            await TenantModel.update(id, {
+                custom_domain: domain,
+                custom_domain_verified: result.success
+            });
+
+            res.json({
+                success: true,
+                message: 'Custom domain configuration initiated',
+                data: result
+            });
+        } catch (error) {
+            console.error('Setup custom domain error:', error);
+            res.status(500).json({ error: error.message || 'Failed to setup custom domain' });
+        }
+    }
+
+    /**
      * Full delete tenant - removes all resources
      */
     async fullDeleteTenant(req, res) {
