@@ -15,8 +15,21 @@ ALTER TABLE tenants
 ADD CONSTRAINT fk_tenants_server FOREIGN KEY (server_id) REFERENCES servers(id) ON DELETE SET NULL;
 
 -- 3. Update port_allocation to be server-aware
--- First, drop existing primary key and foreign keys to rebuild
-ALTER TABLE port_allocation DROP FOREIGN KEY fk_port_tenant; -- Assuming this is the FK name, adjust if different
+-- First, drop existing foreign key if it exists (may have auto-generated name)
+SET @fk_name = (
+    SELECT CONSTRAINT_NAME FROM information_schema.KEY_COLUMN_USAGE 
+    WHERE TABLE_SCHEMA = DATABASE() 
+    AND TABLE_NAME = 'port_allocation' 
+    AND COLUMN_NAME = 'tenant_id' 
+    AND REFERENCED_TABLE_NAME = 'tenants'
+    LIMIT 1
+);
+SET @drop_fk_sql = IF(@fk_name IS NOT NULL, CONCAT('ALTER TABLE port_allocation DROP FOREIGN KEY ', @fk_name), 'SELECT 1');
+PREPARE stmt FROM @drop_fk_sql;
+EXECUTE stmt;
+DEALLOCATE PREPARE stmt;
+
+-- Drop primary key
 ALTER TABLE port_allocation DROP PRIMARY KEY;
 
 -- Add server_id to port_allocation
