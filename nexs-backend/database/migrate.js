@@ -67,7 +67,8 @@ const runMigrations = async () => {
                             'ER_DUP_FIELDNAME',      // Duplicate column name
                             'ER_TABLE_EXISTS_ERROR', // Table already exists
                             'ER_DUP_ENTRY',          // Duplicate entry
-                            'ER_BAD_FIELD_ERROR'     // Unknown column (for SELECT statements)
+                            'ER_BAD_FIELD_ERROR',    // Unknown column (for SELECT statements)
+                            'ER_DUP_KEYNAME'         // Duplicate key/index name
                         ];
                         if (ignorableErrors.includes(stmtErr.code)) {
                             console.log(`   ⚠️ Skipped (already exists): ${stmtErr.message.substring(0, 50)}...`);
