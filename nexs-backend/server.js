@@ -134,6 +134,7 @@ app.use('/api/settings', settingsRoutes);
 
 // NexCRM Master Routes (Tenant Management)
 app.use('/api/tenants', require('./routes/tenant.routes'));
+app.use('/api/admin', require('./routes/admin.routes'));
 app.use('/api/plans', require('./routes/plan.routes'));
 
 // Security Monitoring
