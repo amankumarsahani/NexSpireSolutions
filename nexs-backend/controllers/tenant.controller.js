@@ -111,7 +111,10 @@ class TenantController {
 
             // Provision the tenant (create DB, start process, configure Cloudflare)
             try {
-                const provisionResult = await Provisioner.provisionTenant({
+                // Initialize Provisioner service
+                const provisioner = new Provisioner();
+
+                const provisionResult = await provisioner.provisionTenant({
                     id: tenantId,
                     name,
                     slug,
