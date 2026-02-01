@@ -21,8 +21,8 @@ const EmailService = require('./email.service');
 class Provisioner {
     constructor() {
         // Paths - adjust based on your server setup
-        // Fix: Use correct relative path or environment variable
-        this.nexcrmBackendPath = process.env.NEXCRM_BACKEND_PATH || path.join(__dirname, '../../../NexCRM/nexcrm-backend');
+        // Fix: Use correct absolute path for the server or environment variable
+        this.nexcrmBackendPath = process.env.NEXCRM_BACKEND_PATH || '/var/www/html/nexcrm-backend';
         this.migrationsPath = path.join(__dirname, '../database/migrations');
 
         // Cloudflare config
@@ -375,7 +375,7 @@ class Provisioner {
             try {
                 for (const setting of settings) {
                     await tenantPool.query(
-                        'INSERT INTO settings (`key`, `value`, `group`) VALUES (?, ?, ?)',
+                        'INSERT INTO settings (setting_key, setting_value, category) VALUES (?, ?, ?)',
                         [setting.key, setting.value, 'general']
                     );
                 }
@@ -388,7 +388,7 @@ class Provisioner {
         } else {
             try {
                 for (const setting of settings) {
-                    const sql = `INSERT INTO settings (\\\`key\\\`, \\\`value\\\`, \\\`group\\\`) VALUES ('${setting.key}', '${setting.value}', 'general')`;
+                    const sql = `INSERT INTO settings (setting_key, setting_value, category) VALUES ('${setting.key}', '${setting.value}', 'general')`;
                     const cmd = `mysql -u${server.db_user} -p${server.db_password} ${dbName} -e "${sql}"`;
                     await this.executeOnServer(server, cmd);
                 }
@@ -813,7 +813,8 @@ class Provisioner {
 
         try {
             // Path structure for tenant backend on target server
-            const backendPath = server.nexcrm_backend_path || '/var/www/nexcrm-backend';
+            // Path structure for tenant backend on target server
+            const backendPath = server.nexcrm_backend_path || this.nexcrmBackendPath;
 
             // Environment variables for tenant
             const envVars = `TENANT_ID=${tenant.id} TENANT_SLUG=${slug} PORT=${port} DB_NAME=nexcrm_${slug} DB_USER=${server.db_user || 'root'} DB_PASSWORD='${server.db_password}'`;
