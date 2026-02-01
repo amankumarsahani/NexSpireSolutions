@@ -649,24 +649,34 @@ class Provisioner {
     async updateEcosystemConfig(tenant, port, server = { is_primary: true }) {
         const ecosystemPath = server.ecosystem_config_path || '/var/www/html/ecosystem.config.js';
         const processName = `tenant-${tenant.slug}`;
-        const backendPath = server.nexcrm_backend_path || '/var/www/nexcrm-backend';
+        const backendPath = server.nexcrm_backend_path || this.nexcrmBackendPath;
+        const dbSlug = tenant.slug.replace(/-/g, '_');
+        const dbPass = server.db_password || process.env.DB_PASSWORD || '';
 
         try {
             // Read current config
             const { stdout: configContent } = await this.executeOnServer(server, `cat ${ecosystemPath}`);
 
             // Check if already exists
-            if (configContent.includes(`name: "${processName}"` || configContent.includes(`name: '${processName}'`))) {
+            if (configContent.includes(`name: "${processName}"`) || configContent.includes(`name: '${processName}'`)) {
                 console.log(`[Provisioner] Ecosystem config already has ${processName}`);
                 return;
             }
 
-            // Create new app entry
+            // Create new app entry with env block for database credentials
             const newApp = `    {
       name: "${processName}",
       cwd: "${backendPath}",
       script: "server.js",
-      args: "--port ${port} --db nexcrm_${tenant.slug.replace(/-/g, '_')} --industry ${tenant.industry_type || 'general'}"
+      args: "--port ${port} --db nexcrm_${dbSlug} --industry ${tenant.industry_type || 'general'}",
+      env: {
+        PORT: ${port},
+        DB_NAME: "nexcrm_${dbSlug}",
+        DB_USER: "${server.db_user || 'root'}",
+        DB_PASSWORD: "${dbPass}",
+        TENANT_ID: ${tenant.id},
+        TENANT_SLUG: "${tenant.slug}"
+      }
     }`;
 
             // Naive insertion: replace the last ] with , newApp ]
