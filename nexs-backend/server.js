@@ -39,8 +39,11 @@ const corsOptions = {
             'https://admin.nexspiresolutions.co.in'
         ];
 
+        // Allow any subdomain of nexspiresolutions.co.in
+        const isNexspireSubdomain = origin && /https:\/\/[a-z0-9-]+\.nexspiresolutions\.co\.in$/.test(origin);
+
         // Allow requests with no origin (mobile apps, Postman, etc.)
-        if (!origin || allowedOrigins.indexOf(origin) !== -1) {
+        if (!origin || allowedOrigins.indexOf(origin) !== -1 || isNexspireSubdomain) {
             callback(null, true);
         } else {
             callback(new Error('Not allowed by CORS'));

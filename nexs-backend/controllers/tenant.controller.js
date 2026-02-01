@@ -466,27 +466,32 @@ class TenantController {
                 return res.status(404).json({ error: 'Tenant not found' });
             }
 
-            // Perform full cleanup
-            // Wrapped in try-catch to ensure DB delete happens even if cleanup fails
-            let cleanupResults = {};
-            try {
-                const provisioner = new Provisioner();
-                cleanupResults = await provisioner.fullCleanup(tenant, {
-                    dropDb: dropDatabase
-                });
-            } catch (cleanupError) {
-                console.error('Full cleanup partial error:', cleanupError);
-                cleanupResults = { error: cleanupError.message, partial: true };
-            }
-
-            // Hard delete from database
-            await TenantModel.hardDelete(id);
-
-            res.json({
+            // Send immediate response to prevent timeouts
+            res.status(202).json({
                 success: true,
-                message: 'Tenant fully deleted',
-                data: cleanupResults
+                message: 'Tenant deletion initiated in background',
+                data: { tenantId: id }
             });
+
+            // Perform full cleanup in background
+            (async () => {
+                try {
+                    const provisioner = new Provisioner();
+                    await provisioner.fullCleanup(tenant, {
+                        dropDb: dropDatabase
+                    });
+                } catch (cleanupError) {
+                    console.error('[Background Delete] Cleanup partial error:', cleanupError);
+                } finally {
+                    // Hard delete from database regardless of cleanup success
+                    try {
+                        await TenantModel.hardDelete(id);
+                        console.log(`[Background Delete] Tenant ${id} hard deleted from DB`);
+                    } catch (dbError) {
+                        console.error(`[Background Delete] Failed to hard delete tenant ${id} from DB:`, dbError);
+                    }
+                }
+            })();
         } catch (error) {
             console.error('Full delete tenant error:', error);
             res.status(500).json({ error: 'Failed to fully delete tenant' });
