@@ -787,7 +787,9 @@ class Provisioner {
             const tunnelConfigPath = server.cloudflare_config_path || '/etc/cloudflared/config.yml';
             const { stdout: config } = await this.executeOnServer(server, `cat ${tunnelConfigPath}`);
 
-            const hostname = `${slug}-crm-api.${this.cfDomain}`;
+            // hostname is already the full subdomain (e.g., mytest1-crm-api.nexspiresolutions.co.in)
+            // Extract slug from hostname for temp file naming
+            const slug = hostname.split('-crm-api')[0] || 'tenant';
 
             // Check if entry already exists
             if (config.includes(hostname)) {
@@ -838,7 +840,8 @@ class Provisioner {
             const backendPath = server.nexcrm_backend_path || this.nexcrmBackendPath;
 
             // Environment variables for tenant
-            const dbPass = server.db_password || '';
+            // Use server's db_password, fallback to environment variable, then empty string
+            const dbPass = server.db_password || process.env.DB_PASSWORD || '';
             const envVars = `TENANT_ID=${tenant.id} TENANT_SLUG=${slug} PORT=${port} DB_NAME=nexcrm_${slug} DB_USER=${server.db_user || 'root'} DB_PASSWORD='${dbPass}'`;
 
             // Start process using PM2 on target server
@@ -846,7 +849,7 @@ class Provisioner {
 
             // Persist PM2 list and update ecosystem.config.js on target server
             await this.executeOnServer(server, 'pm2 save');
-            await this.updateEcosystemConfig(slug, port, server);
+            await this.updateEcosystemConfig(tenant, port, server);
 
             console.log(`[Provisioner] PM2 process "${processName}" started on port ${port} on server ${server.name}`);
 
