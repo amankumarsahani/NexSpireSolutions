@@ -21,7 +21,7 @@ const EmailService = require('./email.service');
 class Provisioner {
     constructor() {
         // Paths - adjust based on your server setup
-        this.nexcrmBackendPath = process.env.NEXCRM_BACKEND_PATH || '/var/www/nexcrm-backend';
+        this.nexcrmBackendPath = process.env.NEXCRM_BACKEND_PATH || path.join(__dirname, '../../NexCRM/nexcrm-backend');
         this.migrationsPath = path.join(__dirname, '../database/migrations');
 
         // Cloudflare config
