@@ -409,6 +409,15 @@ class Provisioner {
                         [setting.key, setting.value]
                     );
                 }
+
+                // Fix: Force update industry if it's stuck on 'general'
+                if (tenantData.industry_type && tenantData.industry_type !== 'general') {
+                    await tenantPool.query(
+                        "UPDATE settings SET setting_value = ? WHERE setting_key = 'industry' AND setting_value = 'general'",
+                        [tenantData.industry_type]
+                    );
+                }
+
                 console.log(`[Provisioner] Initial settings seeded for ${tenantData.name}`);
             } catch (error) {
                 console.warn(`[Provisioner] Could not seed settings locally: ${error.message}`);
@@ -422,9 +431,70 @@ class Provisioner {
                     const cmd = `mysql -u${server.db_user || this.dbUser} -p${server.db_password || this.dbPass} ${dbName} -e "${sql}"`;
                     await this.executeOnServer(server, cmd);
                 }
+
+                // Fix: Force update industry if it's stuck on 'general'
+                if (tenantData.industry_type && tenantData.industry_type !== 'general') {
+                    const sql = `UPDATE settings SET setting_value = '${tenantData.industry_type}' WHERE setting_key = 'industry' AND setting_value = 'general'`;
+                    const cmd = `mysql -u${server.db_user || this.dbUser} -p${server.db_password || this.dbPass} ${dbName} -e "${sql}"`;
+                    await this.executeOnServer(server, cmd);
+                }
+
                 console.log(`[Provisioner] Initial settings seeded for ${tenantData.name} on remote server ${server.name}`);
             } catch (error) {
                 console.warn(`[Provisioner] Could not seed settings remotely on ${server.name}: ${error.message}`);
+            }
+        }
+    }
+
+    /**
+     * Sync tenant settings (name, email, industry) to tenant DB
+     * Used when tenant details are updated in Admin Panel
+     */
+    async syncTenantSettings(tenant, server) {
+        if (!tenant || !server) return;
+        const dbName = `nexcrm_${tenant.slug.replace(/-/g, '_')}`;
+
+        const updates = [
+            { key: 'company_name', value: tenant.name },
+            { key: 'email', value: tenant.email },
+            { key: 'industry', value: tenant.industry_type || 'general' }
+        ];
+
+        console.log(`[Provisioner] Syncing settings for ${tenant.slug}...`);
+
+        if (server.is_primary) {
+            const tenantPool = require('mysql2/promise').createPool({
+                host: server.db_host || this.dbHost,
+                port: server.db_port || this.dbPort,
+                user: server.db_user || this.dbUser,
+                password: server.db_password || this.dbPass,
+                database: dbName
+            });
+
+            try {
+                for (const update of updates) {
+                    await tenantPool.query(
+                        `INSERT INTO settings (setting_key, setting_value) VALUES (?, ?) 
+                         ON DUPLICATE KEY UPDATE setting_value = ?`,
+                        [update.key, update.value, update.value]
+                    );
+                }
+                console.log(`[Provisioner] Settings synced locally for ${tenant.slug}`);
+            } catch (error) {
+                console.warn(`[Provisioner] Failed to sync settings locally: ${error.message}`);
+            } finally {
+                await tenantPool.end();
+            }
+        } else {
+            try {
+                for (const update of updates) {
+                    const sql = `INSERT INTO settings (setting_key, setting_value) VALUES ('${update.key}', '${update.value}') ON DUPLICATE KEY UPDATE setting_value = '${update.value}'`;
+                    const cmd = `mysql -u${server.db_user || this.dbUser} -p${server.db_password || this.dbPass} ${dbName} -e "${sql}"`;
+                    await this.executeOnServer(server, cmd);
+                }
+                console.log(`[Provisioner] Settings synced remotely for ${tenant.slug}`);
+            } catch (error) {
+                console.warn(`[Provisioner] Failed to sync settings remotely: ${error.message}`);
             }
         }
     }

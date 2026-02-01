@@ -207,6 +207,25 @@ class TenantController {
 
             const updated = await TenantModel.update(id, req.body);
 
+            // Fix: Sync settings to tenant DB if critical fields changed
+            if (req.body.name || req.body.email || req.body.industry_type) {
+                const freshTenant = await TenantModel.findById(id);
+                if (freshTenant) {
+                    const provisioner = new Provisioner();
+                    let server = { is_primary: true };
+
+                    if (freshTenant.server_id) {
+                        const s = await ServerModel.findById(freshTenant.server_id);
+                        if (s) server = s;
+                    }
+
+                    // Run sync in background
+                    provisioner.syncTenantSettings(freshTenant, server).catch(err => {
+                        console.error(`[Update Tenant] JSON Settings sync failed: ${err.message}`);
+                    });
+                }
+            }
+
             res.json({
                 success: true,
                 message: 'Tenant updated successfully',
