@@ -355,13 +355,19 @@ class Provisioner {
      * Seed initial settings for a new tenant
      */
     async seedInitialSettings(dbName, tenantData, server = { is_primary: true }) {
+        const slug = tenantData.slug || dbName.replace('nexcrm_', '');
+        const domain = this.cfDomain || 'nexspiresolutions.co.in';
+
         const settings = [
             { key: 'company_name', value: tenantData.name },
             { key: 'company_email', value: tenantData.email },
             { key: 'industry_type', value: tenantData.industry_type || 'general' },
             { key: 'timezone', value: 'Asia/Kolkata' },
             { key: 'currency', value: 'INR' },
-            { key: 'date_format', value: 'YYYY-MM-DD' }
+            { key: 'date_format', value: 'YYYY-MM-DD' },
+            { key: 'storefront_url', value: `https://${slug}.${domain}` },
+            { key: 'crm_url', value: `https://${slug}-crm.${domain}` },
+            { key: 'api_url', value: `https://${slug}-crm-api.${domain}` }
         ];
 
         if (server.is_primary) {
@@ -375,7 +381,7 @@ class Provisioner {
             try {
                 for (const setting of settings) {
                     await tenantPool.query(
-                        'INSERT INTO settings (setting_key, setting_value) VALUES (?, ?)',
+                        'INSERT IGNORE INTO settings (setting_key, setting_value) VALUES (?, ?)',
                         [setting.key, setting.value]
                     );
                 }
@@ -388,7 +394,7 @@ class Provisioner {
         } else {
             try {
                 for (const setting of settings) {
-                    const sql = `INSERT INTO settings (setting_key, setting_value) VALUES ('${setting.key}', '${setting.value}')`;
+                    const sql = `INSERT IGNORE INTO settings (setting_key, setting_value) VALUES ('${setting.key}', '${setting.value}')`;
                     const cmd = `mysql -u${server.db_user} -p${server.db_password} ${dbName} -e "${sql}"`;
                     await this.executeOnServer(server, cmd);
                 }
@@ -421,7 +427,12 @@ class Provisioner {
         try {
             const subdomain = `${slug}-crm-api`;
             const hostname = `${subdomain}.${this.cfDomain}`;
-            const tunnelId = server.cloudflare_tunnel_id;
+            const tunnelId = server.cloudflare_tunnel_id || process.env.CLOUDFLARE_TUNNEL_ID;
+
+            if (!tunnelId) {
+                console.error('[Provisioner] Missing Tunnel ID for server:', server.name);
+                throw new Error('Cloudflare Tunnel ID is not configured for this server');
+            }
 
             // Create DNS record (CNAME to Cloudflare Tunnel)
             const response = await fetch(

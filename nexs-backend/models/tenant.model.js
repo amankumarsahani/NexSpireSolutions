@@ -115,7 +115,8 @@ class TenantModel {
         const allowedFields = [
             'name', 'email', 'phone', 'logo_url', 'industry_type',
             'plan_id', 'status', 'custom_features', 'server_id',
-            'custom_domain', 'custom_domain_verified', 'custom_domain_dns_record_id'
+            'custom_domain', 'custom_domain_verified', 'custom_domain_dns_record_id',
+            'process_name', 'process_status', 'assigned_port'
         ];
         const updates = [];
         const values = [];
