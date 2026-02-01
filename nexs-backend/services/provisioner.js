@@ -1297,7 +1297,8 @@ class Provisioner {
             // Simple string manipulation to add new ingress rule before the catch-all
             // A more robust approach would be parsing YAML, but since it's a fixed format:
             const lines = currentConfig.split('\n');
-            const catchAllIndex = lines.findIndex(line => line.includes('service: http_status:404'));
+            // Regex to find the catch-all rule (ignoring whitespace)
+            const catchAllIndex = lines.findIndex(line => /service:\s*http_status:404/.test(line));
 
             if (catchAllIndex !== -1) {
                 const newRule = `  - hostname: ${hostname}\n    service: ${service}`;
@@ -1311,6 +1312,8 @@ class Provisioner {
                 // Restart cloudflared on target server
                 await this.executeOnServer(server, 'sudo systemctl restart cloudflared');
                 console.log(`[Provisioner] Cloudflare Tunnel config updated on server ${server.name} for ${hostname}`);
+            } else {
+                console.error(`[Provisioner] CRITICAL: Could not find catch-all rule (http_status:404) in ${configPath}. Tunnel update skipped for ${hostname}.`);
             }
         } catch (error) {
             // Critical: Don't throw here, just log invalid tunnel update. 
