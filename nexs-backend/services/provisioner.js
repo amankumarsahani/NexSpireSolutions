@@ -1297,21 +1297,42 @@ class Provisioner {
             // Simple string manipulation to add new ingress rule before the catch-all
             // A more robust approach would be parsing YAML, but since it's a fixed format:
             const lines = currentConfig.split('\n');
-            // Regex to find the catch-all rule (ignoring whitespace)
-            const catchAllIndex = lines.findIndex(line => /service:\s*http_status:404/.test(line));
+            // Regex to find the catch-all rule (ignoring whitespace) and capture indentation
+            const matchIndex = lines.findIndex(line => /service:\s*http_status:404/.test(line));
 
-            if (catchAllIndex !== -1) {
-                const newRule = `  - hostname: ${hostname}\n    service: ${service}`;
-                lines.splice(catchAllIndex, 0, newRule);
+            if (matchIndex !== -1) {
+                const catchAllLine = lines[matchIndex];
+                // Capture leading whitespace (indentation)
+                const indentation = catchAllLine.match(/^(\s*)/)[0];
 
+                // Construct new rule with matching indentation
+                // We assume standard structure: "- hostname: ... \n    service: ..."
+                // If the parent list item has 'N' spaces, the 'service' key usually has 'N+2' or 'N+4' spaces
+                // But the 'ingress' items usually start with the dashes aligned.
+
+                // Let's assume the catch-all line is "- service: http_status:404"
+                // If so, the indentation is the spaces before the dash.
+                // But often it is "  - service: http_status:404"
+
+                const newRule = `${indentation}- hostname: ${hostname}\n${indentation}  service: ${service}`;
+
+                lines.splice(matchIndex, 0, newRule);
                 const updatedConfig = lines.join('\n');
 
                 // Write back to target server (needs sudo)
-                await this.executeOnServer(server, `echo "${updatedConfig.replace(/"/g, '\\"')}" | sudo tee ${configPath} > /dev/null`);
+                const echoCmd = `echo "${updatedConfig.replace(/"/g, '\\"')}" | sudo tee ${configPath} > /dev/null`;
+                await this.executeOnServer(server, echoCmd);
 
-                // Restart cloudflared on target server
-                await this.executeOnServer(server, 'sudo systemctl restart cloudflared');
-                console.log(`[Provisioner] Cloudflare Tunnel config updated on server ${server.name} for ${hostname}`);
+                // VERIFICATION: Read it back to ensure it stuck (permissions check)
+                const { stdout: verifyConfig } = await this.executeOnServer(server, `cat ${configPath}`);
+                if (!verifyConfig.includes(hostname)) {
+                    console.error(`[Provisioner] CRITICAL: Tunnel config verification failed! Written config did not contain ${hostname}. Check SUDO permissions.`);
+                } else {
+                    console.log(`[Provisioner] Verified tunnel config contains ${hostname}`);
+                    // Restart cloudflared on target server
+                    await this.executeOnServer(server, 'sudo systemctl restart cloudflared');
+                    console.log(`[Provisioner] Cloudflare Tunnel config updated and valid on server ${server.name} for ${hostname}`);
+                }
             } else {
                 console.error(`[Provisioner] CRITICAL: Could not find catch-all rule (http_status:404) in ${configPath}. Tunnel update skipped for ${hostname}.`);
             }
