@@ -165,6 +165,15 @@ class Provisioner {
             await TenantModel.updateProcessStatus(id, 'running');
             console.log(`[Provisioner] PM2 process started`);
 
+            // 7.1 Update Cloudflare Tunnel Ingress (CRITICAL: Expose the new port)
+            // This maps slug-crm-api.domain -> localhost:PORT
+            try {
+                await this.updateTunnelConfig(slug, port, server);
+            } catch (tunnelError) {
+                console.error(`[Provisioner] Failed to update tunnel: ${tunnelError.message}`);
+                // Don't throw, we want to finish provisioning (user can fix tunnel later)
+            }
+
             // 8. Register with registry service (for mobile app lookup)
             const apiSubdomain = `${slug}-crm-api.${this.cfDomain}`;
             await this.registerWithRegistry({
