@@ -192,7 +192,8 @@ class TenantController {
                 });
             }
 
-            await Provisioner.startProcess(tenant);
+            const provisioner = new Provisioner();
+            await provisioner.startProcess(tenant);
             await TenantModel.updateProcessStatus(id, 'running');
 
             res.json({
@@ -217,7 +218,8 @@ class TenantController {
                 return res.status(404).json({ error: 'Tenant not found' });
             }
 
-            await Provisioner.stopProcess(tenant);
+            const provisioner = new Provisioner();
+            await provisioner.stopProcess(tenant);
             await TenantModel.updateProcessStatus(id, 'stopped');
 
             res.json({
@@ -242,7 +244,8 @@ class TenantController {
                 return res.status(404).json({ error: 'Tenant not found' });
             }
 
-            await Provisioner.restartProcess(tenant);
+            const provisioner = new Provisioner();
+            await provisioner.restartProcess(tenant);
             await TenantModel.updateProcessStatus(id, 'running');
 
             res.json({
@@ -273,7 +276,8 @@ class TenantController {
                 });
             }
 
-            const result = await Provisioner.provisionTenant(tenant);
+            const provisioner = new Provisioner();
+            const result = await provisioner.provisionTenant(tenant);
 
             res.json({
                 success: true,
@@ -317,7 +321,8 @@ class TenantController {
 
             // Stop process if running
             if (tenant.process_status === 'running') {
-                await Provisioner.stopProcess(tenant);
+                const provisioner = new Provisioner();
+                await provisioner.stopProcess(tenant);
             }
 
             // Soft delete
@@ -346,7 +351,8 @@ class TenantController {
                 return res.status(404).json({ error: 'Tenant not found' });
             }
 
-            const logsData = await Provisioner.getProcessLogs(tenant, parseInt(lines));
+            const provisioner = new Provisioner();
+            const logsData = await provisioner.getProcessLogs(tenant, parseInt(lines));
 
             res.json({
                 success: true,
@@ -376,7 +382,8 @@ class TenantController {
             }
 
             // Call provisioner to setup domains
-            const result = await Provisioner.setupCustomDomain(tenant, { crm, storefront, api });
+            const provisioner = new Provisioner();
+            const result = await provisioner.setupCustomDomain(tenant, { crm, storefront, api });
 
             // Update database with new domain columns
             const updateData = {};
@@ -412,7 +419,8 @@ class TenantController {
             }
 
             // Perform full cleanup
-            const cleanupResults = await Provisioner.fullCleanup(tenant, {
+            const provisioner = new Provisioner();
+            const cleanupResults = await provisioner.fullCleanup(tenant, {
                 dropDb: dropDatabase
             });
 

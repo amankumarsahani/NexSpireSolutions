@@ -130,7 +130,8 @@ class WebhookController {
         const tenant = await TenantModel.findById(tenantId);
         if (tenant && tenant.process_status !== 'running') {
             try {
-                await Provisioner.startProcess(tenant);
+                const provisioner = new Provisioner();
+                await provisioner.startProcess(tenant);
                 await TenantModel.updateProcessStatus(tenantId, 'running');
             } catch (error) {
                 console.error('[Webhook] Failed to start tenant process:', error);
@@ -216,7 +217,8 @@ class WebhookController {
         const tenant = await TenantModel.findById(tenantId);
         if (tenant && tenant.process_status === 'running') {
             try {
-                await Provisioner.stopProcess(tenant);
+                const provisioner = new Provisioner();
+                await provisioner.stopProcess(tenant);
                 await TenantModel.updateProcessStatus(tenantId, 'stopped');
             } catch (error) {
                 console.error('[Webhook] Failed to stop tenant process:', error);
