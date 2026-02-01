@@ -383,8 +383,8 @@ class Provisioner {
 
         const settings = [
             { key: 'company_name', value: tenantData.name },
-            { key: 'company_email', value: tenantData.email },
-            { key: 'industry_type', value: tenantData.industry_type || 'general' },
+            { key: 'email', value: tenantData.email },
+            { key: 'industry', value: tenantData.industry_type || 'general' },
             { key: 'timezone', value: 'Asia/Kolkata' },
             { key: 'currency', value: 'INR' },
             { key: 'date_format', value: 'YYYY-MM-DD' },
