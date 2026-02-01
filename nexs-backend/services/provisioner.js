@@ -670,7 +670,11 @@ class Provisioner {
 
         try {
             // Read current config
-            const { stdout: configContent } = await this.executeOnServer(server, `cat ${ecosystemPath}`);
+            const { stdout: configContent } = await this.executeOnServer(server, `cat ${ecosystemPath} || echo "module.exports = { apps: [] };"`);
+
+            if (!configContent) {
+                throw new Error(`Failed to read ecosystem config from ${ecosystemPath}`);
+            }
 
             // Check if already exists
             if (configContent.includes(`name: "${processName}"`) || configContent.includes(`name: '${processName}'`)) {

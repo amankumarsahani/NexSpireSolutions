@@ -129,7 +129,8 @@ class TenantModel {
         });
 
         if (updates.length === 0) {
-            throw new Error('No valid fields to update');
+            console.warn(`[TenantModel] No valid fields to update for tenant ${id}`);
+            return this.findById(id);
         }
 
         values.push(id);
