@@ -375,8 +375,8 @@ class Provisioner {
             try {
                 for (const setting of settings) {
                     await tenantPool.query(
-                        'INSERT INTO settings (setting_key, setting_value, category) VALUES (?, ?, ?)',
-                        [setting.key, setting.value, 'general']
+                        'INSERT INTO settings (setting_key, setting_value) VALUES (?, ?)',
+                        [setting.key, setting.value]
                     );
                 }
                 console.log(`[Provisioner] Initial settings seeded for ${tenantData.name}`);
@@ -388,7 +388,7 @@ class Provisioner {
         } else {
             try {
                 for (const setting of settings) {
-                    const sql = `INSERT INTO settings (setting_key, setting_value, category) VALUES ('${setting.key}', '${setting.value}', 'general')`;
+                    const sql = `INSERT INTO settings (setting_key, setting_value) VALUES ('${setting.key}', '${setting.value}')`;
                     const cmd = `mysql -u${server.db_user} -p${server.db_password} ${dbName} -e "${sql}"`;
                     await this.executeOnServer(server, cmd);
                 }
@@ -817,7 +817,8 @@ class Provisioner {
             const backendPath = server.nexcrm_backend_path || this.nexcrmBackendPath;
 
             // Environment variables for tenant
-            const envVars = `TENANT_ID=${tenant.id} TENANT_SLUG=${slug} PORT=${port} DB_NAME=nexcrm_${slug} DB_USER=${server.db_user || 'root'} DB_PASSWORD='${server.db_password}'`;
+            const dbPass = server.db_password || '';
+            const envVars = `TENANT_ID=${tenant.id} TENANT_SLUG=${slug} PORT=${port} DB_NAME=nexcrm_${slug} DB_USER=${server.db_user || 'root'} DB_PASSWORD='${dbPass}'`;
 
             // Start process using PM2 on target server
             await this.executeOnServer(server, `cd ${backendPath} && ${envVars} pm2 start server.js --name "${processName}"`);
