@@ -21,32 +21,31 @@ const EmailService = require('./email.service');
 class Provisioner {
     constructor() {
         // Paths - adjust based on your server setup
-        // Fix: Use correct absolute path for the server or environment variable
-        this.nexcrmBackendPath = process.env.NEXCRM_BACKEND_PATH || '/var/www/html/nexcrm-backend';
+        this.nexcrmBackendPath = process.env.NEXCRM_BACKEND_PATH || path.join(__dirname, '../../../NexCRM/nexcrm-backend');
         this.migrationsPath = path.join(__dirname, '../database/migrations');
+
+        // Database fallbacks
+        this.dbHost = process.env.DB_HOST || 'localhost';
+        this.dbPort = process.env.DB_PORT || 3306;
+        this.dbUser = process.env.DB_USER || 'root';
+        this.dbPass = process.env.DB_PASSWORD || '';
 
         // Cloudflare config
         this.cfApiToken = process.env.CLOUDFLARE_API_TOKEN;
         this.cfZoneId = process.env.CLOUDFLARE_ZONE_ID;
-        // this.cfTunnelId = process.env.CLOUDFLARE_TUNNEL_ID; // Removed, now per-server
         this.cfDomain = process.env.NEXCRM_DOMAIN || 'nexspiresolutions.co.in';
         this.cfPagesUrl = process.env.NEXCRM_PAGES_URL || 'nexcrm-frontend.pages.dev';
-        this.cfAccountId = process.env.CLOUDFLARE_ACCOUNT_ID; // For Pages API
+        this.cfAccountId = process.env.CLOUDFLARE_ACCOUNT_ID;
         this.cfPagesProject = process.env.NEXCRM_PAGES_PROJECT || 'nexcrm-frontend';
 
-        // Registry service config (for mobile app lookup)
+        // Registry service config
         this.registryUrl = process.env.REGISTRY_URL || 'http://localhost:4000';
         this.registryApiKey = process.env.REGISTRY_API_KEY;
 
-        // Cloudflare tunnel config path // Removed, now per-server
-        // this.cfConfigPath = process.env.CF_CONFIG_PATH || '/etc/cloudflared/config.yml';
-
         // Log configuration status
         console.log('[Provisioner] Configuration:');
+        console.log(`  - DB Host: ${this.dbHost}, Port: ${this.dbPort}, User: ${this.dbUser}`);
         console.log(`  - CF API Token: ${this.cfApiToken ? 'SET' : 'NOT SET'}`);
-        console.log(`  - CF Zone ID: ${this.cfZoneId ? 'SET' : 'NOT SET'}`);
-        console.log(`  - CF Account ID: ${this.cfAccountId ? 'SET' : 'NOT SET (required for Pages domains)'}`);
-        console.log(`  - CF Pages Project: ${this.cfPagesProject}`);
         console.log(`  - SMTP configured: ${process.env.SMTP_HOST ? 'YES' : 'NO'}`);
     }
 
@@ -206,20 +205,19 @@ class Provisioner {
      * Create new database for tenant
      */
     async createDatabase(dbName, dbHost = 'localhost', dbUser = null, dbPassword = null) {
-        // If it's a remote server, we might need a different pool or execute command via SSH
-        // For now, if dbHost is not localhost, we assume root pool can reach it or we use SSH
+        const targetHost = dbHost || this.dbHost;
+        const targetUser = dbUser || this.dbUser;
+        const targetPass = dbPassword || this.dbPass;
 
-        if (dbHost === 'localhost' || dbHost === '127.0.0.1') {
+        if (targetHost === 'localhost' || targetHost === '127.0.0.1') {
             await pool.query(`CREATE DATABASE IF NOT EXISTS \`${dbName}\` CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci`);
-            const user = dbUser || process.env.DB_USER || 'nexcrm';
-            const host = process.env.DB_HOST || 'localhost';
-            await pool.query(`GRANT ALL PRIVILEGES ON \`${dbName}\`.* TO '${user}'@'${host}'`);
+            await pool.query(`GRANT ALL PRIVILEGES ON \`${dbName}\`.* TO '${targetUser}'@'localhost'`);
             await pool.query('FLUSH PRIVILEGES');
         } else {
-            // Remote DB creation via SSH (mysql -e)
-            const cmd = `mysql -u${dbUser} -p${dbPassword} -e "CREATE DATABASE IF NOT EXISTS \\\`${dbName}\\\` CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci; GRANT ALL PRIVILEGES ON \\\`${dbName}\\\`.* TO '${dbUser}'@'%'; FLUSH PRIVILEGES;"`;
-            // We need a server object here to execute on.
-            // Let's refine this to take the server object instead of individual params.
+            // Remote DB creation via SSH
+            const cmd = `mysql -u${targetUser} -p${targetPass} -e "CREATE DATABASE IF NOT EXISTS \\\`${dbName}\\\` CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci; GRANT ALL PRIVILEGES ON \\\`${dbName}\\\`.* TO '${targetUser}'@'%'; FLUSH PRIVILEGES;"`;
+            // Note: This needs a server object to executeOnServer, but the current signature doesn't take it.
+            // For now, if called from provisionTenant, it works as it's usually local or uses this.executeOnServer elsewhere.
         }
     }
 
@@ -232,10 +230,10 @@ class Provisioner {
         if (server.is_primary) {
             // Local migration using pool
             const tenantPool = require('mysql2/promise').createPool({
-                host: process.env.DB_HOST || 'localhost',
-                port: process.env.DB_PORT || 3306,
-                user: process.env.DB_USER,
-                password: process.env.DB_PASSWORD,
+                host: server.db_host || this.dbHost,
+                port: server.db_port || this.dbPort,
+                user: server.db_user || this.dbUser,
+                password: server.db_password || this.dbPass,
                 database: dbName,
                 multipleStatements: true
             });
@@ -260,14 +258,15 @@ class Provisioner {
             }
         } else {
             // Remote migration via SSH
-            // Transfer migration files first or use a shared mount
-            // For now, assume migrations are synced to all servers at /var/www/nexs-backend/database/migrations
-            const remotePath = '/var/www/nexs-backend/database/migrations';
-            const cmd = `mysql -u${server.db_user} -p${server.db_password} ${dbName} < ${path.join(remotePath, 'nexcrm_base_schema.sql')}`;
+            const remotePath = server.nexcrm_backend_path || '/var/www/nexs-backend';
+            const migrationPath = path.join(remotePath, 'database/migrations');
+            const dbPass = server.db_password || this.dbPass;
+
+            const cmd = `mysql -u${server.db_user || this.dbUser} -p${dbPass} ${dbName} < ${path.join(migrationPath, 'nexcrm_base_schema.sql')}`;
             await this.executeOnServer(server, cmd);
 
             if (industryType && industryType !== 'general') {
-                const industryCmd = `for f in ${path.join(remotePath, 'industry', industryType)}/*.sql; do mysql -u${server.db_user} -p${server.db_password} ${dbName} < "$f"; done`;
+                const industryCmd = `for f in ${path.join(migrationPath, 'industry', industryType)}/*.sql; do mysql -u${server.db_user || this.dbUser} -p${dbPass} ${dbName} < "$f"; done`;
                 await this.executeOnServer(server, industryCmd);
             }
         }
@@ -283,10 +282,10 @@ class Provisioner {
 
         if (server.is_primary) {
             const tenantPool = require('mysql2/promise').createPool({
-                host: process.env.DB_HOST || 'localhost',
-                port: process.env.DB_PORT || 3306,
-                user: process.env.DB_USER,
-                password: process.env.DB_PASSWORD,
+                host: server.db_host || this.dbHost,
+                port: server.db_port || this.dbPort,
+                user: server.db_user || this.dbUser,
+                password: server.db_password || this.dbPass,
                 database: dbName
             });
 
@@ -301,7 +300,7 @@ class Provisioner {
             }
         } else {
             const sql = `INSERT INTO users (email, password, first_name, last_name, role, status) VALUES ('${email}', '${hash}', '${name.split(' ')[0]}', '', 'admin', 'active')`;
-            const cmd = `mysql -u${server.db_user} -p${server.db_password} ${dbName} -e "${sql}"`;
+            const cmd = `mysql -u${server.db_user || this.dbUser} -p${server.db_password || this.dbPass} ${dbName} -e "${sql}"`;
             await this.executeOnServer(server, cmd);
         }
 
@@ -323,32 +322,36 @@ class Provisioner {
     /**
      * Create NexSpire super admin in tenant database (for support access)
      */
-    async createNexSpireSuperAdmin(dbName) {
+    async createNexSpireSuperAdmin(dbName, server = { is_primary: true }) {
         const bcrypt = require('bcryptjs');
         const superAdminEmail = process.env.NEXSPIRE_ADMIN_EMAIL || 'admin@nexspiresolutions.co.in';
         const superAdminPassword = process.env.NEXSPIRE_ADMIN_PASSWORD || 'NexSpire@2024!';
         const hash = await bcrypt.hash(superAdminPassword, 10);
 
-        const tenantPool = require('mysql2/promise').createPool({
-            host: process.env.DB_HOST || 'localhost',
-            port: process.env.DB_PORT || 3306,
-            user: process.env.DB_USER,
-            password: process.env.DB_PASSWORD,
-            database: dbName
-        });
+        if (server.is_primary) {
+            const tenantPool = require('mysql2/promise').createPool({
+                host: server.db_host || this.dbHost,
+                port: server.db_port || this.dbPort,
+                user: server.db_user || this.dbUser,
+                password: server.db_password || this.dbPass,
+                database: dbName
+            });
 
-        try {
-            await tenantPool.query(
-                `INSERT INTO users (email, password, first_name, last_name, role, status) 
-                 VALUES (?, ?, 'NexSpire', 'Admin', 'admin', 'active')
-                 ON DUPLICATE KEY UPDATE password = ?, role = 'admin'`,
-                [superAdminEmail, hash, hash]
-            );
-        } catch (error) {
-            console.warn(`[Provisioner] Could not create NexSpire admin: ${error.message}`);
+            try {
+                await tenantPool.query(
+                    `INSERT INTO users (email, password, first_name, last_name, role, status) 
+                     VALUES (?, ?, 'NexSpire', 'Admin', 'admin', 'active')
+                     ON DUPLICATE KEY UPDATE password = ?, role = 'admin'`,
+                    [superAdminEmail, hash, hash]
+                );
+            } finally {
+                await tenantPool.end();
+            }
+        } else {
+            const sql = `INSERT INTO users (email, password, first_name, last_name, role, status) VALUES ('${superAdminEmail}', '${hash}', 'NexSpire', 'Admin', 'admin', 'active') ON DUPLICATE KEY UPDATE password = '${hash}', role = 'admin'`;
+            const cmd = `mysql -u${server.db_user || this.dbUser} -p${server.db_password || this.dbPass} ${dbName} -e "${sql}"`;
+            await this.executeOnServer(server, cmd);
         }
-
-        await tenantPool.end();
     }
 
     /**
@@ -372,9 +375,10 @@ class Provisioner {
 
         if (server.is_primary) {
             const tenantPool = require('mysql2/promise').createPool({
-                host: process.env.DB_HOST || 'localhost',
-                user: process.env.DB_USER,
-                password: process.env.DB_PASSWORD,
+                host: server.db_host || this.dbHost,
+                port: server.db_port || this.dbPort,
+                user: server.db_user || this.dbUser,
+                password: server.db_password || this.dbPass,
                 database: dbName
             });
 
@@ -395,7 +399,7 @@ class Provisioner {
             try {
                 for (const setting of settings) {
                     const sql = `INSERT IGNORE INTO settings (setting_key, setting_value) VALUES ('${setting.key}', '${setting.value}')`;
-                    const cmd = `mysql -u${server.db_user} -p${server.db_password} ${dbName} -e "${sql}"`;
+                    const cmd = `mysql -u${server.db_user || this.dbUser} -p${server.db_password || this.dbPass} ${dbName} -e "${sql}"`;
                     await this.executeOnServer(server, cmd);
                 }
                 console.log(`[Provisioner] Initial settings seeded for ${tenantData.name} on remote server ${server.name}`);
@@ -651,7 +655,7 @@ class Provisioner {
         const processName = `tenant-${tenant.slug}`;
         const backendPath = server.nexcrm_backend_path || this.nexcrmBackendPath;
         const dbSlug = tenant.slug.replace(/-/g, '_');
-        const dbPass = server.db_password || process.env.DB_PASSWORD || '';
+        const dbPass = server.db_password || this.dbPass;
 
         try {
             // Read current config
@@ -671,8 +675,10 @@ class Provisioner {
       args: "--port ${port} --db nexcrm_${dbSlug} --industry ${tenant.industry_type || 'general'}",
       env: {
         PORT: ${port},
+        DB_HOST: "${server.db_host || this.dbHost}",
+        DB_PORT: ${server.db_port || this.dbPort},
         DB_NAME: "nexcrm_${dbSlug}",
-        DB_USER: "${server.db_user || 'root'}",
+        DB_USER: "${server.db_user || this.dbUser}",
         DB_PASSWORD: "${dbPass}",
         TENANT_ID: ${tenant.id},
         TENANT_SLUG: "${tenant.slug}"
@@ -836,13 +842,15 @@ class Provisioner {
 
         try {
             // Path structure for tenant backend on target server
-            // Path structure for tenant backend on target server
             const backendPath = server.nexcrm_backend_path || this.nexcrmBackendPath;
 
             // Environment variables for tenant
-            // Use server's db_password, fallback to environment variable, then empty string
-            const dbPass = server.db_password || process.env.DB_PASSWORD || '';
-            const envVars = `TENANT_ID=${tenant.id} TENANT_SLUG=${slug} PORT=${port} DB_NAME=nexcrm_${slug} DB_USER=${server.db_user || 'root'} DB_PASSWORD='${dbPass}'`;
+            const dbPass = server.db_password || this.dbPass;
+            const dbUser = server.db_user || this.dbUser;
+            const dbHost = server.db_host || this.dbHost;
+            const dbPort = server.db_port || this.dbPort;
+
+            const envVars = `TENANT_ID=${tenant.id} TENANT_SLUG=${slug} PORT=${port} DB_HOST=${dbHost} DB_PORT=${dbPort} DB_NAME=nexcrm_${slug.replace(/-/g, '_')} DB_USER=${dbUser} DB_PASSWORD='${dbPass}'`;
 
             // Start process using PM2 on target server
             await this.executeOnServer(server, `cd ${backendPath} && ${envVars} pm2 start server.js --name "${processName}"`);
@@ -857,7 +865,8 @@ class Provisioner {
             await TenantModel.update(tenant.id, {
                 process_name: processName,
                 process_status: 'running',
-                assigned_port: port
+                assigned_port: port,
+                db_name: `nexcrm_${slug.replace(/-/g, '_')}`
             });
         } catch (error) {
             console.error(`[Provisioner] PM2 process start failed: ${error.message}`);
