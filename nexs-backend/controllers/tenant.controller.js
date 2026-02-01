@@ -1,5 +1,6 @@
 const TenantModel = require('../models/tenant.model');
 const PlanModel = require('../models/plan.model');
+const ServerModel = require('../models/server.model');
 const Provisioner = require('../services/provisioner');
 
 class TenantController {
@@ -110,42 +111,85 @@ class TenantController {
             }
 
             // Provision the tenant (create DB, start process, configure Cloudflare)
+            // We do this asynchronously to prevent creating a timeout on the frontend
             try {
                 // Initialize Provisioner service
                 const provisioner = new Provisioner();
 
-                const provisionResult = await provisioner.provisionTenant({
+                // 1. Select Server (Critical Step)
+                let server;
+                if (server_id) {
+                    server = await ServerModel.findById(server_id);
+                } else {
+                    server = await ServerModel.getBestServer();
+                }
+
+                if (!server) {
+                    throw new Error('No available servers for provisioning');
+                }
+
+                // 2. Allocate Port (Critical Step)
+                const port = await TenantModel.allocatePort(tenantId, server.id);
+
+                // 3. Update Tenant with Server ID (Critical Step)
+                await TenantModel.update(tenantId, { server_id: server.id });
+
+                // 4. Create Database (Critical Step - usually fast enough)
+                const dbName = `nexcrm_${slug.replace(/-/g, '_')}`;
+                const dbHost = server.db_host || 'localhost';
+                await provisioner.createDatabase(dbName, dbHost, server.db_user, server.db_password);
+
+                // RESPONSE sent here - preventing timeout
+                res.status(201).json({
+                    success: true,
+                    message: 'Tenant created successfully. Provisioning resources in background.',
+                    data: {
+                        tenantId,
+                        slug,
+                        status: 'provisioning'
+                    }
+                });
+
+                // 5. Background Provisioning (Heavy Lifting)
+                // We deliberately do NOT await this. We let it run in the background.
+                provisioner.provisionTenant({
                     id: tenantId,
                     name,
                     slug,
                     email,
                     industry_type: industry_type || 'general',
-                    plan_slug,
-                    server_id: server_id // Pass the selected server
-                }, server_id);
-
-                res.status(201).json({
-                    success: true,
-                    message: 'Tenant created and provisioned successfully',
-                    data: {
-                        tenantId,
-                        ...provisionResult
-                    }
+                    plan_slug
+                }, server.id, {
+                    skipPortAllocation: true,
+                    assignedPort: port,
+                    skipDbCreation: true
+                }).catch(async (bgError) => {
+                    console.error(`[Background Provisioning Error] Tenant ${slug}:`, bgError);
+                    await TenantModel.updateProcessStatus(tenantId, 'error');
                 });
+
             } catch (provisionError) {
-                // Log the error but return partial success
-                console.error('Provisioning error:', provisionError);
+                // If critical setup fails, we DO return an error response (or warning)
+                console.error('Critical provisioning error:', provisionError);
 
-                res.status(201).json({
-                    success: true,
-                    message: 'Tenant created but provisioning failed. Please provision manually.',
-                    data: { tenantId },
-                    provisionError: provisionError.message
-                });
+                // Update status to indicate issue
+                await TenantModel.updateProcessStatus(tenantId, 'error');
+
+                // If check prevents double header sending
+                if (!res.headersSent) {
+                    res.status(201).json({
+                        success: true,
+                        message: 'Tenant created but provisioning failed. Please provision manually.',
+                        data: { tenantId },
+                        provisionError: provisionError.message
+                    });
+                }
             }
         } catch (error) {
             console.error('Create tenant error:', error);
-            res.status(500).json({ error: 'Failed to create tenant' });
+            if (!res.headersSent) {
+                res.status(500).json({ error: 'Failed to create tenant: ' + error.message });
+            }
         }
     }
 
@@ -320,9 +364,13 @@ class TenantController {
             }
 
             // Stop process if running
-            if (tenant.process_status === 'running') {
-                const provisioner = new Provisioner();
-                await provisioner.stopProcess(tenant);
+            try {
+                if (tenant.process_status === 'running') {
+                    const provisioner = new Provisioner();
+                    await provisioner.stopProcess(tenant);
+                }
+            } catch (cleanupError) {
+                console.warn('Error stopping process during delete (ignoring):', cleanupError);
             }
 
             // Soft delete
@@ -419,10 +467,17 @@ class TenantController {
             }
 
             // Perform full cleanup
-            const provisioner = new Provisioner();
-            const cleanupResults = await provisioner.fullCleanup(tenant, {
-                dropDb: dropDatabase
-            });
+            // Wrapped in try-catch to ensure DB delete happens even if cleanup fails
+            let cleanupResults = {};
+            try {
+                const provisioner = new Provisioner();
+                cleanupResults = await provisioner.fullCleanup(tenant, {
+                    dropDb: dropDatabase
+                });
+            } catch (cleanupError) {
+                console.error('Full cleanup partial error:', cleanupError);
+                cleanupResults = { error: cleanupError.message, partial: true };
+            }
 
             // Hard delete from database
             await TenantModel.hardDelete(id);

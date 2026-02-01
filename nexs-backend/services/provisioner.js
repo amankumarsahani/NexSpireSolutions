@@ -68,7 +68,7 @@ class Provisioner {
     /**
      * Full tenant provisioning flow
      */
-    async provisionTenant(tenant, preferredServerId = null) {
+    async provisionTenant(tenant, preferredServerId = null, options = {}) {
         const { id, name, slug, email, industry_type, plan_slug } = tenant;
 
         console.log(`[Provisioner] Starting provisioning for: ${slug}`);
@@ -89,17 +89,28 @@ class Provisioner {
             console.log(`[Provisioner] Provisioning tenant "${tenant.name}" on server "${server.name}"`);
 
             // 1. Allocate port
-            const port = await TenantModel.allocatePort(id, server.id);
-            console.log(`[Provisioner] Allocated port: ${port}`);
+            let port;
+            if (options.skipPortAllocation && options.assignedPort) {
+                port = options.assignedPort;
+                console.log(`[Provisioner] Using pre-allocated port: ${port}`);
+            } else {
+                port = await TenantModel.allocatePort(id, server.id);
+                console.log(`[Provisioner] Allocated port: ${port}`);
+            }
 
-            // Update tenant with assigned server
+            // Update tenant with assigned server (duplicate update if already done but safe)
             await TenantModel.update(id, { server_id: server.id });
 
             // 2. Create database
             const dbName = `nexcrm_${slug.replace(/-/g, '_')}`;
             const dbHost = server.db_host || 'localhost';
-            await this.createDatabase(dbName, dbHost, server.db_user, server.db_password);
-            console.log(`[Provisioner] Created database: ${dbName}`);
+
+            if (!options.skipDbCreation) {
+                await this.createDatabase(dbName, dbHost, server.db_user, server.db_password);
+                console.log(`[Provisioner] Created database: ${dbName}`);
+            } else {
+                console.log(`[Provisioner] Database creation skipped (assumed pre-created): ${dbName}`);
+            }
 
             // 3. Run migrations on new database (base + industry-specific)
             await this.runMigrations(dbName, industry_type, server);
@@ -1302,7 +1313,9 @@ class Provisioner {
                 console.log(`[Provisioner] Cloudflare Tunnel config updated on server ${server.name} for ${hostname}`);
             }
         } catch (error) {
-            console.warn(`[Provisioner] Failed to update Tunnel config: ${error.message}`);
+            // Critical: Don't throw here, just log invalid tunnel update. 
+            // This prevents "Failed to create tenant" if tunnel restart fails/times out
+            console.warn(`[Provisioner] Failed to update Tunnel config (non-fatal): ${error.message}`);
         }
     }
 
@@ -1321,25 +1334,23 @@ class Provisioner {
             return true;
         } catch (error) {
             console.error('[Provisioner] Could not drop database:', error.message);
+            // Don't swallow this error as DB drop is critical for "full" cleanup, but return false
             return false;
         }
     }
 
     /**
-     * Drop tenant database
+     * Create database
      */
     async createDatabase(dbName, dbHost = 'localhost', dbUser = 'root', dbPassword = '') {
         try {
-            // Using mysql connection to run CREATE DATABASE
-            // Note: This assumes the Admin API server can reach the target server's DB
-            // If DB is local to target server and not exposed, we might need to run via SSH
             const connection = await pool.getConnection();
             await connection.query(`CREATE DATABASE IF NOT EXISTS \`${dbName}\``);
             connection.release();
             console.log(`[Provisioner] Database "${dbName}" created successfully on ${dbHost}`);
         } catch (error) {
             console.error(`[Provisioner] Database creation failed: ${error.message}`);
-            throw error;
+            throw error; // Rethrow because DB creation is critical
         }
     }
 
@@ -1365,9 +1376,9 @@ class Provisioner {
         const processName = tenant.process_name || `tenant-${tenant.slug}`;
         console.log(`[Provisioner] Starting full cleanup for: ${tenant.slug} on ${server.name}`);
 
-        try { await this.deleteProcess(tenant); results.pm2Deleted = true; } catch (e) { /* ignore */ }
+        // Execute all steps independently - failing one should not stop others
+        try { await this.deleteProcess(tenant); results.pm2Deleted = true; } catch (e) { console.warn('PM2 cleanup error:', e.message); }
 
-        // Cleanup storage (local to the server where uploads are, assuming primary or shared mount)
         try {
             if (server.is_primary) {
                 const uploadsDir = path.join(this.nexcrmBackendPath, 'uploads');
@@ -1381,11 +1392,11 @@ class Provisioner {
                 await this.executeOnServer(server, `sudo rm -rf ${remoteDir}`);
                 results.storageCleanedUp = true;
             }
-        } catch (e) { /* ignore */ }
+        } catch (e) { console.warn('Storage cleanup error:', e.message); }
 
-        if (tenant.cf_dns_record_id) { try { await this.removeCloudflareRoute(tenant.cf_dns_record_id); results.apiDnsRemoved = true; } catch (e) { /* ignore */ } }
-        try { await this.removeCloudflareFrontendRoute(tenant.slug); results.frontendDnsRemoved = true; } catch (e) { /* ignore */ }
-        try { await this.removeStorefrontRoute(tenant.slug); results.storefrontDnsRemoved = true; } catch (e) { /* ignore */ }
+        if (tenant.cf_dns_record_id) { try { await this.removeCloudflareRoute(tenant.cf_dns_record_id); results.apiDnsRemoved = true; } catch (e) { console.warn('API DNS cleanup error:', e.message); } }
+        try { await this.removeCloudflareFrontendRoute(tenant.slug); results.frontendDnsRemoved = true; } catch (e) { console.warn('Frontend DNS cleanup error:', e.message); }
+        try { await this.removeStorefrontRoute(tenant.slug); results.storefrontDnsRemoved = true; } catch (e) { console.warn('Storefront DNS cleanup error:', e.message); }
 
         try {
             const frontendDomain = `${tenant.slug}-crm.${this.cfDomain}`;
@@ -1394,14 +1405,14 @@ class Provisioner {
             await this.removeDomainFromPages(frontendDomain, this.cfPagesProject);
             await this.removeDomainFromPages(storefrontDomain, storefrontProject);
             results.pagesDomainsRemoved = true;
-        } catch (e) { /* ignore */ }
+        } catch (e) { console.warn('Pages domain cleanup error:', e.message); }
 
-        try { await this.removeFromTunnelConfig(tenant.slug, server); results.tunnelConfigUpdated = true; } catch (e) { /* ignore */ }
-        if (tenant.custom_domain) { try { await this.removeFromTunnelConfig(tenant.slug, server, tenant.custom_domain); } catch (e) { /* ignore */ } }
+        try { await this.removeFromTunnelConfig(tenant.slug, server); results.tunnelConfigUpdated = true; } catch (e) { console.warn('Tunnel config cleanup error:', e.message); }
+        if (tenant.custom_domain) { try { await this.removeFromTunnelConfig(tenant.slug, server, tenant.custom_domain); } catch (e) { console.warn('Custom domain tunnel cleanup error:', e.message); } }
 
-        try { await this.removeFromEcosystemConfig(processName, server); results.ecosystemUpdated = true; } catch (e) { /* ignore */ }
-        if (dropDb && tenant.db_name) { try { await this.dropDatabase(tenant.db_name, server); results.databaseDropped = true; } catch (e) { /* ignore */ } }
-        try { const unregistered = await this.unregisterFromRegistry(tenant.slug); results.registryCleanedUp = unregistered; } catch (e) { /* ignore */ }
+        try { await this.removeFromEcosystemConfig(processName, server); results.ecosystemUpdated = true; } catch (e) { console.warn('Ecosystem cleanup error:', e.message); }
+        if (dropDb && tenant.db_name) { try { await this.dropDatabase(tenant.db_name, server); results.databaseDropped = true; } catch (e) { console.warn('DB drop error:', e.message); } }
+        try { const unregistered = await this.unregisterFromRegistry(tenant.slug); results.registryCleanedUp = unregistered; } catch (e) { console.warn('Registry cleanup error:', e.message); }
 
         return results;
     }
