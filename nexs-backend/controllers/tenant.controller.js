@@ -356,15 +356,15 @@ class TenantController {
     }
 
     /**
-     * Setup custom domain for tenant
+     * Setup custom domains for tenant (CRM, Storefront, API)
      */
     async setupCustomDomain(req, res) {
         try {
             const { id } = req.params;
-            const { domain } = req.body;
+            const { crm, storefront, api } = req.body;
 
-            if (!domain) {
-                return res.status(400).json({ error: 'Domain is required' });
+            if (!crm && !storefront && !api) {
+                return res.status(400).json({ error: 'At least one domain is required' });
             }
 
             const tenant = await TenantModel.findById(id);
@@ -372,14 +372,17 @@ class TenantController {
                 return res.status(404).json({ error: 'Tenant not found' });
             }
 
-            // Call provisioner to setup domain on Cloudflare Pages/Tunnel
-            const result = await Provisioner.setupCustomDomain(tenant, domain);
+            // Call provisioner to setup domains
+            const result = await Provisioner.setupCustomDomain(tenant, { crm, storefront, api });
 
-            // Update database
-            await TenantModel.update(id, {
-                custom_domain: domain,
-                custom_domain_verified: result.success
-            });
+            // Update database with new domain columns
+            const updateData = {};
+            if (crm) updateData.custom_domain_crm = crm;
+            if (storefront) updateData.custom_domain_storefront = storefront;
+            if (api) updateData.custom_domain_api = api;
+            updateData.custom_domain_verified = result.success;
+
+            await TenantModel.update(id, updateData);
 
             res.json({
                 success: true,

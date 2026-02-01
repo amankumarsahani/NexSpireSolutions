@@ -674,37 +674,61 @@ class Provisioner {
     }
 
     /**
-     * Setup Custom Domain for a tenant (Frontend via Pages)
+     * Setup Custom Domains for a tenant (CRM, Storefront, API)
+     * @param {Object} tenant - Tenant object with id, slug, assigned_port, server_id
+     * @param {Object} domains - { crm: string, storefront: string, api: string }
      */
-    async setupCustomDomain(tenant, customDomain) {
-        console.log(`[Provisioner] Setting up custom domain "${customDomain}" for tenant ${tenant.slug}...`);
+    async setupCustomDomain(tenant, domains) {
+        console.log(`[Provisioner] Setting up custom domains for tenant ${tenant.slug}...`, domains);
+
+        const results = {
+            crm: { success: false, domain: domains.crm, cnameTarget: null },
+            storefront: { success: false, domain: domains.storefront, cnameTarget: null },
+            api: { success: false, domain: domains.api, cnameTarget: null }
+        };
 
         try {
-            const isInternalDomain = customDomain.endsWith(this.cfDomain);
-            let dnsRecordId = null;
+            // 1. CRM Domain - Attach to Pages (nexcrm-frontend)
+            if (domains.crm) {
+                console.log(`[Provisioner] Attaching CRM domain: ${domains.crm}`);
+                const crmSuccess = await this.attachDomainToPages(domains.crm);
+                results.crm.success = crmSuccess;
+                results.crm.cnameTarget = this.cfPagesUrl; // nexcrm-frontend.pages.dev
+            }
 
-            // 1. If it's OUR subdomain (internal), create DNS record
-            if (isInternalDomain) {
-                if (this.cfApiToken && this.cfZoneId) {
-                    // This logic remains for subdomains like "special.nexspiresolutions.co.in"
-                    // But typically users want external domains like "crm.mybrand.com"
-                    // ... implementation skipped for brevity as this is rare for "custom" domain feature
+            // 2. Storefront Domain - Attach to Storefront Pages project
+            if (domains.storefront) {
+                console.log(`[Provisioner] Attaching Storefront domain: ${domains.storefront}`);
+                const storefrontProject = process.env.NEXCRM_STOREFRONT_PROJECT || 'nexcrm-storefront';
+                const storefrontSuccess = await this.attachCustomDomainToPages(
+                    this.cfAccountId,
+                    storefrontProject,
+                    domains.storefront
+                );
+                results.storefront.success = storefrontSuccess;
+                results.storefront.cnameTarget = `${storefrontProject}.pages.dev`;
+            }
+
+            // 3. API Domain - Add to Cloudflare Tunnel ingress
+            if (domains.api) {
+                console.log(`[Provisioner] Configuring API domain: ${domains.api}`);
+                const server = await ServerModel.findById(tenant.server_id);
+                const port = tenant.assigned_port;
+
+                if (server && port) {
+                    // Update tunnel config to route this domain to the tenant's port
+                    await this.updateTunnelConfig(domains.api, port, server);
+                    results.api.success = true;
+                    results.api.cnameTarget = `${server.cloudflare_tunnel_id}.cfargotunnel.com`;
+                } else {
+                    console.error(`[Provisioner] Cannot configure API domain - missing server or port`);
+                    results.api.error = 'Missing server configuration or port assignment';
                 }
             }
 
-            // 2. Attach usage to Cloudflare Pages (Frontend)
-            // This is the primary action for custom domains
-            let pagesAttached = false;
-            if (this.cfAccountId && this.cfPagesProject) {
-                pagesAttached = await this.attachDomainToPages(customDomain);
-            }
-
-            // 3. Return instructions
             return {
-                success: pagesAttached,
-                domain: customDomain,
-                cnameTarget: this.cfPagesUrl, // e.g., nexcrm-frontend.pages.dev
-                verificationNeeded: !isInternalDomain
+                success: results.crm.success || results.storefront.success || results.api.success,
+                results
             };
 
         } catch (error) {
