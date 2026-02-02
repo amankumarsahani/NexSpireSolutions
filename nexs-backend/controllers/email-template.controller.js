@@ -64,7 +64,7 @@ class EmailTemplateController {
      */
     async createTemplate(req, res) {
         try {
-            const { name, subject, html_content, description, variables, category } = req.body;
+            const { name, subject, html_content, description, variables, attachment_document_ids, category } = req.body;
 
             // Validation
             if (!name || !html_content) {
@@ -87,6 +87,7 @@ class EmailTemplateController {
                 html_content,
                 description,
                 variables,
+                attachment_document_ids,
                 category
             });
 

@@ -101,14 +101,15 @@ class EmailTemplateModel {
             html_content,
             description,
             variables,
+            attachment_document_ids,
             category = 'notification',
             is_active = true
         } = data;
 
         const [result] = await query(
             `INSERT INTO email_templates 
-             (name, type, subject, html_content, description, variables, category, is_active) 
-             VALUES (?, ?, ?, ?, ?, ?, ?, ?)`,
+             (name, type, subject, html_content, description, variables, attachment_document_ids, category, is_active) 
+             VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?)`,
             [
                 name,
                 type,
@@ -116,6 +117,7 @@ class EmailTemplateModel {
                 html_content,
                 description,
                 JSON.stringify(variables || []),
+                attachment_document_ids || null,
                 category,
                 is_active
             ]
@@ -134,7 +136,7 @@ class EmailTemplateModel {
         const fields = [];
         const params = [];
 
-        const allowedFields = ['name', 'type', 'subject', 'html_content', 'description', 'variables', 'category', 'is_active'];
+        const allowedFields = ['name', 'type', 'subject', 'html_content', 'description', 'variables', 'attachment_document_ids', 'category', 'is_active'];
 
         for (const field of allowedFields) {
             if (data[field] !== undefined) {
