@@ -3,20 +3,20 @@ const { pool } = require('../config/database');
 const DocumentTemplateModel = {
     // Get all document templates (without content for list view)
     async findAll(filters = {}) {
-        let query = 'SELECT id, name, slug, description, category, variables, isActive, isDefault, created_at, updated_at FROM document_templates WHERE 1=1';
+        let query = 'SELECT `id`, `name`, `slug`, `description`, `category`, `variables`, `isActive` AS `is_active`, `isDefault` AS `is_default`, `createdAt` AS `created_at`, `updatedAt` AS `updated_at` FROM `document_templates` WHERE 1=1';
         const params = [];
 
         if (filters.category) {
-            query += ' AND category = ?';
+            query += ' AND `category` = ?';
             params.push(filters.category);
         }
 
         if (filters.isActive !== undefined) {
-            query += ' AND isActive = ?';
+            query += ' AND `isActive` = ?';
             params.push(filters.isActive);
         }
 
-        query += ' ORDER BY isDefault DESC, name ASC';
+        query += ' ORDER BY `isDefault` DESC, `name` ASC';
 
         const [rows] = await pool.query(query, params);
         return rows;
@@ -25,7 +25,7 @@ const DocumentTemplateModel = {
     // Get by ID with content
     async findById(id) {
         const [rows] = await pool.query(
-            'SELECT * FROM document_templates WHERE id = ?',
+            'SELECT `id`, `name`, `slug`, `description`, `category`, `content`, `variables`, `isActive` AS `is_active`, `isDefault` AS `is_default`, `createdAt` AS `created_at`, `updatedAt` AS `updated_at` FROM `document_templates` WHERE `id` = ?',
             [id]
         );
         return rows[0];
@@ -34,7 +34,7 @@ const DocumentTemplateModel = {
     // Get by slug
     async findBySlug(slug) {
         const [rows] = await pool.query(
-            'SELECT * FROM document_templates WHERE slug = ?',
+            'SELECT `id`, `name`, `slug`, `description`, `category`, `content`, `variables`, `isActive` AS `is_active`, `isDefault` AS `is_default`, `createdAt` AS `created_at`, `updatedAt` AS `updated_at` FROM `document_templates` WHERE `slug` = ?',
             [slug]
         );
         return rows[0];
@@ -42,12 +42,11 @@ const DocumentTemplateModel = {
 
     // Create new template
     async create(data) {
-        const { name, slug, description, category, content, variables } = data;
+        const { name, slug, description, category, content, variables, isDefault } = data;
 
         const [result] = await pool.query(
-            `INSERT INTO document_templates (name, slug, description, category, content, variables) 
-             VALUES (?, ?, ?, ?, ?, ?)`,
-            [name, slug, description, category || 'sales', content, JSON.stringify(variables || [])]
+            'INSERT INTO `document_templates` (`name`, `slug`, `description`, `category`, `content`, `variables`, `isDefault`) VALUES (?, ?, ?, ?, ?, ?, ?)',
+            [name, slug, description, category || 'sales', content, JSON.stringify(variables || []), isDefault || false]
         );
 
         return this.findById(result.insertId);
@@ -58,17 +57,17 @@ const DocumentTemplateModel = {
         const updates = [];
         const values = [];
 
-        const allowedFields = ['name', 'slug', 'description', 'category', 'content', 'isActive'];
+        const allowedFields = ['name', 'slug', 'description', 'category', 'content', 'isActive', 'isDefault'];
 
         allowedFields.forEach(field => {
             if (data[field] !== undefined) {
-                updates.push(`${field} = ?`);
+                updates.push(`\`${field}\` = ?`);
                 values.push(data[field]);
             }
         });
 
         if (data.variables !== undefined) {
-            updates.push('variables = ?');
+            updates.push('`variables` = ?');
             values.push(JSON.stringify(data.variables));
         }
 
@@ -79,7 +78,7 @@ const DocumentTemplateModel = {
         values.push(id);
 
         await pool.query(
-            `UPDATE document_templates SET ${updates.join(', ')} WHERE id = ?`,
+            `UPDATE \`document_templates\` SET ${updates.join(', ')} WHERE \`id\` = ?`,
             values
         );
 

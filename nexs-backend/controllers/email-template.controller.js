@@ -1,5 +1,6 @@
 const EmailTemplateModel = require('../models/email-template.model');
 const templateLoader = require('../services/template.loader');
+const pdfService = require('../services/pdf.service');
 
 /**
  * Email Template Controller
@@ -250,13 +251,38 @@ class EmailTemplateController {
                 return res.status(400).json({ error: 'Email content is required' });
             }
 
+            // Process attachments - Convert HTML documents to PDF
+            let processedAttachments = [];
+            if (attachments && Array.isArray(attachments)) {
+                for (let attachment of attachments) {
+                    // Check if it's an HTML attachment that should be a PDF
+                    if (attachment.contentType === 'text/html' && attachment.filename.endsWith('.html')) {
+                        try {
+                            const pdfBuffer = await pdfService.generateFromHtml(attachment.content);
+                            processedAttachments.push({
+                                filename: attachment.filename.replace('.html', '.pdf'),
+                                content: pdfBuffer,
+                                contentType: 'application/pdf'
+                            });
+                        } catch (pdfError) {
+                            console.error('Failed to convert HTML attachment to PDF:', pdfError);
+                            // Fallback to HTML if PDF fails, or skip? 
+                            // Let's fallback to original but log it
+                            processedAttachments.push(attachment);
+                        }
+                    } else {
+                        processedAttachments.push(attachment);
+                    }
+                }
+            }
+
             // Use the email service to send
             const emailService = require('../services/email.service');
             const result = await emailService.sendEmail({
                 to,
                 subject: emailSubject || 'Message from Nexspire Solutions',
                 html: emailHtml,
-                attachments: attachments || []
+                attachments: processedAttachments
             });
 
             if (!result.success) {
