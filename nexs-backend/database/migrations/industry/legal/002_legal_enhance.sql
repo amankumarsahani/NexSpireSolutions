@@ -427,13 +427,16 @@ ADD COLUMN IF NOT EXISTS updated_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP ON UPDAT
 -- 18. Create document_templates table
 CREATE TABLE IF NOT EXISTS legal_document_templates (
     id INT PRIMARY KEY AUTO_INCREMENT,
-    template_name VARCHAR(255) NOT NULL,
+    name VARCHAR(255) NOT NULL,
+    template_name VARCHAR(255) AS (name) STORED,
     template_code VARCHAR(50) UNIQUE,
     category ENUM('pleading','motion','contract','letter','affidavit','notice','agreement','other') DEFAULT 'other',
     practice_area VARCHAR(100),
     description TEXT,
     content LONGTEXT,
     variables JSON,
+    header TEXT,
+    footer TEXT,
     file_url VARCHAR(500),
     is_active BOOLEAN DEFAULT TRUE,
     usage_count INT DEFAULT 0,
@@ -442,3 +445,10 @@ CREATE TABLE IF NOT EXISTS legal_document_templates (
     updated_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
     INDEX idx_template_category (category)
 );
+
+-- Compatibility fix for legal_document_templates
+-- Ensure 'name' exists (required by routes) and sync from 'template_name' (used in older migrations)
+ALTER TABLE legal_document_templates ADD COLUMN IF NOT EXISTS name VARCHAR(255) AFTER id;
+ALTER TABLE legal_document_templates ADD COLUMN IF NOT EXISTS header TEXT AFTER variables;
+ALTER TABLE legal_document_templates ADD COLUMN IF NOT EXISTS footer TEXT AFTER header;
+UPDATE legal_document_templates SET name = template_name WHERE (name IS NULL OR name = '') AND (template_name IS NOT NULL AND template_name != '');
