@@ -11,6 +11,8 @@ const db = require('../config/database');
 class AIBlogService {
     constructor() {
         this.unsplashAccessKey = process.env.UNSPLASH_ACCESS_KEY || null;
+        // Use Groq (Llama) by default to avoid Gemini rate limits
+        this.defaultModel = 'llama-3.3-70b-versatile';
     }
 
     /**
@@ -39,7 +41,7 @@ Requirements:
 Return ONLY the JSON, no markdown or explanation.`;
 
         const prompt = customPrompt || defaultPrompt;
-        const response = await AIService.generateContent(prompt, 'You are a JSON-only response bot.');
+        const response = await AIService.generateContent(prompt, 'You are a JSON-only response bot.', this.defaultModel);
 
         try {
             let cleaned = response.trim();
@@ -84,7 +86,7 @@ Format requirements:
 Return ONLY the HTML content, no markdown code blocks.`;
 
         const content = await AIService.generateContent(prompt,
-            'You are a professional blog writer. Return clean HTML content only, no markdown formatting.');
+            'You are a professional blog writer. Return clean HTML content only, no markdown formatting.', this.defaultModel);
 
         let cleanContent = content.trim();
         if (cleanContent.startsWith('```')) {
