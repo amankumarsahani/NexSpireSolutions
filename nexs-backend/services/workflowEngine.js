@@ -6,6 +6,7 @@
 const db = require('../config/database');
 const EmailService = require('./email.service');
 const AIService = require('./ai.service');
+const AIBlogService = require('./aiBlog.service');
 
 class WorkflowEngine {
     constructor() {
@@ -27,7 +28,13 @@ class WorkflowEngine {
             delay: this.handleDelay.bind(this),
             ai_assistant: this.handleAIAssistant.bind(this),
             update_inquiry: this.handleUpdateInquiry.bind(this),
-            assign_inquiry: this.handleAssignUser.bind(this)
+            assign_inquiry: this.handleAssignUser.bind(this),
+
+            // AI Blog nodes
+            ai_pick_topic: this.handleAIPickTopic.bind(this),
+            ai_write_blog: this.handleAIWriteBlog.bind(this),
+            ai_fetch_image: this.handleAIFetchImage.bind(this),
+            ai_post_blog: this.handleAIPostBlog.bind(this)
         };
     }
 
@@ -760,6 +767,136 @@ class WorkflowEngine {
             console.error(`[WorkflowEngine] AI Assistant handler error:`, error);
             // On failure, continue with existing data
             return contextData || {};
+        }
+    }
+
+    // ============================================
+    // AI BLOG NODE HANDLERS
+    // ============================================
+
+    /**
+     * AI Pick Topic - Generates a blog topic with AI
+     */
+    async handleAIPickTopic(node, contextData) {
+        console.log(`[WorkflowEngine] Executing AI Pick Topic node`);
+
+        let config = node.config || {};
+        if (typeof config === 'string') {
+            try { config = JSON.parse(config); } catch (e) { config = {}; }
+        }
+
+        const niche = config.niche || 'Technology';
+        const customPrompt = config.custom_prompt || null;
+
+        const topicData = await AIBlogService.pickTopic(niche, customPrompt);
+
+        console.log(`[WorkflowEngine] AI picked topic: ${topicData.topic}`);
+        return {
+            ...contextData,
+            blog_topic: topicData.topic,
+            blog_keywords: topicData.keywords,
+            blog_image_query: topicData.imageQuery,
+            blog_outline: topicData.outline
+        };
+    }
+
+    /**
+     * AI Write Blog - Generates full blog content with AI
+     */
+    async handleAIWriteBlog(node, contextData) {
+        console.log(`[WorkflowEngine] Executing AI Write Blog node`);
+
+        let config = node.config || {};
+        if (typeof config === 'string') {
+            try { config = JSON.parse(config); } catch (e) { config = {}; }
+        }
+
+        const topicData = {
+            topic: contextData.blog_topic || config.topic || 'Untitled Blog',
+            keywords: contextData.blog_keywords || [],
+            outline: contextData.blog_outline || [],
+            imageQuery: contextData.blog_image_query || ''
+        };
+
+        const blogConfig = {
+            wordCount: config.word_count || 1000,
+            tone: config.tone || 'professional'
+        };
+
+        const blogData = await AIBlogService.writeBlog(topicData, blogConfig);
+
+        console.log(`[WorkflowEngine] AI wrote blog: ${blogData.title}`);
+        return {
+            ...contextData,
+            blog_title: blogData.title,
+            blog_excerpt: blogData.excerpt,
+            blog_content: blogData.content,
+            blog_image_query: blogData.imageQuery || contextData.blog_image_query
+        };
+    }
+
+    /**
+     * AI Fetch Image - Gets image from Unsplash
+     */
+    async handleAIFetchImage(node, contextData) {
+        console.log(`[WorkflowEngine] Executing AI Fetch Image node`);
+
+        let config = node.config || {};
+        if (typeof config === 'string') {
+            try { config = JSON.parse(config); } catch (e) { config = {}; }
+        }
+
+        const query = contextData.blog_image_query || config.query || 'technology';
+        const accessKey = config.unsplash_key || process.env.UNSPLASH_ACCESS_KEY;
+
+        const imageData = await AIBlogService.fetchUnsplashImage(query, accessKey);
+
+        console.log(`[WorkflowEngine] Fetched image for: ${query}`);
+        return {
+            ...contextData,
+            blog_image: imageData.url,
+            blog_image_credit: imageData.credit,
+            blog_image_link: imageData.link
+        };
+    }
+
+    /**
+     * AI Post Blog - Posts the blog to database
+     */
+    async handleAIPostBlog(node, contextData) {
+        console.log(`[WorkflowEngine] Executing AI Post Blog node`);
+
+        let config = node.config || {};
+        if (typeof config === 'string') {
+            try { config = JSON.parse(config); } catch (e) { config = {}; }
+        }
+
+        const blogData = {
+            title: contextData.blog_title || 'Untitled Blog',
+            excerpt: contextData.blog_excerpt || '',
+            content: contextData.blog_content || '',
+            image: contextData.blog_image || '',
+            category: config.category || 'General',
+            author: config.author || 'AI Writer',
+            status: config.status || 'draft'
+        };
+
+        try {
+            const result = await AIBlogService.postBlog(blogData);
+            console.log(`[WorkflowEngine] Blog posted: ${result.title} (ID: ${result.id})`);
+            return {
+                ...contextData,
+                blog_posted: true,
+                blog_id: result.id,
+                blog_slug: result.slug
+            };
+        } catch (error) {
+            console.error('[WorkflowEngine] Post blog error:', error.message);
+            return {
+                ...contextData,
+                blog_posted: false,
+                blog_error: error.message
+            };
         }
     }
 }
