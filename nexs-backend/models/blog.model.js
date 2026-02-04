@@ -7,11 +7,12 @@ const BlogModel = {
         const params = [];
 
         if (filters.status) {
-            query += ' AND status = ?';
-            params.push(filters.status);
+            query += ' AND published = ?';
+            // Map 'published' -> 1, others (draft) -> 0
+            params.push(filters.status === 'published' ? 1 : 0);
         } else {
-            // Default to published only for public access
-            query += ' AND status = "published"';
+            // Default to published only for public access if not specified
+            query += ' AND published = 1';
         }
 
         if (filters.category) {
@@ -44,7 +45,7 @@ const BlogModel = {
     // Get blog by slug (for public view)
     async findBySlug(slug) {
         const [rows] = await pool.query(
-            'SELECT * FROM blogs WHERE slug = ? AND status = "published"',
+            'SELECT * FROM blogs WHERE slug = ? AND published = 1',
             [slug]
         );
         return this._mapRow(rows[0]);
@@ -209,7 +210,7 @@ const BlogModel = {
     // Get categories
     async getCategories() {
         const [rows] = await pool.query(
-            'SELECT DISTINCT category FROM blogs WHERE category IS NOT NULL AND status = "published"'
+            'SELECT DISTINCT category FROM blogs WHERE category IS NOT NULL AND published = 1'
         );
         return rows.map(r => r.category);
     }
