@@ -96,7 +96,10 @@ Content Structure & Formatting Requirements:
 Technical Constraints:
 - Return ONLY the HTML body content (do not include <html>, <head>, or <body> tags).
 - Do NOT include the main H1 title at the top.
-- Do not use markdown (no ** or ##), use real HTML tags (<strong>, <h2>).`;
+- Do not use markdown (no ** or ##), use real HTML tags (<strong>, <h2>).
+- **CRITICAL**: Use <p> tags for ALL paragraphs. Do NOT use <br> for spacing.
+- Ensure proper hierarchy: <h2> for main sections, <h3> for subsections.
+- Make the content visually appealing with short paragraphs and bullet points.`;
 
         const useModel = model || this.defaultModel;
         const content = await AIService.generateContent(prompt,
@@ -216,7 +219,8 @@ Technical Constraints:
                 author: author || 'Content Writer',
                 status: status || 'draft',
                 read_time: readTime,
-                featured: false
+                featured: false,
+                keywords: blogData.keywords || []
             });
 
             console.log(`[AIBlogService] Blog created: ${title} (ID: ${resultId})`);

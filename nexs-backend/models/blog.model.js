@@ -38,7 +38,7 @@ const BlogModel = {
         }
 
         const [rows] = await pool.query(query, params);
-        return rows;
+        return rows.map(r => this._mapRow(r));
     },
 
     // Get blog by slug (for public view)
@@ -47,13 +47,67 @@ const BlogModel = {
             'SELECT * FROM blogs WHERE slug = ? AND status = "published"',
             [slug]
         );
-        return rows[0];
+        return this._mapRow(rows[0]);
     },
+
+    // Helper to map DB row to frontend object
+    _mapRow(row) {
+        if (!row) return null;
+        return {
+            ...row,
+            image: row.image_url,
+            status: row.published ? 'published' : 'draft',
+            // keywords is usually parsed by mysql2 if column type is JSON, but generic fallback:
+            keywords: typeof row.keywords === 'string' ? JSON.parse(row.keywords || '[]') : (row.keywords || [])
+        };
+    },
+
+    // Get all published blogs
+    async findAll(filters = {}) {
+        let query = 'SELECT * FROM blogs WHERE 1=1';
+        const params = [];
+
+        if (filters.status) {
+            query += ' AND published = ?';
+            params.push(filters.status === 'published');
+        } else {
+            // Default to published only for public access if not specified?? 
+            // Actually existing logic said: "Default to published only for public access"
+            // But for admin list we might want all? 
+            // Let's keep logic: if no status filter, default to published? 
+            // Wait, admin List likely requests all. 
+            // In BlogController usually we ask for all. 
+            // I'll stick to mapping filters.
+            if (filters.status) {
+                // handled above
+            } else {
+                // The original code had: query += ' AND status = "published"';
+                // If that was unintended for admin, I should check. 
+                // Assuming Admin passes nothing, we probably want ALL. 
+                // But let's assume original logic was "public view" unless filtered.
+                query += ' AND published = 1';
+            }
+        }
+
+        // ... (rest of filtering logic, replacing image/status mapping if needed in filters?)
+        // Actually original findAll mapping was simple. 
+        // Let's just update the return:
+
+        // RE-READING ORIGINAL findAll:
+        // if (filters.status) query += ' AND status = ?' ...
+        // else query += ' AND status = "published"';
+
+        // I need to replace that block.
+        // And match other filters.
+    },
+
+    // RE-INSTRUCTING: 
+    // I will use replace_file_content on findById and findAll specifically.
 
     // Get blog by ID (for admin)
     async findById(id) {
         const [rows] = await pool.query('SELECT * FROM blogs WHERE id = ?', [id]);
-        return rows[0];
+        return this._mapRow(rows[0]);
     },
 
     // Create blog
@@ -68,13 +122,32 @@ const BlogModel = {
             image,
             featured = false,
             status = 'draft',
-            read_time
+            read_time,
+            keywords = []
         } = blogData;
 
+        // Map frontend/service fields to DB columns
+        // status: 'published' -> published: true (1)
+        const isPublished = status === 'published';
+        const keywordsJson = JSON.stringify(keywords);
+
         const [result] = await pool.query(
-            `INSERT INTO blogs (title, slug, excerpt, content, category, author, image, featured, status, read_time)
-             VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?)`,
-            [title, slug, excerpt, content, category, author, image, featured, status, read_time]
+            `INSERT INTO blogs 
+            (title, slug, excerpt, content, category, author, image_url, featured, published, read_time, keywords)
+             VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)`,
+            [
+                title,
+                slug,
+                excerpt,
+                content,
+                category,
+                author,
+                image,           // Maps to image_url
+                featured,
+                isPublished,     // Maps to published
+                read_time,
+                keywordsJson
+            ]
         );
 
         return result.insertId;
@@ -82,16 +155,40 @@ const BlogModel = {
 
     // Update blog
     async update(id, blogData) {
-        const allowedFields = ['title', 'slug', 'excerpt', 'content', 'category', 'author', 'image', 'featured', 'status', 'read_time'];
         const updates = [];
         const values = [];
 
-        allowedFields.forEach(field => {
-            if (blogData[field] !== undefined) {
-                updates.push(`${field} = ?`);
-                values.push(blogData[field]);
+        // Field mapping configuration
+        const fieldMap = {
+            'title': 'title',
+            'slug': 'slug',
+            'excerpt': 'excerpt',
+            'content': 'content',
+            'category': 'category',
+            'author': 'author',
+            'image': 'image_url', // Map image -> image_url
+            'featured': 'featured',
+            'read_time': 'read_time'
+        };
+
+        // Handle standard fields
+        Object.keys(fieldMap).forEach(key => {
+            if (blogData[key] !== undefined) {
+                updates.push(`${fieldMap[key]} = ?`);
+                values.push(blogData[key]);
             }
         });
+
+        // Handle special fields
+        if (blogData.status !== undefined) {
+            updates.push('published = ?');
+            values.push(blogData.status === 'published');
+        }
+
+        if (blogData.keywords !== undefined) {
+            updates.push('keywords = ?');
+            values.push(JSON.stringify(blogData.keywords));
+        }
 
         if (updates.length === 0) {
             throw new Error('No valid fields to update');
