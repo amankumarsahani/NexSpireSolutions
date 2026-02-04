@@ -22,18 +22,22 @@ class AIBlogService {
      * @returns {Promise<{topic: string, keywords: string[], imageQuery: string, outline: string[]}>}
      */
     async pickTopic(niche, customPrompt = null) {
-        const defaultPrompt = `You are a professional content strategist. Generate a unique, engaging blog topic for the "${niche}" niche.
+        const defaultPrompt = `You are a professional content strategist. Generate a unique, creative blog topic for the "${niche}" niche.
+
+IMPORTANT: Be creative and specific! Avoid generic titles like "The Future of X" or "How X is Transforming Y".
+Instead, focus on specific case studies, unique angles, practical tips, or emerging trends.
 
 Return your response as JSON in this exact format:
 {
-    "topic": "The full blog title",
+    "topic": "The full blog title - make it specific and unique",
     "keywords": ["keyword1", "keyword2", "keyword3"],
     "imageQuery": "2-3 word search query for finding a relevant header image",
     "outline": ["Section 1 title", "Section 2 title", "Section 3 title"]
 }
 
 Requirements:
-- Topic should be SEO-friendly and engaging
+- Topic should be SEO-friendly, engaging, and UNIQUE (not generic)
+- Include a specific angle, number, or hook (e.g., "5 Ways...", "The Hidden...", "Why X Fails at Y")
 - Keywords should be relevant for search optimization
 - Image query should be generic enough to find good stock photos
 - Outline should have 3-5 sections
@@ -41,7 +45,7 @@ Requirements:
 Return ONLY the JSON, no markdown or explanation.`;
 
         const prompt = customPrompt || defaultPrompt;
-        const response = await AIService.generateContent(prompt, 'You are a JSON-only response bot.', this.defaultModel);
+        const response = await AIService.generateContent(prompt, 'You are a JSON-only response bot. Be creative and avoid generic titles.', this.defaultModel);
 
         try {
             let cleaned = response.trim();
@@ -155,15 +159,19 @@ Return ONLY the HTML content, no markdown code blocks.`;
     }
 
     /**
-     * Create URL-safe slug from title
+     * Create URL-safe slug from title with unique suffix
      */
     slugify(title) {
-        return title
+        const baseSlug = title
             .toLowerCase()
             .replace(/[^a-z0-9\s-]/g, '')
             .replace(/\s+/g, '-')
             .replace(/-+/g, '-')
-            .substring(0, 60);
+            .substring(0, 50);
+
+        // Add timestamp suffix to ensure uniqueness
+        const suffix = Date.now().toString(36);
+        return `${baseSlug}-${suffix}`;
     }
 
     /**
