@@ -7,6 +7,7 @@
 const axios = require('axios');
 const AIService = require('./ai.service');
 const db = require('../config/database');
+const BlogModel = require('../models/blog.model');
 
 class AIBlogService {
     constructor() {
@@ -69,7 +70,7 @@ Return ONLY the JSON, no markdown or explanation.`;
         const { topic, keywords = [], outline = [], imageQuery } = topicData;
         const { wordCount = 1000, tone = 'professional' } = config;
 
-        const prompt = `Write a complete blog article about: "${topic}"
+        const prompt = `Write a comprehensive, professional blog article about: "${topic}"
 
 Guidelines:
 - Word count: approximately ${wordCount} words
@@ -77,13 +78,19 @@ Guidelines:
 - Keywords to include naturally: ${keywords.join(', ')}
 - Follow this outline: ${outline.join(', ')}
 
-Format requirements:
-- Start with an engaging introduction
-- Use proper HTML formatting (h2, h3, p, ul, li tags)
-- Include a compelling conclusion with a call-to-action
-- Do NOT include the main title (h1) - just the content
+Content Structure & Formatting Requirements:
+- **Introduction**: Hook the reader immediately. State the problem and the value this article provides.
+- **Body Paragraphs**: 
+    - Use short, punchy paragraphs (2-4 sentences max). Avoid walls of text.
+    - Use **bold** for key concepts or emphasis.
+    - Include at least one <ul> or <ol> list to break up the text.
+    - Use appropriate <h2> and <h3> headers.
+- **Conclusion**: Summarize key takeaways and end with a strong Call to Action (CTA).
 
-Return ONLY the HTML content, no markdown code blocks.`;
+Technical Constraints:
+- Return ONLY the HTML body content (do not include <html>, <head>, or <body> tags).
+- Do NOT include the main H1 title at the top.
+- Do not use markdown (no ** or ##), use real HTML tags (<strong>, <h2>).`;
 
         const content = await AIService.generateContent(prompt,
             'You are a professional blog writer. Return clean HTML content only, no markdown formatting.', this.defaultModel);
@@ -188,14 +195,21 @@ Return ONLY the HTML content, no markdown code blocks.`;
         const readTime = this.calculateReadTime(content);
 
         try {
-            const [result] = await db.query(
-                `INSERT INTO blogs (title, slug, excerpt, content, image, category, author, status, read_time, featured)
-                 VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?)`,
-                [title, slug, excerpt, content, image || '', category || 'General', author || 'AI Writer', status || 'draft', readTime, false]
-            );
+            const resultId = await BlogModel.create({
+                title,
+                slug,
+                excerpt,
+                content,
+                image: image || '',
+                category: category || 'General',
+                author: author || 'Content Writer',
+                status: status || 'draft',
+                read_time: readTime,
+                featured: false
+            });
 
-            console.log(`[AIBlogService] Blog created: ${title} (ID: ${result.insertId})`);
-            return { id: result.insertId, slug, title };
+            console.log(`[AIBlogService] Blog created: ${title} (ID: ${resultId})`);
+            return { id: resultId, slug, title };
         } catch (error) {
             console.error('[AIBlogService] Post blog error:', error.message);
             throw new Error(`Failed to post blog: ${error.message}`);
