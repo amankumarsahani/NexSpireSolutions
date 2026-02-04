@@ -787,8 +787,9 @@ class WorkflowEngine {
 
         const niche = config.niche || 'Technology';
         const customPrompt = config.custom_prompt || null;
+        const model = config.model || null;
 
-        const topicData = await AIBlogService.pickTopic(niche, customPrompt);
+        const topicData = await AIBlogService.pickTopic(niche, customPrompt, model);
 
         console.log(`[WorkflowEngine] AI picked topic: ${topicData.topic}`);
         return {
@@ -820,7 +821,8 @@ class WorkflowEngine {
 
         const blogConfig = {
             wordCount: config.word_count || 1000,
-            tone: config.tone || 'professional'
+            tone: config.tone || 'professional',
+            model: config.model || null
         };
 
         const blogData = await AIBlogService.writeBlog(topicData, blogConfig);

@@ -20,9 +20,10 @@ class AIBlogService {
      * Generate a blog topic using AI
      * @param {string} niche - Blog niche/category
      * @param {string} customPrompt - Optional custom prompt
+     * @param {string} model - Optional AI model to use
      * @returns {Promise<{topic: string, keywords: string[], imageQuery: string, outline: string[]}>}
      */
-    async pickTopic(niche, customPrompt = null) {
+    async pickTopic(niche, customPrompt = null, model = null) {
         const defaultPrompt = `You are a professional content strategist. Generate a unique, creative blog topic for the "${niche}" niche.
 
 IMPORTANT: Be creative and specific! Avoid generic titles like "The Future of X" or "How X is Transforming Y".
@@ -46,7 +47,8 @@ Requirements:
 Return ONLY the JSON, no markdown or explanation.`;
 
         const prompt = customPrompt || defaultPrompt;
-        const response = await AIService.generateContent(prompt, 'You are a JSON-only response bot. Be creative and avoid generic titles.', this.defaultModel);
+        const useModel = model || this.defaultModel;
+        const response = await AIService.generateContent(prompt, 'You are a JSON-only response bot. Be creative and avoid generic titles.', useModel);
 
         try {
             let cleaned = response.trim();
@@ -67,12 +69,12 @@ Return ONLY the JSON, no markdown or explanation.`;
     /**
      * Generate full blog content using AI
      * @param {object} topicData - Data from pickTopic
-     * @param {object} config - Blog config (wordCount, tone)
+     * @param {object} config - Blog config (wordCount, tone, model)
      * @returns {Promise<{title: string, excerpt: string, content: string, imageQuery: string}>}
      */
     async writeBlog(topicData, config = {}) {
         const { topic, keywords = [], outline = [], imageQuery } = topicData;
-        const { wordCount = 1000, tone = 'professional' } = config;
+        const { wordCount = 1000, tone = 'professional', model = null } = config;
 
         const prompt = `Write a comprehensive, professional blog article about: "${topic}"
 
@@ -96,8 +98,9 @@ Technical Constraints:
 - Do NOT include the main H1 title at the top.
 - Do not use markdown (no ** or ##), use real HTML tags (<strong>, <h2>).`;
 
+        const useModel = model || this.defaultModel;
         const content = await AIService.generateContent(prompt,
-            'You are a professional blog writer. Return clean HTML content only, no markdown formatting.', this.defaultModel);
+            'You are a professional blog writer. Return clean HTML content only, no markdown formatting.', useModel);
 
         let cleanContent = content.trim();
         if (cleanContent.startsWith('```')) {
