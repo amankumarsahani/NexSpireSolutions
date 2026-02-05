@@ -67,7 +67,7 @@ const BlogPage = () => {
                     day: 'numeric'
                 }),
                 readTime: blog.read_time || '5 min read',
-                image: blog.image,
+                image: blog.image_url || blog.image,
                 featured: blog.featured,
                 slug: blog.slug
             }));

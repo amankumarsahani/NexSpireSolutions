@@ -73,7 +73,7 @@ function Blog() {
           return {
             title: blog.title,
             category: blog.category || "Technology",
-            image: blog.image || `https://images.unsplash.com/photo-1517180102446-f3ece451e9d8?w=400&h=250&fit=crop`,
+            image: blog.image_url || blog.image || `https://images.unsplash.com/photo-1517180102446-f3ece451e9d8?w=400&h=250&fit=crop`,
             description: blog.excerpt || blog.title,
             tags: blog.category ? [blog.category] : ["Technology"],
             author: blog.author || "Nexspire Team",
