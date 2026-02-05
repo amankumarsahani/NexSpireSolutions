@@ -63,47 +63,7 @@ const BlogModel = {
         };
     },
 
-    // Get all published blogs
-    async findAll(filters = {}) {
-        let query = 'SELECT * FROM blogs WHERE 1=1';
-        const params = [];
 
-        if (filters.status) {
-            query += ' AND published = ?';
-            params.push(filters.status === 'published');
-        } else {
-            // Default to published only for public access if not specified?? 
-            // Actually existing logic said: "Default to published only for public access"
-            // But for admin list we might want all? 
-            // Let's keep logic: if no status filter, default to published? 
-            // Wait, admin List likely requests all. 
-            // In BlogController usually we ask for all. 
-            // I'll stick to mapping filters.
-            if (filters.status) {
-                // handled above
-            } else {
-                // The original code had: query += ' AND status = "published"';
-                // If that was unintended for admin, I should check. 
-                // Assuming Admin passes nothing, we probably want ALL. 
-                // But let's assume original logic was "public view" unless filtered.
-                query += ' AND published = 1';
-            }
-        }
-
-        // ... (rest of filtering logic, replacing image/status mapping if needed in filters?)
-        // Actually original findAll mapping was simple. 
-        // Let's just update the return:
-
-        // RE-READING ORIGINAL findAll:
-        // if (filters.status) query += ' AND status = ?' ...
-        // else query += ' AND status = "published"';
-
-        // I need to replace that block.
-        // And match other filters.
-    },
-
-    // RE-INSTRUCTING: 
-    // I will use replace_file_content on findById and findAll specifically.
 
     // Get blog by ID (for admin)
     async findById(id) {
