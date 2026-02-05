@@ -18,6 +18,8 @@ router.post('/subscriptions/:tenantId/pause', billingController.pauseSubscriptio
 router.post('/subscriptions/:tenantId/resume', billingController.resumeSubscription);
 
 // Payment history
+router.get('/payments', billingController.getAllPayments); // Admin: Get all payments
+router.post('/payments/sync', billingController.syncPayment); // Admin: Manual sync
 router.get('/payments/:tenantId', billingController.getPaymentHistory);
 
 // Billing stats

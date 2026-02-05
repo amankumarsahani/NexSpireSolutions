@@ -158,9 +158,10 @@ app.use('/api/track', require('./routes/tracking.routes'));
 // Automation Workflows
 app.use('/api/workflows', require('./routes/workflow.routes'));
 
-// Billing & Webhooks
+// Billing
 app.use('/api/billing', require('./routes/billing.routes'));
-app.use('/webhooks', require('./routes/webhook.routes'));
+// Webhooks moved to top of file
+
 
 // Blog
 app.use('/api/blogs', require('./routes/blog.routes'));

@@ -17,10 +17,19 @@ class WebhookController {
     /**
      * Main webhook handler
      */
+    /**
+     * Main webhook handler
+     */
     async handleWebhook(req, res) {
         try {
             const signature = req.headers['x-razorpay-signature'];
             const body = JSON.stringify(req.body);
+
+            // Log raw webhook
+            await pool.query(
+                `INSERT INTO webhook_logs (provider, event_type, payload) VALUES (?, ?, ?)`,
+                ['razorpay', req.body.event || 'unknown', body]
+            ).catch(err => console.error('Failed to log webhook:', err));
 
             // Verify signature
             if (!RazorpayService.verifyWebhookSignature(body, signature)) {
@@ -38,28 +47,22 @@ class WebhookController {
                 case 'subscription.activated':
                     await this.handleSubscriptionActivated(payload);
                     break;
-
                 case 'subscription.charged':
                     await this.handleSubscriptionCharged(payload);
                     break;
-
                 case 'subscription.completed':
                 case 'subscription.cancelled':
                     await this.handleSubscriptionCancelled(payload);
                     break;
-
                 case 'subscription.halted':
                     await this.handleSubscriptionHalted(payload);
                     break;
-
                 case 'payment.captured':
                     await this.handlePaymentCaptured(payload);
                     break;
-
                 case 'payment.failed':
                     await this.handlePaymentFailed(payload);
                     break;
-
                 default:
                     console.log(`[Webhook] Unhandled event: ${event}`);
             }
@@ -294,15 +297,34 @@ class WebhookController {
         console.log(`[Webhook] Payment failed for tenant ${tenantId}`);
     }
     // Stripe webhook handler
+    // Stripe webhook handler
     async handleStripeWebhook(req, res) {
         try {
             const sig = req.headers['stripe-signature'];
             const payload = req.body; // raw body buffer
+
+            // We need to parse event to log it properly, but verification needs raw body
+            // We'll log after construction/verification for safety, or we can log raw buffer if needed.
+            // Let's rely on StripeService to verify first.
+
             if (!StripeService.verifyWebhookSignature(payload, sig)) {
                 console.error('[Webhook] Invalid Stripe signature');
+                // Log failed attempt
+                await pool.query(
+                    `INSERT INTO webhook_logs (provider, status, error_message) VALUES (?, ?, ?)`,
+                    ['stripe', 'failed', 'Invalid signature']
+                ).catch(err => console.error('Failed to log webhook:', err));
                 return res.status(400).json({ error: 'Invalid signature' });
             }
+
             const event = StripeService.getLastEvent();
+
+            // Log successful webhook
+            await pool.query(
+                `INSERT INTO webhook_logs (provider, event_type, payload, status) VALUES (?, ?, ?, ?)`,
+                ['stripe', event.type, JSON.stringify(event), 'received']
+            ).catch(err => console.error('Failed to log webhook:', err));
+
             console.log(`[Webhook] Received Stripe event: ${event.type}`);
             switch (event.type) {
                 case 'checkout.session.completed':
@@ -327,8 +349,33 @@ class WebhookController {
     async handleStripeCheckoutSessionCompleted(event) {
         const session = event.data.object;
         const tenantId = session.metadata?.tenant_id;
+        const planId = session.metadata?.plan_id;
+
         if (!tenantId) return;
         await TenantModel.update(tenantId, { status: 'active' });
+
+        // Record Payment
+        try {
+            // Find subscription if it exists (for recurring) or null
+            let subscriptionId = null;
+            if (session.subscription) {
+                const [subs] = await pool.query('SELECT id FROM subscriptions WHERE stripe_subscription_id = ?', [session.subscription]);
+                if (subs.length) subscriptionId = subs[0].id;
+            }
+
+            await StripeService.recordPayment({
+                tenant_id: tenantId,
+                subscription_id: subscriptionId,
+                amount: session.amount_total / 100, // Stripe amount is in cents
+                stripe_payment_id: session.payment_intent,
+                stripe_session_id: session.id,
+                status: 'success'
+            });
+            console.log(`[Webhook] Stripe payment recorded for tenant ${tenantId}`);
+        } catch (err) {
+            console.error('[Webhook] Failed to record Stripe payment:', err);
+        }
+
         const workflowEngine = require('../services/workflowEngine');
         await workflowEngine.trigger('stripe_payment_received', 'tenant', tenantId, { session });
 
@@ -345,7 +392,28 @@ class WebhookController {
         const invoice = event.data.object;
         const tenantId = invoice.metadata?.tenant_id;
         if (!tenantId) return;
-        console.log(`[Webhook] Invoice paid for tenant ${tenantId}`);
+
+        try {
+            // Find subscription
+            let subscriptionId = null;
+            if (invoice.subscription) {
+                const [subs] = await pool.query('SELECT id FROM subscriptions WHERE stripe_subscription_id = ?', [invoice.subscription]);
+                if (subs.length) subscriptionId = subs[0].id;
+            }
+
+            await StripeService.recordPayment({
+                tenant_id: tenantId,
+                subscription_id: subscriptionId,
+                amount: invoice.amount_paid / 100,
+                stripe_payment_id: invoice.payment_intent,
+                stripe_session_id: null, // No session ID for recurring invoices usually
+                status: 'success'
+            });
+            console.log(`[Webhook] Stripe recurring payment recorded for tenant ${tenantId}`);
+        } catch (err) {
+            console.error('[Webhook] Failed to record Stripe recurring payment:', err);
+        }
+
         const workflowEngine = require('../services/workflowEngine');
         await workflowEngine.trigger('stripe_invoice_paid', 'tenant', tenantId, { invoice });
     }

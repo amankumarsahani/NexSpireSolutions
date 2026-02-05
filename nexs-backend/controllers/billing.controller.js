@@ -219,9 +219,95 @@ class BillingController {
         }
     }
 
-    async getBillingStats(req, res) {
+    /**
+     * Get all payments (Admin)
+     */
+    async getAllPayments(req, res) {
         try {
-            const [stats] = await pool.query(`
+            const page = parseInt(req.query.page) || 1;
+            const limit = parseInt(req.query.limit) || 10;
+            const offset = (page - 1) * limit;
+            const status = req.query.status;
+
+            let query = `
+                SELECT 
+                    p.*, 
+                    t.name as tenant_name, 
+                    t.email as tenant_email,
+                    pl.name as plan_name
+                FROM payments p
+                LEFT JOIN tenants t ON p.tenant_id = t.id
+                LEFT JOIN subscriptions s ON p.subscription_id = s.id
+                LEFT JOIN plans pl ON s.plan_id = pl.id
+            `;
+
+            const params = [];
+
+            if (status && status !== 'all') {
+                query += ' WHERE p.status = ?';
+                params.push(status);
+            }
+
+            query += ' ORDER BY p.created_at DESC LIMIT ? OFFSET ?';
+            params.push(limit, offset);
+
+            const [payments] = await pool.query(query, params);
+
+            // Get total count
+            let countQuery = 'SELECT COUNT(*) as total FROM payments p';
+            const countParams = [];
+            if (status && status !== 'all') {
+                countQuery += ' WHERE p.status = ?';
+                countParams.push(status);
+            }
+            const [totalResult] = await pool.query(countQuery, countParams);
+
+            res.json({
+                success: true,
+                data: payments,
+                pagination: {
+                    page,
+                    limit,
+                    total: totalResult[0].total,
+                    pages: Math.ceil(totalResult[0].total / limit)
+                }
+            res.json({
+                    success: true,
+                    data: payments,
+                    pagination: {
+                        page,
+                        limit,
+                        total: totalResult[0].total,
+                        pages: Math.ceil(totalResult[0].total / limit)
+                    }
+                });
+            } catch (error) {
+                console.error('Get all payments error:', error);
+                res.status(500).json({ error: 'Failed to fetch payments' });
+            }
+        }
+
+    async syncPayment(req, res) {
+            try {
+                const { provider, paymentId } = req.body;
+
+                if (provider !== 'stripe') {
+                    return res.status(400).json({ error: 'Only Stripe sync supported currently' });
+                }
+
+                const StripeService = require('../services/stripe.service');
+                const result = await StripeService.fetchAndSyncPayment(paymentId);
+
+                res.json(result);
+            } catch (error) {
+                console.error('Sync payment error:', error);
+                res.status(500).json({ error: error.message || 'Sync failed' });
+            }
+        }
+
+    async getBillingStats(req, res) {
+            try {
+                const [stats] = await pool.query(`
                 SELECT 
                     COUNT(DISTINCT s.tenant_id) as total_subscribers,
                     SUM(CASE WHEN s.status = 'active' THEN 1 ELSE 0 END) as active_subscriptions,
@@ -231,15 +317,15 @@ class BillingController {
                 FROM subscriptions s
             `);
 
-            res.json({
-                success: true,
-                data: stats[0]
-            });
-        } catch (error) {
-            console.error('Get billing stats error:', error);
-            res.status(500).json({ error: 'Failed to fetch billing stats' });
+                res.json({
+                    success: true,
+                    data: stats[0]
+                });
+            } catch (error) {
+                console.error('Get billing stats error:', error);
+                res.status(500).json({ error: 'Failed to fetch billing stats' });
+            }
         }
     }
-}
 
 module.exports = new BillingController();

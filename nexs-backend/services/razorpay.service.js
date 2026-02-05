@@ -8,20 +8,48 @@ const { pool } = require('../config/database');
 
 class RazorpayService {
     constructor() {
-        this.keyId = process.env.RAZORPAY_KEY_ID;
-        this.keySecret = process.env.RAZORPAY_KEY_SECRET;
         this.baseUrl = 'https://api.razorpay.com/v1';
+    }
 
-        if (!this.keyId || !this.keySecret) {
+    /**
+     * Get credentials from DB or Env
+     */
+    async getCredentials() {
+        let keyId = process.env.RAZORPAY_KEY_ID;
+        let keySecret = process.env.RAZORPAY_KEY_SECRET;
+
+        try {
+            const [settings] = await pool.query(
+                'SELECT setting_key, setting_value FROM settings WHERE setting_key IN (?, ?)',
+                ['razorpay_api_key', 'razorpay_secret_key']
+            );
+
+            settings.forEach(s => {
+                if (s.setting_key === 'razorpay_api_key' && s.setting_value) keyId = s.setting_value;
+                if (s.setting_key === 'razorpay_secret_key' && s.setting_value) keySecret = s.setting_value;
+            });
+        } catch (err) {
+            console.error('[Razorpay] DB lookup failed:', err.message);
+        }
+
+        if (!keyId || !keySecret) {
             console.warn('[Razorpay] Credentials not configured. Billing features disabled.');
         }
+
+        return { keyId, keySecret };
     }
 
     /**
      * Make authenticated request to Razorpay API
      */
     async apiRequest(endpoint, method = 'GET', body = null) {
-        const auth = Buffer.from(`${this.keyId}:${this.keySecret}`).toString('base64');
+        const { keyId, keySecret } = await this.getCredentials();
+
+        if (!keyId || !keySecret) {
+            throw new Error('Razorpay credentials missing');
+        }
+
+        const auth = Buffer.from(`${keyId}:${keySecret}`).toString('base64');
 
         const options = {
             method,
@@ -192,8 +220,22 @@ class RazorpayService {
     /**
      * Verify webhook signature
      */
-    verifyWebhookSignature(body, signature, secret) {
-        const webhookSecret = secret || process.env.RAZORPAY_WEBHOOK_SECRET;
+    async verifyWebhookSignature(body, signature) {
+        let webhookSecret = process.env.RAZORPAY_WEBHOOK_SECRET;
+
+        try {
+            const [[setting]] = await pool.query(
+                'SELECT setting_value FROM settings WHERE setting_key = ?',
+                ['razorpay_webhook_secret']
+            );
+            if (setting && setting.setting_value) {
+                webhookSecret = setting.setting_value;
+            }
+        } catch (err) {
+            console.error('[Razorpay] DB lookup failed for webhook secret:', err.message);
+        }
+
+        if (!webhookSecret) return false;
 
         const expectedSignature = crypto
             .createHmac('sha256', webhookSecret)
