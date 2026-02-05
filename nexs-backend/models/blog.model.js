@@ -7,12 +7,11 @@ const BlogModel = {
         const params = [];
 
         if (filters.status) {
-            query += ' AND published = ?';
-            // Map 'published' -> 1, others (draft) -> 0
-            params.push(filters.status === 'published' ? 1 : 0);
+            query += ' AND status = ?';
+            params.push(filters.status);
         } else {
             // Default to published only for public access if not specified
-            query += ' AND published = 1';
+            query += " AND status = 'published'";
         }
 
         if (filters.category) {
@@ -45,7 +44,7 @@ const BlogModel = {
     // Get blog by slug (for public view)
     async findBySlug(slug) {
         const [rows] = await pool.query(
-            'SELECT * FROM blogs WHERE slug = ? AND published = 1',
+            "SELECT * FROM blogs WHERE slug = ? AND status = 'published'",
             [slug]
         );
         return this._mapRow(rows[0]);
@@ -56,8 +55,6 @@ const BlogModel = {
         if (!row) return null;
         return {
             ...row,
-            image: row.image_url,
-            status: row.published ? 'published' : 'draft',
             // keywords is usually parsed by mysql2 if column type is JSON, but generic fallback:
             keywords: typeof row.keywords === 'string' ? JSON.parse(row.keywords || '[]') : (row.keywords || [])
         };
@@ -87,14 +84,11 @@ const BlogModel = {
             keywords = []
         } = blogData;
 
-        // Map frontend/service fields to DB columns
-        // status: 'published' -> published: true (1)
-        const isPublished = status === 'published';
         const keywordsJson = JSON.stringify(keywords);
 
         const [result] = await pool.query(
             `INSERT INTO blogs 
-            (title, slug, excerpt, content, category, author, image_url, featured, published, read_time, keywords)
+            (title, slug, excerpt, content, category, author, image, featured, status, read_time, keywords)
              VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)`,
             [
                 title,
@@ -103,9 +97,9 @@ const BlogModel = {
                 content,
                 category,
                 author,
-                image,           // Maps to image_url
+                image,
                 featured,
-                isPublished,     // Maps to published
+                status,
                 read_time,
                 keywordsJson
             ]
@@ -127,9 +121,10 @@ const BlogModel = {
             'content': 'content',
             'category': 'category',
             'author': 'author',
-            'image': 'image_url', // Map image -> image_url
+            'image': 'image',
             'featured': 'featured',
-            'read_time': 'read_time'
+            'read_time': 'read_time',
+            'status': 'status'
         };
 
         // Handle standard fields
@@ -141,10 +136,6 @@ const BlogModel = {
         });
 
         // Handle special fields
-        if (blogData.status !== undefined) {
-            updates.push('published = ?');
-            values.push(blogData.status === 'published');
-        }
 
         if (blogData.keywords !== undefined) {
             updates.push('keywords = ?');
@@ -170,7 +161,7 @@ const BlogModel = {
     // Get categories
     async getCategories() {
         const [rows] = await pool.query(
-            'SELECT DISTINCT category FROM blogs WHERE category IS NOT NULL AND published = 1'
+            "SELECT DISTINCT category FROM blogs WHERE category IS NOT NULL AND status = 'published'"
         );
         return rows.map(r => r.category);
     }
