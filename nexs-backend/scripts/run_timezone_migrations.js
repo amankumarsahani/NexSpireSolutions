@@ -37,22 +37,22 @@ async function runTimezoneForAllTenants() {
         console.log(`📍 Admin DB: ${adminConfig.host}:${adminConfig.port}/${adminConfig.database}`);
         console.log('='.repeat(55) + '\n');
 
-        // Get all active tenants with their server info
+        // Get all tenants with their server info
         const [tenants] = await adminConn.query(`
             SELECT 
-                t.id, t.name, t.slug, t.db_name, t.status,
+                t.id, t.name, t.slug, t.db_name, t.status, t.process_status,
                 s.db_host, s.db_user, s.db_password, s.name as server_name
             FROM tenants t
             LEFT JOIN servers s ON t.server_id = s.id
-            WHERE t.status = 'active' OR t.status = 'running'
         `);
 
-        console.log(`📋 Found ${tenants.length} active tenants\n`);
+        console.log(`📋 Found ${tenants.length} tenants\n`);
 
         for (const tenant of tenants) {
             const dbName = tenant.db_name || `nexcrm_${tenant.slug.replace(/-/g, '_')}`;
             console.log(`\n📦 Processing: ${tenant.name} (${dbName})`);
-            console.log(`   Server: ${tenant.server_name || 'primary'}`);
+            console.log(`   Server: ${tenant.server_name || 'primary'} | Status: ${tenant.status || tenant.process_status || 'unknown'}`);
+
 
             let tenantConn;
             try {
