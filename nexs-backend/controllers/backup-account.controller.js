@@ -25,6 +25,19 @@ class BackupAccountController {
             res.status(500).json({ success: false, message: error.message });
         }
     }
+
+    /**
+     * Trigger manual backup
+     */
+    async triggerManualBackup(req, res) {
+        try {
+            const backupWorker = require('../workers/backupWorker');
+            backupWorker.triggerNow(); // Run async
+            res.json({ success: true, message: 'Backup process started in background' });
+        } catch (error) {
+            res.status(500).json({ success: false, message: error.message });
+        }
+    }
 }
 
 module.exports = new BackupAccountController();

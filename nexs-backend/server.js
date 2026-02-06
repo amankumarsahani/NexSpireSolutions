@@ -174,6 +174,10 @@ emailWorker.start(30000); // Process queue every 30 seconds
 const workflowWorker = require('./workers/workflowWorker');
 workflowWorker.start(60000); // Check every 60 seconds
 
+// Start backup worker
+const backupWorker = require('./workers/backupWorker');
+backupWorker.start(60000); // Check every minute
+
 // 404 Handler
 app.use((req, res) => {
     res.status(404).json({
