@@ -78,6 +78,14 @@ class WorkflowWorker {
                 }
                 canvasData = canvasData || { nodes: [] };
 
+                // Debug: dump all node types and triggerTypes
+                const allNodes = canvasData.nodes || [];
+                console.log(`[WorkflowWorker] Workflow ${workflow.id} has ${allNodes.length} nodes:`);
+                allNodes.forEach((n, i) => {
+                    console.log(`[WorkflowWorker]   Node ${i}: type="${n.type}", triggerType="${n.data?.triggerType}", actionType="${n.data?.actionType}"`);
+                });
+
+
                 // Find the schedule trigger node - React Flow uses type='trigger' with data.triggerType='scheduled'
                 const triggerNode = (canvasData.nodes || []).find(
                     node => node.type === 'trigger' &&
