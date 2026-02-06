@@ -41,7 +41,7 @@ async function runTimezoneForAllTenants() {
         const [tenants] = await adminConn.query(`
             SELECT 
                 t.id, t.name, t.slug, t.db_name, t.status,
-                s.db_host, s.db_port, s.db_user, s.db_password, s.name as server_name
+                s.db_host, s.db_user, s.db_password, s.name as server_name
             FROM tenants t
             LEFT JOIN servers s ON t.server_id = s.id
             WHERE t.status = 'active' OR t.status = 'running'
@@ -59,12 +59,13 @@ async function runTimezoneForAllTenants() {
                 // Connect to the tenant database using server credentials
                 tenantConn = await mysql.createConnection({
                     host: tenant.db_host || adminConfig.host,
-                    port: tenant.db_port || adminConfig.port,
+                    port: 3306, // Default MySQL port
                     user: tenant.db_user || adminConfig.user,
                     password: tenant.db_password || adminConfig.password,
                     database: dbName,
                     multipleStatements: true
                 });
+
 
                 // Migration 026: Add timezone column to users table
                 console.log('  → Running migration 026_add_user_timezone...');
