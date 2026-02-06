@@ -101,8 +101,9 @@ class WorkflowWorker {
                     ? JSON.parse(workflow.trigger_config || '{}')
                     : (workflow.trigger_config || {});
 
-                const runTime = nodeConfig.run_time || triggerConfig.run_time || null;
+                const runTime = nodeConfig.run_time || nodeConfig.schedule_time || triggerConfig.run_time || triggerConfig.schedule_time || null;
                 const intervalMinutes = nodeConfig.interval_minutes || triggerConfig.interval_minutes || null;
+
 
                 // Debug: show extracted config
                 console.log(`[WorkflowWorker] Workflow ${workflow.id} config: run_time="${runTime}", interval="${intervalMinutes}", triggerNode found: ${!!triggerNode}`);
