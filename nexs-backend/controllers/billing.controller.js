@@ -271,43 +271,34 @@ class BillingController {
                     total: totalResult[0].total,
                     pages: Math.ceil(totalResult[0].total / limit)
                 }
-            res.json({
-                    success: true,
-                    data: payments,
-                    pagination: {
-                        page,
-                        limit,
-                        total: totalResult[0].total,
-                        pages: Math.ceil(totalResult[0].total / limit)
-                    }
-                });
-            } catch (error) {
-                console.error('Get all payments error:', error);
-                res.status(500).json({ error: 'Failed to fetch payments' });
-            }
+            });
+        } catch (error) {
+            console.error('Get all payments error:', error);
+            res.status(500).json({ error: 'Failed to fetch payments' });
         }
+    }
 
     async syncPayment(req, res) {
-            try {
-                const { provider, paymentId } = req.body;
+        try {
+            const { provider, paymentId } = req.body;
 
-                if (provider !== 'stripe') {
-                    return res.status(400).json({ error: 'Only Stripe sync supported currently' });
-                }
-
-                const StripeService = require('../services/stripe.service');
-                const result = await StripeService.fetchAndSyncPayment(paymentId);
-
-                res.json(result);
-            } catch (error) {
-                console.error('Sync payment error:', error);
-                res.status(500).json({ error: error.message || 'Sync failed' });
+            if (provider !== 'stripe') {
+                return res.status(400).json({ error: 'Only Stripe sync supported currently' });
             }
+
+            const StripeService = require('../services/stripe.service');
+            const result = await StripeService.fetchAndSyncPayment(paymentId);
+
+            res.json(result);
+        } catch (error) {
+            console.error('Sync payment error:', error);
+            res.status(500).json({ error: error.message || 'Sync failed' });
         }
+    }
 
     async getBillingStats(req, res) {
-            try {
-                const [stats] = await pool.query(`
+        try {
+            const [stats] = await pool.query(`
                 SELECT 
                     COUNT(DISTINCT s.tenant_id) as total_subscribers,
                     SUM(CASE WHEN s.status = 'active' THEN 1 ELSE 0 END) as active_subscriptions,
@@ -317,15 +308,15 @@ class BillingController {
                 FROM subscriptions s
             `);
 
-                res.json({
-                    success: true,
-                    data: stats[0]
-                });
-            } catch (error) {
-                console.error('Get billing stats error:', error);
-                res.status(500).json({ error: 'Failed to fetch billing stats' });
-            }
+            res.json({
+                success: true,
+                data: stats[0]
+            });
+        } catch (error) {
+            console.error('Get billing stats error:', error);
+            res.status(500).json({ error: 'Failed to fetch billing stats' });
         }
     }
+}
 
 module.exports = new BillingController();
