@@ -62,6 +62,14 @@ class WorkflowWorker {
                  WHERE is_active = TRUE AND (trigger_type = 'scheduled' OR trigger_type = 'trigger_schedule')`
             );
 
+            console.log(`[WorkflowWorker] Found ${scheduled.length} scheduled workflows`);
+
+            // Log each workflow for debugging
+            for (const wf of scheduled) {
+                console.log(`[WorkflowWorker]   - ID: ${wf.id}, Name: ${wf.name}, Type: ${wf.trigger_type}, Active: ${wf.is_active}`);
+            }
+
+
             for (const workflow of scheduled) {
                 // Parse canvas_data to get schedule config from trigger node
                 let canvasData = workflow.canvas_data;
