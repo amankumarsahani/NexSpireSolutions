@@ -78,9 +78,10 @@ class WorkflowWorker {
                 }
                 canvasData = canvasData || { nodes: [] };
 
-                // Find the schedule trigger node
+                // Find the schedule trigger node - React Flow uses type='trigger' with data.triggerType='scheduled'
                 const triggerNode = (canvasData.nodes || []).find(
-                    node => node.type === 'trigger_schedule' || node.type === 'scheduled'
+                    node => node.type === 'trigger' &&
+                        (node.data?.triggerType === 'scheduled' || node.data?.triggerType === 'trigger_schedule')
                 );
                 const nodeConfig = triggerNode?.data?.config || {};
 
@@ -92,7 +93,14 @@ class WorkflowWorker {
                 const runTime = nodeConfig.run_time || triggerConfig.run_time || null;
                 const intervalMinutes = nodeConfig.interval_minutes || triggerConfig.interval_minutes || null;
 
+                // Debug: show extracted config
+                console.log(`[WorkflowWorker] Workflow ${workflow.id} config: run_time="${runTime}", interval="${intervalMinutes}", triggerNode found: ${!!triggerNode}`);
+                if (triggerNode) {
+                    console.log(`[WorkflowWorker]   triggerNode.data.config:`, JSON.stringify(nodeConfig));
+                }
+
                 if (this.shouldRunScheduled({ run_time: runTime, interval_minutes: intervalMinutes }, workflow, currentTime)) {
+
                     console.log(`[WorkflowWorker] Running scheduled workflow: ${workflow.name}`);
 
                     // Update last_run_at before executing
