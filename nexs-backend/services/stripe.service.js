@@ -173,48 +173,46 @@ class StripeService {
 
         return result.insertId;
     }
-        return result.insertId;
-    }
 
     /**
      * Fetch payment from Stripe and sync to DB
      */
     async fetchAndSyncPayment(paymentIntentId) {
-    const stripe = await this.getClient();
+        const stripe = await this.getClient();
 
-    try {
-        const paymentIntent = await stripe.paymentIntents.retrieve(paymentIntentId);
+        try {
+            const paymentIntent = await stripe.paymentIntents.retrieve(paymentIntentId);
 
-        if (!paymentIntent) {
-            throw new Error('Payment Intent not found');
+            if (!paymentIntent) {
+                throw new Error('Payment Intent not found');
+            }
+
+            // Check if exists
+            const [existing] = await pool.query('SELECT id FROM payments WHERE stripe_payment_id = ?', [paymentIntent.id]);
+            if (existing.length > 0) {
+                return { success: false, message: 'Payment already exists' };
+            }
+
+            // We need tenant_id to record it. If it's in metadata excellent, if not we might be stuck.
+            const tenantId = paymentIntent.metadata?.tenant_id;
+            if (!tenantId) {
+                throw new Error('Payment Intent missing tenant_id in metadata');
+            }
+
+            await this.recordPayment({
+                tenant_id: tenantId,
+                amount: paymentIntent.amount / 100,
+                stripe_payment_id: paymentIntent.id,
+                status: paymentIntent.status === 'succeeded' ? 'success' : 'failed'
+            });
+
+            return { success: true, message: 'Payment synced successfully' };
+
+        } catch (error) {
+            console.error('Sync payment error:', error);
+            throw error;
         }
-
-        // Check if exists
-        const [existing] = await pool.query('SELECT id FROM payments WHERE stripe_payment_id = ?', [paymentIntent.id]);
-        if (existing.length > 0) {
-            return { success: false, message: 'Payment already exists' };
-        }
-
-        // We need tenant_id to record it. If it's in metadata excellent, if not we might be stuck.
-        const tenantId = paymentIntent.metadata?.tenant_id;
-        if (!tenantId) {
-            throw new Error('Payment Intent missing tenant_id in metadata');
-        }
-
-        await this.recordPayment({
-            tenant_id: tenantId,
-            amount: paymentIntent.amount / 100,
-            stripe_payment_id: paymentIntent.id,
-            status: paymentIntent.status === 'succeeded' ? 'success' : 'failed'
-        });
-
-        return { success: true, message: 'Payment synced successfully' };
-
-    } catch (error) {
-        console.error('Sync payment error:', error);
-        throw error;
     }
-}
 }
 
 module.exports = new StripeService();
