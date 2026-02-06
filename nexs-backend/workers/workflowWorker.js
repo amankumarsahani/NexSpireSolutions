@@ -71,27 +71,30 @@ class WorkflowWorker {
 
 
             for (const workflow of scheduled) {
-                // Parse canvas_data to get schedule config from trigger node
-                let canvasData = workflow.canvas_data;
-                if (typeof canvasData === 'string') {
-                    try { canvasData = JSON.parse(canvasData); } catch (e) { canvasData = { nodes: [] }; }
-                }
-                canvasData = canvasData || { nodes: [] };
+                // Query workflow_nodes table directly to get the schedule trigger node config
+                const [nodes] = await db.query(
+                    `SELECT * FROM workflow_nodes WHERE workflow_id = ? AND node_type = 'trigger'`,
+                    [workflow.id]
+                );
 
-                // Debug: dump all node types and triggerTypes
-                const allNodes = canvasData.nodes || [];
-                console.log(`[WorkflowWorker] Workflow ${workflow.id} has ${allNodes.length} nodes:`);
-                allNodes.forEach((n, i) => {
-                    console.log(`[WorkflowWorker]   Node ${i}: type="${n.type}", triggerType="${n.data?.triggerType}", actionType="${n.data?.actionType}"`);
+                // Debug: show found nodes
+                console.log(`[WorkflowWorker] Workflow ${workflow.id} has ${nodes.length} trigger nodes`);
+                nodes.forEach((n, i) => {
+                    console.log(`[WorkflowWorker]   Node ${i}: action_type="${n.action_type}", config="${typeof n.config === 'string' ? n.config : JSON.stringify(n.config)}"`);
                 });
 
-
-                // Find the schedule trigger node - React Flow uses type='trigger' with data.triggerType='scheduled'
-                const triggerNode = (canvasData.nodes || []).find(
-                    node => node.type === 'trigger' &&
-                        (node.data?.triggerType === 'scheduled' || node.data?.triggerType === 'trigger_schedule')
+                // Find the schedule trigger node (action_type stores the trigger type for trigger nodes)
+                const triggerNode = nodes.find(
+                    node => node.action_type === 'scheduled' || node.action_type === 'trigger_schedule'
                 );
-                const nodeConfig = triggerNode?.data?.config || {};
+
+                // Parse node config
+                let nodeConfig = {};
+                if (triggerNode) {
+                    nodeConfig = typeof triggerNode.config === 'string'
+                        ? JSON.parse(triggerNode.config || '{}')
+                        : (triggerNode.config || {});
+                }
 
                 // Get schedule settings from either nodeConfig or trigger_config
                 const triggerConfig = typeof workflow.trigger_config === 'string'
@@ -103,11 +106,9 @@ class WorkflowWorker {
 
                 // Debug: show extracted config
                 console.log(`[WorkflowWorker] Workflow ${workflow.id} config: run_time="${runTime}", interval="${intervalMinutes}", triggerNode found: ${!!triggerNode}`);
-                if (triggerNode) {
-                    console.log(`[WorkflowWorker]   triggerNode.data.config:`, JSON.stringify(nodeConfig));
-                }
 
                 if (this.shouldRunScheduled({ run_time: runTime, interval_minutes: intervalMinutes }, workflow, currentTime)) {
+
 
                     console.log(`[WorkflowWorker] Running scheduled workflow: ${workflow.name}`);
 
