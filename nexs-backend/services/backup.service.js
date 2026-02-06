@@ -14,10 +14,16 @@ class BackupService {
      */
     async backupAllTenants() {
         console.log('[BackupService] Starting daily backup run...');
-        const tenants = await TenantModel.findAll({ status: 'active' });
 
-        for (const tenant of tenants) {
+        // Fetch ALL tenants (including trial)
+        const tenants = await TenantModel.findAll({});
+        const activeTenants = tenants.filter(t => t.status !== 'cancelled' && t.status !== 'suspended');
+
+        console.log(`[BackupService] Found ${tenants.length} total tenants. Proceeding with ${activeTenants.length} eligible (active/trial) tenants.`);
+
+        for (const tenant of activeTenants) {
             try {
+                console.log(`[BackupService] Processing tenant: ${tenant.slug} (${tenant.status})`);
                 await this.backupTenant(tenant);
             } catch (error) {
                 console.error(`[BackupService] Failed to backup tenant ${tenant.slug}:`, error.message);
