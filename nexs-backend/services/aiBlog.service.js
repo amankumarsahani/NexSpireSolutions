@@ -214,7 +214,7 @@ Technical Constraints:
                 slug,
                 excerpt,
                 content,
-                image: image || '',
+                image_url: image || '',
                 category: category || 'General',
                 author: author || 'Content Writer',
                 status: status || 'draft',

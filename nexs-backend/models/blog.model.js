@@ -77,7 +77,7 @@ const BlogModel = {
             content,
             category,
             author,
-            image,
+            image_url,
             featured = false,
             status = 'draft',
             read_time,
@@ -88,7 +88,7 @@ const BlogModel = {
 
         const [result] = await pool.query(
             `INSERT INTO blogs 
-            (title, slug, excerpt, content, category, author, image, featured, status, read_time, keywords)
+            (title, slug, excerpt, content, category, author, image_url, featured, status, read_time, keywords)
              VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)`,
             [
                 title,
@@ -97,7 +97,7 @@ const BlogModel = {
                 content,
                 category,
                 author,
-                image,
+                image_url,
                 featured,
                 status,
                 read_time,
@@ -121,7 +121,7 @@ const BlogModel = {
             'content': 'content',
             'category': 'category',
             'author': 'author',
-            'image': 'image',
+            'image_url': 'image_url',
             'featured': 'featured',
             'read_time': 'read_time',
             'status': 'status'
