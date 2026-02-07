@@ -105,6 +105,10 @@ class BackupService {
      * Upload file to Google Drive
      */
     async uploadToGDrive(account, filePath, fileName) {
+        if (!account.folder_id) {
+            throw new Error('Backup account missing folder_id. Cannot upload to root of service account.');
+        }
+
         const auth = new google.auth.GoogleAuth({
             credentials: JSON.parse(account.credentials_json),
             scopes: ['https://www.googleapis.com/auth/drive.file'],
@@ -114,7 +118,7 @@ class BackupService {
 
         const fileMetadata = {
             name: fileName,
-            parents: account.folder_id ? [account.folder_id] : [],
+            parents: [account.folder_id],
         };
 
         const media = {
@@ -126,6 +130,7 @@ class BackupService {
             resource: fileMetadata,
             media: media,
             fields: 'id',
+            supportsAllDrives: true, // Required for Shared Drives
         });
 
         return res.data.id;
@@ -158,7 +163,10 @@ class BackupService {
             scopes: ['https://www.googleapis.com/auth/drive.file'],
         });
         const drive = google.drive({ version: 'v3', auth });
-        await drive.files.delete({ fileId });
+        await drive.files.delete({
+            fileId,
+            supportsAllDrives: true // Required for Shared Drives
+        });
     }
 }
 
