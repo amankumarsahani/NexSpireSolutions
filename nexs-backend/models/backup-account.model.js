@@ -5,7 +5,7 @@ class BackupAccountModel {
      * Get all backup accounts
      */
     static async findAll() {
-        const [rows] = await pool.query('SELECT id, account_name, folder_id, subject_email, is_active, usage_count FROM backup_accounts');
+        const [rows] = await pool.query('SELECT id, account_name, folder_id, subject_email, credentials_json, is_active, usage_count FROM backup_accounts');
         return rows;
     }
 
