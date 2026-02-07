@@ -27,6 +27,33 @@ class BackupAccountController {
     }
 
     /**
+     * Update backup account
+     */
+    async updateAccount(req, res) {
+        try {
+            const { id } = req.params;
+            await BackupAccountModel.update(id, req.body);
+            const account = await BackupAccountModel.findById(id);
+            res.json({ success: true, data: account });
+        } catch (error) {
+            res.status(500).json({ success: false, message: error.message });
+        }
+    }
+
+    /**
+     * Delete backup account
+     */
+    async deleteAccount(req, res) {
+        try {
+            const { id } = req.params;
+            await BackupAccountModel.delete(id);
+            res.json({ success: true, message: 'Backup account deleted' });
+        } catch (error) {
+            res.status(500).json({ success: false, message: error.message });
+        }
+    }
+
+    /**
      * Trigger manual backup
      */
     async triggerManualBackup(req, res) {

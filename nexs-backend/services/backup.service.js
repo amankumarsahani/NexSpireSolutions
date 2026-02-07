@@ -111,10 +111,18 @@ class BackupService {
 
         console.log(`[BackupService] Uploading to GDrive Folder ID: ${account.folder_id}`);
 
-        const auth = new google.auth.GoogleAuth({
+        const authOptions = {
             credentials: JSON.parse(account.credentials_json),
             scopes: ['https://www.googleapis.com/auth/drive.file'],
-        });
+        };
+
+        // If subject_email is present (Domain-Wide Delegation), add it to impersonate
+        if (account.subject_email) {
+            authOptions.clientOptions = { subject: account.subject_email };
+            console.log(`[BackupService] Impersonating user: ${account.subject_email}`);
+        }
+
+        const auth = new google.auth.GoogleAuth(authOptions);
 
         const drive = google.drive({ version: 'v3', auth });
 
@@ -166,11 +174,18 @@ class BackupService {
     }
 
     async deleteFromGDrive(account, fileId) {
-        const auth = new google.auth.GoogleAuth({
+        const authOptions = {
             credentials: JSON.parse(account.credentials_json),
             scopes: ['https://www.googleapis.com/auth/drive.file'],
-        });
+        };
+
+        if (account.subject_email) {
+            authOptions.clientOptions = { subject: account.subject_email };
+        }
+
+        const auth = new google.auth.GoogleAuth(authOptions);
         const drive = google.drive({ version: 'v3', auth });
+
         await drive.files.delete({
             fileId,
             supportsAllDrives: true // Required for Shared Drives

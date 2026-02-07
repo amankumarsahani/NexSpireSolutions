@@ -5,7 +5,7 @@ class BackupAccountModel {
      * Get all backup accounts
      */
     static async findAll() {
-        const [rows] = await pool.query('SELECT id, account_name, folder_id, is_active, usage_count FROM backup_accounts');
+        const [rows] = await pool.query('SELECT id, account_name, folder_id, subject_email, is_active, usage_count FROM backup_accounts');
         return rows;
     }
 
@@ -41,12 +41,31 @@ class BackupAccountModel {
      * Create backup account
      */
     static async create(data) {
-        const { account_name, credentials_json, folder_id } = data;
+        const { account_name, credentials_json, folder_id, subject_email } = data;
         const [result] = await pool.query(`
-            INSERT INTO backup_accounts (account_name, credentials_json, folder_id)
-            VALUES (?, ?, ?)
-        `, [account_name, JSON.stringify(credentials_json), folder_id]);
+            INSERT INTO backup_accounts (account_name, credentials_json, folder_id, subject_email)
+            VALUES (?, ?, ?, ?)
+        `, [account_name, JSON.stringify(credentials_json), folder_id, subject_email || null]);
         return result.insertId;
+    }
+
+    /**
+     * Update backup account
+     */
+    static async update(id, data) {
+        const { account_name, credentials_json, folder_id, subject_email } = data;
+        await pool.query(`
+            UPDATE backup_accounts 
+            SET account_name = ?, credentials_json = ?, folder_id = ?, subject_email = ?
+            WHERE id = ?
+        `, [account_name, JSON.stringify(credentials_json), folder_id, subject_email || null, id]);
+    }
+
+    /**
+     * Delete backup account
+     */
+    static async delete(id) {
+        await pool.query('DELETE FROM backup_accounts WHERE id = ?', [id]);
     }
 
     /**
