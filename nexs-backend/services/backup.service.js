@@ -109,6 +109,8 @@ class BackupService {
             throw new Error('Backup account missing folder_id. Cannot upload to root of service account.');
         }
 
+        console.log(`[BackupService] Uploading to GDrive Folder ID: ${account.folder_id}`);
+
         const auth = new google.auth.GoogleAuth({
             credentials: JSON.parse(account.credentials_json),
             scopes: ['https://www.googleapis.com/auth/drive.file'],
@@ -126,14 +128,20 @@ class BackupService {
             body: fs.createReadStream(filePath),
         };
 
-        const res = await drive.files.create({
-            resource: fileMetadata,
-            media: media,
-            fields: 'id',
-            supportsAllDrives: true, // Required for Shared Drives
-        });
-
-        return res.data.id;
+        try {
+            const res = await drive.files.create({
+                resource: fileMetadata,
+                media: media,
+                fields: 'id',
+                supportsAllDrives: true, // Required for Shared Drives
+            });
+            return res.data.id;
+        } catch (error) {
+            if (error.message && error.message.includes('Service Accounts do not have storage quota')) {
+                throw new Error(`Google Drive Storage Error: Service Accounts cannot own files in standard folders. Please use a 'Shared Drive' (Team Drive) and ensure the Service Account is added as a 'Contributor' or 'Manager', OR use Domain-Wide Delegation.`);
+            }
+            throw error;
+        }
     }
 
     /**
