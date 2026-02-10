@@ -96,6 +96,7 @@ class ServerModel {
     static async getStats() {
         const [rows] = await pool.query(`
             SELECT s.id, s.name, s.hostname, s.is_active, s.is_primary,
+                   s.cloudflare_tunnel_id, s.ssh_user, s.db_host,
                    COUNT(t.id) as tenant_count,
                    SUM(CASE WHEN t.process_status = 'running' THEN 1 ELSE 0 END) as running_count
             FROM servers s
