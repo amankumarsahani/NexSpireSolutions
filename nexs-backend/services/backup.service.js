@@ -148,6 +148,9 @@ class BackupService {
             if (error.message && error.message.includes('Service Accounts do not have storage quota')) {
                 throw new Error(`Google Drive Storage Error: Service Accounts cannot own files in standard folders. Please use a 'Shared Drive' (Team Drive) and ensure the Service Account is added as a 'Contributor' or 'Manager', OR use Domain-Wide Delegation.`);
             }
+            if (error.message && (error.message.includes('unauthorized_client') || error.message.includes('Client is unauthorized'))) {
+                throw new Error(`Authorization Error: Domain-Wide Delegation failed. If you are using a personal Gmail account, leave the 'Impersonate Email' field BLANK. If using Workspace, ensure the Service Account is authorized in the Admin Console.`);
+            }
             throw error;
         }
     }
