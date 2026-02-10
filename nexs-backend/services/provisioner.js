@@ -165,14 +165,8 @@ class Provisioner {
             await TenantModel.updateProcessStatus(id, 'running');
             console.log(`[Provisioner] PM2 process started`);
 
-            // 7.1 Update Cloudflare Tunnel Ingress (CRITICAL: Expose the new port)
-            // This maps slug-crm-api.domain -> localhost:PORT
-            try {
-                await this.updateTunnelConfig(slug, port, server);
-            } catch (tunnelError) {
-                console.error(`[Provisioner] Failed to update tunnel: ${tunnelError.message}`);
-                // Don't throw, we want to finish provisioning (user can fix tunnel later)
-            }
+            // 7.1 Tunnel config already updated by addCloudflareRoute in step 6
+            // No duplicate call needed here
 
             // 8. Register with registry service (for mobile app lookup)
             const apiSubdomain = `${slug}-crm-api.${this.cfDomain}`;
@@ -553,7 +547,8 @@ class Provisioner {
             }
 
             // Update Cloudflare Tunnel configuration on the target server
-            await this.updateTunnelConfig(hostname, port, server);
+            // Pass slug (not full hostname) — updateTunnelConfig constructs the hostname
+            await this.updateTunnelConfig(slug, port, server);
 
             console.log(`[Provisioner] Cloudflare route added: ${hostname}`);
             return data.result.id;
@@ -881,53 +876,8 @@ class Provisioner {
             return false;
         }
     }
-    /**
-     * Update Cloudflare tunnel config on target server
-     */
-    async updateTunnelConfig(hostname, port, server = { is_primary: true }) {
-        try {
-            const tunnelConfigPath = server.cloudflare_config_path || '/etc/cloudflared/config.yml';
-            const { stdout: config } = await this.executeOnServer(server, `cat ${tunnelConfigPath}`);
-
-            // hostname is already the full subdomain (e.g., mytest1-crm-api.nexspiresolutions.co.in)
-            // Extract slug from hostname for temp file naming
-            const slug = hostname.split('-crm-api')[0] || 'tenant';
-
-            // Check if entry already exists
-            if (config.includes(hostname)) {
-                console.log(`[Provisioner] Tunnel config already has entry for ${hostname}`);
-                return;
-            }
-
-            // Insert new route before catch-all
-            const newRoute = `  - hostname: ${hostname}\n    service: http://localhost:${port}\n`;
-
-            // Find the catch-all and insert before it
-            const newConfig = config.replace(
-                '  - service: http_status:404',
-                newRoute + '  - service: http_status:404'
-            );
-
-            const tmpFile = `/tmp/tunnel_${slug}.yml`;
-            await this.executeOnServer(server, `echo "${newConfig.replace(/"/g, '\\"')}" > ${tmpFile} && sudo mv ${tmpFile} ${tunnelConfigPath}`);
-
-            console.log(`[Provisioner] Tunnel config updated on server ${server.name}`);
-
-            // Restart cloudflared AFTER a delay
-            const restartCmd = 'sudo systemctl restart cloudflared';
-            setTimeout(async () => {
-                try {
-                    await this.executeOnServer(server, restartCmd);
-                    console.log(`[Provisioner] Cloudflared restarted on server ${server.name}`);
-                } catch (err) {
-                    console.warn(`[Provisioner] cloudflared restart failed on ${server.name}:`, err.message);
-                }
-            }, 5000);
-
-        } catch (error) {
-            console.warn(`[Provisioner] Could not update tunnel config on ${server.name}:`, error.message);
-        }
-    }
+    // NOTE: updateTunnelConfig is defined below (near line 1373)
+    // It takes (slug, port, server, customDomain) and constructs hostname as {slug}-crm-api.{domain}
 
     /**
      * Start PM2 process for tenant
