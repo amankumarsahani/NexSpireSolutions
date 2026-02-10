@@ -20,6 +20,7 @@ CREATE TABLE IF NOT EXISTS users (
     position VARCHAR(100),
     bio TEXT,
     join_date DATE,
+    timezone VARCHAR(50) DEFAULT NULL COMMENT 'IANA timezone identifier (e.g., Asia/Kolkata)',
     created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
     updated_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
     
@@ -274,7 +275,8 @@ INSERT IGNORE INTO settings (setting_key, setting_value) VALUES
 ('secondary_color', '#10b981'),
 ('currency', 'INR'),
 ('currency_symbol', '₹'),
-('industry', 'general');
+('industry', 'general'),
+('timezone', 'UTC');
 
 -- ============================================
 -- ROLE PERMISSIONS TABLE (RBAC)
