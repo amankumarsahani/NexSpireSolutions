@@ -3,6 +3,7 @@ import { Link, useLocation, useNavigate } from 'react-router-dom';
 
 const Header = () => {
   const [isMenuOpen, setIsMenuOpen] = useState(false);
+  const [activeDropdown, setActiveDropdown] = useState(null);
   const [scrolled, setScrolled] = useState(false);
   const location = useLocation();
   const navigate = useNavigate();
@@ -169,34 +170,43 @@ const Header = () => {
               <div className="px-4 space-y-1">
                 {navItems.map((item) => (
                   <div key={item.label}>
-                    <Link
-                      to={item.path}
-                      onClick={(e) => !item.children && handleNavClick(e, item.path)}
-                      className={`relative z-10 block px-4 py-2 text-base font-semibold rounded-xl transition-all duration-300 ${isActive(item.path)
+                    <div
+                      onClick={(e) => {
+                        if (item.children) {
+                          setActiveDropdown(activeDropdown === item.label ? null : item.label);
+                        } else {
+                          handleNavClick(e, item.path);
+                        }
+                      }}
+                      className={`relative z-10 block px-4 py-2 text-base font-semibold rounded-xl transition-all duration-300 cursor-pointer ${isActive(item.path)
                         ? 'text-white bg-gradient-to-r from-blue-500 to-purple-500 shadow-lg shadow-blue-500/25'
                         : 'text-slate-700 hover:text-white hover:bg-gradient-to-r hover:from-blue-400 hover:to-purple-400 hover:shadow-md hover:shadow-blue-400/20'
                         }`}
                     >
                       <div className="flex items-center justify-between">
                         <span>{item.label}</span>
-                        {isActive(item.path) && (
+                        {item.children ? (
+                          <i className={`ri-arrow-down-s-line transition-transform duration-300 ${activeDropdown === item.label ? 'rotate-180' : ''}`}></i>
+                        ) : isActive(item.path) && (
                           <div className="w-2 h-2 bg-gradient-to-r from-purple-400 to-pink-400 rounded-full animate-pulse shadow-sm"></div>
                         )}
                       </div>
-                    </Link>
+                    </div>
 
                     {item.children && (
-                      <div className="pl-6 pr-2 space-y-1 mt-1 border-l-2 border-slate-100 ml-4">
-                        {item.children.map(child => (
-                          <Link
-                            key={child.label}
-                            to={child.path}
-                            onClick={() => setIsMenuOpen(false)}
-                            className="block px-4 py-2 text-sm font-medium text-slate-600 hover:text-blue-600"
-                          >
-                            {child.label}
-                          </Link>
-                        ))}
+                      <div className={`overflow-hidden transition-all duration-300 ${activeDropdown === item.label ? 'max-h-96 opacity-100 mt-1' : 'max-h-0 opacity-0'}`}>
+                        <div className="pl-6 pr-2 space-y-1 border-l-2 border-slate-100 ml-4 pb-2">
+                          {item.children.map(child => (
+                            <Link
+                              key={child.label}
+                              to={child.path}
+                              onClick={() => setIsMenuOpen(false)}
+                              className="block px-4 py-2 text-sm font-medium text-slate-600 hover:text-blue-600"
+                            >
+                              {child.label}
+                            </Link>
+                          ))}
+                        </div>
                       </div>
                     )}
                   </div>

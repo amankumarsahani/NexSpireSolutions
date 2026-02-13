@@ -7,6 +7,33 @@ import { useEffect, useRef, useState } from 'react'
  * @param {number} duration - Animation duration in ms
  * @param {string} className - Additional classes
  */
+const animationStyles = {
+    'fade-up': {
+        initial: { opacity: 0, transform: 'translateY(40px)' },
+        visible: { opacity: 1, transform: 'translateY(0)' }
+    },
+    'fade-down': {
+        initial: { opacity: 0, transform: 'translateY(-40px)' },
+        visible: { opacity: 1, transform: 'translateY(0)' }
+    },
+    'fade-left': {
+        initial: { opacity: 0, transform: 'translateX(-40px)' },
+        visible: { opacity: 1, transform: 'translateX(0)' }
+    },
+    'fade-right': {
+        initial: { opacity: 0, transform: 'translateX(40px)' },
+        visible: { opacity: 1, transform: 'translateX(0)' }
+    },
+    'zoom': {
+        initial: { opacity: 0, transform: 'scale(0.9)' },
+        visible: { opacity: 1, transform: 'scale(1)' }
+    },
+    'flip': {
+        initial: { opacity: 0, transform: 'rotateX(-10deg)' },
+        visible: { opacity: 1, transform: 'rotateX(0)' }
+    }
+}
+
 export default function ScrollReveal({
     children,
     animation = 'fade-up',
@@ -25,7 +52,7 @@ export default function ScrollReveal({
                 if (entry.isIntersecting) {
                     setIsVisible(true)
                     if (once) {
-                        observer.unobserve(entry.target)
+                        observer.disconnect()
                     }
                 } else if (!once) {
                     setIsVisible(false)
@@ -40,38 +67,9 @@ export default function ScrollReveal({
         }
 
         return () => {
-            if (currentRef) {
-                observer.unobserve(currentRef)
-            }
+            observer.disconnect()
         }
     }, [threshold, once])
-
-    const animationStyles = {
-        'fade-up': {
-            initial: { opacity: 0, transform: 'translateY(40px)' },
-            visible: { opacity: 1, transform: 'translateY(0)' }
-        },
-        'fade-down': {
-            initial: { opacity: 0, transform: 'translateY(-40px)' },
-            visible: { opacity: 1, transform: 'translateY(0)' }
-        },
-        'fade-left': {
-            initial: { opacity: 0, transform: 'translateX(-40px)' },
-            visible: { opacity: 1, transform: 'translateX(0)' }
-        },
-        'fade-right': {
-            initial: { opacity: 0, transform: 'translateX(40px)' },
-            visible: { opacity: 1, transform: 'translateX(0)' }
-        },
-        'zoom': {
-            initial: { opacity: 0, transform: 'scale(0.9)' },
-            visible: { opacity: 1, transform: 'scale(1)' }
-        },
-        'flip': {
-            initial: { opacity: 0, transform: 'rotateX(-10deg)' },
-            visible: { opacity: 1, transform: 'rotateX(0)' }
-        }
-    }
 
     const style = animationStyles[animation] || animationStyles['fade-up']
     const currentStyle = isVisible ? style.visible : style.initial
@@ -93,7 +91,7 @@ export default function ScrollReveal({
 }
 
 /**
- * StaggerReveal - Reveals children with staggered delay
+ * StaggerReveal - Reveals children with staggered delay using a single observer
  */
 export function StaggerReveal({
     children,
@@ -101,23 +99,66 @@ export function StaggerReveal({
     staggerDelay = 100,
     baseDelay = 0,
     duration = 600,
-    className = ''
+    threshold = 0.1,
+    className = '',
+    once = true
 }) {
+    const [isVisible, setIsVisible] = useState(false)
+    const ref = useRef(null)
+
+    useEffect(() => {
+        const observer = new IntersectionObserver(
+            ([entry]) => {
+                if (entry.isIntersecting) {
+                    setIsVisible(true)
+                    if (once) {
+                        observer.disconnect()
+                    }
+                } else if (!once) {
+                    setIsVisible(false)
+                }
+            },
+            { threshold, rootMargin: '50px' }
+        )
+
+        const currentRef = ref.current
+        if (currentRef) {
+            observer.observe(currentRef)
+        }
+
+        return () => {
+            observer.disconnect()
+        }
+    }, [threshold, once])
+
+    const style = animationStyles[animation] || animationStyles['fade-up']
+    const currentStyle = isVisible ? style.visible : style.initial
+
     return (
-        <div className={className}>
+        <div ref={ref} className={className}>
             {Array.isArray(children) ? children.map((child, index) => (
-                <ScrollReveal
+                <div
                     key={index}
-                    animation={animation}
-                    delay={baseDelay + (index * staggerDelay)}
-                    duration={duration}
+                    style={{
+                        ...currentStyle,
+                        transition: `opacity ${duration}ms ease-out, transform ${duration}ms ease-out`,
+                        transitionDelay: `${baseDelay + (index * staggerDelay)}ms`,
+                        willChange: 'opacity, transform'
+                    }}
                 >
                     {child}
-                </ScrollReveal>
+                </div>
             )) : (
-                <ScrollReveal animation={animation} delay={baseDelay} duration={duration}>
+                <div
+                    style={{
+                        ...currentStyle,
+                        transition: `opacity ${duration}ms ease-out, transform ${duration}ms ease-out`,
+                        transitionDelay: `${baseDelay}ms`,
+                        willChange: 'opacity, transform'
+                    }}
+                >
                     {children}
-                </ScrollReveal>
+                </div>
             )}
         </div>
     )

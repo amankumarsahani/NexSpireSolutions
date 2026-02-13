@@ -56,7 +56,7 @@ function Blog() {
   const fetchBlogs = async () => {
     try {
       setLoading(true)
-      const response = await blogAPI.getAll({ status: 'published', limit: 6 })
+      const response = await blogAPI.getAll({ status: 'published', limit: 3 })
       const blogs = response.data?.blogs || []
 
       if (blogs.length > 0) {

@@ -145,7 +145,7 @@ const About = () => {
             <div className="absolute -inset-4 bg-gradient-to-r from-blue-400/20 to-purple-400/20 rounded-2xl blur-2xl opacity-0 group-hover:opacity-100 transition-opacity duration-700"></div>
             <div className="relative bg-white/80 backdrop-blur-sm rounded-2xl p-6 shadow-xl border border-white/50">
               <img
-                src="https://readdy.ai/api/search-image?query=Modern%20software%20development%20team%20collaborating%20in%20bright%20office%20space%2C%20developers%20working%20together%20on%20computers%2C%20agile%20methodology%20workspace%2C%20diverse%20team%20of%20programmers%20and%20designers%2C%20clean%20contemporary%20office%20with%20natural%20lighting&width=600&height=400&seq=about-professional&orientation=landscape"
+                src="https://images.unsplash.com/photo-1522071820081-009f0129c71c?w=600&h=400&fit=crop&q=80"
                 alt="Our professional team at work"
                 className="rounded-xl shadow-lg object-cover w-full h-80 transition-transform duration-700 group-hover:scale-[1.02]"
               />

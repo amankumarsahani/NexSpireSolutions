@@ -24,7 +24,7 @@ const AboutPage = lazy(() => import('./pages/AboutPage'));
 const PortfolioPage = lazy(() => import('./pages/PortfolioPage'));
 const ContactPage = lazy(() => import('./pages/ContactPage'));
 const BlogPage = lazy(() => import('./pages/BlogPage'));
-const CRMPricingPage = lazy(() => import('./pages/CRMPricingPage'));
+const NexCRMLandingPage = lazy(() => import('./pages/NexCRMLandingPage'));
 const PrivacyPolicy = lazy(() => import('./pages/PrivacyPolicy'));
 const TermsOfService = lazy(() => import('./pages/TermsOfService'));
 const FAQPage = lazy(() => import('./pages/FAQPage'));
@@ -56,7 +56,7 @@ const LoadingSpinner = () => (
 // Memoized Landing Page for better performance
 const LandingPage = memo(function LandingPage() {
   return (
-    <div className="min-h-screen bg-white">
+    <div className="min-h-screen bg-white w-full">
       <Helmet>
         <title>Nexspire Solutions - AI Software Agency & Freelance Experts in Mohali, Chandigarh</title>
         <meta name="description" content="Nexspire Solutions is a top-rated AI & custom software development agency. We are a team of expert freelancers in Mohali & Chandigarh specializing in React, Next.js, Mobile Apps, and Digital Transformation." />
@@ -130,7 +130,7 @@ function App() {
             <Route path="/portfolio" element={<PortfolioPage />} />
             <Route path="/contact" element={<ContactPage />} />
             <Route path="/blog" element={<BlogPage />} />
-            <Route path="/nexcrm" element={<CRMPricingPage />} />
+            <Route path="/nexcrm" element={<NexCRMLandingPage />} />
             <Route path="/privacy-policy" element={<PrivacyPolicy />} />
             <Route path="/terms" element={<TermsOfService />} />
             <Route path="/faq" element={<FAQPage />} />

@@ -1,7 +1,25 @@
+import { useState } from 'react';
 import { Link } from 'react-router-dom';
 
 const Footer = () => {
   const currentYear = new Date().getFullYear();
+  const [email, setEmail] = useState('');
+  const [subscribed, setSubscribed] = useState(false);
+  const [isSubmitting, setIsSubmitting] = useState(false);
+
+  const handleSubscribe = (e) => {
+    e.preventDefault();
+    if (!email) return;
+
+    setIsSubmitting(true);
+    // Simulate API call
+    setTimeout(() => {
+      setIsSubmitting(false);
+      setSubscribed(true);
+      setEmail('');
+      setTimeout(() => setSubscribed(false), 5000);
+    }, 1000);
+  };
 
   const footerLinks = {
     Services: [
@@ -29,10 +47,10 @@ const Footer = () => {
   };
 
   const socialLinks = [
-    { icon: "ri-github-line", href: "#", label: "GitHub" },
+    { icon: "ri-github-line", href: "https://github.com/orgs/Nexspire-Solutions/repositories", label: "GitHub" },
     { icon: "ri-twitter-line", href: "#", label: "Twitter" },
-    { icon: "ri-linkedin-line", href: "#", label: "LinkedIn" },
-    { icon: "ri-dribbble-line", href: "#", label: "Dribbble" }
+    { icon: "ri-linkedin-line", href: "https://www.linkedin.com/company/nexspire-solution", label: "LinkedIn" },
+    { icon: "ri-instagram-line", href: "https://www.instagram.com/nexspire_solutions/", label: "Instagram" }
   ];
 
   return (
@@ -59,6 +77,8 @@ const Footer = () => {
                     key={index}
                     href={social.href}
                     aria-label={social.label}
+                    target="_blank"
+                    rel="noopener noreferrer"
                     className="w-10 h-10 bg-gray-800 rounded-full flex items-center justify-center hover:bg-blue-600 transition-colors duration-300"
                   >
                     <i className={`${social.icon} text-lg`}></i>
@@ -97,16 +117,36 @@ const Footer = () => {
                 Get the latest news and updates about our services and industry insights.
               </p>
             </div>
-            <div className="flex flex-col sm:flex-row gap-4">
-              <input
-                type="email"
-                placeholder="Enter your email"
-                className="flex-1 px-4 py-3 rounded-lg bg-gray-800 border border-gray-700 focus:ring-2 focus:ring-blue-500 focus:border-transparent text-white placeholder-gray-400 transition-all"
-              />
-              <button className="bg-gradient-to-r from-blue-600 to-purple-600 text-white px-6 py-3 rounded-lg font-semibold hover:shadow-lg hover:shadow-blue-500/25 transition-all duration-300 whitespace-nowrap">
-                Subscribe
-              </button>
-            </div>
+            <form onSubmit={handleSubscribe} className="flex flex-col sm:flex-row gap-4 relative">
+              {subscribed ? (
+                <div className="flex-1 bg-green-500/20 border border-green-500/50 text-green-400 px-6 py-3 rounded-lg flex items-center justify-center">
+                  <i className="ri-checkbox-circle-line mr-2"></i>
+                  Subscribed successfully!
+                </div>
+              ) : (
+                <>
+                  <input
+                    type="email"
+                    placeholder="Enter your email"
+                    value={email}
+                    onChange={(e) => setEmail(e.target.value)}
+                    required
+                    className="flex-1 px-4 py-3 rounded-lg bg-gray-800 border border-gray-700 focus:ring-2 focus:ring-blue-500 focus:border-transparent text-white placeholder-gray-400 transition-all outline-none"
+                  />
+                  <button
+                    type="submit"
+                    disabled={isSubmitting}
+                    className="bg-gradient-to-r from-blue-600 to-purple-600 text-white px-6 py-3 rounded-lg font-semibold hover:shadow-lg hover:shadow-blue-500/25 transition-all duration-300 whitespace-nowrap cursor-pointer disabled:opacity-70 disabled:cursor-not-allowed flex items-center justify-center min-w-[120px]"
+                  >
+                    {isSubmitting ? (
+                      <i className="ri-loader-4-line animate-spin text-xl"></i>
+                    ) : (
+                      'Subscribe'
+                    )}
+                  </button>
+                </>
+              )}
+            </form>
           </div>
         </div>
 
