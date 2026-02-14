@@ -2,6 +2,7 @@ import { lazy, Suspense, memo } from 'react';
 import { BrowserRouter, Routes, Route } from 'react-router-dom';
 import { Helmet } from 'react-helmet-async';
 import ScrollReveal from './components/ScrollReveal';
+import ScrollToTop from './components/ScrollToTop';
 
 // Critical components - load immediately (including all landing page sections)
 import Header from './components/Header';
@@ -56,7 +57,7 @@ const LoadingSpinner = () => (
 // Memoized Landing Page for better performance
 const LandingPage = memo(function LandingPage() {
   return (
-    <div className="min-h-screen bg-white w-full">
+    <div className="min-h-screen bg-white w-full overflow-x-hidden">
       <Helmet>
         <title>Nexspire Solutions - AI Software Agency & Freelance Experts in Mohali, Chandigarh</title>
         <meta name="description" content="Nexspire Solutions is a top-rated AI & custom software development agency. We are a team of expert freelancers in Mohali & Chandigarh specializing in React, Next.js, Mobile Apps, and Digital Transformation." />
@@ -121,36 +122,35 @@ const LandingPage = memo(function LandingPage() {
 function App() {
   return (
     <BrowserRouter>
-      <Suspense fallback={<LoadingSpinner />}>
-        <Routes>
-          <Route element={<PublicLayout />}>
-            <Route path="/" element={<LandingPage />} />
-            <Route path="/services" element={<ServicesPage />} />
-            <Route path="/about" element={<AboutPage />} />
-            <Route path="/portfolio" element={<PortfolioPage />} />
-            <Route path="/contact" element={<ContactPage />} />
-            <Route path="/blog" element={<BlogPage />} />
-            <Route path="/nexcrm" element={<NexCRMLandingPage />} />
-            <Route path="/privacy-policy" element={<PrivacyPolicy />} />
-            <Route path="/terms" element={<TermsOfService />} />
-            <Route path="/faq" element={<FAQPage />} />
-            <Route path="/software-development-company/:city" element={<CityLandingPage />} />
-            <Route path="/services/custom-web-development" element={<CustomWebDevelopment />} />
-            <Route path="/services/mobile-app-development" element={<MobileAppDevelopment />} />
-            <Route path="/services/ai-machine-learning" element={<AiMachineLearning />} />
-            <Route path="/services/cloud-solutions" element={<CloudSolutions />} />
-            <Route path="/services/ecommerce-development" element={<EcommerceDevelopment />} />
-            <Route path="/blog/ai-trends-2026" element={<AiTrends2026 />} />
-            <Route path="/blog/react-native-vs-flutter" element={<ReactVsFlutter />} />
-            <Route path="/blog/cost-of-custom-crm-2026" element={<CostOfCustomCrm />} />
-            <Route path="/blog/monolith-to-microservices" element={<MonolithToMicroservices />} />
-            <Route path="/blog/why-business-needs-pwa" element={<PwaBenefits />} />
-            <Route path="/blog/:slug" element={<BlogArticle />} />
-            <Route path="/portfolio/:slug" element={<ProjectDetail />} />
-            <Route path="*" element={<NotFound />} />
-          </Route>
-        </Routes>
-      </Suspense>
+      <ScrollToTop />
+      <Routes>
+        <Route element={<PublicLayout />}>
+          <Route path="/" element={<LandingPage />} />
+          <Route path="/services" element={<ServicesPage />} />
+          <Route path="/about" element={<AboutPage />} />
+          <Route path="/portfolio" element={<PortfolioPage />} />
+          <Route path="/contact" element={<ContactPage />} />
+          <Route path="/blog" element={<BlogPage />} />
+          <Route path="/nexcrm" element={<NexCRMLandingPage />} />
+          <Route path="/privacy-policy" element={<PrivacyPolicy />} />
+          <Route path="/terms" element={<TermsOfService />} />
+          <Route path="/faq" element={<FAQPage />} />
+          <Route path="/software-development-company/:city" element={<CityLandingPage />} />
+          <Route path="/services/custom-web-development" element={<CustomWebDevelopment />} />
+          <Route path="/services/mobile-app-development" element={<MobileAppDevelopment />} />
+          <Route path="/services/ai-machine-learning" element={<AiMachineLearning />} />
+          <Route path="/services/cloud-solutions" element={<CloudSolutions />} />
+          <Route path="/services/ecommerce-development" element={<EcommerceDevelopment />} />
+          <Route path="/blog/ai-trends-2026" element={<AiTrends2026 />} />
+          <Route path="/blog/react-native-vs-flutter" element={<ReactVsFlutter />} />
+          <Route path="/blog/cost-of-custom-crm-2026" element={<CostOfCustomCrm />} />
+          <Route path="/blog/monolith-to-microservices" element={<MonolithToMicroservices />} />
+          <Route path="/blog/why-business-needs-pwa" element={<PwaBenefits />} />
+          <Route path="/blog/:slug" element={<BlogArticle />} />
+          <Route path="/portfolio/:slug" element={<ProjectDetail />} />
+          <Route path="*" element={<NotFound />} />
+        </Route>
+      </Routes>
     </BrowserRouter>
   );
 }

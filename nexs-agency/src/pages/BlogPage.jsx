@@ -40,7 +40,25 @@ const BlogPage = () => {
     const [loadingMore, setLoadingMore] = useState(false);
     const [hasMore, setHasMore] = useState(true);
     const [page, setPage] = useState(1);
+    // const [page, setPage] = useState(1);
     const loaderRef = useRef(null);
+
+    // Newsletter state
+    const [email, setEmail] = useState('');
+    const [subscribeStatus, setSubscribeStatus] = useState('idle'); // idle, loading, success, error
+
+    const handleSubscribe = (e) => {
+        e.preventDefault();
+        if (!email) return;
+        setSubscribeStatus('loading');
+
+        // Simulate API call
+        setTimeout(() => {
+            setSubscribeStatus('success');
+            setEmail('');
+            setTimeout(() => setSubscribeStatus('idle'), 5000);
+        }, 1500);
+    };
 
     useEffect(() => {
         window.scrollTo(0, 0);
@@ -353,15 +371,36 @@ const BlogPage = () => {
                             <p className="text-xl text-gray-300 mb-10 leading-relaxed">
                                 Join 5,000+ developers and designers. Get the latest insights, tutorials, and trends delivered straight to your inbox.
                             </p>
-                            <form className="flex flex-col md:flex-row gap-4 max-w-xl mx-auto">
-                                <input
-                                    type="email"
-                                    placeholder="Enter your email address"
-                                    className="flex-1 px-8 py-5 rounded-full text-gray-900 focus:outline-none focus:ring-4 focus:ring-blue-500/50 text-lg"
-                                />
-                                <button className="px-10 py-5 bg-blue-600 text-white rounded-full font-bold hover:bg-blue-500 transition-all shadow-lg hover:shadow-blue-600/30 text-lg whitespace-nowrap">
-                                    Subscribe Now
-                                </button>
+                            <form onSubmit={handleSubscribe} className="flex flex-col md:flex-row gap-4 max-w-xl mx-auto relative">
+                                {subscribeStatus === 'success' ? (
+                                    <div className="w-full bg-green-500/20 border border-green-500/50 text-white px-8 py-5 rounded-full flex items-center justify-center animate-fade-in">
+                                        <i className="ri-checkbox-circle-line mr-2 text-xl"></i>
+                                        <span className="font-medium text-lg">Thanks for subscribing!</span>
+                                    </div>
+                                ) : (
+                                    <>
+                                        <input
+                                            type="email"
+                                            placeholder="Enter your email address"
+                                            value={email}
+                                            onChange={(e) => setEmail(e.target.value)}
+                                            required
+                                            disabled={subscribeStatus === 'loading'}
+                                            className="flex-1 px-8 py-5 rounded-full text-gray-900 focus:outline-none focus:ring-4 focus:ring-blue-500/50 text-lg disabled:opacity-70"
+                                        />
+                                        <button
+                                            type="submit"
+                                            disabled={subscribeStatus === 'loading'}
+                                            className="px-10 py-5 bg-blue-600 text-white rounded-full font-bold hover:bg-blue-500 transition-all shadow-lg hover:shadow-blue-600/30 text-lg whitespace-nowrap disabled:opacity-70 disabled:cursor-not-allowed flex items-center justify-center min-w-[200px]"
+                                        >
+                                            {subscribeStatus === 'loading' ? (
+                                                <i className="ri-loader-4-line animate-spin text-2xl"></i>
+                                            ) : (
+                                                'Subscribe Now'
+                                            )}
+                                        </button>
+                                    </>
+                                )}
                             </form>
                             <p className="mt-6 text-sm text-gray-500">
                                 No spam, ever. Unsubscribe anytime.

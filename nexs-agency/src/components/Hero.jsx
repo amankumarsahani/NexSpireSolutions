@@ -65,7 +65,7 @@ const Hero = () => {
         <div className="max-w-5xl mx-auto py-20 sm:py-24">
 
           {/* Centered Content */}
-          <div className={`space-y-4 sm:space-y-6 text-center transition-all duration-1000 ${isVisible ? 'opacity-100 translate-y-0' : 'opacity-0 translate-y-10'}`}>
+          <div className={`space-y-4 sm:space-y-6 text-center transition-all duration-700 ${isVisible ? 'opacity-100 translate-y-0' : 'opacity-0 translate-y-10'}`}>
 
             {/* Company Badge */}
             <div className="inline-flex items-center bg-white/90 backdrop-blur-md border border-white/30 rounded-full px-3 sm:px-4 py-2 text-blue-700 font-semibold text-sm sm:text-base hover:shadow-lg transition-shadow cursor-pointer group">
@@ -135,7 +135,7 @@ const Hero = () => {
                 <img
                   src={tech.logo}
                   alt={tech.name}
-                  loading="lazy"
+                  loading="eager"
                   decoding="async"
                   width="32"
                   height="32"

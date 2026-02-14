@@ -48,7 +48,6 @@ const Footer = () => {
 
   const socialLinks = [
     { icon: "ri-github-line", href: "https://github.com/orgs/Nexspire-Solutions/repositories", label: "GitHub" },
-    { icon: "ri-twitter-line", href: "#", label: "Twitter" },
     { icon: "ri-linkedin-line", href: "https://www.linkedin.com/company/nexspire-solution", label: "LinkedIn" },
     { icon: "ri-instagram-line", href: "https://www.instagram.com/nexspire_solutions/", label: "Instagram" }
   ];
@@ -163,7 +162,7 @@ const Footer = () => {
               <Link to="/terms" className="text-gray-400 hover:text-white text-sm transition-colors">
                 Terms of Service
               </Link>
-              <Link to="#" className="text-gray-400 hover:text-white text-sm transition-colors">
+              <Link to="/privacy-policy" className="text-gray-400 hover:text-white text-sm transition-colors">
                 Cookie Policy
               </Link>
             </div>

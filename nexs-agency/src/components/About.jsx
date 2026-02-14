@@ -147,6 +147,7 @@ const About = () => {
               <img
                 src="https://images.unsplash.com/photo-1522071820081-009f0129c71c?w=600&h=400&fit=crop&q=80"
                 alt="Our professional team at work"
+                loading="lazy"
                 className="rounded-xl shadow-lg object-cover w-full h-80 transition-transform duration-700 group-hover:scale-[1.02]"
               />
 

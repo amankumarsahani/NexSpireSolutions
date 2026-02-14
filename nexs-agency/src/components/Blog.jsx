@@ -170,6 +170,7 @@ function Blog() {
                     <img
                       src={post.image}
                       alt={post.title}
+                      loading="lazy"
                       className="w-full h-full object-cover group-hover:scale-110 transition-all duration-700"
                     />
 
