@@ -567,6 +567,7 @@ class TenantController {
                 const cancelUrl = `${adminUrl}/payment/cancelled`;
                 const session = await StripeService.createCheckoutSession(
                     planId.toString(),
+                    planSlug,
                     successUrl,
                     cancelUrl,
                     { tenant_id: tenant.id.toString(), plan_id: planId.toString() }
@@ -642,6 +643,7 @@ class TenantController {
                 const cancelUrl = `${adminUrl}/payment/cancelled`;
                 const session = await StripeService.createCheckoutSession(
                     planId.toString(),
+                    planSlug,
                     successUrl,
                     cancelUrl,
                     { tenant_id: tenant.id.toString(), plan_id: planId.toString() }

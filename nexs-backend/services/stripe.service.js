@@ -87,19 +87,20 @@ class StripeService {
 
     /**
      * Create a Stripe Checkout Session for a plan
-     * @param {string} planId - internal plan identifier (used to fetch price ID)
+     * @param {string|number} planId - internal plan identifier (used in metadata)
+     * @param {string} planSlug - string name of the plan (used to fetch price ID from settings)
      * @param {string} successUrl - URL to redirect after successful payment
      * @param {string} cancelUrl - URL to redirect if payment is cancelled
      * @param {object} metadata - optional metadata for tracking/workflows
      * @returns {object} Stripe session object
      */
-    async createCheckoutSession(planId, successUrl, cancelUrl, metadata = {}) {
+    async createCheckoutSession(planId, planSlug, successUrl, cancelUrl, metadata = {}) {
         // 1. Try to get Price ID from Database settings first
         let priceId = null;
         try {
             const [[setting]] = await pool.query(
                 'SELECT setting_value FROM settings WHERE setting_key = ?',
-                [`stripe_price_id_${planId.toLowerCase()}`]
+                [`stripe_price_id_${planSlug.toLowerCase()}`]
             );
             if (setting && setting.setting_value) {
                 priceId = setting.setting_value;
@@ -110,11 +111,11 @@ class StripeService {
 
         // 2. Fallback to Environment Variables
         if (!priceId) {
-            priceId = process.env[`STRIPE_PRICE_ID_${planId.toUpperCase()}`];
+            priceId = process.env[`STRIPE_PRICE_ID_${planSlug.toUpperCase()}`];
         }
 
         if (!priceId) {
-            throw new Error(`No Stripe price configured for plan ${planId}. Please check Admin Settings or .env`);
+            throw new Error(`No Stripe price configured for plan ${planSlug} (ID: ${planId}). Please check Admin Settings or .env`);
         }
 
         const stripe = await this.getClient();

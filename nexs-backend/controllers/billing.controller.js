@@ -210,7 +210,12 @@ class BillingController {
             if (!planId) {
                 return res.status(400).json({ error: 'planId is required' });
             }
-            const session = await StripeService.createCheckoutSession(planId, successUrl, cancelUrl, metadata);
+
+            // Resolve the slug for the price ID lookup
+            const [plans] = await pool.query('SELECT slug FROM plans WHERE id = ?', [planId]);
+            const planSlug = plans.length ? plans[0].slug : 'starter';
+
+            const session = await StripeService.createCheckoutSession(planId, planSlug, successUrl, cancelUrl, metadata);
             // Return the URL to redirect the user
             res.json({ success: true, url: session.url });
         } catch (error) {
