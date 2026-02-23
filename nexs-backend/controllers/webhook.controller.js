@@ -370,8 +370,8 @@ class WebhookController {
                 tenant_id: tenantId,
                 subscription_id: subscriptionId,
                 amount: session.amount_total / 100, // Stripe amount is in cents
-                stripe_payment_id: session.payment_intent,
-                stripe_session_id: session.id,
+                stripe_payment_intent_id: session.payment_intent,
+                stripe_invoice_id: session.invoice || session.id,
                 status: 'success'
             });
             console.log(`[Webhook] Stripe payment recorded for tenant ${tenantId}`);
@@ -425,8 +425,8 @@ class WebhookController {
                 tenant_id: tenantId,
                 subscription_id: subscriptionId,
                 amount: invoice.amount_paid / 100,
-                stripe_payment_id: invoice.payment_intent,
-                stripe_session_id: null, // No session ID for recurring invoices usually
+                stripe_payment_intent_id: invoice.payment_intent,
+                stripe_invoice_id: invoice.id,
                 status: 'success'
             });
             console.log(`[Webhook] Stripe recurring payment recorded for tenant ${tenantId}`);
@@ -493,8 +493,8 @@ class WebhookController {
                 tenant_id: tenantId,
                 subscription_id: subscriptionId,
                 amount: invoice.amount_due / 100,
-                stripe_payment_id: invoice.payment_intent,
-                stripe_session_id: null,
+                stripe_payment_intent_id: invoice.payment_intent,
+                stripe_invoice_id: invoice.id,
                 status: 'failed'
             });
             console.log(`[Webhook] Stripe failed payment recorded for tenant ${tenantId}`);

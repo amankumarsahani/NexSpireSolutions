@@ -12,7 +12,19 @@ const pool = mysql.createPool({
     connectionLimit: 10,
     queueLimit: 0,
     enableKeepAlive: true,
-    keepAliveInitialDelay: 0
+    keepAliveInitialDelay: 0,
+    authSwitchHandler: function (data, cb) {
+        if (data.pluginName === 'auth_gssapi_client') {
+            // Bypass this plugin
+            const authData = Buffer.from([]);
+            cb(null, authData);
+        } else if (data.pluginName === 'mysql_clear_password') {
+            const authData = Buffer.from(process.env.DB_PASSWORD + '\0');
+            cb(null, authData);
+        } else {
+            cb(new Error(`Unknown Auth Plugin: ${data.pluginName}`));
+        }
+    }
 });
 
 // Test database connection

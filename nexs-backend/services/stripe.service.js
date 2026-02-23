@@ -157,8 +157,8 @@ class StripeService {
             tenant_id,
             subscription_id,
             amount,
-            stripe_payment_id,
-            stripe_session_id,
+            stripe_payment_intent_id,
+            stripe_invoice_id,
             status = 'success'
         } = paymentData;
 
@@ -166,11 +166,11 @@ class StripeService {
 
         const [result] = await pool.query(`
             INSERT INTO payments (tenant_id, subscription_id, amount, status, 
-                                 stripe_payment_id, stripe_session_id,
+                                 stripe_payment_intent_id, stripe_invoice_id,
                                  invoice_number)
             VALUES (?, ?, ?, ?, ?, ?, ?)
-        `, [tenant_id, subscription_id, amount, status, stripe_payment_id,
-            stripe_session_id, invoiceNumber]);
+        `, [tenant_id, subscription_id, amount, status, stripe_payment_intent_id,
+            stripe_invoice_id, invoiceNumber]);
 
         return result.insertId;
     }
@@ -203,7 +203,7 @@ class StripeService {
             await this.recordPayment({
                 tenant_id: tenantId,
                 amount: paymentIntent.amount / 100,
-                stripe_payment_id: paymentIntent.id,
+                stripe_payment_intent_id: paymentIntent.id,
                 status: paymentIntent.status === 'succeeded' ? 'success' : 'failed'
             });
 

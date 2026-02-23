@@ -562,9 +562,13 @@ class TenantController {
             // 4. Generate Stripe checkout session
             let checkoutUrl = '';
             try {
-                const adminUrl = process.env.APP_URL || 'http://localhost:5173';
-                const successUrl = `${adminUrl}/payment/success`;
-                const cancelUrl = `${adminUrl}/payment/cancelled`;
+                // Point users back to their own CRM instance
+                const baseDomain = process.env.VITE_APP_BASE_DOMAIN || 'nexspiresolutions.co.in';
+                const tenantDomain = tenant.custom_domain || `${tenant.slug}-crm.${baseDomain}`;
+                const tenantUrl = tenantDomain.startsWith('http') ? tenantDomain : `https://${tenantDomain}`;
+
+                const successUrl = `${tenantUrl}/payment/success`;
+                const cancelUrl = `${tenantUrl}/payment/cancelled`;
                 const session = await StripeService.createCheckoutSession(
                     planId.toString(),
                     planSlug,
@@ -638,9 +642,13 @@ class TenantController {
             // 2. Generate Stripe checkout session
             let checkoutUrl = '';
             try {
-                const adminUrl = process.env.APP_URL || 'http://localhost:5173';
-                const successUrl = `${adminUrl}/payment/success`;
-                const cancelUrl = `${adminUrl}/payment/cancelled`;
+                // Point users back to their own CRM instance
+                const baseDomain = process.env.VITE_APP_BASE_DOMAIN || 'nexspiresolutions.co.in';
+                const tenantDomain = tenant.custom_domain || `${tenant.slug}-crm.${baseDomain}`;
+                const tenantUrl = tenantDomain.startsWith('http') ? tenantDomain : `https://${tenantDomain}`;
+
+                const successUrl = `${tenantUrl}/payment/success`;
+                const cancelUrl = `${tenantUrl}/payment/cancelled`;
                 const session = await StripeService.createCheckoutSession(
                     planId.toString(),
                     planSlug,
