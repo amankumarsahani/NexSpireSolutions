@@ -605,6 +605,86 @@ class TenantController {
             res.status(500).json({ error: 'Failed to end trial and request payment' });
         }
     }
+
+    /**
+     * Send Payment Link via email without suspending
+     */
+    async sendPaymentLink(req, res) {
+        try {
+            const { id } = req.params;
+            const StripeService = require('../services/stripe.service');
+            const EmailService = require('../services/email.service');
+            const { pool } = require('../config/database');
+
+            const tenant = await TenantModel.findById(id);
+            if (!tenant) return res.status(404).json({ error: 'Tenant not found' });
+
+            // 1. Get plan to generate payment link
+            let planId = tenant.plan_id;
+            let planSlug = 'starter';
+
+            if (planId) {
+                const [plans] = await pool.query('SELECT slug FROM plans WHERE id = ?', [planId]);
+                if (plans.length) planSlug = plans[0].slug;
+            } else {
+                const [plans] = await pool.query('SELECT id, slug FROM plans ORDER BY id ASC LIMIT 1');
+                if (plans.length) {
+                    planId = plans[0].id;
+                    planSlug = plans[0].slug;
+                }
+            }
+
+            // 2. Generate Stripe checkout session
+            let checkoutUrl = '';
+            try {
+                const adminUrl = process.env.APP_URL || 'http://localhost:5173';
+                const successUrl = `${adminUrl}/payment/success`;
+                const cancelUrl = `${adminUrl}/payment/cancelled`;
+                const session = await StripeService.createCheckoutSession(
+                    planId.toString(),
+                    successUrl,
+                    cancelUrl,
+                    { tenant_id: tenant.id.toString(), plan_id: planId.toString() }
+                );
+                checkoutUrl = session.url;
+            } catch (stripeErr) {
+                console.error('Could not generate stripe link:', stripeErr.message);
+                return res.status(500).json({ error: 'Could not generate Stripe link. Have you configured your keys and prices?' });
+            }
+
+            if (!checkoutUrl) {
+                return res.status(500).json({ error: 'Checkout URL generation failed' });
+            }
+
+            const html = `
+                <div style="font-family: Arial, sans-serif; max-width: 600px; margin: 0 auto; color: #333;">
+                    <h2 style="color: #4f46e5;">Action Required: Complete Your Subscription</h2>
+                    <p>Hi ${tenant.name},</p>
+                    <p>Attached is the secure payment link to subscribe to your Nexspire CRM and Storefront instance.</p>
+                    <p>Please click the button below to review your plan details and securely enter your payment information.</p>
+                    <p style="margin: 30px 0;"><a href="${checkoutUrl}" style="padding: 12px 24px; background: #4f46e5; color: white; text-decoration: none; border-radius: 6px; font-weight: bold;">Review Plan & Pay</a></p>
+                    <p>If you have any questions, please reach out to our team.</p>
+                    <hr style="border: none; border-top: 1px solid #eaeaea; margin: 30px 0;" />
+                    <p style="font-size: 12px; color: #888;">&copy; ${new Date().getFullYear()} Nexspire Solutions</p>
+                </div>
+            `;
+
+            await EmailService.sendEmail({
+                to: tenant.email,
+                subject: 'Action Required: Submit Your Nexspire Subscription Payment',
+                html
+            });
+
+            res.json({
+                success: true,
+                message: 'Payment link generated and emailed to the tenant.',
+                paymentLink: checkoutUrl
+            });
+        } catch (error) {
+            console.error('Send payment link error:', error);
+            res.status(500).json({ error: 'Failed to send payment link' });
+        }
+    }
 }
 
 module.exports = new TenantController();
