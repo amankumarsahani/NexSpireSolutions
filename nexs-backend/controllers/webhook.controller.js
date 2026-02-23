@@ -333,6 +333,9 @@ class WebhookController {
                 case 'invoice.paid':
                     await this.handleStripeInvoicePaid(event);
                     break;
+                case 'invoice.payment_failed':
+                    await this.handleStripeInvoicePaymentFailed(event);
+                    break;
                 case 'customer.subscription.deleted':
                     await this.handleStripeSubscriptionDeleted(event);
                     break;
@@ -390,7 +393,20 @@ class WebhookController {
 
     async handleStripeInvoicePaid(event) {
         const invoice = event.data.object;
-        const tenantId = invoice.metadata?.tenant_id;
+        let tenantId = invoice.metadata?.tenant_id;
+
+        // If metadata is empty on invoice, try fetching it from subscription
+        if (!tenantId && invoice.subscription) {
+            try {
+                const [subs] = await pool.query('SELECT tenant_id FROM subscriptions WHERE stripe_subscription_id = ?', [invoice.subscription]);
+                if (subs.length) {
+                    tenantId = subs[0].tenant_id;
+                }
+            } catch (err) {
+                console.error('[Webhook] Error fetching tenant_id from subscription:', err);
+            }
+        }
+
         if (!tenantId) return;
 
         try {
@@ -398,7 +414,11 @@ class WebhookController {
             let subscriptionId = null;
             if (invoice.subscription) {
                 const [subs] = await pool.query('SELECT id FROM subscriptions WHERE stripe_subscription_id = ?', [invoice.subscription]);
-                if (subs.length) subscriptionId = subs[0].id;
+                if (subs.length) {
+                    subscriptionId = subs[0].id;
+                    // Ensure subscription is active if it was past due
+                    await pool.query('UPDATE subscriptions SET status = "active" WHERE id = ?', [subscriptionId]);
+                }
             }
 
             await StripeService.recordPayment({
@@ -410,6 +430,27 @@ class WebhookController {
                 status: 'success'
             });
             console.log(`[Webhook] Stripe recurring payment recorded for tenant ${tenantId}`);
+
+            // Check if tenant was suspended, if so reactivate
+            const tenant = await TenantModel.findById(tenantId);
+            if (tenant) {
+                if (tenant.status !== 'active') {
+                    await TenantModel.update(tenantId, { status: 'active' });
+                    console.log(`[Webhook] Reactivated tenant ${tenantId}`);
+                }
+
+                if (tenant.process_status !== 'running' && tenant.assigned_port && tenant.db_name) {
+                    try {
+                        const provisioner = new Provisioner();
+                        await provisioner.startProcess(tenant);
+                        await TenantModel.updateProcessStatus(tenantId, 'running');
+                        console.log(`[Webhook] Started PM2 process for tenant ${tenantId}`);
+                    } catch (startError) {
+                        console.error('[Webhook] Failed to start tenant process:', startError);
+                    }
+                }
+            }
+
         } catch (err) {
             console.error('[Webhook] Failed to record Stripe recurring payment:', err);
         }
@@ -418,11 +459,85 @@ class WebhookController {
         await workflowEngine.trigger('stripe_invoice_paid', 'tenant', tenantId, { invoice });
     }
 
+    async handleStripeInvoicePaymentFailed(event) {
+        const invoice = event.data.object;
+        let tenantId = invoice.metadata?.tenant_id;
+
+        if (!tenantId && invoice.subscription) {
+            try {
+                const [subs] = await pool.query('SELECT tenant_id FROM subscriptions WHERE stripe_subscription_id = ?', [invoice.subscription]);
+                if (subs.length) {
+                    tenantId = subs[0].tenant_id;
+                }
+            } catch (err) {
+                console.error('[Webhook] Error fetching tenant_id from subscription:', err);
+            }
+        }
+
+        if (!tenantId) {
+            console.error('[Webhook] Could not find tenantId for failed invoice');
+            return;
+        }
+
+        try {
+            let subscriptionId = null;
+            if (invoice.subscription) {
+                const [subs] = await pool.query('SELECT id FROM subscriptions WHERE stripe_subscription_id = ?', [invoice.subscription]);
+                if (subs.length) {
+                    subscriptionId = subs[0].id;
+                    await pool.query('UPDATE subscriptions SET status = "past_due" WHERE id = ?', [subscriptionId]);
+                }
+            }
+
+            await StripeService.recordPayment({
+                tenant_id: tenantId,
+                subscription_id: subscriptionId,
+                amount: invoice.amount_due / 100,
+                stripe_payment_id: invoice.payment_intent,
+                stripe_session_id: null,
+                status: 'failed'
+            });
+            console.log(`[Webhook] Stripe failed payment recorded for tenant ${tenantId}`);
+
+            // Suspend the tenant and stop process
+            await TenantModel.update(tenantId, { status: 'suspended' });
+            console.log(`[Webhook] Suspended tenant ${tenantId} due to failed payment`);
+
+            const tenant = await TenantModel.findById(tenantId);
+            if (tenant && tenant.process_status === 'running') {
+                try {
+                    const provisioner = new Provisioner();
+                    await provisioner.stopProcess(tenant);
+                    await TenantModel.updateProcessStatus(tenantId, 'stopped');
+                    console.log(`[Webhook] Stopped PM2 process for tenant ${tenantId}`);
+                } catch (stopError) {
+                    console.error('[Webhook] Failed to stop tenant process:', stopError);
+                }
+            }
+
+        } catch (err) {
+            console.error('[Webhook] Error handling Stripe payment failure:', err);
+        }
+    }
+
     async handleStripeSubscriptionDeleted(event) {
         const subscription = event.data.object;
         const tenantId = subscription.metadata?.tenant_id;
         if (!tenantId) return;
         await pool.query(`UPDATE subscriptions SET status = 'cancelled' WHERE stripe_subscription_id = ?`, [subscription.id]);
+
+        await TenantModel.update(tenantId, { status: 'cancelled' });
+        const tenant = await TenantModel.findById(tenantId);
+        if (tenant && tenant.process_status === 'running') {
+            try {
+                const provisioner = new Provisioner();
+                await provisioner.stopProcess(tenant);
+                await TenantModel.updateProcessStatus(tenantId, 'stopped');
+            } catch (err) {
+                console.error('[Webhook] Failed to stop process for cancelled sub:', err);
+            }
+        }
+
         const workflowEngine = require('../services/workflowEngine');
         await workflowEngine.trigger('stripe_subscription_cancelled', 'tenant', tenantId, { subscription });
     }
