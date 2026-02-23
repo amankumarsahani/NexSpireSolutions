@@ -516,6 +516,95 @@ class TenantController {
             res.status(500).json({ error: 'Failed to fully delete tenant' });
         }
     }
+
+    /**
+     * End trial, suspend process, and request payment via email
+     */
+    async endTrialAndRequestPayment(req, res) {
+        try {
+            const { id } = req.params;
+            const StripeService = require('../services/stripe.service');
+            const EmailService = require('../services/email.service');
+            const { pool } = require('../config/database');
+
+            const tenant = await TenantModel.findById(id);
+            if (!tenant) return res.status(404).json({ error: 'Tenant not found' });
+
+            // 1. Suspend the tenant
+            await TenantModel.update(id, { status: 'suspended' });
+
+            // 2. Stop their process
+            if (tenant.process_status === 'running') {
+                try {
+                    const provisioner = new Provisioner();
+                    await provisioner.stopProcess(tenant);
+                    await TenantModel.updateProcessStatus(id, 'stopped');
+                } catch (e) {
+                    console.error('Failed to stop process:', e);
+                }
+            }
+
+            // 3. Get plan to generate payment link
+            let planId = tenant.plan_id;
+            let planSlug = 'starter';
+
+            if (planId) {
+                const [plans] = await pool.query('SELECT slug FROM plans WHERE id = ?', [planId]);
+                if (plans.length) planSlug = plans[0].slug;
+            } else {
+                const [plans] = await pool.query('SELECT id, slug FROM plans ORDER BY id ASC LIMIT 1');
+                if (plans.length) {
+                    planId = plans[0].id;
+                    planSlug = plans[0].slug;
+                }
+            }
+
+            // 4. Generate Stripe checkout session
+            let checkoutUrl = '';
+            try {
+                const adminUrl = process.env.APP_URL || 'http://localhost:5173';
+                const successUrl = `${adminUrl}/payment/success`;
+                const cancelUrl = `${adminUrl}/payment/cancelled`;
+                const session = await StripeService.createCheckoutSession(
+                    planId.toString(),
+                    successUrl,
+                    cancelUrl,
+                    { tenant_id: tenant.id.toString(), plan_id: planId.toString() }
+                );
+                checkoutUrl = session.url;
+            } catch (stripeErr) {
+                console.error('Could not generate stripe link:', stripeErr.message);
+            }
+
+            const html = `
+                <div style="font-family: Arial, sans-serif; max-width: 600px; margin: 0 auto; color: #333;">
+                    <h2 style="color: #4f46e5;">Your Nexspire Trial Has Ended</h2>
+                    <p>Hi ${tenant.name},</p>
+                    <p>We hope you enjoyed using Nexspire! Your free trial has concluded and your account has been temporarily suspended to prevent overages.</p>
+                    <p>To restore access to your CRM and storefront instantly, please securely subscribe to a plan using the link below.</p>
+                    ${checkoutUrl ? `<p style="margin: 30px 0;"><a href="${checkoutUrl}" style="padding: 12px 24px; background: #4f46e5; color: white; text-decoration: none; border-radius: 6px; font-weight: bold;">Subscribe & Pay Now</a></p>` : ''}
+                    <p>If you have any questions, please reach out to our team.</p>
+                    <hr style="border: none; border-top: 1px solid #eaeaea; margin: 30px 0;" />
+                    <p style="font-size: 12px; color: #888;">&copy; ${new Date().getFullYear()} Nexspire Solutions</p>
+                </div>
+            `;
+
+            await EmailService.sendEmail({
+                to: tenant.email,
+                subject: 'Action Required: Your Nexspire Trial Has Ended',
+                html
+            });
+
+            res.json({
+                success: true,
+                message: 'Trial ended, tenant suspended, and payment email sent.',
+                paymentLink: checkoutUrl
+            });
+        } catch (error) {
+            console.error('End trial error:', error);
+            res.status(500).json({ error: 'Failed to end trial and request payment' });
+        }
+    }
 }
 
 module.exports = new TenantController();

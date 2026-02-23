@@ -35,5 +35,8 @@ router.post('/:id/start', tenantController.startTenant);
 router.post('/:id/stop', tenantController.stopTenant);
 router.post('/:id/restart', tenantController.restartTenant);
 
+// Trial Management
+router.post('/:id/end-trial', tenantController.endTrialAndRequestPayment);
+
 module.exports = router;
 
