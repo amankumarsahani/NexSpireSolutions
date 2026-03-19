@@ -1068,3 +1068,69 @@ INSERT IGNORE INTO delivery_zones (name, is_serviceable, cod_available, delivery
 ('Metro Cities', TRUE, TRUE, 50.00, 1000.00, '2-3 days'),
 ('Rest of India', TRUE, TRUE, 80.00, 1500.00, '4-7 days'),
 ('Remote Areas', TRUE, FALSE, 150.00, 2000.00, '7-10 days');
+
+-- ============================================
+-- GENERIC CRM INVOICES TABLE
+-- ============================================
+CREATE TABLE IF NOT EXISTS crm_invoices (
+    id INT AUTO_INCREMENT PRIMARY KEY,
+    invoice_number VARCHAR(60) UNIQUE NOT NULL,
+    industry_type VARCHAR(50) DEFAULT 'general',
+    invoice_context VARCHAR(50) DEFAULT 'general',
+    source_type VARCHAR(50),
+    source_id INT,
+    client_id INT,
+    title VARCHAR(255),
+    invoice_date DATE NOT NULL,
+    due_date DATE,
+    currency VARCHAR(10) DEFAULT 'INR',
+    currency_symbol VARCHAR(10) DEFAULT '₹',
+    billing_name VARCHAR(255) NOT NULL,
+    billing_company VARCHAR(255),
+    billing_email VARCHAR(255),
+    billing_phone VARCHAR(50),
+    billing_address TEXT,
+    billing_gst_number VARCHAR(50),
+    subtotal DECIMAL(15,2) DEFAULT 0,
+    discount_amount DECIMAL(15,2) DEFAULT 0,
+    taxable_amount DECIMAL(15,2) DEFAULT 0,
+    tax_rate DECIMAL(7,2) DEFAULT 0,
+    tax_amount DECIMAL(15,2) DEFAULT 0,
+    total DECIMAL(15,2) DEFAULT 0,
+    amount_paid DECIMAL(15,2) DEFAULT 0,
+    balance_due DECIMAL(15,2) DEFAULT 0,
+    status ENUM('draft', 'sent', 'viewed', 'partial', 'paid', 'overdue', 'cancelled') DEFAULT 'draft',
+    notes TEXT,
+    meta_json JSON,
+    created_by INT,
+    created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+    updated_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
+    sent_at DATETIME NULL,
+    paid_at DATETIME NULL,
+    INDEX idx_context_status (invoice_context, status),
+    INDEX idx_industry_status (industry_type, status),
+    INDEX idx_client (client_id),
+    FOREIGN KEY (client_id) REFERENCES clients(id) ON DELETE SET NULL,
+    FOREIGN KEY (created_by) REFERENCES users(id) ON DELETE SET NULL
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4;
+
+-- ============================================
+-- GENERIC CRM INVOICE ITEMS TABLE
+-- ============================================
+CREATE TABLE IF NOT EXISTS crm_invoice_items (
+    id INT AUTO_INCREMENT PRIMARY KEY,
+    invoice_id INT NOT NULL,
+    sort_order INT DEFAULT 1,
+    item_type VARCHAR(50) DEFAULT 'custom',
+    reference_type VARCHAR(50),
+    reference_id INT,
+    description VARCHAR(255) NOT NULL,
+    quantity DECIMAL(12,2) DEFAULT 1,
+    unit VARCHAR(50) DEFAULT 'unit',
+    unit_price DECIMAL(15,2) DEFAULT 0,
+    line_total DECIMAL(15,2) DEFAULT 0,
+    meta_json JSON,
+    created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+    INDEX idx_invoice_id (invoice_id),
+    FOREIGN KEY (invoice_id) REFERENCES crm_invoices(id) ON DELETE CASCADE
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4;

@@ -102,7 +102,9 @@ const INDUSTRY_MODULES = {
         'raw_materials',
         'work_orders',
         'quality_checks',
-        'suppliers'
+        'suppliers',
+        'material_movements',
+        'invoices'
     ],
 
     // Logistics/Transport specific

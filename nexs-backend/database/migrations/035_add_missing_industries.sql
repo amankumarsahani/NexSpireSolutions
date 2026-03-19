@@ -13,7 +13,7 @@ INSERT INTO industry_configs (industry_type, display_name, description, modules,
     JSON_OBJECT('tracking_enabled', true)
 ),
 ('manufacturing', 'Manufacturing', 'CRM for production and manufacturing',
-    JSON_ARRAY('production', 'raw_materials', 'work_orders', 'quality_checks', 'suppliers'),
+    JSON_ARRAY('production', 'raw_materials', 'work_orders', 'quality_checks', 'suppliers', 'material_movements', 'invoices'),
     JSON_OBJECT('qc_check_required', true)
 ),
 ('restaurant', 'Restaurant', 'CRM for restaurants and food service',
