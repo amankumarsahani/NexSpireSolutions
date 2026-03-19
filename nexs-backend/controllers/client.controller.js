@@ -61,7 +61,7 @@ const ClientController = {
             };
 
             // Validation
-            if (!clientData.companyName) {
+            if (!clientData.companyName && !clientData.name) {
                 return res.status(400).json({ error: 'Company name is required' });
             }
 
@@ -70,7 +70,7 @@ const ClientController = {
 
             // Auto-enroll new client into active campaigns (async, don't wait)
             if (client.email) {
-                autoEnrollService.enrollClient(clientId, client.email, client.contactName, client.companyName).catch(err => {
+                autoEnrollService.enrollClient(clientId, client.email, client.name, client.company).catch(err => {
                     console.error('Auto-enroll failed:', err);
                 });
             }

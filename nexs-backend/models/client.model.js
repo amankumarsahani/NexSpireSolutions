@@ -4,15 +4,20 @@ const ClientModel = {
     // Create new client
     async create(clientData) {
         const {
-            companyName, contactName, email, phone, website,
-            industry, address, city, country, status = 'prospect', notes, createdBy
+            companyName, contactName, name, email, phone, website,
+            industry, address, company, status = 'active', notes, createdBy, assignedTo
         } = clientData;
 
+        // Map frontend fields to actual DB columns
+        // DB has: name, company, assignedTo (not companyName, contactName, createdBy, city, country)
+        const dbName = name || contactName || companyName || '';
+        const dbCompany = company || companyName || '';
+
         const [result] = await pool.query(
-            `INSERT INTO clients (companyName, contactName, email, phone, website, industry, 
-       address, city, country, status, notes, createdBy) 
-       VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)`,
-            [companyName, contactName, email, phone, website, industry, address, city, country, status, notes, createdBy]
+            `INSERT INTO clients (name, email, phone, company, address, website, industry, 
+       status, notes, assignedTo) 
+       VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?)`,
+            [dbName, email, phone, dbCompany, address, website, industry, status, notes, assignedTo || createdBy]
         );
 
         return result.insertId;
@@ -35,7 +40,7 @@ const ClientModel = {
         }
 
         if (filters.search) {
-            query += ' AND (companyName LIKE ? OR contactName LIKE ? OR email LIKE ?)';
+            query += ' AND (name LIKE ? OR company LIKE ? OR email LIKE ?)';
             const searchTerm = `%${filters.search}%`;
             params.push(searchTerm, searchTerm, searchTerm);
         }
@@ -68,7 +73,7 @@ const ClientModel = {
         }
 
         if (filters.search) {
-            query += ' AND (companyName LIKE ? OR contactName LIKE ? OR email LIKE ?)';
+            query += ' AND (name LIKE ? OR company LIKE ? OR email LIKE ?)';
             const searchTerm = `%${filters.search}%`;
             params.push(searchTerm, searchTerm, searchTerm);
         }
@@ -86,15 +91,19 @@ const ClientModel = {
     // Update client
     async update(id, clientData) {
         const {
-            companyName, contactName, email, phone, website,
-            industry, address, city, country, status, notes
+            companyName, contactName, name, email, phone, website,
+            industry, address, company, status, notes
         } = clientData;
 
+        // Map frontend fields to actual DB columns
+        const dbName = name || contactName || companyName || '';
+        const dbCompany = company || companyName || '';
+
         await pool.query(
-            `UPDATE clients SET companyName = ?, contactName = ?, email = ?, phone = ?, 
-       website = ?, industry = ?, address = ?, city = ?, country = ?, status = ?, notes = ? 
+            `UPDATE clients SET name = ?, email = ?, phone = ?, company = ?, 
+       website = ?, industry = ?, address = ?, status = ?, notes = ? 
        WHERE id = ?`,
-            [companyName, contactName, email, phone, website, industry, address, city, country, status, notes, id]
+            [dbName, email, phone, dbCompany, website, industry, address, status, notes, id]
         );
 
         return this.findById(id);
@@ -112,8 +121,8 @@ const ClientModel = {
       SELECT 
         COUNT(*) as total,
         SUM(CASE WHEN status = 'active' THEN 1 ELSE 0 END) as active,
-        SUM(CASE WHEN status = 'prospect' THEN 1 ELSE 0 END) as prospects,
-        SUM(CASE WHEN status = 'inactive' THEN 1 ELSE 0 END) as inactive
+        SUM(CASE WHEN status = 'inactive' THEN 1 ELSE 0 END) as inactive,
+        SUM(CASE WHEN status = 'churned' THEN 1 ELSE 0 END) as churned
       FROM clients
     `);
 
