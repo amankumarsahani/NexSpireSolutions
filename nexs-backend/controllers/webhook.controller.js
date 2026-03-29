@@ -32,7 +32,7 @@ class WebhookController {
             ).catch(err => console.error('Failed to log webhook:', err));
 
             // Verify signature
-            if (!RazorpayService.verifyWebhookSignature(body, signature)) {
+            if (!(await RazorpayService.verifyWebhookSignature(body, signature))) {
                 console.error('[Webhook] Invalid signature');
                 return res.status(400).json({ error: 'Invalid signature' });
             }
@@ -63,6 +63,9 @@ class WebhookController {
                 case 'payment.failed':
                     await this.handlePaymentFailed(payload);
                     break;
+                case 'payment_link.paid':
+                    await this.handlePaymentLinkPaid(payload);
+                    break;
                 default:
                     console.log(`[Webhook] Unhandled event: ${event}`);
             }
@@ -83,9 +86,9 @@ class WebhookController {
         try {
             // Check if client exists by email
             const [existingClient] = await pool.query('SELECT * FROM clients WHERE email = ?', [email]);
-            if (existingClient) {
+            if (existingClient.length) {
                 console.log(`[Webhook] Client already exists: ${email}`);
-                return existingClient;
+                return existingClient[0];
             }
 
             // Create client
@@ -106,6 +109,54 @@ class WebhookController {
             console.error(`[Webhook] Failed to create client ${email}:`, error);
             return null;
         }
+    }
+
+    getNotes(...sources) {
+        for (const source of sources) {
+            if (source && typeof source === 'object' && !Array.isArray(source) && Object.keys(source).length > 0) {
+                return source;
+            }
+        }
+
+        return {};
+    }
+
+    parsePlanId(notes = {}) {
+        const parsed = Number(notes.plan_id);
+        return Number.isFinite(parsed) && parsed > 0 ? parsed : null;
+    }
+
+    async activateTenantAccess(tenantId, planId = null, billingCycle = 'monthly') {
+        let subscriptionId = null;
+
+        if (planId) {
+            subscriptionId = await RazorpayService.ensureSubscriptionRecord({
+                tenantId,
+                planId,
+                billingCycle
+            });
+            await TenantModel.update(tenantId, { status: 'active', plan_id: planId });
+        } else {
+            const [subs] = await pool.query(
+                'SELECT id FROM subscriptions WHERE tenant_id = ? ORDER BY created_at DESC LIMIT 1',
+                [tenantId]
+            );
+            subscriptionId = subs[0]?.id || null;
+            await TenantModel.update(tenantId, { status: 'active' });
+        }
+
+        const tenant = await TenantModel.findById(tenantId);
+        if (tenant && tenant.process_status !== 'running' && tenant.assigned_port && tenant.db_name) {
+            try {
+                const provisioner = new Provisioner();
+                await provisioner.startProcess(tenant);
+                await TenantModel.updateProcessStatus(tenantId, 'running');
+            } catch (error) {
+                console.error('[Webhook] Failed to start tenant process:', error);
+            }
+        }
+
+        return subscriptionId;
     }
 
     /**
@@ -259,17 +310,27 @@ class WebhookController {
      */
     async handlePaymentCaptured(payload) {
         const payment = payload.payment.entity;
-        const tenantId = payment.notes?.tenant_id;
+        const notes = this.getNotes(payment.notes);
+        const tenantId = notes.tenant_id;
 
         if (!tenantId) return;
 
-        // Record one-time payment
+        const subscriptionId = await this.activateTenantAccess(
+            tenantId,
+            this.parsePlanId(notes),
+            notes.billing_cycle || 'monthly'
+        );
+
         await RazorpayService.recordPayment({
             tenant_id: tenantId,
+            subscription_id: subscriptionId,
             amount: payment.amount / 100,
+            currency: payment.currency || 'INR',
             razorpay_payment_id: payment.id,
             razorpay_order_id: payment.order_id,
-            status: 'success'
+            status: 'success',
+            payment_method: payment.method || null,
+            notes
         });
 
         console.log(`[Webhook] Payment captured for tenant ${tenantId}: ₹${payment.amount / 100}`);
@@ -280,7 +341,8 @@ class WebhookController {
      */
     async handlePaymentFailed(payload) {
         const payment = payload.payment.entity;
-        const tenantId = payment.notes?.tenant_id;
+        const notes = this.getNotes(payment.notes);
+        const tenantId = notes.tenant_id;
 
         if (!tenantId) return;
 
@@ -288,14 +350,51 @@ class WebhookController {
         await RazorpayService.recordPayment({
             tenant_id: tenantId,
             amount: payment.amount / 100,
+            currency: payment.currency || 'INR',
             razorpay_payment_id: payment.id,
-            status: 'failed'
+            razorpay_order_id: payment.order_id,
+            status: 'failed',
+            payment_method: payment.method || null,
+            notes
         });
 
         // TODO: Send email notification about failed payment
 
         console.log(`[Webhook] Payment failed for tenant ${tenantId}`);
     }
+
+    async handlePaymentLinkPaid(payload) {
+        const paymentLink = payload.payment_link?.entity;
+        const payment = payload.payment?.entity;
+        const notes = this.getNotes(payment?.notes, paymentLink?.notes);
+        const tenantId = notes.tenant_id;
+
+        if (!tenantId) {
+            console.log('[Webhook] Payment link paid without tenant context; skipping tenant activation');
+            return;
+        }
+
+        const subscriptionId = await this.activateTenantAccess(
+            tenantId,
+            this.parsePlanId(notes),
+            notes.billing_cycle || 'monthly'
+        );
+
+        await RazorpayService.recordPayment({
+            tenant_id: tenantId,
+            subscription_id: subscriptionId,
+            amount: (payment?.amount || paymentLink?.amount_paid || 0) / 100,
+            currency: payment?.currency || paymentLink?.currency || 'INR',
+            razorpay_payment_id: payment?.id,
+            razorpay_order_id: payment?.order_id || paymentLink?.order_id || null,
+            status: 'success',
+            payment_method: payment?.method || null,
+            notes
+        });
+
+        console.log(`[Webhook] Payment link settled for tenant ${tenantId}`);
+    }
+
     // Stripe webhook handler
     // Stripe webhook handler
     async handleStripeWebhook(req, res) {
@@ -307,7 +406,7 @@ class WebhookController {
             // We'll log after construction/verification for safety, or we can log raw buffer if needed.
             // Let's rely on StripeService to verify first.
 
-            if (!StripeService.verifyWebhookSignature(payload, sig)) {
+            if (!(await StripeService.verifyWebhookSignature(payload, sig))) {
                 console.error('[Webhook] Invalid Stripe signature');
                 // Log failed attempt
                 await pool.query(

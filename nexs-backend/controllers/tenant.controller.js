@@ -2,6 +2,7 @@ const TenantModel = require('../models/tenant.model');
 const PlanModel = require('../models/plan.model');
 const ServerModel = require('../models/server.model');
 const Provisioner = require('../services/provisioner');
+const RazorpayService = require('../services/razorpay.service');
 
 class TenantController {
     /**
@@ -523,7 +524,6 @@ class TenantController {
     async endTrialAndRequestPayment(req, res) {
         try {
             const { id } = req.params;
-            const StripeService = require('../services/stripe.service');
             const EmailService = require('../services/email.service');
             const { pool } = require('../config/database');
 
@@ -559,8 +559,8 @@ class TenantController {
                 }
             }
 
-            // 4. Generate Stripe checkout session
-            let checkoutUrl = '';
+            // 4. Generate Razorpay payment link
+            let paymentLinkUrl = '';
             try {
                 // Point users back to their own CRM instance
                 const baseDomain = process.env.VITE_APP_BASE_DOMAIN || 'nexspiresolutions.co.in';
@@ -569,16 +569,26 @@ class TenantController {
 
                 const successUrl = `${tenantUrl}/payment/success`;
                 const cancelUrl = `${tenantUrl}/payment/cancelled`;
-                const session = await StripeService.createCheckoutSession(
-                    planId.toString(),
-                    planSlug,
+                const paymentLink = await RazorpayService.createHostedPaymentLink({
+                    planId: planId.toString(),
+                    billingCycle: 'monthly',
                     successUrl,
                     cancelUrl,
-                    { tenant_id: tenant.id.toString(), plan_id: planId.toString() }
-                );
-                checkoutUrl = session.url;
-            } catch (stripeErr) {
-                console.error('Could not generate stripe link:', stripeErr.message);
+                    customer: {
+                        name: tenant.name,
+                        email: tenant.email,
+                        contact: tenant.phone
+                    },
+                    metadata: {
+                        tenant_id: tenant.id.toString(),
+                        plan_id: planId.toString(),
+                        plan_slug: planSlug,
+                        source: 'tenant_end_trial'
+                    }
+                });
+                paymentLinkUrl = paymentLink.short_url;
+            } catch (razorpayErr) {
+                console.error('Could not generate Razorpay link:', razorpayErr.message);
             }
 
             const html = `
@@ -586,8 +596,8 @@ class TenantController {
                     <h2 style="color: #4f46e5;">Your Nexspire Trial Has Ended</h2>
                     <p>Hi ${tenant.name},</p>
                     <p>We hope you enjoyed using Nexspire! Your free trial has concluded and your account has been temporarily suspended to prevent overages.</p>
-                    <p>To restore access to your CRM and storefront instantly, please securely subscribe to a plan using the link below.</p>
-                    ${checkoutUrl ? `<p style="margin: 30px 0;"><a href="${checkoutUrl}" style="padding: 12px 24px; background: #4f46e5; color: white; text-decoration: none; border-radius: 6px; font-weight: bold;">Subscribe & Pay Now</a></p>` : ''}
+                    <p>To restore access to your CRM and storefront instantly, please securely complete payment using the Razorpay link below.</p>
+                    ${paymentLinkUrl ? `<p style="margin: 30px 0;"><a href="${paymentLinkUrl}" style="padding: 12px 24px; background: #4f46e5; color: white; text-decoration: none; border-radius: 6px; font-weight: bold;">Pay Securely with Razorpay</a></p>` : ''}
                     <p>If you have any questions, please reach out to our team.</p>
                     <hr style="border: none; border-top: 1px solid #eaeaea; margin: 30px 0;" />
                     <p style="font-size: 12px; color: #888;">&copy; ${new Date().getFullYear()} Nexspire Solutions</p>
@@ -603,7 +613,8 @@ class TenantController {
             res.json({
                 success: true,
                 message: 'Trial ended, tenant suspended, and payment email sent.',
-                paymentLink: checkoutUrl
+                paymentLink: paymentLinkUrl,
+                provider: 'razorpay'
             });
         } catch (error) {
             console.error('End trial error:', error);
@@ -617,7 +628,6 @@ class TenantController {
     async sendPaymentLink(req, res) {
         try {
             const { id } = req.params;
-            const StripeService = require('../services/stripe.service');
             const EmailService = require('../services/email.service');
             const { pool } = require('../config/database');
 
@@ -639,8 +649,8 @@ class TenantController {
                 }
             }
 
-            // 2. Generate Stripe checkout session
-            let checkoutUrl = '';
+            // 2. Generate Razorpay payment link
+            let paymentLinkUrl = '';
             try {
                 // Point users back to their own CRM instance
                 const baseDomain = process.env.VITE_APP_BASE_DOMAIN || 'nexspiresolutions.co.in';
@@ -649,20 +659,30 @@ class TenantController {
 
                 const successUrl = `${tenantUrl}/payment/success`;
                 const cancelUrl = `${tenantUrl}/payment/cancelled`;
-                const session = await StripeService.createCheckoutSession(
-                    planId.toString(),
-                    planSlug,
+                const paymentLink = await RazorpayService.createHostedPaymentLink({
+                    planId: planId.toString(),
+                    billingCycle: 'monthly',
                     successUrl,
                     cancelUrl,
-                    { tenant_id: tenant.id.toString(), plan_id: planId.toString() }
-                );
-                checkoutUrl = session.url;
-            } catch (stripeErr) {
-                console.error('Could not generate stripe link:', stripeErr.message);
-                return res.status(500).json({ error: 'Could not generate Stripe link. Have you configured your keys and prices?' });
+                    customer: {
+                        name: tenant.name,
+                        email: tenant.email,
+                        contact: tenant.phone
+                    },
+                    metadata: {
+                        tenant_id: tenant.id.toString(),
+                        plan_id: planId.toString(),
+                        plan_slug: planSlug,
+                        source: 'tenant_payment_request'
+                    }
+                });
+                paymentLinkUrl = paymentLink.short_url;
+            } catch (razorpayErr) {
+                console.error('Could not generate Razorpay link:', razorpayErr.message);
+                return res.status(500).json({ error: 'Could not generate Razorpay link. Have you configured your keys?' });
             }
 
-            if (!checkoutUrl) {
+            if (!paymentLinkUrl) {
                 return res.status(500).json({ error: 'Checkout URL generation failed' });
             }
 
@@ -670,9 +690,9 @@ class TenantController {
                 <div style="font-family: Arial, sans-serif; max-width: 600px; margin: 0 auto; color: #333;">
                     <h2 style="color: #4f46e5;">Action Required: Complete Your Subscription</h2>
                     <p>Hi ${tenant.name},</p>
-                    <p>Attached is the secure payment link to subscribe to your Nexspire CRM and Storefront instance.</p>
-                    <p>Please click the button below to review your plan details and securely enter your payment information.</p>
-                    <p style="margin: 30px 0;"><a href="${checkoutUrl}" style="padding: 12px 24px; background: #4f46e5; color: white; text-decoration: none; border-radius: 6px; font-weight: bold;">Review Plan & Pay</a></p>
+                    <p>Attached is the secure Razorpay payment link for your Nexspire CRM and storefront instance.</p>
+                    <p>Please click the button below to review your plan details and complete payment securely.</p>
+                    <p style="margin: 30px 0;"><a href="${paymentLinkUrl}" style="padding: 12px 24px; background: #4f46e5; color: white; text-decoration: none; border-radius: 6px; font-weight: bold;">Review Plan & Pay</a></p>
                     <p>If you have any questions, please reach out to our team.</p>
                     <hr style="border: none; border-top: 1px solid #eaeaea; margin: 30px 0;" />
                     <p style="font-size: 12px; color: #888;">&copy; ${new Date().getFullYear()} Nexspire Solutions</p>
@@ -688,7 +708,8 @@ class TenantController {
             res.json({
                 success: true,
                 message: 'Payment link generated and emailed to the tenant.',
-                paymentLink: checkoutUrl
+                paymentLink: paymentLinkUrl,
+                provider: 'razorpay'
             });
         } catch (error) {
             console.error('Send payment link error:', error);

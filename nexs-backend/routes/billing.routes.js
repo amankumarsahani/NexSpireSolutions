@@ -4,7 +4,7 @@ const billingController = require('../controllers/billing.controller');
 const { auth, isAdmin } = require('../middleware/auth');
 
 // Public routes (required for Agency Pricing page)
-router.post('/payment-link', billingController.createPaymentLink); // Generate Stripe checkout link
+router.post('/payment-link', billingController.createPaymentLink); // Generate Razorpay payment link
 
 // All other billing routes require admin authentication
 router.use(auth);

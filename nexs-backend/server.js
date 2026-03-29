@@ -62,6 +62,7 @@ app.use(cors(corsOptions));
 // Rate Limiting & Rogue Path Protection (AFTER CORS)
 const { generalRateLimit } = require('./middleware/rateLimit');
 const { roguePathBlocker } = require('./middleware/security');
+const webhookRoutes = require('./routes/webhook.routes');
 
 app.use(roguePathBlocker); // Block rogue paths
 app.use(generalRateLimit); // Then apply global rate limit
@@ -71,6 +72,10 @@ app.use(helmet({
     contentSecurityPolicy: false, // Disable CSP for API
     crossOriginEmbedderPolicy: false
 }));
+
+// Webhooks must be mounted before the global body parsers so provider-specific
+// raw/json parsing continues to work for signature verification.
+app.use('/api/webhooks', webhookRoutes);
 
 app.use(express.json({ limit: '100mb' })); // Parse JSON bodies with increased limit
 app.use(express.urlencoded({ limit: '100mb', extended: true })); // Parse URL-encoded bodies with increased limit

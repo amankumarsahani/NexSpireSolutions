@@ -4,7 +4,6 @@
  */
 
 const RazorpayService = require('../services/razorpay.service');
-const StripeService = require('../services/stripe.service');
 const TenantModel = require('../models/tenant.model');
 
 const { pool } = require('../config/database');
@@ -202,22 +201,42 @@ class BillingController {
     }
 
     /**
-     * Create a Stripe payment link (checkout session) for a plan
+     * Create a hosted Razorpay payment link for a plan
      */
     async createPaymentLink(req, res) {
         try {
-            const { planId, successUrl, cancelUrl, metadata } = req.body;
+            const {
+                planId,
+                successUrl,
+                cancelUrl,
+                billingCycle,
+                metadata = {},
+                customer = {}
+            } = req.body;
+
             if (!planId) {
                 return res.status(400).json({ error: 'planId is required' });
             }
 
-            // Resolve the slug for the price ID lookup
-            const [plans] = await pool.query('SELECT slug FROM plans WHERE id = ?', [planId]);
-            const planSlug = plans.length ? plans[0].slug : 'starter';
+            const paymentLink = await RazorpayService.createHostedPaymentLink({
+                planId,
+                billingCycle: billingCycle || metadata.billing_cycle,
+                successUrl,
+                cancelUrl,
+                metadata,
+                customer
+            });
 
-            const session = await StripeService.createCheckoutSession(planId, planSlug, successUrl, cancelUrl, metadata);
-            // Return the URL to redirect the user
-            res.json({ success: true, url: session.url });
+            res.json({
+                success: true,
+                provider: 'razorpay',
+                url: paymentLink.short_url,
+                data: {
+                    paymentLinkId: paymentLink.id,
+                    referenceId: paymentLink.reference_id,
+                    status: paymentLink.status
+                }
+            });
         } catch (error) {
             console.error('Create payment link error:', error);
             res.status(500).json({ error: error.message || 'Failed to create payment link' });
@@ -285,14 +304,22 @@ class BillingController {
 
     async syncPayment(req, res) {
         try {
-            const { provider, paymentId } = req.body;
+            const { provider = 'razorpay', paymentId } = req.body;
 
-            if (provider !== 'stripe') {
-                return res.status(400).json({ error: 'Only Stripe sync supported currently' });
+            if (!paymentId) {
+                return res.status(400).json({ error: 'paymentId is required' });
             }
 
-            const StripeService = require('../services/stripe.service');
-            const result = await StripeService.fetchAndSyncPayment(paymentId);
+            let result;
+
+            if (provider === 'razorpay') {
+                result = await RazorpayService.fetchAndSyncPayment(paymentId);
+            } else if (provider === 'stripe') {
+                const StripeService = require('../services/stripe.service');
+                result = await StripeService.fetchAndSyncPayment(paymentId);
+            } else {
+                return res.status(400).json({ error: 'Unsupported payment provider' });
+            }
 
             res.json(result);
         } catch (error) {

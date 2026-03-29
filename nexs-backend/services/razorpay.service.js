@@ -6,6 +6,11 @@
 const crypto = require('crypto');
 const { pool } = require('../config/database');
 
+const PLAN_ALIASES = {
+    growth: 'professional',
+    business: 'enterprise'
+};
+
 class RazorpayService {
     constructor() {
         this.baseUrl = 'https://api.razorpay.com/v1';
@@ -37,6 +42,11 @@ class RazorpayService {
         }
 
         return { keyId, keySecret };
+    }
+
+    async getPublicKey() {
+        const { keyId } = await this.getCredentials();
+        return keyId;
     }
 
     /**
@@ -72,6 +82,144 @@ class RazorpayService {
         }
 
         return data;
+    }
+
+    normalizeBillingCycle(billingCycle = 'monthly') {
+        return String(billingCycle).toLowerCase() === 'yearly' ? 'yearly' : 'monthly';
+    }
+
+    async resolvePlan(planReference, preferredBillingCycle = 'monthly') {
+        if (planReference === undefined || planReference === null || planReference === '') {
+            throw new Error('Plan reference is required');
+        }
+
+        let billingCycle = this.normalizeBillingCycle(preferredBillingCycle);
+        let normalizedReference = String(planReference).trim().toLowerCase();
+
+        if (normalizedReference.endsWith('_yearly')) {
+            billingCycle = 'yearly';
+            normalizedReference = normalizedReference.slice(0, -7);
+        } else if (normalizedReference.endsWith('_monthly')) {
+            billingCycle = 'monthly';
+            normalizedReference = normalizedReference.slice(0, -8);
+        }
+
+        const lookupCandidates = [normalizedReference];
+        if (PLAN_ALIASES[normalizedReference]) {
+            lookupCandidates.push(PLAN_ALIASES[normalizedReference]);
+        }
+
+        let plan = null;
+
+        if (/^\d+$/.test(normalizedReference)) {
+            const [rows] = await pool.query('SELECT * FROM plans WHERE id = ?', [Number(normalizedReference)]);
+            plan = rows[0] || null;
+        }
+
+        if (!plan) {
+            for (const candidate of lookupCandidates) {
+                const [rows] = await pool.query(
+                    'SELECT * FROM plans WHERE LOWER(slug) = ? OR LOWER(name) = ? LIMIT 1',
+                    [candidate, candidate]
+                );
+
+                if (rows.length) {
+                    plan = rows[0];
+                    break;
+                }
+            }
+        }
+
+        if (!plan) {
+            throw new Error(`Plan not found for reference "${planReference}"`);
+        }
+
+        const rawAmount = billingCycle === 'yearly' ? plan.price_yearly : plan.price_monthly;
+        const amount = Number(rawAmount || 0);
+
+        if (!amount || amount <= 0) {
+            throw new Error(`Plan ${plan.name} does not have a valid ${billingCycle} price`);
+        }
+
+        return { plan, billingCycle, amount };
+    }
+
+    sanitizeNotes(notes = {}) {
+        const result = {};
+
+        Object.entries(notes)
+            .filter(([, value]) => value !== undefined && value !== null && value !== '')
+            .slice(0, 15)
+            .forEach(([key, value]) => {
+                result[String(key).slice(0, 64)] = String(value).slice(0, 255);
+            });
+
+        return result;
+    }
+
+    buildReferenceId(prefix, planSlug, billingCycle) {
+        const safePrefix = String(prefix || 'nex').replace(/[^a-z0-9]/gi, '').toLowerCase() || 'nex';
+        const safeSlug = String(planSlug || 'plan').replace(/[^a-z0-9]/gi, '').toLowerCase() || 'plan';
+        const safeCycle = this.normalizeBillingCycle(billingCycle) === 'yearly' ? 'y' : 'm';
+        return `${safePrefix}_${safeSlug}_${safeCycle}_${Date.now().toString(36)}`.slice(0, 40);
+    }
+
+    isValidHttpUrl(url) {
+        if (!url) return false;
+
+        try {
+            const parsed = new URL(url);
+            return parsed.protocol === 'http:' || parsed.protocol === 'https:';
+        } catch (error) {
+            return false;
+        }
+    }
+
+    async createHostedPaymentLink({
+        planId,
+        billingCycle = 'monthly',
+        successUrl,
+        cancelUrl,
+        metadata = {},
+        customer = {}
+    }) {
+        const resolved = await this.resolvePlan(planId, billingCycle);
+        const notes = this.sanitizeNotes({
+            ...metadata,
+            plan_id: resolved.plan.id,
+            plan_slug: resolved.plan.slug,
+            billing_cycle: resolved.billingCycle,
+            cancel_url: cancelUrl || ''
+        });
+
+        const payload = {
+            amount: Math.round(resolved.amount * 100),
+            currency: 'INR',
+            description: `NexCRM ${resolved.plan.name} ${resolved.billingCycle} plan`,
+            reference_id: this.buildReferenceId('nexcrm', resolved.plan.slug, resolved.billingCycle),
+            reminder_enable: true,
+            notes
+        };
+
+        if (customer && (customer.name || customer.email || customer.contact)) {
+            payload.customer = {};
+
+            if (customer.name) payload.customer.name = customer.name;
+            if (customer.email) payload.customer.email = customer.email;
+            if (customer.contact) payload.customer.contact = customer.contact;
+
+            payload.notify = {
+                email: Boolean(customer.email),
+                sms: Boolean(customer.contact)
+            };
+        }
+
+        if (this.isValidHttpUrl(successUrl)) {
+            payload.callback_url = successUrl;
+            payload.callback_method = 'get';
+        }
+
+        return this.apiRequest('/payment_links', 'POST', payload);
     }
 
     /**
@@ -269,6 +417,78 @@ class RazorpayService {
         return paymentLink;
     }
 
+    async ensureSubscriptionRecord({
+        tenantId,
+        planId,
+        billingCycle = 'monthly',
+        razorpaySubscriptionId = null,
+        razorpayCustomerId = null
+    }) {
+        if (!tenantId || !planId) {
+            return null;
+        }
+
+        const cycle = this.normalizeBillingCycle(billingCycle);
+        const periodStart = new Date();
+        const periodEnd = new Date(periodStart);
+
+        if (cycle === 'yearly') {
+            periodEnd.setFullYear(periodEnd.getFullYear() + 1);
+        } else {
+            periodEnd.setMonth(periodEnd.getMonth() + 1);
+        }
+
+        const [existingRows] = razorpaySubscriptionId
+            ? await pool.query(
+                'SELECT id FROM subscriptions WHERE razorpay_subscription_id = ? LIMIT 1',
+                [razorpaySubscriptionId]
+            )
+            : await pool.query(
+                'SELECT id FROM subscriptions WHERE tenant_id = ? ORDER BY created_at DESC LIMIT 1',
+                [tenantId]
+            );
+
+        if (existingRows.length) {
+            await pool.query(`
+                UPDATE subscriptions
+                SET plan_id = ?, status = 'active', billing_cycle = ?,
+                    current_period_start = ?, current_period_end = ?,
+                    razorpay_subscription_id = COALESCE(?, razorpay_subscription_id),
+                    razorpay_customer_id = COALESCE(?, razorpay_customer_id)
+                WHERE id = ?
+            `, [
+                planId,
+                cycle,
+                periodStart,
+                periodEnd,
+                razorpaySubscriptionId,
+                razorpayCustomerId,
+                existingRows[0].id
+            ]);
+
+            return existingRows[0].id;
+        }
+
+        const [result] = await pool.query(`
+            INSERT INTO subscriptions (
+                tenant_id, plan_id, status, billing_cycle,
+                current_period_start, current_period_end,
+                razorpay_subscription_id, razorpay_customer_id
+            )
+            VALUES (?, ?, 'active', ?, ?, ?, ?, ?)
+        `, [
+            tenantId,
+            planId,
+            cycle,
+            periodStart,
+            periodEnd,
+            razorpaySubscriptionId,
+            razorpayCustomerId
+        ]);
+
+        return result.insertId;
+    }
+
     /**
      * Record payment in database
      */
@@ -280,18 +500,65 @@ class RazorpayService {
             razorpay_payment_id,
             razorpay_order_id,
             razorpay_signature,
+            currency = 'INR',
+            payment_method = null,
+            notes = null,
             status = 'success'
         } = paymentData;
+
+        if (!tenant_id) {
+            throw new Error('tenant_id is required to record a payment');
+        }
+
+        if (razorpay_payment_id) {
+            const [existing] = await pool.query(
+                'SELECT id FROM payments WHERE razorpay_payment_id = ? LIMIT 1',
+                [razorpay_payment_id]
+            );
+
+            if (existing.length) {
+                await pool.query(`
+                    UPDATE payments
+                    SET status = ?, amount = ?, currency = ?, razorpay_order_id = COALESCE(?, razorpay_order_id),
+                        razorpay_signature = COALESCE(?, razorpay_signature),
+                        payment_method = COALESCE(?, payment_method),
+                        notes = COALESCE(?, notes)
+                    WHERE id = ?
+                `, [
+                    status,
+                    amount,
+                    currency,
+                    razorpay_order_id,
+                    razorpay_signature,
+                    payment_method,
+                    notes ? JSON.stringify(notes) : null,
+                    existing[0].id
+                ]);
+
+                return existing[0].id;
+            }
+        }
 
         const invoiceNumber = `INV-${Date.now()}`;
 
         const [result] = await pool.query(`
             INSERT INTO payments (tenant_id, subscription_id, amount, status, 
                                  razorpay_payment_id, razorpay_order_id, razorpay_signature,
-                                 invoice_number)
-            VALUES (?, ?, ?, ?, ?, ?, ?, ?)
-        `, [tenant_id, subscription_id, amount, status, razorpay_payment_id,
-            razorpay_order_id, razorpay_signature, invoiceNumber]);
+                                 invoice_number, currency, payment_method, notes)
+            VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)
+        `, [
+            tenant_id,
+            subscription_id,
+            amount,
+            status,
+            razorpay_payment_id,
+            razorpay_order_id,
+            razorpay_signature,
+            invoiceNumber,
+            currency,
+            payment_method,
+            notes ? JSON.stringify(notes) : null
+        ]);
 
         return result.insertId;
     }
@@ -310,6 +577,52 @@ class RazorpayService {
         `, [tenantId]);
 
         return payments;
+    }
+
+    async fetchAndSyncPayment(paymentId) {
+        const payment = await this.apiRequest(`/payments/${paymentId}`);
+
+        if (!payment) {
+            throw new Error('Payment not found');
+        }
+
+        const [existing] = await pool.query(
+            'SELECT id FROM payments WHERE razorpay_payment_id = ? LIMIT 1',
+            [payment.id]
+        );
+
+        if (existing.length) {
+            return { success: false, message: 'Payment already exists', paymentId: existing[0].id };
+        }
+
+        const tenantId = payment.notes?.tenant_id;
+        if (!tenantId) {
+            throw new Error('Razorpay payment is not linked to a tenant');
+        }
+
+        const planId = payment.notes?.plan_id ? Number(payment.notes.plan_id) : null;
+        const billingCycle = payment.notes?.billing_cycle || 'monthly';
+        const subscriptionId = planId
+            ? await this.ensureSubscriptionRecord({ tenantId, planId, billingCycle })
+            : null;
+
+        const recordedPaymentId = await this.recordPayment({
+            tenant_id: tenantId,
+            subscription_id: subscriptionId,
+            amount: payment.amount / 100,
+            currency: payment.currency || 'INR',
+            razorpay_payment_id: payment.id,
+            razorpay_order_id: payment.order_id,
+            status: payment.status === 'captured' ? 'success' : 'failed',
+            payment_method: payment.method || null,
+            notes: payment.notes || null
+        });
+
+        return {
+            success: true,
+            message: 'Payment synced successfully',
+            paymentId: recordedPaymentId
+        };
     }
 }
 

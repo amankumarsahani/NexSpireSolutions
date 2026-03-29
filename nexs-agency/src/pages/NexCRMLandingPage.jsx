@@ -185,11 +185,12 @@ export default function NexCRMLandingPage() {
         }
 
         const planId = planName.toLowerCase();
-        showToast('Initiating secure checkout...', 'info');
+        showToast('Initiating secure Razorpay checkout...', 'info');
         try {
             const finalPlanId = isYearly ? `${planId}_yearly` : planId;
             const response = await billingAPI.createPaymentLink({
                 planId: finalPlanId,
+                billingCycle: isYearly ? 'yearly' : 'monthly',
                 successUrl: window.location.origin + '/nexcrm?payment=success',
                 cancelUrl: window.location.origin + '/nexcrm/pricing?payment=cancelled',
                 metadata: {
@@ -204,8 +205,8 @@ export default function NexCRMLandingPage() {
                 showToast(response.data.error || 'Failed to generate checkout link');
             }
         } catch (err) {
-            showToast('Failed to initiate checkout. Please contact support.');
-            console.error('Checkout error:', err);
+            showToast('Failed to initiate Razorpay checkout. Please contact support.');
+            console.error('Razorpay checkout error:', err);
         }
     };
 
@@ -362,7 +363,7 @@ export default function NexCRMLandingPage() {
                         <div className="md:col-span-1 bg-white rounded-[2rem] p-10 border border-slate-100 shadow-xl shadow-slate-200/50 hover:translate-y-[-4px] hover:shadow-2xl transition-all group">
                             <div className="w-14 h-14 bg-purple-50 text-purple-600 rounded-2xl flex items-center justify-center text-2xl mb-6 group-hover:scale-110 transition-transform"><i className="ri-bank-card-line"></i></div>
                             <h3 className="text-xl font-bold text-slate-900 mb-3">Invoicing & Payments</h3>
-                            <p className="text-slate-600 font-medium leading-relaxed">Accept global payments via Stripe. Recurring billing built-in.</p>
+                            <p className="text-slate-600 font-medium leading-relaxed">Accept payments via Razorpay with UPI, cards, and net banking.</p>
                         </div>
 
                         {/* Standard Feature - Pipeline */}

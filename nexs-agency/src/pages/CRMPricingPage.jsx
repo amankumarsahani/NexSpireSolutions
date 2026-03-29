@@ -199,13 +199,13 @@ export default function CRMPricingPage() {
             return;
         }
 
-        // Stripe Checkout logic
         const planId = planName.toLowerCase();
-        const id = showToast('Initiating secure checkout...', 'info');
+        showToast('Initiating secure Razorpay checkout...', 'info');
         try {
             const finalPlanId = isYearly ? `${planId}_yearly` : planId;
             const response = await billingAPI.createPaymentLink({
                 planId: finalPlanId,
+                billingCycle: isYearly ? 'yearly' : 'monthly',
                 successUrl: window.location.origin + '/nexcrm?payment=success',
                 cancelUrl: window.location.origin + '/nexcrm/pricing?payment=cancelled',
                 metadata: {
@@ -220,8 +220,8 @@ export default function CRMPricingPage() {
                 showToast(response.data.error || 'Failed to generate checkout link');
             }
         } catch (err) {
-            showToast('Failed to initiate checkout. Please contact support.');
-            console.error('Checkout error:', err);
+            showToast('Failed to initiate Razorpay checkout. Please contact support.');
+            console.error('Razorpay checkout error:', err);
         }
     };
 
@@ -492,7 +492,7 @@ export default function CRMPricingPage() {
                             },
                             {
                                 q: 'What payment methods do you accept?',
-                                a: 'We accept all major credit/debit cards, UPI, Net Banking, and bank transfers for annual plans.'
+                                a: 'We accept UPI, cards, net banking, and other methods supported by Razorpay.'
                             },
                             {
                                 q: 'What happens if I exceed my limits?',

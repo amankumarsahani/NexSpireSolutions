@@ -39,12 +39,7 @@ exports.getPublicSettings = async (req, res) => {
         const publicKeys = [
             'pricing_page_mode',
             'contact_sales_email',
-            'stripe_price_id_starter',
-            'stripe_price_id_starter_yearly',
-            'stripe_price_id_growth',
-            'stripe_price_id_growth_yearly',
-            'stripe_price_id_business',
-            'stripe_price_id_business_yearly'
+            'billing_provider'
         ];
 
         const [settings] = await db.query(
