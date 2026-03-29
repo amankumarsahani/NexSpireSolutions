@@ -9,3 +9,5 @@ router.post('/stripe', express.raw({ type: 'application/json' }), webhookControl
 // Razorpay Webhook
 // Handles /webhooks/razorpay
 router.post('/razorpay', express.json(), webhookController.handleWebhook);
+
+module.exports = router;
