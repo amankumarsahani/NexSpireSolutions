@@ -15,11 +15,16 @@ class BackupService {
     async backupAllTenants() {
         console.log('[BackupService] Starting daily backup run...');
 
-        // Fetch ALL tenants (including trial)
-        const tenants = await TenantModel.findAll({});
-        const activeTenants = tenants.filter(t => t.status !== 'cancelled' && t.status !== 'suspended');
+        // Default to active tenants only. Allow override for special cases.
+        const allowedStatuses = (process.env.BACKUP_TENANT_STATUSES || 'active')
+            .split(',')
+            .map(status => status.trim().toLowerCase())
+            .filter(Boolean);
 
-        console.log(`[BackupService] Found ${tenants.length} total tenants. Proceeding with ${activeTenants.length} eligible (active/trial) tenants.`);
+        const tenants = await TenantModel.findAll({});
+        const activeTenants = tenants.filter(t => allowedStatuses.includes(String(t.status || '').toLowerCase()));
+
+        console.log(`[BackupService] Found ${tenants.length} total tenants. Proceeding with ${activeTenants.length} eligible tenant(s) for statuses: ${allowedStatuses.join(', ')}.`);
 
         for (const tenant of activeTenants) {
             try {

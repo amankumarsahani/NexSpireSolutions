@@ -1,5 +1,6 @@
 import { useState, useEffect } from 'react';
 import { Link, useLocation, useNavigate } from 'react-router-dom';
+import { useAuth } from '../context/AuthContext';
 
 const Header = () => {
   const [isMenuOpen, setIsMenuOpen] = useState(false);
@@ -7,6 +8,8 @@ const Header = () => {
   const [scrolled, setScrolled] = useState(false);
   const location = useLocation();
   const navigate = useNavigate();
+  const { user, isAuthenticated } = useAuth();
+  const showAdminBackups = isAuthenticated && user?.role === 'admin';
 
   const navItems = [
     { label: 'Home', path: '/' },
@@ -141,6 +144,19 @@ const Header = () => {
                   )}
                 </div>
               ))}
+              {showAdminBackups ? (
+                <div className="relative group">
+                  <Link
+                    to="/admin/backups"
+                    className={`relative z-10 px-4 py-2 text-sm font-semibold rounded-full transition-all duration-300 inline-flex items-center gap-1 ${isActive('/admin/backups')
+                      ? 'bg-gradient-to-r from-blue-500 to-purple-500 text-white shadow-lg shadow-blue-500/25'
+                      : 'text-slate-700 hover:text-white hover:bg-gradient-to-r hover:from-blue-400 hover:to-purple-400 hover:shadow-md hover:shadow-blue-400/20'
+                      }`}
+                  >
+                    Backups
+                  </Link>
+                </div>
+              ) : null}
             </div>
           </nav>
 
@@ -223,6 +239,18 @@ const Header = () => {
                     )}
                   </div>
                 ))}
+                {showAdminBackups ? (
+                  <Link
+                    to="/admin/backups"
+                    onClick={() => setIsMenuOpen(false)}
+                    className={`relative z-10 block px-4 py-2 text-base font-semibold rounded-xl transition-all duration-300 ${isActive('/admin/backups')
+                      ? 'text-white bg-gradient-to-r from-blue-500 to-purple-500 shadow-lg shadow-blue-500/25'
+                      : 'text-slate-700 hover:text-white hover:bg-gradient-to-r hover:from-blue-400 hover:to-purple-400 hover:shadow-md hover:shadow-blue-400/20'
+                      }`}
+                  >
+                    Backups
+                  </Link>
+                ) : null}
               </div>
 
               <div className="relative px-4 pt-4 mt-4">

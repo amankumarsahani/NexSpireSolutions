@@ -155,6 +155,16 @@ export const billingAPI = {
     createPaymentLink: (data) => api.post('/billing/payment-link', data)
 };
 
+// Admin Backup Management
+export const adminAPI = {
+    getServers: () => api.get('/admin/servers'),
+    getBackupAccounts: () => api.get('/admin/backup-accounts'),
+    createBackupAccount: (data) => api.post('/admin/backup-accounts', data),
+    updateBackupAccount: (id, data) => api.put(`/admin/backup-accounts/${id}`, data),
+    deleteBackupAccount: (id) => api.delete(`/admin/backup-accounts/${id}`),
+    runBackupsNow: () => api.post('/admin/backup-accounts/run-now')
+};
+
 // Blog
 export const blogAPI = {
     getAll: (params) => api.get('/blogs', { params }),

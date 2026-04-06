@@ -43,6 +43,7 @@ const PwaBenefits = lazy(() => import('./pages/blog/PwaBenefits'));
 const BlogArticle = lazy(() => import('./pages/BlogArticle'));
 const ProjectDetail = lazy(() => import('./pages/ProjectDetail'));
 const NotFound = lazy(() => import('./pages/NotFound'));
+const AdminBackupsPage = lazy(() => import('./pages/AdminBackupsPage'));
 
 // Loading spinner component
 const LoadingSpinner = () => (
@@ -132,6 +133,7 @@ function App() {
           <Route path="/contact" element={<ContactPage />} />
           <Route path="/blog" element={<BlogPage />} />
           <Route path="/nexcrm" element={<NexCRMLandingPage />} />
+          <Route path="/admin/backups" element={<AdminBackupsPage />} />
           <Route path="/privacy-policy" element={<PrivacyPolicy />} />
           <Route path="/terms" element={<TermsOfService />} />
           <Route path="/faq" element={<FAQPage />} />

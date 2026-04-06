@@ -2,6 +2,10 @@ const express = require('express');
 const router = express.Router();
 const ServerController = require('../controllers/server.controller');
 const BackupAccountController = require('../controllers/backup-account.controller');
+const { auth, isAdmin } = require('../middleware/auth');
+
+router.use(auth);
+router.use(isAdmin);
 
 // Server routes
 router.get('/servers', ServerController.getAllServers);
