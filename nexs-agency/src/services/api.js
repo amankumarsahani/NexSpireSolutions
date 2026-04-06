@@ -162,6 +162,7 @@ export const adminAPI = {
     createBackupAccount: (data) => api.post('/admin/backup-accounts', data),
     updateBackupAccount: (id, data) => api.put(`/admin/backup-accounts/${id}`, data),
     deleteBackupAccount: (id) => api.delete(`/admin/backup-accounts/${id}`),
+    exchangeGoogleOauthCode: (data) => api.post('/admin/backup-accounts/google-oauth/exchange', data),
     runBackupsNow: () => api.post('/admin/backup-accounts/run-now')
 };
 

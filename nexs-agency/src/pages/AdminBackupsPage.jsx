@@ -14,6 +14,8 @@ const EMPTY_FORM = {
     oauth_refresh_token: ''
 };
 
+const GOOGLE_OAUTH_SESSION_KEY = 'nexs_backup_google_oauth';
+
 function SignInPanel() {
     const { login, loading } = useAuth();
     const [email, setEmail] = useState('');
@@ -133,6 +135,7 @@ export default function AdminBackupsPage() {
     const [pageLoading, setPageLoading] = useState(true);
     const [saving, setSaving] = useState(false);
     const [running, setRunning] = useState(false);
+    const [oauthConnecting, setOauthConnecting] = useState(false);
     const [notice, setNotice] = useState({ type: '', message: '' });
 
     const isAdmin = user?.role === 'admin';
@@ -150,6 +153,18 @@ export default function AdminBackupsPage() {
 
     const setMessage = (message, type = 'success') => {
         setNotice({ type, message });
+    };
+
+    const getRedirectUri = () => `${window.location.origin}/admin/backups`;
+
+    const clearGoogleOauthParams = () => {
+        const url = new URL(window.location.href);
+        url.searchParams.delete('code');
+        url.searchParams.delete('scope');
+        url.searchParams.delete('state');
+        url.searchParams.delete('error');
+        url.searchParams.delete('prompt');
+        window.history.replaceState({}, document.title, `${url.pathname}${url.search}${url.hash}`);
     };
 
     const loadData = async () => {
@@ -176,6 +191,112 @@ export default function AdminBackupsPage() {
 
     useEffect(() => {
         loadData();
+    }, [isAuthenticated, isAdmin]);
+
+    useEffect(() => {
+        const raw = sessionStorage.getItem(GOOGLE_OAUTH_SESSION_KEY);
+        if (!raw) return;
+
+        try {
+            const pending = JSON.parse(raw);
+            if (pending?.form) {
+                setForm((prev) => {
+                    const isPristine = prev.account_name === EMPTY_FORM.account_name
+                        && prev.folder_id === EMPTY_FORM.folder_id
+                        && prev.oauth_client_id === EMPTY_FORM.oauth_client_id
+                        && prev.oauth_refresh_token === EMPTY_FORM.oauth_refresh_token
+                        && prev.credentials_json === EMPTY_FORM.credentials_json;
+
+                    return isPristine ? { ...prev, ...pending.form } : prev;
+                });
+            }
+
+            if (pending?.editingId) {
+                setEditingId((prev) => prev || pending.editingId);
+            }
+        } catch {
+            sessionStorage.removeItem(GOOGLE_OAUTH_SESSION_KEY);
+        }
+    }, []);
+
+    useEffect(() => {
+        if (!isAuthenticated || !isAdmin) return;
+
+        const params = new URLSearchParams(window.location.search);
+        const code = params.get('code');
+        const state = params.get('state');
+        const error = params.get('error');
+
+        if (!code && !error) return;
+
+        const runExchange = async () => {
+            const raw = sessionStorage.getItem(GOOGLE_OAUTH_SESSION_KEY);
+
+            if (error) {
+                clearGoogleOauthParams();
+                setMessage(`Google OAuth failed: ${error}`, 'error');
+                return;
+            }
+
+            if (!raw) {
+                clearGoogleOauthParams();
+                setMessage('Google OAuth state was missing. Start the Connect Google Drive flow again.', 'error');
+                return;
+            }
+
+            let pending;
+            try {
+                pending = JSON.parse(raw);
+            } catch {
+                sessionStorage.removeItem(GOOGLE_OAUTH_SESSION_KEY);
+                clearGoogleOauthParams();
+                setMessage('Google OAuth session data was invalid. Start the flow again.', 'error');
+                return;
+            }
+
+            if (!pending?.state || pending.state !== state) {
+                sessionStorage.removeItem(GOOGLE_OAUTH_SESSION_KEY);
+                clearGoogleOauthParams();
+                setMessage('Google OAuth state mismatch. Start the flow again.', 'error');
+                return;
+            }
+
+            setOauthConnecting(true);
+
+            try {
+                const response = await adminAPI.exchangeGoogleOauthCode({
+                    client_id: pending.form.oauth_client_id,
+                    client_secret: pending.form.oauth_client_secret,
+                    code,
+                    redirect_uri: getRedirectUri()
+                });
+
+                const refreshToken = response.data?.data?.refresh_token || '';
+                const email = response.data?.data?.email || '';
+
+                setForm((prev) => ({
+                    ...prev,
+                    ...pending.form,
+                    oauth_refresh_token: refreshToken
+                }));
+
+                if (pending.editingId) {
+                    setEditingId(pending.editingId);
+                }
+
+                setMessage(email
+                    ? `Connected Google Drive for ${email}. Save the backup account to persist the refresh token.`
+                    : 'Google Drive connected. Save the backup account to persist the refresh token.');
+            } catch (exchangeError) {
+                setMessage(exchangeError.response?.data?.message || exchangeError.response?.data?.error || 'Failed to exchange Google OAuth code', 'error');
+            } finally {
+                setOauthConnecting(false);
+                sessionStorage.removeItem(GOOGLE_OAUTH_SESSION_KEY);
+                clearGoogleOauthParams();
+            }
+        };
+
+        runExchange();
     }, [isAuthenticated, isAdmin]);
 
     const handleChange = (event) => {
@@ -268,6 +389,38 @@ export default function AdminBackupsPage() {
         } finally {
             setRunning(false);
         }
+    };
+
+    const handleConnectGoogleDrive = () => {
+        if (form.auth_type !== 'oauth_personal') {
+            setMessage('Switch this backup account to Personal Drive OAuth before connecting Google Drive.', 'error');
+            return;
+        }
+
+        if (!form.oauth_client_id.trim() || !form.oauth_client_secret.trim()) {
+            setMessage('OAuth client ID and client secret are required before connecting Google Drive.', 'error');
+            return;
+        }
+
+        const state = `${Date.now()}_${Math.random().toString(36).slice(2)}`;
+        sessionStorage.setItem(GOOGLE_OAUTH_SESSION_KEY, JSON.stringify({
+            state,
+            editingId,
+            form
+        }));
+
+        const params = new URLSearchParams({
+            client_id: form.oauth_client_id.trim(),
+            redirect_uri: getRedirectUri(),
+            response_type: 'code',
+            scope: 'https://www.googleapis.com/auth/drive https://www.googleapis.com/auth/userinfo.email',
+            access_type: 'offline',
+            prompt: 'consent',
+            include_granted_scopes: 'true',
+            state
+        });
+
+        window.location.assign(`https://accounts.google.com/o/oauth2/v2/auth?${params.toString()}`);
     };
 
     if (!isAuthenticated) {
@@ -429,8 +582,26 @@ export default function AdminBackupsPage() {
                                             <label className="mb-2 block text-sm font-medium text-slate-700">OAuth refresh token</label>
                                             <textarea name="oauth_refresh_token" value={form.oauth_refresh_token} onChange={handleChange} rows={5} spellCheck={false} className="w-full rounded-3xl border border-slate-200 bg-slate-950 px-4 py-4 font-mono text-sm text-cyan-100 outline-none focus:border-cyan-400 focus:ring-4 focus:ring-cyan-100" required />
                                         </div>
+                                        <div className="rounded-2xl border border-slate-200 bg-slate-50 px-4 py-3 text-sm text-slate-700">
+                                            <p className="font-semibold text-slate-900">Authorized redirect URI</p>
+                                            <p className="mt-2 break-all font-mono text-xs text-slate-600">{getRedirectUri()}</p>
+                                            <p className="mt-2 text-slate-600">Add this exact URI to your Google Cloud OAuth client before clicking Connect Google Drive.</p>
+                                        </div>
+                                        <div className="flex flex-wrap items-center gap-3">
+                                            <button
+                                                type="button"
+                                                onClick={handleConnectGoogleDrive}
+                                                disabled={oauthConnecting}
+                                                className="rounded-2xl bg-gradient-to-r from-blue-600 to-cyan-500 px-5 py-3 text-sm font-semibold text-white disabled:opacity-60"
+                                            >
+                                                {oauthConnecting ? 'Connecting...' : 'Connect Google Drive'}
+                                            </button>
+                                            <span className="text-sm text-slate-500">
+                                                This fills the refresh token automatically after Google sends you back here.
+                                            </span>
+                                        </div>
                                         <div className="rounded-2xl border border-blue-200 bg-blue-50 px-4 py-3 text-sm text-blue-800">
-                                            Personal Google Drive requires OAuth. Generate a refresh token with Google Drive scope and paste it here. Do not use `Impersonate Email` for `@gmail.com` accounts.
+                                            Personal Google Drive uses OAuth. Do not use `Impersonate Email` for `@gmail.com` accounts. After Connect succeeds, click Save to persist the refresh token.
                                         </div>
                                     </>
                                 ) : (

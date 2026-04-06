@@ -19,6 +19,7 @@ router.get('/backup-accounts', BackupAccountController.getAllAccounts);
 router.post('/backup-accounts', BackupAccountController.createAccount);
 router.put('/backup-accounts/:id', BackupAccountController.updateAccount);
 router.delete('/backup-accounts/:id', BackupAccountController.deleteAccount);
+router.post('/backup-accounts/google-oauth/exchange', BackupAccountController.exchangeGoogleOauthCode);
 router.post('/backup-accounts/run-now', BackupAccountController.triggerManualBackup);
 
 module.exports = router;
