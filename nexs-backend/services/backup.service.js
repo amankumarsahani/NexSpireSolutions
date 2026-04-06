@@ -16,7 +16,7 @@ class BackupService {
         console.log('[BackupService] Starting daily backup run...');
 
         // Default to active tenants only. Allow override for special cases.
-        const allowedStatuses = (process.env.BACKUP_TENANT_STATUSES || 'active')
+        const allowedStatuses = (process.env.BACKUP_TENANT_STATUSES || 'active,trial')
             .split(',')
             .map(status => status.trim().toLowerCase())
             .filter(Boolean);
