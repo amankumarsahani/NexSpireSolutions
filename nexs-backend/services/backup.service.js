@@ -9,6 +9,48 @@ const ServerModel = require('../models/server.model');
 const BackupAccountModel = require('../models/backup-account.model');
 
 class BackupService {
+    getAccountAuthType(account) {
+        return account?.auth_type === 'oauth_personal' ? 'oauth_personal' : 'service_account';
+    }
+
+    createDriveClient(account) {
+        const authType = this.getAccountAuthType(account);
+
+        if (authType === 'oauth_personal') {
+            if (!account.oauth_client_id || !account.oauth_client_secret || !account.oauth_refresh_token) {
+                throw new Error('Backup account is missing OAuth client_id, client_secret, or refresh_token for personal Google Drive access.');
+            }
+
+            const auth = new google.auth.OAuth2(
+                account.oauth_client_id,
+                account.oauth_client_secret
+            );
+
+            auth.setCredentials({
+                refresh_token: account.oauth_refresh_token
+            });
+
+            return google.drive({ version: 'v3', auth });
+        }
+
+        if (!account.credentials_json) {
+            throw new Error('Backup account is missing service account credentials JSON.');
+        }
+
+        const authOptions = {
+            credentials: JSON.parse(account.credentials_json),
+            scopes: ['https://www.googleapis.com/auth/drive.file'],
+        };
+
+        if (account.subject_email) {
+            authOptions.clientOptions = { subject: account.subject_email };
+            console.log(`[BackupService] Impersonating user: ${account.subject_email}`);
+        }
+
+        const auth = new google.auth.GoogleAuth(authOptions);
+        return google.drive({ version: 'v3', auth });
+    }
+
     /**
      * Run daily backup for all active tenants
      */
@@ -111,25 +153,13 @@ class BackupService {
      */
     async uploadToGDrive(account, filePath, fileName) {
         if (!account.folder_id) {
-            throw new Error('Backup account missing folder_id. Cannot upload to root of service account.');
+            throw new Error('Backup account missing folder_id. Please provide a Google Drive folder ID.');
         }
 
-        console.log(`[BackupService] Uploading to GDrive Folder ID: ${account.folder_id}`);
+        const authType = this.getAccountAuthType(account);
+        console.log(`[BackupService] Uploading to GDrive Folder ID: ${account.folder_id} using ${authType} auth`);
 
-        const authOptions = {
-            credentials: JSON.parse(account.credentials_json),
-            scopes: ['https://www.googleapis.com/auth/drive.file'],
-        };
-
-        // If subject_email is present (Domain-Wide Delegation), add it to impersonate
-        if (account.subject_email) {
-            authOptions.clientOptions = { subject: account.subject_email };
-            console.log(`[BackupService] Impersonating user: ${account.subject_email}`);
-        }
-
-        const auth = new google.auth.GoogleAuth(authOptions);
-
-        const drive = google.drive({ version: 'v3', auth });
+        const drive = this.createDriveClient(account);
 
         const fileMetadata = {
             name: fileName,
@@ -146,15 +176,21 @@ class BackupService {
                 resource: fileMetadata,
                 media: media,
                 fields: 'id',
-                supportsAllDrives: true, // Required for Shared Drives
+                supportsAllDrives: true,
             });
             return res.data.id;
         } catch (error) {
-            if (error.message && error.message.includes('Service Accounts do not have storage quota')) {
+            if (authType === 'service_account' && error.message && error.message.includes('Service Accounts do not have storage quota')) {
                 throw new Error(`Google Drive Storage Error: Service Accounts cannot own files in standard folders. Please use a 'Shared Drive' (Team Drive) and ensure the Service Account is added as a 'Contributor' or 'Manager', OR use Domain-Wide Delegation.`);
             }
-            if (error.message && (error.message.includes('unauthorized_client') || error.message.includes('Client is unauthorized'))) {
+            if (authType === 'service_account' && error.message && (error.message.includes('unauthorized_client') || error.message.includes('Client is unauthorized'))) {
                 throw new Error(`Authorization Error: Domain-Wide Delegation failed. If you are using a personal Gmail account, leave the 'Impersonate Email' field BLANK. If using Workspace, ensure the Service Account is authorized in the Admin Console.`);
+            }
+            if (authType === 'oauth_personal' && error.message && error.message.includes('invalid_grant')) {
+                throw new Error('Google OAuth Error: The stored refresh token is invalid, expired, or revoked. Generate a new refresh token for the personal Google Drive account and update this backup account.');
+            }
+            if (authType === 'oauth_personal' && error.message && error.message.includes('unauthorized_client')) {
+                throw new Error('Google OAuth Error: This OAuth client is not allowed for the requested Drive access. Verify the Google Cloud OAuth client configuration and consent screen.');
             }
             throw error;
         }
@@ -182,21 +218,11 @@ class BackupService {
     }
 
     async deleteFromGDrive(account, fileId) {
-        const authOptions = {
-            credentials: JSON.parse(account.credentials_json),
-            scopes: ['https://www.googleapis.com/auth/drive.file'],
-        };
-
-        if (account.subject_email) {
-            authOptions.clientOptions = { subject: account.subject_email };
-        }
-
-        const auth = new google.auth.GoogleAuth(authOptions);
-        const drive = google.drive({ version: 'v3', auth });
+        const drive = this.createDriveClient(account);
 
         await drive.files.delete({
             fileId,
-            supportsAllDrives: true // Required for Shared Drives
+            supportsAllDrives: true
         });
     }
 }

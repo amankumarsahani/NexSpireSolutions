@@ -5,7 +5,21 @@ class BackupAccountModel {
      * Get all backup accounts
      */
     static async findAll() {
-        const [rows] = await pool.query('SELECT id, account_name, folder_id, subject_email, credentials_json, is_active, usage_count FROM backup_accounts');
+        const [rows] = await pool.query(`
+            SELECT
+                id,
+                account_name,
+                auth_type,
+                folder_id,
+                subject_email,
+                credentials_json,
+                oauth_client_id,
+                oauth_client_secret,
+                oauth_refresh_token,
+                is_active,
+                usage_count
+            FROM backup_accounts
+        `);
         return rows;
     }
 
@@ -41,11 +55,44 @@ class BackupAccountModel {
      * Create backup account
      */
     static async create(data) {
-        const { account_name, credentials_json, folder_id, subject_email } = data;
+        const {
+            account_name,
+            auth_type = 'service_account',
+            credentials_json,
+            folder_id,
+            subject_email,
+            oauth_client_id,
+            oauth_client_secret,
+            oauth_refresh_token
+        } = data;
+
+        const normalizedAuthType = auth_type === 'oauth_personal' ? 'oauth_personal' : 'service_account';
+        const serializedCredentials = normalizedAuthType === 'service_account' && credentials_json
+            ? (typeof credentials_json === 'string' ? credentials_json : JSON.stringify(credentials_json))
+            : null;
+
         const [result] = await pool.query(`
-            INSERT INTO backup_accounts (account_name, credentials_json, folder_id, subject_email)
-            VALUES (?, ?, ?, ?)
-        `, [account_name, JSON.stringify(credentials_json), folder_id, subject_email || null]);
+            INSERT INTO backup_accounts (
+                account_name,
+                auth_type,
+                credentials_json,
+                folder_id,
+                subject_email,
+                oauth_client_id,
+                oauth_client_secret,
+                oauth_refresh_token
+            )
+            VALUES (?, ?, ?, ?, ?, ?, ?, ?)
+        `, [
+            account_name,
+            normalizedAuthType,
+            serializedCredentials,
+            folder_id,
+            subject_email || null,
+            normalizedAuthType === 'oauth_personal' ? oauth_client_id || null : null,
+            normalizedAuthType === 'oauth_personal' ? oauth_client_secret || null : null,
+            normalizedAuthType === 'oauth_personal' ? oauth_refresh_token || null : null
+        ]);
         return result.insertId;
     }
 
@@ -53,12 +100,45 @@ class BackupAccountModel {
      * Update backup account
      */
     static async update(id, data) {
-        const { account_name, credentials_json, folder_id, subject_email } = data;
+        const {
+            account_name,
+            auth_type = 'service_account',
+            credentials_json,
+            folder_id,
+            subject_email,
+            oauth_client_id,
+            oauth_client_secret,
+            oauth_refresh_token
+        } = data;
+
+        const normalizedAuthType = auth_type === 'oauth_personal' ? 'oauth_personal' : 'service_account';
+        const serializedCredentials = normalizedAuthType === 'service_account' && credentials_json
+            ? (typeof credentials_json === 'string' ? credentials_json : JSON.stringify(credentials_json))
+            : null;
+
         await pool.query(`
             UPDATE backup_accounts 
-            SET account_name = ?, credentials_json = ?, folder_id = ?, subject_email = ?
+            SET
+                account_name = ?,
+                auth_type = ?,
+                credentials_json = ?,
+                folder_id = ?,
+                subject_email = ?,
+                oauth_client_id = ?,
+                oauth_client_secret = ?,
+                oauth_refresh_token = ?
             WHERE id = ?
-        `, [account_name, JSON.stringify(credentials_json), folder_id, subject_email || null, id]);
+        `, [
+            account_name,
+            normalizedAuthType,
+            serializedCredentials,
+            folder_id,
+            subject_email || null,
+            normalizedAuthType === 'oauth_personal' ? oauth_client_id || null : null,
+            normalizedAuthType === 'oauth_personal' ? oauth_client_secret || null : null,
+            normalizedAuthType === 'oauth_personal' ? oauth_refresh_token || null : null,
+            id
+        ]);
     }
 
     /**

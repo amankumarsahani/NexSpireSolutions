@@ -4,10 +4,14 @@ import { adminAPI } from '../services/api';
 import { useAuth } from '../context/AuthContext';
 
 const EMPTY_FORM = {
+    auth_type: 'oauth_personal',
     account_name: '',
     folder_id: '',
     subject_email: '',
-    credentials_json: '{\n  \n}'
+    credentials_json: '{\n  \n}',
+    oauth_client_id: '',
+    oauth_client_secret: '',
+    oauth_refresh_token: ''
 };
 
 function SignInPanel() {
@@ -109,6 +113,9 @@ function AccessDenied({ email, onLogout }) {
 }
 
 function safePrettyJson(value) {
+    if (!value) {
+        return '{\n  \n}';
+    }
     try {
         const parsed = typeof value === 'string' ? JSON.parse(value) : value;
         return JSON.stringify(parsed, null, 2);
@@ -177,12 +184,17 @@ export default function AdminBackupsPage() {
     };
 
     const handleEdit = (account) => {
+        const authType = account.auth_type === 'oauth_personal' ? 'oauth_personal' : 'service_account';
         setEditingId(account.id);
         setForm({
+            auth_type: authType,
             account_name: account.account_name || '',
             folder_id: account.folder_id || '',
             subject_email: account.subject_email || '',
-            credentials_json: safePrettyJson(account.credentials_json)
+            credentials_json: safePrettyJson(account.credentials_json),
+            oauth_client_id: account.oauth_client_id || '',
+            oauth_client_secret: account.oauth_client_secret || '',
+            oauth_refresh_token: account.oauth_refresh_token || ''
         });
         setMessage(`Editing "${account.account_name}"`, 'info');
     };
@@ -203,21 +215,28 @@ export default function AdminBackupsPage() {
         event.preventDefault();
         setSaving(true);
         setNotice({ type: '', message: '' });
+        const authType = form.auth_type === 'oauth_personal' ? 'oauth_personal' : 'service_account';
+        let credentials = null;
 
-        let credentials;
-        try {
-            credentials = JSON.parse(form.credentials_json);
-        } catch {
-            setSaving(false);
-            setMessage('Credentials JSON is invalid', 'error');
-            return;
+        if (authType === 'service_account') {
+            try {
+                credentials = JSON.parse(form.credentials_json);
+            } catch {
+                setSaving(false);
+                setMessage('Credentials JSON is invalid', 'error');
+                return;
+            }
         }
 
         const payload = {
+            auth_type: authType,
             account_name: form.account_name.trim(),
             folder_id: form.folder_id.trim(),
-            subject_email: form.subject_email.trim(),
-            credentials_json: credentials
+            subject_email: authType === 'service_account' ? form.subject_email.trim() : '',
+            credentials_json: authType === 'service_account' ? credentials : null,
+            oauth_client_id: authType === 'oauth_personal' ? form.oauth_client_id.trim() : '',
+            oauth_client_secret: authType === 'oauth_personal' ? form.oauth_client_secret.trim() : '',
+            oauth_refresh_token: authType === 'oauth_personal' ? form.oauth_refresh_token.trim() : ''
         };
 
         try {
@@ -347,7 +366,7 @@ export default function AdminBackupsPage() {
                             <div className="flex items-center justify-between gap-4">
                                 <div>
                                     <h2 className="font-display text-2xl font-bold text-slate-900">{editingId ? 'Edit Backup Account' : 'Add Backup Account'}</h2>
-                                    <p className="mt-2 text-sm text-slate-600">Paste the service-account JSON and the target Drive folder ID.</p>
+                                    <p className="mt-2 text-sm text-slate-600">Choose personal OAuth for normal Gmail Drive, or service-account mode for Shared Drive setups.</p>
                                 </div>
                                 {editingId ? (
                                     <button type="button" onClick={resetForm} className="rounded-2xl border border-slate-200 px-4 py-2 text-sm font-semibold text-slate-700">
@@ -358,26 +377,82 @@ export default function AdminBackupsPage() {
 
                             <div className="mt-8 space-y-5">
                                 <div>
+                                    <label className="mb-2 block text-sm font-medium text-slate-700">Google auth mode</label>
+                                    <div className="grid gap-3 md:grid-cols-2">
+                                        <button
+                                            type="button"
+                                            onClick={() => setForm((prev) => ({ ...prev, auth_type: 'oauth_personal' }))}
+                                            className={`rounded-2xl border px-4 py-3 text-left transition ${form.auth_type === 'oauth_personal'
+                                                ? 'border-blue-500 bg-blue-50 text-blue-800'
+                                                : 'border-slate-200 bg-white text-slate-700'
+                                                }`}
+                                        >
+                                            <span className="block text-sm font-semibold">Personal Drive OAuth</span>
+                                            <span className="mt-1 block text-xs text-slate-500">Use normal `@gmail.com` Drive with OAuth client ID, secret, and refresh token.</span>
+                                        </button>
+                                        <button
+                                            type="button"
+                                            onClick={() => setForm((prev) => ({ ...prev, auth_type: 'service_account' }))}
+                                            className={`rounded-2xl border px-4 py-3 text-left transition ${form.auth_type === 'service_account'
+                                                ? 'border-blue-500 bg-blue-50 text-blue-800'
+                                                : 'border-slate-200 bg-white text-slate-700'
+                                                }`}
+                                        >
+                                            <span className="block text-sm font-semibold">Service Account</span>
+                                            <span className="mt-1 block text-xs text-slate-500">Use Shared Drive / Workspace-style setup with service-account JSON.</span>
+                                        </button>
+                                    </div>
+                                </div>
+
+                                <div>
                                     <label className="mb-2 block text-sm font-medium text-slate-700">Account name</label>
                                     <input name="account_name" value={form.account_name} onChange={handleChange} className="w-full rounded-2xl border border-slate-200 px-4 py-3 outline-none focus:border-blue-500 focus:ring-4 focus:ring-blue-100" required />
                                 </div>
-                                <div className="grid gap-5 md:grid-cols-2">
-                                    <div>
-                                        <label className="mb-2 block text-sm font-medium text-slate-700">Folder ID</label>
-                                        <input name="folder_id" value={form.folder_id} onChange={handleChange} className="w-full rounded-2xl border border-slate-200 px-4 py-3 outline-none focus:border-blue-500 focus:ring-4 focus:ring-blue-100" required />
-                                    </div>
-                                    <div>
-                                        <label className="mb-2 block text-sm font-medium text-slate-700">Impersonate email</label>
-                                        <input name="subject_email" value={form.subject_email} onChange={handleChange} className="w-full rounded-2xl border border-slate-200 px-4 py-3 outline-none focus:border-blue-500 focus:ring-4 focus:ring-blue-100" />
-                                    </div>
-                                </div>
                                 <div>
-                                    <label className="mb-2 block text-sm font-medium text-slate-700">Service account JSON</label>
-                                    <textarea name="credentials_json" value={form.credentials_json} onChange={handleChange} rows={14} spellCheck={false} className="w-full rounded-3xl border border-slate-200 bg-slate-950 px-4 py-4 font-mono text-sm text-cyan-100 outline-none focus:border-cyan-400 focus:ring-4 focus:ring-cyan-100" required />
+                                    <label className="mb-2 block text-sm font-medium text-slate-700">Folder ID</label>
+                                    <input name="folder_id" value={form.folder_id} onChange={handleChange} className="w-full rounded-2xl border border-slate-200 px-4 py-3 outline-none focus:border-blue-500 focus:ring-4 focus:ring-blue-100" required />
                                 </div>
-                                <div className="rounded-2xl border border-slate-200 bg-slate-50 px-4 py-3 text-sm text-slate-600">
-                                    Use a Shared Drive or a folder already shared with the service account.
-                                </div>
+
+                                {form.auth_type === 'oauth_personal' ? (
+                                    <>
+                                        <div className="grid gap-5 md:grid-cols-2">
+                                            <div>
+                                                <label className="mb-2 block text-sm font-medium text-slate-700">OAuth client ID</label>
+                                                <input name="oauth_client_id" value={form.oauth_client_id} onChange={handleChange} className="w-full rounded-2xl border border-slate-200 px-4 py-3 outline-none focus:border-blue-500 focus:ring-4 focus:ring-blue-100" required />
+                                            </div>
+                                            <div>
+                                                <label className="mb-2 block text-sm font-medium text-slate-700">OAuth client secret</label>
+                                                <input name="oauth_client_secret" value={form.oauth_client_secret} onChange={handleChange} className="w-full rounded-2xl border border-slate-200 px-4 py-3 outline-none focus:border-blue-500 focus:ring-4 focus:ring-blue-100" required />
+                                            </div>
+                                        </div>
+                                        <div>
+                                            <label className="mb-2 block text-sm font-medium text-slate-700">OAuth refresh token</label>
+                                            <textarea name="oauth_refresh_token" value={form.oauth_refresh_token} onChange={handleChange} rows={5} spellCheck={false} className="w-full rounded-3xl border border-slate-200 bg-slate-950 px-4 py-4 font-mono text-sm text-cyan-100 outline-none focus:border-cyan-400 focus:ring-4 focus:ring-cyan-100" required />
+                                        </div>
+                                        <div className="rounded-2xl border border-blue-200 bg-blue-50 px-4 py-3 text-sm text-blue-800">
+                                            Personal Google Drive requires OAuth. Generate a refresh token with Google Drive scope and paste it here. Do not use `Impersonate Email` for `@gmail.com` accounts.
+                                        </div>
+                                    </>
+                                ) : (
+                                    <>
+                                        <div className="grid gap-5 md:grid-cols-2">
+                                            <div>
+                                                <label className="mb-2 block text-sm font-medium text-slate-700">Impersonate email</label>
+                                                <input name="subject_email" value={form.subject_email} onChange={handleChange} className="w-full rounded-2xl border border-slate-200 px-4 py-3 outline-none focus:border-blue-500 focus:ring-4 focus:ring-blue-100" />
+                                            </div>
+                                            <div className="rounded-2xl border border-amber-200 bg-amber-50 px-4 py-3 text-sm text-amber-800">
+                                                Service-account mode is for Shared Drives or Google Workspace setups, not normal personal Gmail Drive folders.
+                                            </div>
+                                        </div>
+                                        <div>
+                                            <label className="mb-2 block text-sm font-medium text-slate-700">Service account JSON</label>
+                                            <textarea name="credentials_json" value={form.credentials_json} onChange={handleChange} rows={14} spellCheck={false} className="w-full rounded-3xl border border-slate-200 bg-slate-950 px-4 py-4 font-mono text-sm text-cyan-100 outline-none focus:border-cyan-400 focus:ring-4 focus:ring-cyan-100" required />
+                                        </div>
+                                        <div className="rounded-2xl border border-slate-200 bg-slate-50 px-4 py-3 text-sm text-slate-600">
+                                            Use a Shared Drive or a folder already shared with the service account.
+                                        </div>
+                                    </>
+                                )}
                                 <button type="submit" disabled={saving} className="rounded-2xl bg-slate-900 px-5 py-3 text-sm font-semibold text-white disabled:opacity-60">
                                     {saving ? 'Saving...' : editingId ? 'Update Backup Account' : 'Create Backup Account'}
                                 </button>
@@ -406,6 +481,7 @@ export default function AdminBackupsPage() {
                                         </div>
                                     ) : accounts.map((account) => {
                                         let clientEmail = '';
+                                        const authType = account.auth_type === 'oauth_personal' ? 'oauth_personal' : 'service_account';
                                         try {
                                             const credentials = typeof account.credentials_json === 'string' ? JSON.parse(account.credentials_json) : account.credentials_json;
                                             clientEmail = credentials?.client_email || '';
@@ -422,11 +498,23 @@ export default function AdminBackupsPage() {
                                                             <span className={`rounded-full px-3 py-1 text-xs font-semibold ${account.is_active ? 'bg-emerald-100 text-emerald-700' : 'bg-slate-200 text-slate-700'}`}>
                                                                 {account.is_active ? 'Active' : 'Inactive'}
                                                             </span>
+                                                            <span className={`rounded-full px-3 py-1 text-xs font-semibold ${authType === 'oauth_personal' ? 'bg-blue-100 text-blue-700' : 'bg-purple-100 text-purple-700'}`}>
+                                                                {authType === 'oauth_personal' ? 'Personal Drive OAuth' : 'Service Account'}
+                                                            </span>
                                                         </div>
                                                         <div className="grid gap-2 text-sm text-slate-600">
                                                             <p><span className="font-medium text-slate-800">Folder ID:</span> {account.folder_id || '-'}</p>
-                                                            <p><span className="font-medium text-slate-800">Service account:</span> {clientEmail || 'Hidden / unavailable'}</p>
-                                                            <p><span className="font-medium text-slate-800">Impersonate email:</span> {account.subject_email || 'Not set'}</p>
+                                                            {authType === 'oauth_personal' ? (
+                                                                <>
+                                                                    <p><span className="font-medium text-slate-800">OAuth client ID:</span> {account.oauth_client_id || 'Not set'}</p>
+                                                                    <p><span className="font-medium text-slate-800">Refresh token:</span> {account.oauth_refresh_token ? 'Stored' : 'Missing'}</p>
+                                                                </>
+                                                            ) : (
+                                                                <>
+                                                                    <p><span className="font-medium text-slate-800">Service account:</span> {clientEmail || 'Hidden / unavailable'}</p>
+                                                                    <p><span className="font-medium text-slate-800">Impersonate email:</span> {account.subject_email || 'Not set'}</p>
+                                                                </>
+                                                            )}
                                                             <p><span className="font-medium text-slate-800">Usage count:</span> {account.usage_count ?? 0}</p>
                                                         </div>
                                                     </div>
