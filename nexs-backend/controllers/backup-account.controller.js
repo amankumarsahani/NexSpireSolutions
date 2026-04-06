@@ -2,7 +2,7 @@ const BackupAccountModel = require('../models/backup-account.model');
 const { google } = require('googleapis');
 
 class BackupAccountController {
-    validatePayload(payload) {
+    validatePayload = (payload) => {
         const authType = payload.auth_type === 'oauth_personal' ? 'oauth_personal' : 'service_account';
 
         if (!payload.account_name || !payload.folder_id) {
@@ -24,7 +24,7 @@ class BackupAccountController {
     /**
      * List all backup accounts
      */
-    async getAllAccounts(req, res) {
+    getAllAccounts = async (req, res) => {
         try {
             const accounts = await BackupAccountModel.findAll();
             res.json({ success: true, data: accounts });
@@ -36,7 +36,7 @@ class BackupAccountController {
     /**
      * Create backup account
      */
-    async createAccount(req, res) {
+    createAccount = async (req, res) => {
         try {
             this.validatePayload(req.body);
             const accountId = await BackupAccountModel.create(req.body);
@@ -50,7 +50,7 @@ class BackupAccountController {
     /**
      * Update backup account
      */
-    async updateAccount(req, res) {
+    updateAccount = async (req, res) => {
         try {
             const { id } = req.params;
             this.validatePayload(req.body);
@@ -65,7 +65,7 @@ class BackupAccountController {
     /**
      * Delete backup account
      */
-    async deleteAccount(req, res) {
+    deleteAccount = async (req, res) => {
         try {
             const { id } = req.params;
             await BackupAccountModel.delete(id);
@@ -78,10 +78,10 @@ class BackupAccountController {
     /**
      * Trigger manual backup
      */
-    async triggerManualBackup(req, res) {
+    triggerManualBackup = async (req, res) => {
         try {
             const backupWorker = require('../workers/backupWorker');
-            backupWorker.triggerNow(); // Run async
+            backupWorker.triggerNow();
             res.json({ success: true, message: 'Backup process started in background' });
         } catch (error) {
             res.status(500).json({ success: false, message: error.message });
@@ -91,7 +91,7 @@ class BackupAccountController {
     /**
      * Exchange Google OAuth authorization code for refresh token
      */
-    async exchangeGoogleOauthCode(req, res) {
+    exchangeGoogleOauthCode = async (req, res) => {
         try {
             const { client_id, client_secret, code, redirect_uri } = req.body;
 
