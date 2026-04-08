@@ -896,10 +896,12 @@ class Provisioner {
             const dbHost = server.db_host || this.dbHost;
             const dbPort = server.db_port || this.dbPort;
 
-            const envVars = `TENANT_ID=${tenant.id} TENANT_SLUG=${slug} PORT=${port} DB_HOST=${dbHost} DB_PORT=${dbPort} DB_NAME=nexcrm_${slug.replace(/-/g, '_')} DB_USER=${dbUser} DB_PASSWORD='${dbPass}' INDUSTRY_TYPE=${tenant.industry_type || 'general'} PLAN_SLUG=${tenant.plan_slug || 'starter'}`;
+            const dbName = `nexcrm_${slug.replace(/-/g, '_')}`;
 
             // Start process using PM2 on target server
-            await this.executeOnServer(server, `cd ${backendPath} && ${envVars} pm2 start server.js --name "${processName}" -- --industry ${tenant.industry_type || 'general'} --plan ${tenant.plan_slug || 'starter'}`);
+            // Critical config passed as CLI args (PM2 forwards everything after --)
+            // DB credentials also passed via ecosystem.config.js env block
+            await this.executeOnServer(server, `cd ${backendPath} && pm2 start server.js --name "${processName}" -- --port ${port} --db ${dbName} --slug ${slug} --industry ${tenant.industry_type || 'general'} --plan ${tenant.plan_slug || 'starter'}`);
 
             // Persist PM2 list and update ecosystem.config.js on target server
             await this.executeOnServer(server, 'pm2 save');
@@ -912,7 +914,7 @@ class Provisioner {
                 process_name: processName,
                 process_status: 'running',
                 assigned_port: port,
-                db_name: `nexcrm_${slug.replace(/-/g, '_')}`
+                db_name: dbName
             });
         } catch (error) {
             console.error(`[Provisioner] PM2 process start failed: ${error.message}`);
