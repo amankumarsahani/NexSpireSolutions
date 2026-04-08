@@ -447,9 +447,9 @@ class TenantController {
     async setupCustomDomain(req, res) {
         try {
             const { id } = req.params;
-            const { crm, storefront, api } = req.body;
+            const { crm, storefront } = req.body;
 
-            if (!crm && !storefront && !api) {
+            if (!crm && !storefront) {
                 return res.status(400).json({ error: 'At least one domain is required' });
             }
 
@@ -458,22 +458,28 @@ class TenantController {
                 return res.status(404).json({ error: 'Tenant not found' });
             }
 
-            // Call provisioner to setup domains
-            const provisioner = new Provisioner();
-            const result = await provisioner.setupCustomDomain(tenant, { crm, storefront, api });
-
-            // Update database with new domain columns
+            // Save domains to DB FIRST (before Cloudflare setup)
+            // This ensures domain resolution works even if Cloudflare attachment fails
             const updateData = {};
             if (crm) updateData.custom_domain_crm = crm;
             if (storefront) updateData.custom_domain_storefront = storefront;
-            if (api) updateData.custom_domain_api = api;
-            updateData.custom_domain_verified = result.success;
-
             await TenantModel.update(id, updateData);
+
+            // Then attempt Cloudflare Pages attachment (non-blocking for DB save)
+            let result = { success: false, results: {} };
+            try {
+                const provisioner = new Provisioner();
+                result = await provisioner.setupCustomDomain(tenant, { crm, storefront });
+                // Update verification status based on Cloudflare result
+                await TenantModel.update(id, { custom_domain_verified: result.success });
+            } catch (cfError) {
+                console.warn('Cloudflare domain setup failed (domains saved to DB):', cfError.message);
+                // Don't throw — domains are saved, Cloudflare can be retried
+            }
 
             res.json({
                 success: true,
-                message: 'Custom domain configuration initiated',
+                message: 'Custom domains saved' + (result.success ? ' and configured with Cloudflare' : ' (Cloudflare setup pending)'),
                 data: result
             });
         } catch (error) {
