@@ -42,8 +42,13 @@ const corsOptions = {
         // Allow any subdomain of nexspiresolutions.co.in
         const isNexspireSubdomain = origin && /https:\/\/[a-z0-9-]+\.nexspiresolutions\.co\.in$/.test(origin);
 
+        // Allow any HTTPS origin (for custom domain storefronts calling /api/resolve-domain)
+        // The resolve-domain endpoint returns public, non-sensitive data.
+        // Protected endpoints are still gated by auth middleware.
+        const isHttps = origin && /^https:\/\/.+/.test(origin);
+
         // Allow requests with no origin (mobile apps, Postman, etc.)
-        if (!origin || allowedOrigins.indexOf(origin) !== -1 || isNexspireSubdomain) {
+        if (!origin || allowedOrigins.indexOf(origin) !== -1 || isNexspireSubdomain || isHttps) {
             callback(null, true);
         } else {
             callback(new Error('Not allowed by CORS'));
@@ -139,6 +144,61 @@ app.use('/api/document-templates', require('./routes/document-template.routes'))
 app.use('/api/activities', require('./routes/activity.routes'));
 app.use('/api/dashboard', require('./routes/dashboard.routes'));
 app.use('/api/settings', settingsRoutes);
+
+// Public: Resolve custom domain → tenant info (no auth required)
+// Used by storefront to discover which tenant a custom domain belongs to
+app.get('/api/resolve-domain', async (req, res) => {
+    try {
+        const { domain } = req.query;
+        if (!domain) {
+            return res.status(400).json({ found: false, error: 'domain query parameter is required' });
+        }
+
+        const normalizedDomain = domain.toLowerCase().trim();
+        const { pool: adminPool } = require('./config/database');
+
+        // Search across all custom domain columns
+        const [rows] = await adminPool.query(
+            `SELECT slug, name, industry_type, assigned_port, status,
+                    custom_domain_crm, custom_domain_storefront, custom_domain_api,
+                    custom_domain_verified
+             FROM tenants
+             WHERE status IN ('active', 'trial')
+               AND (custom_domain_storefront = ? OR custom_domain_crm = ? OR custom_domain_api = ? OR custom_domain = ?)
+             LIMIT 1`,
+            [normalizedDomain, normalizedDomain, normalizedDomain, normalizedDomain]
+        );
+
+        if (!rows.length) {
+            return res.status(404).json({ found: false, error: 'No tenant found for this domain' });
+        }
+
+        const tenant = rows[0];
+        const baseDomain = process.env.NEXCRM_DOMAIN || 'nexspiresolutions.co.in';
+
+        res.json({
+            found: true,
+            tenant: {
+                slug: tenant.slug,
+                name: tenant.name,
+                industry: tenant.industry_type,
+                api_url: tenant.custom_domain_api
+                    ? `https://${tenant.custom_domain_api}`
+                    : `https://${tenant.slug}-crm-api.${baseDomain}`,
+                storefront_url: tenant.custom_domain_storefront
+                    ? `https://${tenant.custom_domain_storefront}`
+                    : `https://${tenant.slug}.${baseDomain}`,
+                crm_url: tenant.custom_domain_crm
+                    ? `https://${tenant.custom_domain_crm}`
+                    : `https://${tenant.slug}-crm.${baseDomain}`,
+                verified: !!tenant.custom_domain_verified
+            }
+        });
+    } catch (error) {
+        console.error('Resolve domain error:', error);
+        res.status(500).json({ found: false, error: 'Internal server error' });
+    }
+});
 
 // NexCRM Master Routes (Tenant Management)
 app.use('/api/tenants', require('./routes/tenant.routes'));
