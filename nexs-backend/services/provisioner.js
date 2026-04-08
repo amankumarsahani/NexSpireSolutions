@@ -836,7 +836,7 @@ class Provisioner {
 
                 if (server && port) {
                     // Update tunnel config to route this domain to the tenant's port
-                    await this.updateTunnelConfig(domains.api, port, server);
+                    await this.updateTunnelConfig(tenant.slug, port, server, domains.api);
                     results.api.success = true;
                     results.api.cnameTarget = `${server.cloudflare_tunnel_id}.cfargotunnel.com`;
                 } else {
@@ -870,7 +870,17 @@ class Provisioner {
                 }
             );
             const data = await response.json();
-            return data.success;
+            if (data.success) return true;
+
+            // Treat "already added" (code 8000018) as success
+            const alreadyExists = data.errors?.some(e => e.code === 8000018);
+            if (alreadyExists) {
+                console.log(`[Provisioner] Pages domain ${domain} already attached to ${projectName} — treating as success`);
+                return true;
+            }
+
+            console.error(`[Provisioner] Pages domain attachment error:`, data.errors);
+            return false;
         } catch (error) {
             console.error(`[Provisioner] Cloudflare Pages domain attachment failed: ${error.message}`);
             return false;
@@ -901,6 +911,11 @@ class Provisioner {
             // Start process using PM2 on target server
             // Critical config passed as CLI args (PM2 forwards everything after --)
             // DB credentials also passed via ecosystem.config.js env block
+            // First try to delete any existing errored/stopped process with the same name
+            try {
+                await this.executeOnServer(server, `pm2 delete ${processName} 2>/dev/null || true`);
+            } catch (_e) { /* ignore if doesn't exist */ }
+
             await this.executeOnServer(server, `cd ${backendPath} && pm2 start server.js --name "${processName}" -- --port ${port} --db ${dbName} --slug ${slug} --industry ${tenant.industry_type || 'general'} --plan ${tenant.plan_slug || 'starter'}`);
 
             // Persist PM2 list and update ecosystem.config.js on target server
@@ -1331,10 +1346,14 @@ class Provisioner {
             // Read current config from target server
             const { stdout: currentConfig } = await this.executeOnServer(server, `cat ${configPath}`);
 
+            // Check if this hostname already exists in the config — skip if so
+            if (currentConfig.includes(`hostname: ${hostname}`)) {
+                console.log(`[Provisioner] Tunnel config already has ${hostname} — skipping`);
+                return;
+            }
+
             // Simple string manipulation to add new ingress rule before the catch-all
-            // A more robust approach would be parsing YAML, but since it's a fixed format:
             const lines = currentConfig.split('\n');
-            // Regex to find the catch-all rule (ignoring whitespace) and capture indentation
             const matchIndex = lines.findIndex(line => /service:\s*http_status:404/.test(line));
 
             if (matchIndex !== -1) {
