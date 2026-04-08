@@ -635,13 +635,20 @@ class Provisioner {
 
             const data = await response.json();
 
-            if (!data.success) {
-                console.error('[Provisioner] Pages domain attachment error:', data.errors);
-                return false;
+            if (data.success) {
+                console.log(`[Provisioner] Domain attached to Pages: ${domain}`);
+                return true;
             }
 
-            console.log(`[Provisioner] Domain attached to Pages: ${domain}`);
-            return true;
+            // Treat "already added" (code 8000018) as success
+            const alreadyExists = data.errors?.some(e => e.code === 8000018);
+            if (alreadyExists) {
+                console.log(`[Provisioner] Pages domain ${domain} already attached to ${this.cfPagesProject} — treating as success`);
+                return true;
+            }
+
+            console.error('[Provisioner] Pages domain attachment error:', data.errors);
+            return false;
 
         } catch (error) {
             console.warn('[Provisioner] Pages domain attachment error:', error.message);
