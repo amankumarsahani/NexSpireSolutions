@@ -802,8 +802,7 @@ class Provisioner {
 
         const results = {
             crm: { success: false, domain: domains.crm, cnameTarget: null },
-            storefront: { success: false, domain: domains.storefront, cnameTarget: null },
-            api: { success: false, domain: domains.api, cnameTarget: null }
+            storefront: { success: false, domain: domains.storefront, cnameTarget: null }
         };
 
         try {
@@ -828,25 +827,11 @@ class Provisioner {
                 results.storefront.cnameTarget = `${storefrontProject}.pages.dev`;
             }
 
-            // 3. API Domain - Add to Cloudflare Tunnel ingress
-            if (domains.api) {
-                console.log(`[Provisioner] Configuring API domain: ${domains.api}`);
-                const server = await ServerModel.findById(tenant.server_id);
-                const port = tenant.assigned_port;
-
-                if (server && port) {
-                    // Update tunnel config to route this domain to the tenant's port
-                    await this.updateTunnelConfig(tenant.slug, port, server, domains.api);
-                    results.api.success = true;
-                    results.api.cnameTarget = `${server.cloudflare_tunnel_id}.cfargotunnel.com`;
-                } else {
-                    console.error(`[Provisioner] Cannot configure API domain - missing server or port`);
-                    results.api.error = 'Missing server configuration or port assignment';
-                }
-            }
+            // API always stays on {slug}-crm-api.nexspiresolutions.co.in (managed via Cloudflare Tunnel)
+            // No custom API domain support — Tunnel requires Cloudflare-proxied DNS which external domains don't have
 
             return {
-                success: results.crm.success || results.storefront.success || results.api.success,
+                success: results.crm.success || results.storefront.success,
                 results
             };
 

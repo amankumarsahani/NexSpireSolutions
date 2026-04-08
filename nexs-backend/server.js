@@ -182,9 +182,9 @@ app.get('/api/resolve-domain', async (req, res) => {
                 slug: tenant.slug,
                 name: tenant.name,
                 industry: tenant.industry_type,
-                api_url: tenant.custom_domain_api
-                    ? `https://${tenant.custom_domain_api}`
-                    : `https://${tenant.slug}-crm-api.${baseDomain}`,
+                // API always stays on nexspiresolutions.co.in (Cloudflare Tunnel)
+                // Custom domains are only for CRM and Storefront (Cloudflare Pages)
+                api_url: `https://${tenant.slug}-crm-api.${baseDomain}`,
                 storefront_url: tenant.custom_domain_storefront
                     ? `https://${tenant.custom_domain_storefront}`
                     : `https://${tenant.slug}.${baseDomain}`,
