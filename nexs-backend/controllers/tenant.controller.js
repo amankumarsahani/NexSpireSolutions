@@ -256,8 +256,17 @@ class TenantController {
                 });
             }
 
+            // Resolve the server for this tenant
+            const server = tenant.server_id
+                ? await ServerModel.findById(tenant.server_id)
+                : await ServerModel.getBestServer();
+
+            if (!server) {
+                return res.status(400).json({ error: 'No server found for this tenant' });
+            }
+
             const provisioner = new Provisioner();
-            await provisioner.startProcess(tenant);
+            await provisioner.startProcess(tenant, tenant.assigned_port, server);
             await TenantModel.updateProcessStatus(id, 'running');
 
             res.json({
