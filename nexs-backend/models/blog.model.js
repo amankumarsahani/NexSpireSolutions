@@ -6,13 +6,14 @@ const BlogModel = {
         let query = 'SELECT * FROM blogs WHERE 1=1';
         const params = [];
 
-        if (filters.status) {
+        if (filters.status && filters.status !== 'all') {
             query += ' AND status = ?';
             params.push(filters.status);
-        } else {
+        } else if (!filters.status) {
             // Default to published only for public access if not specified
             query += " AND status = 'published'";
         }
+        // 'all' = no status filter (admin sees everything)
 
         if (filters.category) {
             query += ' AND category = ?';
@@ -46,10 +47,10 @@ const BlogModel = {
         let query = 'SELECT COUNT(*) as total FROM blogs WHERE 1=1';
         const params = [];
 
-        if (filters.status) {
+        if (filters.status && filters.status !== 'all') {
             query += ' AND status = ?';
             params.push(filters.status);
-        } else {
+        } else if (!filters.status) {
             query += " AND status = 'published'";
         }
 

@@ -10,7 +10,7 @@ const BlogController = {
                 search: req.query.search,
                 page: req.query.page || 1,
                 limit: req.query.limit || 10,
-                status: req.user ? req.query.status : 'published' // Admin can see drafts
+                status: req.user ? (req.query.status || 'all') : 'published' // Admin sees all by default
             };
 
             const blogs = await BlogModel.findAll(filters);
