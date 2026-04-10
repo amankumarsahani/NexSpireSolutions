@@ -76,13 +76,38 @@ const LeadModel = {
 
         query += ' ORDER BY l.created_at DESC';
 
-        if (filters.limit) {
-            query += ' LIMIT ?';
-            params.push(parseInt(filters.limit));
-        }
+        const limit = parseInt(filters.limit) || 10;
+        const page = parseInt(filters.page) || 1;
+        const offset = (page - 1) * limit;
+        query += ' LIMIT ? OFFSET ?';
+        params.push(limit, offset);
 
         const [rows] = await pool.query(query, params);
         return rows;
+    },
+
+    async count(filters = {}) {
+        let query = `SELECT COUNT(*) as total FROM leads l WHERE 1=1`;
+        const params = [];
+
+        if (filters.status) {
+            query += ' AND l.status = ?';
+            params.push(filters.status);
+        }
+
+        if (filters.assignedTo) {
+            query += ' AND l.assignedTo = ?';
+            params.push(filters.assignedTo);
+        }
+
+        if (filters.search) {
+            query += ' AND (l.contactName LIKE ? OR l.company LIKE ? OR l.email LIKE ?)';
+            const searchTerm = `%${filters.search}%`;
+            params.push(searchTerm, searchTerm, searchTerm);
+        }
+
+        const [rows] = await pool.query(query, params);
+        return rows[0].total;
     },
 
     async findByAssignee(userId, filters = {}) {
@@ -98,13 +123,27 @@ const LeadModel = {
 
         query += ' ORDER BY l.created_at DESC';
 
-        if (filters.limit) {
-            query += ' LIMIT ?';
-            params.push(parseInt(filters.limit));
-        }
+        const limit = parseInt(filters.limit) || 10;
+        const page = parseInt(filters.page) || 1;
+        const offset = (page - 1) * limit;
+        query += ' LIMIT ? OFFSET ?';
+        params.push(limit, offset);
 
         const [rows] = await pool.query(query, params);
         return rows;
+    },
+
+    async countByAssignee(userId, filters = {}) {
+        let query = `SELECT COUNT(*) as total FROM leads l WHERE l.assignedTo = ?`;
+        const params = [userId];
+
+        if (filters.status) {
+            query += ' AND l.status = ?';
+            params.push(filters.status);
+        }
+
+        const [rows] = await pool.query(query, params);
+        return rows[0].total;
     },
 
     async findById(id) {

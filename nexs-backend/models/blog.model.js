@@ -32,13 +32,40 @@ const BlogModel = {
 
         query += ' ORDER BY created_at DESC';
 
-        if (filters.limit) {
-            query += ' LIMIT ?';
-            params.push(parseInt(filters.limit));
-        }
+        const limit = parseInt(filters.limit) || 10;
+        const page = parseInt(filters.page) || 1;
+        const offset = (page - 1) * limit;
+        query += ' LIMIT ? OFFSET ?';
+        params.push(limit, offset);
 
         const [rows] = await pool.query(query, params);
         return rows.map(r => this._mapRow(r));
+    },
+
+    async count(filters = {}) {
+        let query = 'SELECT COUNT(*) as total FROM blogs WHERE 1=1';
+        const params = [];
+
+        if (filters.status) {
+            query += ' AND status = ?';
+            params.push(filters.status);
+        } else {
+            query += " AND status = 'published'";
+        }
+
+        if (filters.category) {
+            query += ' AND category = ?';
+            params.push(filters.category);
+        }
+
+        if (filters.search) {
+            query += ' AND (title LIKE ? OR excerpt LIKE ?)';
+            const searchTerm = `%${filters.search}%`;
+            params.push(searchTerm, searchTerm);
+        }
+
+        const [rows] = await pool.query(query, params);
+        return rows[0].total;
     },
 
     // Get blog by slug (for public view)

@@ -8,17 +8,28 @@ const BlogController = {
                 category: req.query.category,
                 featured: req.query.featured === 'true' ? true : undefined,
                 search: req.query.search,
-                limit: req.query.limit,
+                page: req.query.page || 1,
+                limit: req.query.limit || 10,
                 status: req.user ? req.query.status : 'published' // Admin can see drafts
             };
 
             const blogs = await BlogModel.findAll(filters);
+            const total = await BlogModel.count(filters);
             const categories = await BlogModel.getCategories();
+
+            const page = parseInt(filters.page);
+            const limit = parseInt(filters.limit);
 
             res.json({
                 success: true,
                 blogs,
-                categories
+                categories,
+                pagination: {
+                    page,
+                    limit,
+                    total,
+                    pages: Math.ceil(total / limit)
+                }
             });
         } catch (error) {
             console.error('Get blogs error:', error);

@@ -5,18 +5,25 @@ const TeamController = {
     // Get all team members
     async getAll(req, res) {
         try {
-            const { status, department } = req.query;
-            const filters = {};
-
-            if (status) filters.status = status;
-            if (department) filters.department = department;
+            const { status, department, page = 1, limit = 10 } = req.query;
+            const filters = { status, department, page, limit };
 
             const teamMembers = await TeamModel.getAll(filters);
+            const total = await TeamModel.count(filters);
+
+            const p = parseInt(page);
+            const l = parseInt(limit);
 
             res.json({
                 success: true,
                 count: teamMembers.length,
-                data: teamMembers
+                data: teamMembers,
+                pagination: {
+                    page: p,
+                    limit: l,
+                    total,
+                    pages: Math.ceil(total / l)
+                }
             });
         } catch (error) {
             console.error('Get all team members error:', error);

@@ -10,13 +10,24 @@ class TenantController {
      */
     async getAllTenants(req, res) {
         try {
-            const { status, plan_id, limit } = req.query;
-            const tenants = await TenantModel.findAll({ status, plan_id, limit });
+            const { status, plan_id, page = 1, limit = 10 } = req.query;
+            const filters = { status, plan_id, page, limit };
+            const tenants = await TenantModel.findAll(filters);
+            const total = await TenantModel.count(filters);
+
+            const p = parseInt(page);
+            const l = parseInt(limit);
 
             res.json({
                 success: true,
                 data: tenants,
-                count: tenants.length
+                count: tenants.length,
+                pagination: {
+                    page: p,
+                    limit: l,
+                    total,
+                    pages: Math.ceil(total / l)
+                }
             });
         } catch (error) {
             console.error('Get tenants error:', error);

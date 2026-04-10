@@ -8,18 +8,37 @@ const LeadController = {
         try {
             const userRole = req.user?.role;
             const userId = req.user?.id;
+            const filters = {
+                status: req.query.status,
+                search: req.query.search,
+                page: req.query.page || 1,
+                limit: req.query.limit || 10,
+            };
 
-            let leads;
+            let leads, total;
 
             // Sales operators only see their assigned leads
             if (userRole === 'sales_operator') {
-                leads = await LeadModel.findByAssignee(userId, req.query);
+                leads = await LeadModel.findByAssignee(userId, filters);
+                total = await LeadModel.countByAssignee(userId, filters);
             } else {
                 // Admin sees all
-                leads = await LeadModel.findAll(req.query);
+                leads = await LeadModel.findAll(filters);
+                total = await LeadModel.count(filters);
             }
 
-            res.json({ leads });
+            const page = parseInt(filters.page);
+            const limit = parseInt(filters.limit);
+
+            res.json({
+                leads,
+                pagination: {
+                    page,
+                    limit,
+                    total,
+                    pages: Math.ceil(total / limit)
+                }
+            });
         } catch (error) {
             console.error('Get leads error:', error);
             res.status(500).json({ error: 'Failed to fetch leads' });

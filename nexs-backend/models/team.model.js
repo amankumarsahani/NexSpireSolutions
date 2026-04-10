@@ -20,11 +20,35 @@ const TeamModel = {
 
             query += ' ORDER BY created_at DESC';
 
+            const limit = parseInt(filters.limit) || 10;
+            const page = parseInt(filters.page) || 1;
+            const offset = (page - 1) * limit;
+            query += ' LIMIT ? OFFSET ?';
+            params.push(limit, offset);
+
             const [rows] = await pool.query(query, params);
             return rows;
         } catch (error) {
             throw error;
         }
+    },
+
+    async count(filters = {}) {
+        let query = 'SELECT COUNT(*) as total FROM team_members WHERE 1=1';
+        const params = [];
+
+        if (filters.status) {
+            query += ' AND status = ?';
+            params.push(filters.status);
+        }
+
+        if (filters.department) {
+            query += ' AND department = ?';
+            params.push(filters.department);
+        }
+
+        const [rows] = await pool.query(query, params);
+        return rows[0].total;
     },
 
     // Get team member by ID

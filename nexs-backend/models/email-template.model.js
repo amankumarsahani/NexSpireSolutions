@@ -11,7 +11,7 @@ class EmailTemplateModel {
      * @returns {Promise<Array>} List of templates
      */
     static async findAll(options = {}) {
-        const { category, isActive, type } = options;
+        const { category, isActive, type, page, limit } = options;
         let sql = 'SELECT * FROM email_templates WHERE 1=1';
         const params = [];
 
@@ -32,6 +32,12 @@ class EmailTemplateModel {
         }
 
         sql += ' ORDER BY category ASC, name ASC';
+
+        const l = parseInt(limit) || 9;
+        const p = parseInt(page) || 1;
+        const offset = (p - 1) * l;
+        sql += ' LIMIT ? OFFSET ?';
+        params.push(l, offset);
 
         try {
             const [rows] = await query(sql, params);
@@ -54,10 +60,51 @@ class EmailTemplateModel {
                 }
 
                 fallbackSql += ' ORDER BY category ASC, name ASC';
+                fallbackSql += ' LIMIT ? OFFSET ?';
+                fallbackParams.push(l, offset);
 
                 const [fallbackRows] = await query(fallbackSql, fallbackParams);
                 return fallbackRows.map(this.parseRow);
             }
+            throw error;
+        }
+    }
+
+    static async count(options = {}) {
+        const { category, isActive, type } = options;
+        let sql = 'SELECT COUNT(*) as total FROM email_templates WHERE 1=1';
+        const params = [];
+
+        if (type) {
+            sql += ' AND type = ?';
+            params.push(type);
+        }
+
+        if (category) {
+            sql += ' AND category = ?';
+            params.push(category);
+        }
+
+        if (isActive !== undefined) {
+            sql += ' AND is_active = ?';
+            params.push(isActive);
+        }
+
+        try {
+            const [rows] = await query(sql, params);
+            return rows[0].total;
+        } catch (error) {
+            if (type && error.code === 'ER_BAD_FIELD_ERROR') {
+                let fallbackSql = 'SELECT COUNT(*) as total FROM email_templates WHERE 1=1';
+                const fallbackParams = [];
+                if (category) { fallbackSql += ' AND category = ?'; fallbackParams.push(category); }
+                if (isActive !== undefined) { fallbackSql += ' AND is_active = ?'; fallbackParams.push(isActive); }
+                const [fallbackRows] = await query(fallbackSql, fallbackParams);
+                return fallbackRows[0].total;
+            }
+            throw error;
+        }
+    }
             throw error;
         }
     }

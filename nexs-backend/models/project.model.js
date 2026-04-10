@@ -40,13 +40,38 @@ const ProjectModel = {
 
         query += ' ORDER BY p.created_at DESC';
 
-        if (filters.limit) {
-            query += ' LIMIT ?';
-            params.push(parseInt(filters.limit));
-        }
+        const limit = parseInt(filters.limit) || 10;
+        const page = parseInt(filters.page) || 1;
+        const offset = (page - 1) * limit;
+        query += ' LIMIT ? OFFSET ?';
+        params.push(limit, offset);
 
         const [rows] = await pool.query(query, params);
         return rows;
+    },
+
+    async count(filters = {}) {
+        let query = `SELECT COUNT(*) as total FROM projects p WHERE 1=1`;
+        const params = [];
+
+        if (filters.status) {
+            query += ' AND p.status = ?';
+            params.push(filters.status);
+        }
+
+        if (filters.clientId) {
+            query += ' AND p.clientId = ?';
+            params.push(filters.clientId);
+        }
+
+        if (filters.search) {
+            query += ' AND (p.name LIKE ? OR p.description LIKE ?)';
+            const searchTerm = `%${filters.search}%`;
+            params.push(searchTerm, searchTerm);
+        }
+
+        const [rows] = await pool.query(query, params);
+        return rows[0].total;
     },
 
     async findById(id) {

@@ -8,25 +8,31 @@ class InquiryController {
     async getAllInquiries(req, res) {
         try {
             const page = parseInt(req.query.page) || 1;
-            const limit = parseInt(req.query.limit) || 50;
+            const limit = parseInt(req.query.limit) || 10;
             const userRole = req.user?.role;
             const userId = req.user?.id;
 
-            let inquiries;
+            let inquiries, total;
 
             // Sales operators only see their assigned inquiries
             if (userRole === 'sales_operator') {
                 inquiries = await InquiryModel.findByAssignee(userId, page, limit);
+                total = await InquiryModel.countByAssignee(userId);
             } else {
                 // Admin sees all
                 inquiries = await InquiryModel.findAll(page, limit);
+                total = await InquiryModel.count();
             }
 
             res.json({
                 success: true,
                 data: inquiries,
-                page,
-                limit
+                pagination: {
+                    page,
+                    limit,
+                    total,
+                    pages: Math.ceil(total / limit)
+                }
             });
         } catch (error) {
             console.error('Get inquiries error:', error);

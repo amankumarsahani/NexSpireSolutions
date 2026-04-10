@@ -74,6 +74,16 @@ class InquiryModel {
         return result.affectedRows;
     }
 
+    static async count() {
+        const [rows] = await db.query('SELECT COUNT(*) as total FROM inquiries');
+        return rows[0].total;
+    }
+
+    static async countByAssignee(userId) {
+        const [rows] = await db.query('SELECT COUNT(*) as total FROM inquiries WHERE assignedTo = ?', [userId]);
+        return rows[0].total;
+    }
+
     // Get stats
     static async getStats() {
         const [stats] = await db.query(`

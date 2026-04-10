@@ -3,8 +3,29 @@ const ProjectModel = require('../models/project.model');
 const ProjectController = {
     async getAll(req, res) {
         try {
-            const projects = await ProjectModel.findAll(req.query);
-            res.json({ projects });
+            const filters = {
+                status: req.query.status,
+                clientId: req.query.clientId,
+                search: req.query.search,
+                page: req.query.page || 1,
+                limit: req.query.limit || 10,
+            };
+
+            const projects = await ProjectModel.findAll(filters);
+            const total = await ProjectModel.count(filters);
+
+            const page = parseInt(filters.page);
+            const limit = parseInt(filters.limit);
+
+            res.json({
+                projects,
+                pagination: {
+                    page,
+                    limit,
+                    total,
+                    pages: Math.ceil(total / limit)
+                }
+            });
         } catch (error) {
             console.error('Get projects error:', error);
             res.status(500).json({ error: 'Failed to fetch projects' });

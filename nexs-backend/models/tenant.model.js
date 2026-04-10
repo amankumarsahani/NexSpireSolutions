@@ -28,13 +28,32 @@ class TenantModel {
 
         query += ' ORDER BY t.created_at DESC';
 
-        if (filters.limit) {
-            query += ' LIMIT ?';
-            params.push(parseInt(filters.limit));
-        }
+        const limit = parseInt(filters.limit) || 10;
+        const page = parseInt(filters.page) || 1;
+        const offset = (page - 1) * limit;
+        query += ' LIMIT ? OFFSET ?';
+        params.push(limit, offset);
 
         const [rows] = await pool.query(query, params);
         return rows;
+    }
+
+    static async count(filters = {}) {
+        let query = `SELECT COUNT(*) as total FROM tenants t WHERE 1=1`;
+        const params = [];
+
+        if (filters.status) {
+            query += ' AND t.status = ?';
+            params.push(filters.status);
+        }
+
+        if (filters.plan_id) {
+            query += ' AND t.plan_id = ?';
+            params.push(filters.plan_id);
+        }
+
+        const [rows] = await pool.query(query, params);
+        return rows[0].total;
     }
 
     /**

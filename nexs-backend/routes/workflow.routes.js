@@ -19,14 +19,32 @@ router.use(auth);
 // Get all workflows
 router.get('/', async (req, res) => {
     try {
+        const page = parseInt(req.query.page) || 1;
+        const limit = parseInt(req.query.limit) || 10;
+        const offset = (page - 1) * limit;
+
         const [workflows] = await db.query(
             `SELECT w.*, 
              (SELECT COUNT(*) FROM workflow_executions WHERE workflow_id = w.id) as execution_count,
              (SELECT COUNT(*) FROM workflow_executions WHERE workflow_id = w.id AND status = 'completed') as success_count
              FROM workflows w
-             ORDER BY w.created_at DESC`
+             ORDER BY w.created_at DESC
+             LIMIT ? OFFSET ?`,
+            [limit, offset]
         );
-        res.json({ success: true, data: workflows });
+
+        const [[{ total }]] = await db.query('SELECT COUNT(*) as total FROM workflows');
+
+        res.json({
+            success: true,
+            data: workflows,
+            pagination: {
+                page,
+                limit,
+                total,
+                pages: Math.ceil(total / limit)
+            }
+        });
     } catch (error) {
         console.error('Get workflows error:', error);
         res.status(500).json({ success: false, error: 'Failed to fetch workflows' });

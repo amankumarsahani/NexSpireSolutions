@@ -12,18 +12,28 @@ class EmailTemplateController {
      */
     async getAllTemplates(req, res) {
         try {
-            const { category, active, type } = req.query;
-            const options = {};
+            const { category, active, type, page = 1, limit = 9 } = req.query;
+            const options = { page, limit };
 
             if (type) options.type = type;
             if (category) options.category = category;
             if (active !== undefined) options.isActive = active === 'true';
 
             const templates = await EmailTemplateModel.findAll(options);
+            const total = await EmailTemplateModel.count(options);
+
+            const p = parseInt(page);
+            const l = parseInt(limit);
 
             res.json({
                 success: true,
-                data: templates
+                data: templates,
+                pagination: {
+                    page: p,
+                    limit: l,
+                    total,
+                    pages: Math.ceil(total / l)
+                }
             });
         } catch (error) {
             console.error('Get templates error:', error);
