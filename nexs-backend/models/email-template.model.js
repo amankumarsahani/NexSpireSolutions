@@ -105,12 +105,9 @@ class EmailTemplateModel {
             throw error;
         }
     }
-            throw error;
-        }
-    }
 
     /**
-     * Find template by ID
+      * Find template by ID
      * @param {number} id - Template ID
      * @returns {Promise<Object|null>} Template or null
      */
