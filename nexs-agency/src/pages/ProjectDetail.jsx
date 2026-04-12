@@ -35,6 +35,15 @@ const ProjectDetail = () => {
             <Helmet>
                 <title>{project.title} | Portfolio | Nexspire Solutions</title>
                 <meta name="description" content={`Case study: ${project.title}. See how we delivered exceptional results.`} />
+                <link rel="canonical" href={`https://nexspiresolutions.co.in/portfolio/${slug}`} />
+                <meta property="og:title" content={`${project.title} | Portfolio | Nexspire Solutions`} />
+                <meta property="og:description" content={`Case study: ${project.title}. See how we delivered exceptional results.`} />
+                <meta property="og:type" content="website" />
+                <meta property="og:url" content={`https://nexspiresolutions.co.in/portfolio/${slug}`} />
+                <meta property="og:image" content="https://nexspiresolutions.co.in/og-image.jpg" />
+                <meta name="twitter:card" content="summary_large_image" />
+                <meta name="twitter:title" content={`${project.title} | Portfolio | Nexspire Solutions`} />
+                <meta name="twitter:description" content={`Case study: ${project.title}. See how we delivered exceptional results.`} />
             </Helmet>
 
             {/* Breadcrumbs */}

@@ -31,6 +31,14 @@ const ReactVsFlutter = () => {
                 <title>React Native vs Flutter 2026: Comparison Guide | Nexspire Blog</title>
                 <meta name="description" content="Deciding between React Native and Flutter? We compare performance, developer cost, and time-to-market to help you choose the right stack for your mobile app in 2026." />
                 <link rel="canonical" href="https://nexspiresolutions.co.in/blog/react-native-vs-flutter" />
+                <meta property="og:title" content="React Native vs Flutter 2026: Comparison Guide | Nexspire Blog" />
+                <meta property="og:description" content="Deciding between React Native and Flutter? We compare performance, developer cost, and time-to-market." />
+                <meta property="og:type" content="article" />
+                <meta property="og:url" content="https://nexspiresolutions.co.in/blog/react-native-vs-flutter" />
+                <meta property="og:image" content="https://nexspiresolutions.co.in/og-image.jpg" />
+                <meta name="twitter:card" content="summary_large_image" />
+                <meta name="twitter:title" content="React Native vs Flutter 2026: Comparison Guide | Nexspire Blog" />
+                <meta name="twitter:description" content="Deciding between React Native and Flutter? We compare performance, developer cost, and time-to-market." />
                 <script type="application/ld+json">
                     {JSON.stringify(articleSchema)}
                 </script>

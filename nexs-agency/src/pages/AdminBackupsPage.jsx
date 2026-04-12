@@ -446,6 +446,7 @@ export default function AdminBackupsPage() {
             <>
                 <Helmet>
                     <title>Backup Management | Nexspire Solutions</title>
+                    <meta name="robots" content="noindex, nofollow" />
                 </Helmet>
                 <SignInPanel />
             </>
@@ -461,6 +462,7 @@ export default function AdminBackupsPage() {
             <>
                 <Helmet>
                     <title>Backup Management | Nexspire Solutions</title>
+                    <meta name="robots" content="noindex, nofollow" />
                 </Helmet>
                 <AccessDenied email={user?.email} onLogout={logout} />
             </>
@@ -471,6 +473,7 @@ export default function AdminBackupsPage() {
         <>
             <Helmet>
                 <title>Backup Management | Nexspire Solutions</title>
+                <meta name="robots" content="noindex, nofollow" />
             </Helmet>
 
             <section className="min-h-screen bg-[radial-gradient(circle_at_top_left,_rgba(14,165,233,0.10),_transparent_28%),radial-gradient(circle_at_top_right,_rgba(59,130,246,0.12),_transparent_25%),linear-gradient(180deg,#f8fbff_0%,#eef6ff_50%,#f8fafc_100%)] px-6 pb-24 pt-32">

@@ -130,6 +130,14 @@ export default function NexCRMLandingPage() {
                 <title>NexCRM - The Operating System for Modern Agencies</title>
                 <meta name="description" content="Streamline your agency with NexCRM. Integrated project management, CRM, invoicing, and client portals." />
                 <link rel="canonical" href="https://nexspiresolutions.co.in/nexcrm" />
+                <meta property="og:title" content="NexCRM - The Operating System for Modern Agencies" />
+                <meta property="og:description" content="Streamline your agency with NexCRM. Integrated project management, CRM, invoicing, and client portals." />
+                <meta property="og:type" content="website" />
+                <meta property="og:url" content="https://nexspiresolutions.co.in/nexcrm" />
+                <meta property="og:image" content="https://nexspiresolutions.co.in/og-image.jpg" />
+                <meta name="twitter:card" content="summary_large_image" />
+                <meta name="twitter:title" content="NexCRM - The Operating System for Modern Agencies" />
+                <meta name="twitter:description" content="Streamline your agency with NexCRM. Integrated project management, CRM, invoicing, and client portals." />
             </Helmet>
 
             {/* Toast */}

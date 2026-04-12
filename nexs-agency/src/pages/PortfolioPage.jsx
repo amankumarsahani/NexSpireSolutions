@@ -173,7 +173,28 @@ const PortfolioPage = () => {
                 <link rel="canonical" href="https://nexspiresolutions.co.in/portfolio" />
                 <meta property="og:title" content="Portfolio - Custom Software Case Studies | Nexspire Solutions" />
                 <meta property="og:description" content="See how we've helped businesses worldwide with custom E-commerce, Mobile, and AI solutions." />
+                <meta property="og:type" content="website" />
                 <meta property="og:url" content="https://nexspiresolutions.co.in/portfolio" />
+                <meta property="og:image" content="https://nexspiresolutions.co.in/og-image.jpg" />
+                <meta name="twitter:card" content="summary_large_image" />
+                <meta name="twitter:title" content="Portfolio - Custom Software Case Studies | Nexspire Solutions" />
+                <meta name="twitter:description" content="See how we've helped businesses worldwide with custom E-commerce, Mobile, and AI solutions." />
+                <script type="application/ld+json">{JSON.stringify({
+                    "@context": "https://schema.org",
+                    "@type": "ItemList",
+                    "name": "Nexspire Solutions Portfolio",
+                    "url": "https://nexspiresolutions.co.in/portfolio",
+                    "description": "Explore our portfolio of successful projects including E-commerce platforms, HealthTech apps, and AI-Powered CRM systems.",
+                    "numberOfItems": 6,
+                    "itemListElement": [
+                        { "@type": "ListItem", "position": 1, "name": "E-commerce Platform (US Retailer)" },
+                        { "@type": "ListItem", "position": 2, "name": "HealthTech Mobile App (UK)" },
+                        { "@type": "ListItem", "position": 3, "name": "AI-Powered CRM (Australia)" },
+                        { "@type": "ListItem", "position": 4, "name": "Urban Pulse" },
+                        { "@type": "ListItem", "position": 5, "name": "Crypto Exchange" },
+                        { "@type": "ListItem", "position": 6, "name": "EcoEnergy" }
+                    ]
+                })}</script>
             </Helmet>
 
             {/* Scroll Progress Bar */}

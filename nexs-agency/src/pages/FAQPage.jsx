@@ -111,7 +111,12 @@ const FAQPage = () => {
                 <link rel="canonical" href="https://nexspiresolutions.co.in/faq" />
                 <meta property="og:title" content="Frequently Asked Questions | Nexspire Solutions" />
                 <meta property="og:description" content="Common questions answered about our software development services, process, and technologies." />
+                <meta property="og:type" content="website" />
                 <meta property="og:url" content="https://nexspiresolutions.co.in/faq" />
+                <meta property="og:image" content="https://nexspiresolutions.co.in/og-image.jpg" />
+                <meta name="twitter:card" content="summary_large_image" />
+                <meta name="twitter:title" content="Frequently Asked Questions | Nexspire Solutions" />
+                <meta name="twitter:description" content="Common questions answered about our software development services, process, and technologies." />
                 <script type="application/ld+json">
                     {JSON.stringify(faqSchema)}
                 </script>

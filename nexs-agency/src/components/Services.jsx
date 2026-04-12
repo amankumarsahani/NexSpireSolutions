@@ -1,4 +1,5 @@
 import { useState, useEffect, useRef, useCallback, memo } from 'react'
+import { Link } from 'react-router-dom'
 
 const services = [
   {
@@ -8,7 +9,8 @@ const services = [
     features: ["React & Next.js", "Node.js & Python", "Mobile-First Design", "Performance Optimization"],
     gradient: "from-blue-500 to-cyan-500",
     bgPattern: "bg-blue-50",
-    accentColor: "blue"
+    accentColor: "blue",
+    link: "/services/custom-web-development"
   },
   {
     icon: "ri-smartphone-line",
@@ -17,7 +19,8 @@ const services = [
     features: ["iOS & Android", "React Native", "Flutter Development", "App Store Deployment"],
     gradient: "from-purple-500 to-pink-500",
     bgPattern: "bg-purple-50",
-    accentColor: "purple"
+    accentColor: "purple",
+    link: "/services/mobile-app-development"
   },
   {
     icon: "ri-cloud-line",
@@ -26,7 +29,8 @@ const services = [
     features: ["AWS & Azure", "Docker & Kubernetes", "CI/CD Pipelines", "Auto-scaling Systems"],
     gradient: "from-green-500 to-teal-500",
     bgPattern: "bg-green-50",
-    accentColor: "green"
+    accentColor: "green",
+    link: "/services/cloud-solutions"
   },
   {
     icon: "ri-palette-line",
@@ -35,7 +39,8 @@ const services = [
     features: ["User Research", "Interactive Prototypes", "Design Systems", "Accessibility Focus"],
     gradient: "from-orange-500 to-red-500",
     bgPattern: "bg-orange-50",
-    accentColor: "orange"
+    accentColor: "orange",
+    link: "/services"
   },
   {
     icon: "ri-shopping-cart-line",
@@ -44,7 +49,8 @@ const services = [
     features: ["Custom E-commerce", "Payment Integration", "Inventory Management", "Analytics Dashboard"],
     gradient: "from-indigo-500 to-blue-500",
     bgPattern: "bg-indigo-50",
-    accentColor: "indigo"
+    accentColor: "indigo",
+    link: "/services/ecommerce-development"
   },
   {
     icon: "ri-shield-check-line",
@@ -53,7 +59,8 @@ const services = [
     features: ["Security Audits", "Penetration Testing", "Code Quality Reviews", "Compliance Standards"],
     gradient: "from-emerald-500 to-green-500",
     bgPattern: "bg-emerald-50",
-    accentColor: "emerald"
+    accentColor: "emerald",
+    link: "/services"
   }
 ];
 
@@ -189,7 +196,9 @@ const Services = memo(function Services() {
 
                           {/* Enhanced Content */}
                           <h3 className="relative z-10 text-xl sm:text-2xl font-bold text-gray-900 mb-3 sm:mb-4 group-hover:text-gray-800 transition-colors duration-300">
-                            {service.title}
+                            <Link to={service.link} className="hover:text-indigo-600 transition-colors">
+                              {service.title}
+                            </Link>
                           </h3>
 
                           <p className="relative z-10 text-gray-600 mb-4 sm:mb-6 leading-relaxed group-hover:text-gray-700 transition-colors duration-300 text-sm sm:text-base">
@@ -207,6 +216,11 @@ const Services = memo(function Services() {
                               </li>
                             ))}
                           </ul>
+
+                          <Link to={service.link} className={`relative z-10 inline-flex items-center text-sm font-bold bg-gradient-to-r ${service.gradient} bg-clip-text text-transparent hover:opacity-80 transition-opacity duration-300`}>
+                            Learn More
+                            <i className="ri-arrow-right-line ml-1 text-indigo-500"></i>
+                          </Link>
 
                           {/* Enhanced Card glow effect */}
                           <div className={`absolute inset-0 bg-gradient-to-br ${service.gradient} opacity-0 group-hover:opacity-5 transition-opacity duration-500 rounded-2xl`}></div>

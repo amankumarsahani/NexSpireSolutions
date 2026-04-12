@@ -54,6 +54,14 @@ const CustomWebDevelopment = () => {
                 <title>Custom Web Development Services | Enterprise Solutions</title>
                 <meta name="description" content="Build scalable, high-performance web applications with Nexspire. Expert React, Next.js, and Node.js developers delivering custom solutions for global brands." />
                 <link rel="canonical" href="https://nexspiresolutions.co.in/services/custom-web-development" />
+                <meta property="og:title" content="Custom Web Development Services | Enterprise Solutions" />
+                <meta property="og:description" content="Build scalable, high-performance web applications with Nexspire. Expert React, Next.js, and Node.js developers." />
+                <meta property="og:type" content="website" />
+                <meta property="og:url" content="https://nexspiresolutions.co.in/services/custom-web-development" />
+                <meta property="og:image" content="https://nexspiresolutions.co.in/og-image.jpg" />
+                <meta name="twitter:card" content="summary_large_image" />
+                <meta name="twitter:title" content="Custom Web Development Services | Enterprise Solutions" />
+                <meta name="twitter:description" content="Build scalable, high-performance web applications with Nexspire. Expert React, Next.js, and Node.js developers." />
                 <script type="application/ld+json">{JSON.stringify(serviceSchema)}</script>
             </Helmet>
 

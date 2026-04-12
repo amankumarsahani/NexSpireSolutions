@@ -54,6 +54,14 @@ const MobileAppDevelopment = () => {
                 <title>Mobile App Development Services | iOS & Android</title>
                 <meta name="description" content="Create engaging native and cross-platform mobile apps with Nexspire. Expert Flutter, React Native, and Swift developers." />
                 <link rel="canonical" href="https://nexspiresolutions.co.in/services/mobile-app-development" />
+                <meta property="og:title" content="Mobile App Development Services | iOS & Android" />
+                <meta property="og:description" content="Create engaging native and cross-platform mobile apps with Nexspire. Expert Flutter, React Native, and Swift developers." />
+                <meta property="og:type" content="website" />
+                <meta property="og:url" content="https://nexspiresolutions.co.in/services/mobile-app-development" />
+                <meta property="og:image" content="https://nexspiresolutions.co.in/og-image.jpg" />
+                <meta name="twitter:card" content="summary_large_image" />
+                <meta name="twitter:title" content="Mobile App Development Services | iOS & Android" />
+                <meta name="twitter:description" content="Create engaging native and cross-platform mobile apps with Nexspire. Expert Flutter, React Native, and Swift developers." />
                 <script type="application/ld+json">{JSON.stringify(serviceSchema)}</script>
             </Helmet>
 

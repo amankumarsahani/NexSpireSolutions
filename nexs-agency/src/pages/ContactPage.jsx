@@ -91,7 +91,27 @@ const ContactPage = () => {
                 <link rel="canonical" href="https://nexspiresolutions.co.in/contact" />
                 <meta property="og:title" content="Contact Nexspire - Global Reach, Local Presence" />
                 <meta property="og:description" content="Connect with our global team. Offices in Mohali, serving the world." />
+                <meta property="og:type" content="website" />
                 <meta property="og:url" content="https://nexspiresolutions.co.in/contact" />
+                <meta property="og:image" content="https://nexspiresolutions.co.in/og-image.jpg" />
+                <meta name="twitter:card" content="summary_large_image" />
+                <meta name="twitter:title" content="Contact Nexspire - Global Reach, Local Presence" />
+                <meta name="twitter:description" content="Connect with our global team. Offices in Mohali, serving the world." />
+                <script type="application/ld+json">{JSON.stringify({
+                    "@context": "https://schema.org",
+                    "@type": "LocalBusiness",
+                    "name": "Nexspire Solutions",
+                    "url": "https://nexspiresolutions.co.in",
+                    "email": "nexspiretechsolutions@gmail.com",
+                    "telephone": "+919729916844",
+                    "image": "https://nexspiresolutions.co.in/og-image.jpg",
+                    "address": {
+                        "@type": "PostalAddress",
+                        "addressLocality": "Mohali",
+                        "addressRegion": "Punjab",
+                        "addressCountry": "IN"
+                    }
+                })}</script>
             </Helmet>
 
             {/* Scroll Progress Bar */}

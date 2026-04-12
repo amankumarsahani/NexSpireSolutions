@@ -117,6 +117,15 @@ export default function CRMPricingPage() {
             <Helmet>
                 <title>NexCRM Pricing - Affordable Plans for Every Business | Nexspire Solutions</title>
                 <meta name="description" content="Choose the perfect NexCRM plan for your business. Starter from ₹999/month. Leads, E-commerce, Team Chat, Mobile App - all included." />
+                <link rel="canonical" href="https://nexspiresolutions.co.in/nexcrm/pricing" />
+                <meta property="og:title" content="NexCRM Pricing - Affordable Plans for Every Business | Nexspire Solutions" />
+                <meta property="og:description" content="Choose the perfect NexCRM plan for your business. Starter from ₹999/month. Leads, E-commerce, Team Chat, Mobile App - all included." />
+                <meta property="og:type" content="website" />
+                <meta property="og:url" content="https://nexspiresolutions.co.in/nexcrm/pricing" />
+                <meta property="og:image" content="https://nexspiresolutions.co.in/og-image.jpg" />
+                <meta name="twitter:card" content="summary_large_image" />
+                <meta name="twitter:title" content="NexCRM Pricing - Affordable Plans for Every Business | Nexspire Solutions" />
+                <meta name="twitter:description" content="Choose the perfect NexCRM plan for your business. Starter from ₹999/month." />
             </Helmet>
 
             {/* Toast Notification */}

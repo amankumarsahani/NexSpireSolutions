@@ -31,6 +31,14 @@ const CostOfCustomCrm = () => {
                 <title>Cost of Building a Custom CRM 2026 | Nexspire Blog</title>
                 <meta name="description" content="How much does it cost to build a custom CRM in 2026? We break down the costs for MVPs, mid-sized, and enterprise solutions, plus hidden costs to watch for." />
                 <link rel="canonical" href="https://nexspiresolutions.co.in/blog/cost-of-custom-crm-2026" />
+                <meta property="og:title" content="Cost of Building a Custom CRM 2026 | Nexspire Blog" />
+                <meta property="og:description" content="How much does it cost to build a custom CRM in 2026? We break down costs for MVPs, mid-sized, and enterprise solutions." />
+                <meta property="og:type" content="article" />
+                <meta property="og:url" content="https://nexspiresolutions.co.in/blog/cost-of-custom-crm-2026" />
+                <meta property="og:image" content="https://nexspiresolutions.co.in/og-image.jpg" />
+                <meta name="twitter:card" content="summary_large_image" />
+                <meta name="twitter:title" content="Cost of Building a Custom CRM 2026 | Nexspire Blog" />
+                <meta name="twitter:description" content="How much does it cost to build a custom CRM in 2026? We break down costs for MVPs, mid-sized, and enterprise solutions." />
                 <script type="application/ld+json">
                     {JSON.stringify(articleSchema)}
                 </script>

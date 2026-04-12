@@ -1,7 +1,23 @@
+import { Helmet } from 'react-helmet-async';
+
 const PrivacyPolicy = () => {
 
     return (
         <div className="pt-24 pb-16 bg-white min-h-screen">
+            <Helmet>
+                <title>Privacy Policy | Nexspire Solutions</title>
+                <meta name="description" content="Read the Nexspire Solutions privacy policy. Learn how we collect, use, and protect your personal data." />
+                <link rel="canonical" href="https://nexspiresolutions.co.in/privacy-policy" />
+                <meta name="robots" content="noindex, follow" />
+                <meta property="og:title" content="Privacy Policy | Nexspire Solutions" />
+                <meta property="og:description" content="Read the Nexspire Solutions privacy policy. Learn how we collect, use, and protect your personal data." />
+                <meta property="og:type" content="website" />
+                <meta property="og:url" content="https://nexspiresolutions.co.in/privacy-policy" />
+                <meta property="og:image" content="https://nexspiresolutions.co.in/og-image.jpg" />
+                <meta name="twitter:card" content="summary_large_image" />
+                <meta name="twitter:title" content="Privacy Policy | Nexspire Solutions" />
+                <meta name="twitter:description" content="Read the Nexspire Solutions privacy policy. Learn how we collect, use, and protect your personal data." />
+            </Helmet>
             <div className="max-w-3xl mx-auto px-4 sm:px-6 lg:px-8">
                 <h1 className="text-4xl font-bold text-gray-900 mb-8">Privacy Policy</h1>
                 <div className="prose prose-lg prose-blue text-gray-600">

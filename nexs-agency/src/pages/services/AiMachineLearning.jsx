@@ -54,6 +54,14 @@ const AiMachineLearning = () => {
                 <title>AI & Machine Learning Services | Generative AI Solutions</title>
                 <meta name="description" content="Unlock the power of AI with Nexspire Solutions. Custom Machine Learning, Generative AI, and Predictive Analytics for enterprise growth." />
                 <link rel="canonical" href="https://nexspiresolutions.co.in/services/ai-machine-learning" />
+                <meta property="og:title" content="AI & Machine Learning Services | Generative AI Solutions" />
+                <meta property="og:description" content="Unlock the power of AI with Nexspire Solutions. Custom Machine Learning, Generative AI, and Predictive Analytics." />
+                <meta property="og:type" content="website" />
+                <meta property="og:url" content="https://nexspiresolutions.co.in/services/ai-machine-learning" />
+                <meta property="og:image" content="https://nexspiresolutions.co.in/og-image.jpg" />
+                <meta name="twitter:card" content="summary_large_image" />
+                <meta name="twitter:title" content="AI & Machine Learning Services | Generative AI Solutions" />
+                <meta name="twitter:description" content="Unlock the power of AI with Nexspire Solutions. Custom Machine Learning, Generative AI, and Predictive Analytics." />
                 <script type="application/ld+json">{JSON.stringify(serviceSchema)}</script>
             </Helmet>
 

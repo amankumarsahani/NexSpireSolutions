@@ -260,7 +260,12 @@ const CityLandingPage = () => {
                 <link rel="canonical" href={`https://nexspiresolutions.co.in/software-development-company/${city}`} />
                 <meta property="og:title" content={data.title} />
                 <meta property="og:description" content={data.description} />
+                <meta property="og:type" content="website" />
                 <meta property="og:url" content={`https://nexspiresolutions.co.in/software-development-company/${city}`} />
+                <meta property="og:image" content="https://nexspiresolutions.co.in/og-image.jpg" />
+                <meta name="twitter:card" content="summary_large_image" />
+                <meta name="twitter:title" content={data.title} />
+                <meta name="twitter:description" content={data.description} />
                 <script type="application/ld+json">
                     {JSON.stringify(localBusinessSchema)}
                 </script>

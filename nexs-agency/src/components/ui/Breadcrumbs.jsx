@@ -1,4 +1,5 @@
 import { Link, useLocation } from 'react-router-dom';
+import { Helmet } from 'react-helmet-async';
 
 const routeNames = {
     'services': 'Services',
@@ -24,8 +25,37 @@ export default function Breadcrumbs({ className = '' }) {
 
     if (pathnames.length === 0) return null;
 
+    const breadcrumbSchema = {
+        "@context": "https://schema.org",
+        "@type": "BreadcrumbList",
+        "itemListElement": [
+            {
+                "@type": "ListItem",
+                "position": 1,
+                "name": "Home",
+                "item": "https://nexspiresolutions.co.in/"
+            },
+            ...pathnames.map((name, index) => {
+                const routeTo = `/${pathnames.slice(0, index + 1).join('/')}`;
+                const displayName = routeNames[name] || name.split('-').map(
+                    word => word.charAt(0).toUpperCase() + word.slice(1)
+                ).join(' ');
+                return {
+                    "@type": "ListItem",
+                    "position": index + 2,
+                    "name": displayName,
+                    "item": `https://nexspiresolutions.co.in${routeTo}`
+                };
+            })
+        ]
+    };
+
     return (
-        <nav className={`flex items-center gap-2 text-sm ${className}`} aria-label="Breadcrumb">
+        <>
+            <Helmet>
+                <script type="application/ld+json">{JSON.stringify(breadcrumbSchema)}</script>
+            </Helmet>
+            <nav className={`flex items-center gap-2 text-sm ${className}`} aria-label="Breadcrumb">
             <Link
                 to="/"
                 className="text-gray-500 hover:text-blue-600 transition-colors flex items-center gap-1"
@@ -59,6 +89,7 @@ export default function Breadcrumbs({ className = '' }) {
                     </span>
                 );
             })}
-        </nav>
+            </nav>
+        </>
     );
 }

@@ -31,6 +31,14 @@ const PwaBenefits = () => {
                 <title>Benefits of Progressive Web Apps (PWA) | Nexspire Web Dev</title>
                 <meta name="description" content="Progressive Web Apps (PWAs) offer the best of web and mobile. Learn how they boost conversion rates, improve SEO, and cut development costs." />
                 <link rel="canonical" href="https://nexspiresolutions.co.in/blog/why-business-needs-pwa" />
+                <meta property="og:title" content="Benefits of Progressive Web Apps (PWA) | Nexspire Web Dev" />
+                <meta property="og:description" content="Progressive Web Apps (PWAs) offer the best of web and mobile. Learn how they boost conversion rates and cut development costs." />
+                <meta property="og:type" content="article" />
+                <meta property="og:url" content="https://nexspiresolutions.co.in/blog/why-business-needs-pwa" />
+                <meta property="og:image" content="https://nexspiresolutions.co.in/og-image.jpg" />
+                <meta name="twitter:card" content="summary_large_image" />
+                <meta name="twitter:title" content="Benefits of Progressive Web Apps (PWA) | Nexspire Web Dev" />
+                <meta name="twitter:description" content="Progressive Web Apps (PWAs) offer the best of web and mobile. Learn how they boost conversion rates and cut development costs." />
                 <script type="application/ld+json">
                     {JSON.stringify(articleSchema)}
                 </script>

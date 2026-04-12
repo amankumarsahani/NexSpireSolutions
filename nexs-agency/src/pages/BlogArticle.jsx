@@ -115,6 +115,14 @@ const BlogArticle = () => {
                 <title>{blog.title} | Nexspire Insights</title>
                 <meta name="description" content={blog.excerpt} />
                 <link rel="canonical" href={`https://nexspiresolutions.co.in/blog/${blog.slug}`} />
+                <meta property="og:title" content={`${blog.title} | Nexspire Insights`} />
+                <meta property="og:description" content={blog.excerpt} />
+                <meta property="og:type" content="article" />
+                <meta property="og:url" content={`https://nexspiresolutions.co.in/blog/${blog.slug}`} />
+                <meta property="og:image" content="https://nexspiresolutions.co.in/og-image.jpg" />
+                <meta name="twitter:card" content="summary_large_image" />
+                <meta name="twitter:title" content={`${blog.title} | Nexspire Insights`} />
+                <meta name="twitter:description" content={blog.excerpt} />
                 <script type="application/ld+json">
                     {JSON.stringify(articleSchema)}
                 </script>

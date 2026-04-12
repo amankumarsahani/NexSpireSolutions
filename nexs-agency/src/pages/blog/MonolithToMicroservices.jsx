@@ -31,6 +31,14 @@ const MonolithToMicroservices = () => {
                 <title>Monolith to Microservices Migration Guide | Nexspire Cloud</title>
                 <meta name="description" content="Is your legacy monolith slowing you down? Learn the risks and rewards of migrating to a microservices architecture in 2026." />
                 <link rel="canonical" href="https://nexspiresolutions.co.in/blog/monolith-to-microservices" />
+                <meta property="og:title" content="Monolith to Microservices Migration Guide | Nexspire Cloud" />
+                <meta property="og:description" content="Is your legacy monolith slowing you down? Learn the risks and rewards of migrating to a microservices architecture." />
+                <meta property="og:type" content="article" />
+                <meta property="og:url" content="https://nexspiresolutions.co.in/blog/monolith-to-microservices" />
+                <meta property="og:image" content="https://nexspiresolutions.co.in/og-image.jpg" />
+                <meta name="twitter:card" content="summary_large_image" />
+                <meta name="twitter:title" content="Monolith to Microservices Migration Guide | Nexspire Cloud" />
+                <meta name="twitter:description" content="Is your legacy monolith slowing you down? Learn the risks and rewards of migrating to a microservices architecture." />
                 <script type="application/ld+json">
                     {JSON.stringify(articleSchema)}
                 </script>

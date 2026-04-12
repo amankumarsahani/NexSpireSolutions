@@ -54,6 +54,14 @@ const EcommerceDevelopment = () => {
                 <title>E-commerce Development Services | Shopify & Custom Stores</title>
                 <meta name="description" content="Build high-conversion online stores with Nexspire. Experts in Shopify, WooCommerce, and Headless Commerce solutions." />
                 <link rel="canonical" href="https://nexspiresolutions.co.in/services/ecommerce-development" />
+                <meta property="og:title" content="E-commerce Development Services | Shopify & Custom Stores" />
+                <meta property="og:description" content="Build high-conversion online stores with Nexspire. Experts in Shopify, WooCommerce, and Headless Commerce solutions." />
+                <meta property="og:type" content="website" />
+                <meta property="og:url" content="https://nexspiresolutions.co.in/services/ecommerce-development" />
+                <meta property="og:image" content="https://nexspiresolutions.co.in/og-image.jpg" />
+                <meta name="twitter:card" content="summary_large_image" />
+                <meta name="twitter:title" content="E-commerce Development Services | Shopify & Custom Stores" />
+                <meta name="twitter:description" content="Build high-conversion online stores with Nexspire. Experts in Shopify, WooCommerce, and Headless Commerce solutions." />
                 <script type="application/ld+json">{JSON.stringify(serviceSchema)}</script>
             </Helmet>
 

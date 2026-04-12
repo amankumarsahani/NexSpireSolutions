@@ -74,7 +74,28 @@ const AboutPage = () => {
         <link rel="canonical" href="https://nexspiresolutions.co.in/about" />
         <meta property="og:title" content="About Nexspire Solutions – Global Software Agency" />
         <meta property="og:description" content="Top software development agency delivering web, mobile, AI, cloud, and enterprise solutions to clients globally." />
+        <meta property="og:type" content="website" />
         <meta property="og:url" content="https://nexspiresolutions.co.in/about" />
+        <meta property="og:image" content="https://nexspiresolutions.co.in/og-image.jpg" />
+        <meta name="twitter:card" content="summary_large_image" />
+        <meta name="twitter:title" content="About Nexspire Solutions – Global Software Agency" />
+        <meta name="twitter:description" content="Top software development agency delivering web, mobile, AI, cloud, and enterprise solutions to clients globally." />
+        <script type="application/ld+json">{JSON.stringify({
+            "@context": "https://schema.org",
+            "@type": "Organization",
+            "name": "Nexspire Solutions",
+            "url": "https://nexspiresolutions.co.in",
+            "logo": "https://nexspiresolutions.co.in/og-image.jpg",
+            "description": "Top software development agency delivering web, mobile, AI, cloud, and enterprise solutions to clients globally.",
+            "email": "nexspiretechsolutions@gmail.com",
+            "telephone": "+919729916844",
+            "foundingDate": "2020",
+            "sameAs": [
+                "https://github.com/orgs/Nexspire-Solutions/repositories",
+                "https://www.linkedin.com/company/nexspire-solution",
+                "https://www.instagram.com/nexspire_solutions/"
+            ]
+        })}</script>
       </Helmet>
 
       {/* Scroll Progress Bar */}

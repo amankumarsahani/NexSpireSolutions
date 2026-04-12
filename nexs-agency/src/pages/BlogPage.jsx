@@ -170,7 +170,24 @@ const BlogPage = () => {
                 <link rel="canonical" href="https://nexspiresolutions.co.in/blog" />
                 <meta property="og:title" content="Blog - Tech Insights & Trends | Nexspire Solutions" />
                 <meta property="og:description" content="Read expert articles on AI, Cloud, and Software Development." />
+                <meta property="og:type" content="website" />
                 <meta property="og:url" content="https://nexspiresolutions.co.in/blog" />
+                <meta property="og:image" content="https://nexspiresolutions.co.in/og-image.jpg" />
+                <meta name="twitter:card" content="summary_large_image" />
+                <meta name="twitter:title" content="Blog - Tech Insights & Trends | Nexspire Solutions" />
+                <meta name="twitter:description" content="Read expert articles on AI, Cloud, and Software Development." />
+                <script type="application/ld+json">{JSON.stringify({
+                    "@context": "https://schema.org",
+                    "@type": "Blog",
+                    "name": "Nexspire Solutions Blog",
+                    "url": "https://nexspiresolutions.co.in/blog",
+                    "description": "Stay updated with the latest trends in AI, Web Development, Mobile Apps, and Enterprise Software.",
+                    "publisher": {
+                        "@type": "Organization",
+                        "name": "Nexspire Solutions",
+                        "url": "https://nexspiresolutions.co.in"
+                    }
+                })}</script>
             </Helmet>
 
             {/* Breadcrumbs */}

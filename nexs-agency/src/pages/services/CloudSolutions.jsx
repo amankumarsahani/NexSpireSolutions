@@ -54,6 +54,14 @@ const CloudSolutions = () => {
                 <title>Cloud Solutions & DevOps Services | AWS & Azure Experts</title>
                 <meta name="description" content="Scale your business with expert Cloud and DevOps services from Nexspire. Security, migration, and automation on AWS, Azure, and GCP." />
                 <link rel="canonical" href="https://nexspiresolutions.co.in/services/cloud-solutions" />
+                <meta property="og:title" content="Cloud Solutions & DevOps Services | AWS & Azure Experts" />
+                <meta property="og:description" content="Scale your business with expert Cloud and DevOps services from Nexspire. Security, migration, and automation on AWS, Azure, and GCP." />
+                <meta property="og:type" content="website" />
+                <meta property="og:url" content="https://nexspiresolutions.co.in/services/cloud-solutions" />
+                <meta property="og:image" content="https://nexspiresolutions.co.in/og-image.jpg" />
+                <meta name="twitter:card" content="summary_large_image" />
+                <meta name="twitter:title" content="Cloud Solutions & DevOps Services | AWS & Azure Experts" />
+                <meta name="twitter:description" content="Scale your business with expert Cloud and DevOps services from Nexspire. Security, migration, and automation on AWS, Azure, and GCP." />
                 <script type="application/ld+json">{JSON.stringify(serviceSchema)}</script>
             </Helmet>
 
