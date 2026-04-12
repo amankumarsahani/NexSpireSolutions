@@ -224,9 +224,13 @@ const ContactPage = () => {
                         <div className="relative z-10 mt-12">
                             <p className="text-blue-200 mb-6 font-medium">Connect with us</p>
                             <div className="flex gap-4">
-                                {['ri-twitter-x-fill', 'ri-linkedin-fill', 'ri-github-fill', 'ri-dribbble-fill'].map((icon, i) => (
-                                    <a key={i} href="#" className="w-12 h-12 rounded-full border border-white/20 flex items-center justify-center hover:bg-white hover:text-blue-900 transition-all transform hover:scale-110 hover:shadow-lg backdrop-blur-sm">
-                                        <i className={`${icon} text-xl`}></i>
+                                {[
+                                    { icon: 'ri-github-fill', href: 'https://github.com/orgs/Nexspire-Solutions/repositories', label: 'GitHub' },
+                                    { icon: 'ri-linkedin-fill', href: 'https://www.linkedin.com/company/nexspire-solution', label: 'LinkedIn' },
+                                    { icon: 'ri-instagram-fill', href: 'https://www.instagram.com/nexspire_solutions/', label: 'Instagram' }
+                                ].map((social, i) => (
+                                    <a key={i} href={social.href} target="_blank" rel="noopener noreferrer" aria-label={social.label} className="w-12 h-12 rounded-full border border-white/20 flex items-center justify-center hover:bg-white hover:text-blue-900 transition-all transform hover:scale-110 hover:shadow-lg backdrop-blur-sm">
+                                        <i className={`${social.icon} text-xl`}></i>
                                     </a>
                                 ))}
                             </div>

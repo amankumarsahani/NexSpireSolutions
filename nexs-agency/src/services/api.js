@@ -27,114 +27,6 @@ export const authAPI = {
     logout: () => api.post('/auth/logout')
 };
 
-// Team Management
-export const teamAPI = {
-    getAll: (params) => api.get('/team', { params }),
-    getById: (id) => api.get(`/team/${id}`),
-    create: (data) => api.post('/team', data),
-    update: (id, data) => api.put(`/team/${id}`, data),
-    delete: (id) => api.delete(`/team/${id}`),
-    getStats: () => api.get('/team/stats')
-};
-
-// Client Management
-export const clientAPI = {
-    getAll: (params) => api.get('/clients', { params }),
-    getById: (id) => api.get(`/clients/${id}`),
-    create: (data) => api.post('/clients', data),
-    update: (id, data) => api.put(`/clients/${id}`, data),
-    delete: (id) => api.delete(`/clients/${id}`),
-    getStats: () => api.get('/clients/stats'),
-    getPayments: (id) => api.get(`/clients/${id}/payments`),
-    getActivities: (id) => api.get(`/clients/${id}/activities`)
-};
-
-// Project Management
-export const projectAPI = {
-    getAll: (params) => api.get('/projects', { params }),
-    getById: (id) => api.get(`/projects/${id}`),
-    create: (data) => api.post('/projects', data),
-    update: (id, data) => api.put(`/projects/${id}`, data),
-    delete: (id) => api.delete(`/projects/${id}`),
-    getStats: () => api.get('/projects/stats'),
-    // Task Management
-    getTasks: (projectId) => api.get(`/projects/${projectId}/tasks`),
-    createTask: (projectId, data) => api.post(`/projects/${projectId}/tasks`, data),
-    updateTask: (projectId, taskId, data) => api.put(`/projects/${projectId}/tasks/${taskId}`, data),
-    deleteTask: (projectId, taskId) => api.delete(`/projects/${projectId}/tasks/${taskId}`),
-    getTaskStats: (projectId) => api.get(`/projects/${projectId}/tasks/stats`)
-};
-
-// Lead Management
-export const leadAPI = {
-    getAll: (params) => api.get('/leads', { params }),
-    getById: (id) => api.get(`/leads/${id}`),
-    create: (data) => api.post('/leads', data),
-    update: (id, data) => api.put(`/leads/${id}`, data),
-    delete: (id) => api.delete(`/leads/${id}`),
-    getStats: () => api.get('/leads/stats'),
-    addComment: (id, comment) => api.post(`/leads/${id}/comments`, { comment }),
-    getComments: (id) => api.get(`/leads/${id}/comments`),
-    // Note Management
-    getNotes: (id) => api.get(`/leads/${id}/notes`),
-    createNote: (id, data) => api.post(`/leads/${id}/notes`, data),
-    // Lead Conversion
-    convertToClient: (id, data) => api.post(`/leads/${id}/convert`, data),
-    updateScore: (id, score) => api.put(`/leads/${id}/score`, { score })
-};
-
-// Messaging
-export const messageAPI = {
-    getInbox: () => api.get('/messages/inbox'),
-    getOutbox: () => api.get('/messages/outbox'),
-    getUnreadCount: () => api.get('/messages/unread-count'),
-    getConversation: (userId) => api.get(`/messages/conversation/${userId}`),
-    send: (data) => api.post('/messages', data),
-    markAsRead: (id) => api.put(`/messages/${id}/read`),
-    markAllAsRead: () => api.put('/messages/read-all'),
-    delete: (id) => api.delete(`/messages/${id}`),
-    getStats: () => api.get('/messages/stats')
-};
-
-// Document Management
-const ALLOWED_FILE_TYPES = [
-    'application/pdf',
-    'application/msword',
-    'application/vnd.openxmlformats-officedocument.wordprocessingml.document',
-    'application/vnd.ms-excel',
-    'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet',
-    'text/plain',
-    'text/csv',
-    'image/png',
-    'image/jpeg',
-    'image/gif',
-    'image/webp'
-];
-const MAX_FILE_SIZE = 10 * 1024 * 1024; // 10 MB
-
-export const documentAPI = {
-    getAll: (params) => api.get('/documents', { params }),
-    getById: (id) => api.get(`/documents/${id}`),
-    getByProject: (projectId) => api.get(`/documents/project/${projectId}`),
-    upload: (formData) => {
-        const file = formData.get('file');
-        if (file) {
-            if (file.size > MAX_FILE_SIZE) {
-                return Promise.reject(new Error(`File size exceeds ${MAX_FILE_SIZE / (1024 * 1024)} MB limit.`));
-            }
-            if (!ALLOWED_FILE_TYPES.includes(file.type)) {
-                return Promise.reject(new Error('File type not allowed. Accepted: PDF, Word, Excel, CSV, TXT, PNG, JPEG, GIF, WebP.'));
-            }
-        }
-        return api.post('/documents', formData, {
-            headers: { 'Content-Type': 'multipart/form-data' }
-        });
-    },
-    update: (id, data) => api.put(`/documents/${id}`, data),
-    delete: (id) => api.delete(`/documents/${id}`),
-    getStats: () => api.get('/documents/stats')
-};
-
 // Inquiry Management (Public - Contact Form)
 export const inquiryAPI = {
     // Public endpoint - no authentication required
@@ -145,30 +37,6 @@ export const inquiryAPI = {
     updateStatus: (id, status) => api.patch(`/inquiries/${id}/status`, { status }),
     delete: (id) => api.delete(`/inquiries/${id}`),
     getStats: () => api.get('/inquiries/stats')
-};
-
-// Email Template Management
-export const emailTemplateAPI = {
-    getAll: (params) => api.get('/email-templates', { params }),
-    getById: (id) => api.get(`/email-templates/${id}`),
-    create: (data) => api.post('/email-templates', data),
-    update: (id, data) => api.put(`/email-templates/${id}`, data),
-    delete: (id) => api.delete(`/email-templates/${id}`),
-    preview: (id, data) => api.post(`/email-templates/${id}/preview`, data),
-    getStats: () => api.get('/email-templates/stats')
-};
-
-// Workflow Automation
-export const workflowAPI = {
-    getAll: () => api.get('/workflows'),
-    getById: (id) => api.get(`/workflows/${id}`),
-    create: (data) => api.post('/workflows', data),
-    update: (id, data) => api.put(`/workflows/${id}`, data),
-    delete: (id) => api.delete(`/workflows/${id}`),
-    toggle: (id) => api.patch(`/workflows/${id}/toggle`),
-    run: (id, testData) => api.post(`/workflows/${id}/test`, { testData }),
-    getExecutions: (id, limit = 20) => api.get(`/workflows/${id}/executions`, { params: { limit } }),
-    getNodeTypes: () => api.get('/workflows/meta/node-types')
 };
 
 // System Settings
@@ -203,4 +71,3 @@ export const blogAPI = {
 };
 
 export default api;
-

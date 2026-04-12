@@ -341,11 +341,6 @@ const ServicesPage = () => {
             {/* Global Markets Section - Full Width */}
             <AreasWeServe />
 
-            {/* Lead Magnet Section */}
-            <div className="bg-white">
-                <LeadMagnet />
-            </div>
-
             {/* CTA */}
             <section className="py-32 bg-slate-900 text-white text-center relative overflow-hidden">
                 <div className="absolute inset-0 bg-[url('https://grainy-gradients.vercel.app/noise.svg')] opacity-20"></div>

@@ -17,6 +17,7 @@ const Footer = () => {
     };
   }, []);
 
+  // TODO: Replace fake newsletter submission with real API call
   const handleSubscribe = (e) => {
     e.preventDefault();
     if (!email) return;
@@ -168,9 +169,6 @@ const Footer = () => {
               </Link>
               <Link to="/terms" className="text-gray-400 hover:text-white text-sm transition-colors">
                 Terms of Service
-              </Link>
-              <Link to="/privacy-policy" className="text-gray-400 hover:text-white text-sm transition-colors">
-                Cookie Policy
               </Link>
             </div>
           </div>

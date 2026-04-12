@@ -5,6 +5,7 @@ const LeadMagnet = ({ className = "" }) => {
     const [email, setEmail] = useState('');
     const [status, setStatus] = useState('idle'); // idle, loading, success
 
+    // TODO: Replace fake lead magnet submission with real API call
     const handleSubmit = (e) => {
         e.preventDefault();
         setStatus('loading');
