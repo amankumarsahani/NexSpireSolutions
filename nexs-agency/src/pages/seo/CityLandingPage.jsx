@@ -1,7 +1,8 @@
 import { useEffect, useState } from 'react';
 import { Link, useParams } from 'react-router-dom';
 import { Helmet } from 'react-helmet-async';
-import { motion, useScroll, useSpring, useTransform } from 'framer-motion';
+import { motion, useScroll, useTransform } from 'framer-motion';
+import ReadingProgress from '../../components/ui/ReadingProgress';
 
 // City data with SEO content & Timezones
 const cityData = {
@@ -196,10 +197,6 @@ const CityLandingPage = () => {
     const [greeting, setGreeting] = useState('');
 
     useEffect(() => {
-        window.scrollTo(0, 0);
-    }, [city]);
-
-    useEffect(() => {
         const updateTime = () => {
             const now = new Date();
             const timeOptions = {
@@ -226,11 +223,6 @@ const CityLandingPage = () => {
     }, [data.timezone]);
 
     const { scrollYProgress } = useScroll();
-    const scaleX = useSpring(scrollYProgress, {
-        stiffness: 100,
-        damping: 30,
-        restDelta: 0.001
-    });
 
     const y = useTransform(scrollYProgress, [0, 1], [0, 200]);
 
@@ -274,10 +266,7 @@ const CityLandingPage = () => {
                 </script>
             </Helmet>
 
-            <motion.div
-                className="fixed top-0 left-0 right-0 h-1 bg-gradient-to-r from-blue-600 to-purple-600 origin-left z-50"
-                style={{ scaleX }}
-            />
+            <ReadingProgress />
 
             {/* Premium Live Hero Section - Removing overflow-hidden from parent to avoid clipping floating stats */}
             <div className='relative'>

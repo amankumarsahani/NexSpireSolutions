@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from 'react';
+import { useState, useEffect } from 'react';
 
 export default function EditClientModal({ isOpen, onClose, onSave, client }) {
     const [formData, setFormData] = useState({

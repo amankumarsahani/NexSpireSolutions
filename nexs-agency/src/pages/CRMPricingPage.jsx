@@ -1,123 +1,11 @@
 import { useState, useEffect } from 'react';
 import { Helmet } from 'react-helmet-async';
 import { settingsAPI, billingAPI } from '../services/api';
+import { CheckIcon, XIcon } from '../components/ui/Icons';
+import { crmTiers, crmFeatures } from '../constants/crmPricing';
 
-const CheckIcon = () => (
-    <svg className="w-5 h-5 text-emerald-500 flex-shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-        <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M5 13l4 4L19 7" />
-    </svg>
-);
-
-const XIcon = () => (
-    <svg className="w-5 h-5 text-slate-300 flex-shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-        <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M6 18L18 6M6 6l12 12" />
-    </svg>
-);
-
-const tiers = [
-    {
-        name: 'Starter',
-        price: { monthly: 999, yearly: 849 },
-        currency: '₹',
-        description: 'Perfect for small businesses & startups',
-        popular: false,
-        cta: 'Contact Sales',
-        limits: {
-            leads: '500',
-            customers: '200',
-            products: '50',
-            teamMembers: '2',
-            storage: '1 GB'
-        }
-    },
-    {
-        name: 'Growth',
-        price: { monthly: 2499, yearly: 2124 },
-        currency: '₹',
-        description: 'Ideal for growing businesses',
-        popular: true,
-        cta: 'Contact Sales',
-        limits: {
-            leads: '2,000',
-            customers: '1,000',
-            products: '500',
-            teamMembers: '5',
-            storage: '5 GB'
-        }
-    },
-    {
-        name: 'Business',
-        price: { monthly: 5999, yearly: 5099 },
-        currency: '₹',
-        description: 'For established businesses',
-        popular: false,
-        cta: 'Contact Sales',
-        limits: {
-            leads: '10,000',
-            customers: '5,000',
-            products: '2,000',
-            teamMembers: '15',
-            storage: '25 GB'
-        }
-    },
-    {
-        name: 'Enterprise',
-        price: { monthly: null, yearly: null },
-        currency: '',
-        description: 'For large organizations',
-        popular: false,
-        cta: 'Contact Sales',
-        isCustom: true,
-        limits: {
-            leads: 'Unlimited',
-            customers: 'Unlimited',
-            products: 'Unlimited',
-            teamMembers: 'Unlimited',
-            storage: 'Custom'
-        }
-    }
-];
-
-const features = {
-    core: [
-        { name: 'Dashboard & Analytics', starter: true, growth: true, business: true, enterprise: true },
-        { name: 'Lead Management', starter: true, growth: true, business: true, enterprise: true },
-        { name: 'Customer Management', starter: true, growth: true, business: true, enterprise: true },
-        { name: 'Mobile App Access', starter: true, growth: true, business: true, enterprise: true },
-        { name: 'Multi-Industry Templates', starter: true, growth: true, business: true, enterprise: true },
-    ],
-    ecommerce: [
-        { name: 'Product Catalog', starter: '50', growth: '500', business: '2,000', enterprise: 'Unlimited' },
-        { name: 'Order Management', starter: true, growth: true, business: true, enterprise: true },
-        { name: 'Storefront Website', starter: true, growth: true, business: true, enterprise: true },
-        { name: 'Inventory Tracking', starter: false, growth: true, business: true, enterprise: true },
-        { name: 'Vendor Management', starter: false, growth: '5', business: '25', enterprise: 'Unlimited' },
-        { name: 'CMS Pages', starter: '3', growth: '10', business: '50', enterprise: 'Unlimited' },
-        { name: 'Coupons & Discounts', starter: '5', growth: '25', business: 'Unlimited', enterprise: 'Unlimited' },
-    ],
-    communication: [
-        { name: 'Email Templates', starter: '5', growth: '25', business: 'Unlimited', enterprise: 'Unlimited' },
-        { name: 'Emails/Month', starter: '500', growth: '5,000', business: '25,000', enterprise: 'Unlimited' },
-        { name: 'Bulk Mailing', starter: false, growth: '500/mo', business: '5,000/mo', enterprise: 'Unlimited' },
-        { name: 'Team Chat', starter: false, growth: 'Basic', business: 'Full', enterprise: 'Full' },
-        { name: 'Chat History', starter: false, growth: '7 days', business: '90 days', enterprise: 'Unlimited' },
-        { name: 'Push Notifications', starter: false, growth: true, business: true, enterprise: true, soon: true },
-        { name: 'SMS Notifications', starter: false, growth: false, business: '1,000/mo', enterprise: 'Unlimited', soon: true },
-        { name: 'WhatsApp Business', starter: false, growth: false, business: true, enterprise: true, soon: true },
-    ],
-    automation: [
-        { name: 'AI Chatbot', starter: false, growth: false, business: 'Basic', enterprise: 'Advanced', soon: true },
-        { name: 'Auto Responders', starter: false, growth: true, business: true, enterprise: true, soon: true },
-        { name: 'Workflow Triggers', starter: false, growth: false, business: '10', enterprise: 'Unlimited', soon: true },
-    ],
-    support: [
-        { name: 'Email Support', starter: true, growth: true, business: true, enterprise: true },
-        { name: 'Priority Support', starter: false, growth: false, business: true, enterprise: true },
-        { name: 'Dedicated Manager', starter: false, growth: false, business: false, enterprise: true },
-        { name: 'Custom Development', starter: false, growth: false, business: false, enterprise: true },
-        { name: 'API Access', starter: false, growth: false, business: true, enterprise: true },
-    ]
-};
+const tiers = crmTiers;
+const features = crmFeatures;
 
 const FeatureValue = ({ value, soon }) => {
     if (value === true) return <CheckIcon />;
@@ -161,14 +49,6 @@ export default function CRMPricingPage() {
         };
 
         fetchSettings();
-
-        if (document.getElementById('recaptcha-script')) return;
-
-        const script = document.createElement('script');
-        script.id = 'recaptcha-script';
-        script.src = `https://www.google.com/recaptcha/api.js?render=${RECAPTCHA_SITE_KEY}`;
-        script.async = true;
-        document.head.appendChild(script);
     }, []);
 
     const getCaptchaToken = async () => {

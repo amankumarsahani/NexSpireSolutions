@@ -20,7 +20,6 @@ const BlogArticle = () => {
     const [relatedPosts, setRelatedPosts] = useState([]);
 
     useEffect(() => {
-        window.scrollTo(0, 0);
         loadBlog();
     }, [slug]);
 

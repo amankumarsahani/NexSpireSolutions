@@ -1,11 +1,21 @@
-import { useState } from 'react';
+import { useState, useRef, useEffect } from 'react';
 import { Link } from 'react-router-dom';
+import { siteConfig } from '../constants/siteConfig';
 
 const Footer = () => {
   const currentYear = new Date().getFullYear();
   const [email, setEmail] = useState('');
   const [subscribed, setSubscribed] = useState(false);
   const [isSubmitting, setIsSubmitting] = useState(false);
+  const submitTimeoutRef = useRef(null);
+  const resetTimeoutRef = useRef(null);
+
+  useEffect(() => {
+    return () => {
+      if (submitTimeoutRef.current) clearTimeout(submitTimeoutRef.current);
+      if (resetTimeoutRef.current) clearTimeout(resetTimeoutRef.current);
+    };
+  }, []);
 
   const handleSubscribe = (e) => {
     e.preventDefault();
@@ -13,11 +23,11 @@ const Footer = () => {
 
     setIsSubmitting(true);
     // Simulate API call
-    setTimeout(() => {
+    submitTimeoutRef.current = setTimeout(() => {
       setIsSubmitting(false);
       setSubscribed(true);
       setEmail('');
-      setTimeout(() => setSubscribed(false), 5000);
+      resetTimeoutRef.current = setTimeout(() => setSubscribed(false), 5000);
     }, 1000);
   };
 
@@ -46,11 +56,7 @@ const Footer = () => {
     ]
   };
 
-  const socialLinks = [
-    { icon: "ri-github-line", href: "https://github.com/orgs/Nexspire-Solutions/repositories", label: "GitHub" },
-    { icon: "ri-linkedin-line", href: "https://www.linkedin.com/company/nexspire-solution", label: "LinkedIn" },
-    { icon: "ri-instagram-line", href: "https://www.instagram.com/nexspire_solutions/", label: "Instagram" }
-  ];
+  const socialLinks = siteConfig.social;
 
   return (
     <footer className="bg-gray-900 text-white" >
@@ -170,17 +176,6 @@ const Footer = () => {
           </div>
         </div>
       </div>
-
-      {/* Scroll to Top Button */}
-      <div className="fixed bottom-6 right-4 sm:right-6 z-50" >
-        <button
-          onClick={() => window.scrollTo({ top: 0, behavior: 'smooth' })}
-          className="w-14 h-14 sm:w-12 sm:h-12 bg-blue-600 rounded-full flex items-center justify-center shadow-xl hover:bg-blue-700 active:bg-blue-800 transition-all duration-300 hover:scale-105 active:scale-95"
-          aria-label="Scroll to top"
-        >
-          <i className="ri-arrow-up-line text-xl sm:text-lg text-white"></i>
-        </button>
-      </div >
     </footer >
   );
 };

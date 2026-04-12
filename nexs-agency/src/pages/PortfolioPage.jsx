@@ -1,16 +1,11 @@
 import { useEffect, useState, useRef } from 'react';
 import { Link } from 'react-router-dom';
 import { Helmet } from 'react-helmet-async';
-import { motion, useScroll, useTransform, useSpring, useInView, AnimatePresence } from 'framer-motion';
-import { clsx } from 'clsx';
-import { twMerge } from 'tailwind-merge';
+import { motion, useInView, AnimatePresence } from 'framer-motion';
+import { cn } from '../utils/cn';
 import Breadcrumbs from '../components/ui/Breadcrumbs';
 import BackToTop from '../components/ui/BackToTop';
-
-// Utility for tailwind class merging
-function cn(...inputs) {
-    return twMerge(clsx(inputs));
-}
+import ReadingProgress from '../components/ui/ReadingProgress';
 
 const FadeIn = ({ children, className, delay = 0 }) => {
     return (
@@ -89,17 +84,8 @@ const ProjectCard = ({ project, index }) => {
 };
 
 const PortfolioPage = () => {
-    useEffect(() => {
-        window.scrollTo(0, 0);
-    }, []);
 
     const [activeFilter, setActiveFilter] = useState('All');
-    const { scrollYProgress } = useScroll();
-    const scaleX = useSpring(scrollYProgress, {
-        stiffness: 100,
-        damping: 30,
-        restDelta: 0.001
-    });
 
     const projects = [
         {
@@ -191,10 +177,7 @@ const PortfolioPage = () => {
             </Helmet>
 
             {/* Scroll Progress Bar */}
-            <motion.div
-                className="fixed top-0 left-0 right-0 h-1 bg-blue-600 origin-left z-50"
-                style={{ scaleX }}
-            />
+            <ReadingProgress />
 
             {/* Hero Section */}
             <section className="relative min-h-[85vh] flex items-center pt-20 overflow-hidden bg-gray-950 text-white">

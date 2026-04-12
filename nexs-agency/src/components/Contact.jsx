@@ -1,5 +1,6 @@
-import { useState } from 'react';
+import { useState, useRef, useEffect } from 'react';
 import { inquiryAPI } from '../services/api';
+import { siteConfig } from '../constants/siteConfig';
 
 const Contact = () => {
   const [formData, setFormData] = useState({
@@ -12,6 +13,13 @@ const Contact = () => {
 
   const [isSubmitting, setIsSubmitting] = useState(false);
   const [submitStatus, setSubmitStatus] = useState({ type: '', message: '' });
+  const statusTimeoutRef = useRef(null);
+
+  useEffect(() => {
+    return () => {
+      if (statusTimeoutRef.current) clearTimeout(statusTimeoutRef.current);
+    };
+  }, []);
 
   const handleChange = (e) => {
     setFormData({
@@ -37,7 +45,7 @@ const Contact = () => {
       setFormData({ name: '', email: '', phone: '', company: '', message: '' });
 
       // Clear success message after 5 seconds
-      setTimeout(() => {
+      statusTimeoutRef.current = setTimeout(() => {
         setSubmitStatus({ type: '', message: '' });
       }, 5000);
     } catch (error) {
@@ -72,11 +80,7 @@ const Contact = () => {
     }
   ];
 
-  const socialLinks = [
-    { icon: "ri-github-line", href: "https://github.com/orgs/Nexspire-Solutions/repositories", label: "GitHub" },
-    { icon: "ri-linkedin-line", href: "https://www.linkedin.com/company/nexspire-solution", label: "LinkedIn" },
-    { icon: "ri-instagram-line", href: "https://www.instagram.com/nexspire_solutions/", label: "Instagram" }
-  ];
+  const socialLinks = siteConfig.social;
 
   return (
     <section id="contact" className="relative py-20 bg-white overflow-hidden">

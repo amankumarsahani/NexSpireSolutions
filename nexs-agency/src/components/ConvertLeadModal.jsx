@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import { useState } from 'react';
 
 export default function ConvertLeadModal({ isOpen, onClose, onConvert, lead }) {
     const [loading, setLoading] = useState(false);

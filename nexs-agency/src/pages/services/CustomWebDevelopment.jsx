@@ -1,31 +1,12 @@
-import { useEffect } from 'react';
 import { Link } from 'react-router-dom';
 import { Helmet } from 'react-helmet-async';
-import { motion, useScroll, useSpring } from 'framer-motion';
+import { motion } from 'framer-motion';
 import RelatedServices from '../../components/seo/RelatedServices';
 import AreasWeServe from '../../components/seo/AreasWeServe';
-
-const FadeIn = ({ children, className, delay = 0 }) => (
-    <motion.div
-        initial={{ opacity: 0, y: 20 }}
-        whileInView={{ opacity: 1, y: 0 }}
-        viewport={{ once: true, margin: "-50px" }}
-        transition={{ duration: 0.6, delay, ease: "easeOut" }}
-        className={className}
-    >
-        {children}
-    </motion.div>
-);
+import FadeIn from '../../components/ui/FadeIn';
+import ReadingProgress from '../../components/ui/ReadingProgress';
 
 const CustomWebDevelopment = () => {
-    useEffect(() => {
-        window.scrollTo(0, 0);
-    }, []);
-
-    const { scrollYProgress } = useScroll();
-    const scaleX = useSpring(scrollYProgress, {
-        stiffness: 100, damping: 30, restDelta: 0.001
-    });
 
     const capabilities = [
         {
@@ -77,7 +58,7 @@ const CustomWebDevelopment = () => {
             </Helmet>
 
             {/* Scroll Bar */}
-            <motion.div className="fixed top-0 left-0 right-0 h-1 bg-gradient-to-r from-blue-600 to-purple-600 origin-left z-50" style={{ scaleX }} />
+            <ReadingProgress />
 
             {/* Hero Section */}
             <section className="relative pt-32 pb-24 overflow-hidden bg-slate-900 text-white rounded-b-[3rem] shadow-2xl z-20">

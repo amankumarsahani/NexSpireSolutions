@@ -232,7 +232,7 @@ function Pricing() {
               Get Custom Quote
             </a>
             <a
-              href="tel:+15551234567"
+              href="tel:+919729916844"
               className="border-2 border-blue-600 text-blue-600 px-8 py-3 rounded-lg hover:bg-blue-600 hover:text-white transition-colors cursor-pointer whitespace-nowrap"
             >
               Call for Consultation

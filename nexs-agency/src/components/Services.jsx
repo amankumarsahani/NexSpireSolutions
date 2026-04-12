@@ -1,67 +1,67 @@
 import { useState, useEffect, useRef, useCallback, memo } from 'react'
 
+const services = [
+  {
+    icon: "ri-code-line",
+    title: "Web Development",
+    description: "Modern, responsive websites built with cutting-edge technologies and industry best practices for optimal performance.",
+    features: ["React & Next.js", "Node.js & Python", "Mobile-First Design", "Performance Optimization"],
+    gradient: "from-blue-500 to-cyan-500",
+    bgPattern: "bg-blue-50",
+    accentColor: "blue"
+  },
+  {
+    icon: "ri-smartphone-line",
+    title: "Mobile Apps",
+    description: "Native and cross-platform mobile applications that deliver exceptional user experiences across all devices.",
+    features: ["iOS & Android", "React Native", "Flutter Development", "App Store Deployment"],
+    gradient: "from-purple-500 to-pink-500",
+    bgPattern: "bg-purple-50",
+    accentColor: "purple"
+  },
+  {
+    icon: "ri-cloud-line",
+    title: "Cloud Solutions",
+    description: "Scalable cloud infrastructure and DevOps solutions that grow with your business needs and requirements.",
+    features: ["AWS & Azure", "Docker & Kubernetes", "CI/CD Pipelines", "Auto-scaling Systems"],
+    gradient: "from-green-500 to-teal-500",
+    bgPattern: "bg-green-50",
+    accentColor: "green"
+  },
+  {
+    icon: "ri-palette-line",
+    title: "UI/UX Design",
+    description: "Beautiful, intuitive designs that enhance user experience and drive engagement through thoughtful interface design.",
+    features: ["User Research", "Interactive Prototypes", "Design Systems", "Accessibility Focus"],
+    gradient: "from-orange-500 to-red-500",
+    bgPattern: "bg-orange-50",
+    accentColor: "orange"
+  },
+  {
+    icon: "ri-shopping-cart-line",
+    title: "E-commerce Solutions",
+    description: "Complete e-commerce platforms with advanced payment integration and comprehensive inventory management systems.",
+    features: ["Custom E-commerce", "Payment Integration", "Inventory Management", "Analytics Dashboard"],
+    gradient: "from-indigo-500 to-blue-500",
+    bgPattern: "bg-indigo-50",
+    accentColor: "indigo"
+  },
+  {
+    icon: "ri-shield-check-line",
+    title: "Security & Testing",
+    description: "Comprehensive security audits and rigorous testing protocols to ensure your applications are secure and reliable.",
+    features: ["Security Audits", "Penetration Testing", "Code Quality Reviews", "Compliance Standards"],
+    gradient: "from-emerald-500 to-green-500",
+    bgPattern: "bg-emerald-50",
+    accentColor: "emerald"
+  }
+];
+
 const Services = memo(function Services() {
   const [hoveredCard, setHoveredCard] = useState(null)
   const [currentSlide, setCurrentSlide] = useState(0)
   const [isPaused, setIsPaused] = useState(false)
   const intervalRef = useRef(null)
-
-  const services = [
-    {
-      icon: "ri-code-line",
-      title: "Web Development",
-      description: "Modern, responsive websites built with cutting-edge technologies and industry best practices for optimal performance.",
-      features: ["React & Next.js", "Node.js & Python", "Mobile-First Design", "Performance Optimization"],
-      gradient: "from-blue-500 to-cyan-500",
-      bgPattern: "bg-blue-50",
-      accentColor: "blue"
-    },
-    {
-      icon: "ri-smartphone-line",
-      title: "Mobile Apps",
-      description: "Native and cross-platform mobile applications that deliver exceptional user experiences across all devices.",
-      features: ["iOS & Android", "React Native", "Flutter Development", "App Store Deployment"],
-      gradient: "from-purple-500 to-pink-500",
-      bgPattern: "bg-purple-50",
-      accentColor: "purple"
-    },
-    {
-      icon: "ri-cloud-line",
-      title: "Cloud Solutions",
-      description: "Scalable cloud infrastructure and DevOps solutions that grow with your business needs and requirements.",
-      features: ["AWS & Azure", "Docker & Kubernetes", "CI/CD Pipelines", "Auto-scaling Systems"],
-      gradient: "from-green-500 to-teal-500",
-      bgPattern: "bg-green-50",
-      accentColor: "green"
-    },
-    {
-      icon: "ri-palette-line",
-      title: "UI/UX Design",
-      description: "Beautiful, intuitive designs that enhance user experience and drive engagement through thoughtful interface design.",
-      features: ["User Research", "Interactive Prototypes", "Design Systems", "Accessibility Focus"],
-      gradient: "from-orange-500 to-red-500",
-      bgPattern: "bg-orange-50",
-      accentColor: "orange"
-    },
-    {
-      icon: "ri-shopping-cart-line",
-      title: "E-commerce Solutions",
-      description: "Complete e-commerce platforms with advanced payment integration and comprehensive inventory management systems.",
-      features: ["Custom E-commerce", "Payment Integration", "Inventory Management", "Analytics Dashboard"],
-      gradient: "from-indigo-500 to-blue-500",
-      bgPattern: "bg-indigo-50",
-      accentColor: "indigo"
-    },
-    {
-      icon: "ri-shield-check-line",
-      title: "Security & Testing",
-      description: "Comprehensive security audits and rigorous testing protocols to ensure your applications are secure and reliable.",
-      features: ["Security Audits", "Penetration Testing", "Code Quality Reviews", "Compliance Standards"],
-      gradient: "from-emerald-500 to-green-500",
-      bgPattern: "bg-emerald-50",
-      accentColor: "emerald"
-    }
-  ];
 
   // Auto slider functionality
   const startAutoSlide = useCallback(() => {

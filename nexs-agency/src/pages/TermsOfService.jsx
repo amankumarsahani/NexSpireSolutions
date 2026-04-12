@@ -1,9 +1,4 @@
-import { useEffect } from 'react';
-
 const TermsOfService = () => {
-    useEffect(() => {
-        window.scrollTo(0, 0);
-    }, []);
 
     return (
         <div className="pt-24 pb-16 bg-white min-h-screen">

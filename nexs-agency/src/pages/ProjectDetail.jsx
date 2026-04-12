@@ -1,4 +1,3 @@
-import { useEffect } from 'react';
 import { useParams, Link } from 'react-router-dom';
 import { Helmet } from 'react-helmet-async';
 import { motion } from 'framer-motion';
@@ -8,10 +7,6 @@ import RelatedServices from '../components/seo/RelatedServices';
 
 const ProjectDetail = () => {
     const { slug } = useParams();
-
-    useEffect(() => {
-        window.scrollTo(0, 0);
-    }, []);
 
     // Placeholder data since we might not have a full backend for projects yet
     // In a real app, fetch from API based on slug

@@ -1,21 +1,13 @@
-import { useEffect, useState, useMemo } from 'react';
+import { useState, useMemo } from 'react';
 import { Link } from 'react-router-dom';
 import { Helmet } from 'react-helmet-async';
-import { motion, useScroll, useSpring, AnimatePresence } from 'framer-motion';
+import { motion, AnimatePresence } from 'framer-motion';
 import Breadcrumbs from '../components/ui/Breadcrumbs';
 import BackToTop from '../components/ui/BackToTop';
 
-const FAQPage = () => {
-    useEffect(() => {
-        window.scrollTo(0, 0);
-    }, []);
+import ReadingProgress from '../components/ui/ReadingProgress';
 
-    const { scrollYProgress } = useScroll();
-    const scaleX = useSpring(scrollYProgress, {
-        stiffness: 100,
-        damping: 30,
-        restDelta: 0.001
-    });
+const FAQPage = () => {
 
     const [searchQuery, setSearchQuery] = useState('');
     const [activeCategory, setActiveCategory] = useState('All');
@@ -126,10 +118,7 @@ const FAQPage = () => {
             </Helmet>
 
             {/* Scroll Progress Bar */}
-            <motion.div
-                className="fixed top-0 left-0 right-0 h-1 bg-blue-600 origin-left z-50"
-                style={{ scaleX }}
-            />
+            <ReadingProgress />
 
             {/* Hero Section */}
             <section className="relative min-h-[50vh] flex items-center pt-20 overflow-hidden bg-gray-950 text-white">

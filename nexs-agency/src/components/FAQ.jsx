@@ -214,7 +214,7 @@ function FAQ() {
                   </span>
                 </a>
                 <a
-                  href="tel:+15551234567"
+                  href="tel:+919729916844"
                   className="group relative bg-white text-indigo-600 px-8 py-4 rounded-2xl font-semibold hover:shadow-xl hover:scale-105 transition-all duration-300 cursor-pointer whitespace-nowrap"
                 >
                   <span className="flex items-center justify-center">

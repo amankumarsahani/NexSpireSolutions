@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from 'react';
+import { useState, useEffect } from 'react';
 
 export default function AddNoteModal({ isOpen, onClose, onSave, leadId }) {
     const [formData, setFormData] = useState({

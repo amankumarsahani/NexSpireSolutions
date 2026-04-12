@@ -1,13 +1,14 @@
-import { useEffect, useState } from 'react';
+import { useState } from 'react';
 import { Link } from 'react-router-dom';
 import { Helmet } from 'react-helmet-async';
-import { motion, useScroll, useSpring, AnimatePresence } from 'framer-motion';
+import { motion, AnimatePresence } from 'framer-motion';
 import RelatedServices from '../components/seo/RelatedServices';
 import AreasWeServe from '../components/seo/AreasWeServe';
 import ProcessSection from '../components/ProcessSection';
 import ClientLogos from '../components/ClientLogos';
 import Breadcrumbs from '../components/ui/Breadcrumbs';
 import BackToTop from '../components/ui/BackToTop';
+import ReadingProgress from '../components/ui/ReadingProgress';
 
 // Refined Premium Styles
 const serviceStyles = {
@@ -129,16 +130,6 @@ const ServiceCard = ({ service, index }) => {
 };
 
 const ServicesPage = () => {
-    useEffect(() => {
-        window.scrollTo(0, 0);
-    }, []);
-
-    const { scrollYProgress } = useScroll();
-    const scaleX = useSpring(scrollYProgress, {
-        stiffness: 100,
-        damping: 30,
-        restDelta: 0.001
-    });
 
     const services = [
         {
@@ -204,10 +195,7 @@ const ServicesPage = () => {
             </Helmet>
 
             {/* Scroll Progress Bar */}
-            <motion.div
-                className="fixed top-0 left-0 right-0 h-1 bg-gradient-to-r from-blue-600 via-purple-600 to-pink-600 origin-left z-50"
-                style={{ scaleX }}
-            />
+            <ReadingProgress />
 
             {/* Hero Section */}
             <section className="relative pt-32 pb-24 overflow-hidden bg-slate-900 text-white rounded-b-[3rem] shadow-2xl z-20">

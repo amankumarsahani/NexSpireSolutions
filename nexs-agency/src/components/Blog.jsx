@@ -2,51 +2,52 @@ import { useState, useEffect } from 'react'
 import { Link } from 'react-router-dom'
 import { blogAPI } from '../services/api'
 
+const dummyPosts = [
+  {
+    title: "Mobile App Development: Native vs Cross-Platform in 2024",
+    category: "Mobile Development",
+    image: "https://images.unsplash.com/photo-1512941937669-90a1b58e7e9c?w=400&h=250&fit=crop",
+    description: "A comprehensive comparison of native and cross-platform development approaches to help you make the right choice.",
+    tags: ["React Native", "Flutter", "iOS", "Android"],
+    author: "Anu Kumar",
+    date: "March 12, 2025",
+    readTime: "7 min read",
+    color: "from-purple-500 to-pink-500",
+    slug: "mobile-app-development-native-vs-cross-platform"
+  },
+  {
+    title: "UI/UX Design Principles for Modern Web Applications",
+    category: "Design",
+    image: "https://images.unsplash.com/photo-1586717791821-3f44a563fa4c?w=400&h=250&fit=crop",
+    description: "Discover essential design principles that create intuitive and engaging user experiences in modern web applications.",
+    tags: ["UX Design", "UI Design", "Figma", "Prototyping"],
+    author: "Anu Kumar",
+    date: "March 8, 2025",
+    readTime: "6 min read",
+    color: "from-orange-500 to-red-500",
+    slug: "ui-ux-design-principles"
+  },
+  {
+    title: "Cybersecurity Best Practices for Web Applications",
+    category: "Security",
+    image: "https://images.unsplash.com/photo-1555949963-aa79dcee981c?w=400&h=250&fit=crop",
+    description: "Essential security measures every developer should implement to protect web applications from common vulnerabilities.",
+    tags: ["Security", "OWASP", "Authentication", "Encryption"],
+    author: "Anu Kumar",
+    date: "March 5, 2025",
+    readTime: "9 min read",
+    color: "from-red-500 to-pink-500",
+    slug: "cybersecurity-best-practices"
+  }
+]
+
+const categories = ["All", "Web Development", "Mobile Development", "Cloud & DevOps", "Design", "Security", "AI & Technology"]
+
 function Blog() {
   const [activeCategory, setActiveCategory] = useState("All")
   const [isVisible, setIsVisible] = useState(false)
   const [blogPosts, setBlogPosts] = useState([])
   const [loading, setLoading] = useState(true)
-
-  // Dummy/fallback blog posts when API returns empty or fails
-  const dummyPosts = [
-    {
-      title: "Mobile App Development: Native vs Cross-Platform in 2024",
-      category: "Mobile Development",
-      image: "https://images.unsplash.com/photo-1512941937669-90a1b58e7e9c?w=400&h=250&fit=crop",
-      description: "A comprehensive comparison of native and cross-platform development approaches to help you make the right choice.",
-      tags: ["React Native", "Flutter", "iOS", "Android"],
-      author: "Anu Kumar",
-      date: "March 12, 2025",
-      readTime: "7 min read",
-      color: "from-purple-500 to-pink-500",
-      slug: "mobile-app-development-native-vs-cross-platform"
-    },
-    {
-      title: "UI/UX Design Principles for Modern Web Applications",
-      category: "Design",
-      image: "https://images.unsplash.com/photo-1586717791821-3f44a563fa4c?w=400&h=250&fit=crop",
-      description: "Discover essential design principles that create intuitive and engaging user experiences in modern web applications.",
-      tags: ["UX Design", "UI Design", "Figma", "Prototyping"],
-      author: "Anu Kumar",
-      date: "March 8, 2025",
-      readTime: "6 min read",
-      color: "from-orange-500 to-red-500",
-      slug: "ui-ux-design-principles"
-    },
-    {
-      title: "Cybersecurity Best Practices for Web Applications",
-      category: "Security",
-      image: "https://images.unsplash.com/photo-1555949963-aa79dcee981c?w=400&h=250&fit=crop",
-      description: "Essential security measures every developer should implement to protect web applications from common vulnerabilities.",
-      tags: ["Security", "OWASP", "Authentication", "Encryption"],
-      author: "Anu Kumar",
-      date: "March 5, 2025",
-      readTime: "9 min read",
-      color: "from-red-500 to-pink-500",
-      slug: "cybersecurity-best-practices"
-    }
-  ]
 
   useEffect(() => {
     setIsVisible(true)
@@ -96,8 +97,6 @@ function Blog() {
       setLoading(false)
     }
   }
-
-  const categories = ["All", "Web Development", "Mobile Development", "Cloud & DevOps", "Design", "Security", "AI & Technology"]
 
   const filteredPosts = activeCategory === "All"
     ? blogPosts

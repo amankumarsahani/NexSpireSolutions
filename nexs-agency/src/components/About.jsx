@@ -1,5 +1,43 @@
 import { useState, useEffect } from 'react'
 
+const teamMembers = [
+  {
+    name: "Aman Kumar Sahani",
+    role: "Founder & Lead Developer",
+    image: "https://media.licdn.com/dms/image/v2/D5635AQH5ci5Ugk1vTw/profile-framedphoto-shrink_400_400/B56ZfvUFh9GUAc-/0/1752066710244?e=1764432000&v=beta&t=tKuFhdqPPrrcdpFEn9N8hDVCx1MTK5HeqUAbZ_ise8I",
+    skills: ["React", "Node.js", "Python", "AWS"],
+    gradient: "from-blue-500 to-blue-600"
+  },
+  {
+    name: "Anu Kumar",
+    role: "Senior UI/UX Designer",
+    image: "https://media.licdn.com/dms/image/v2/D5635AQHiirkL_Zj4Kg/profile-framedphoto-shrink_400_400/profile-framedphoto-shrink_400_400/0/1712624046763?e=1764432000&v=beta&t=8cpHTXKwpXe6DU-Gvd8Vf9kdWqGg2TJofno2wUZAVLs",
+    skills: ["Figma", "React", "Design Systems"],
+    gradient: "from-purple-500 to-purple-600"
+  },
+  {
+    name: "Kshitij Bhardwaj",
+    role: "Backend Architect",
+    image: "https://media.licdn.com/dms/image/v2/D5635AQFLeeMkFr5TQw/profile-framedphoto-shrink_400_400/B56Zitq2hlH0Ak-/0/1755260348813?e=1764432000&v=beta&t=r4fL3zagpQbN7L5-ubGA70k3szERV5yeJM0cLZTno-E",
+    skills: ["Vue.js", "Django", "PostgreSQL", "Docker"],
+    gradient: "from-green-500 to-green-600"
+  }
+];
+
+const stats = [
+  { number: "150+", label: "Projects Completed", description: "Successfully delivered across various industries" },
+  { number: "80+", label: "Happy Clients", description: "Long-term partnerships built on trust" },
+  { number: "98%", label: "Success Rate", description: "On-time delivery and quality assurance" },
+  { number: "24/7", label: "Support Available", description: "Round-the-clock technical assistance" }
+];
+
+const features = [
+  { icon: "⚡", title: "Agile Development", description: "Fast, iterative development approach for rapid delivery" },
+  { icon: "🛡️", title: "Quality Assurance", description: "Rigorous testing and quality control processes" },
+  { icon: "🚀", title: "Scalable Solutions", description: "Future-proof architecture that grows with your business" },
+  { icon: "💡", title: "Innovation Focus", description: "Cutting-edge technologies and creative problem solving" }
+];
+
 const About = () => {
   const [isVisible, setIsVisible] = useState(false)
   const [hoveredMember, setHoveredMember] = useState(null)
@@ -19,76 +57,6 @@ const About = () => {
 
     return () => observer.disconnect()
   }, [])
-
-  const teamMembers = [
-    {
-      name: "Aman Kumar Sahani",
-      role: "Founder & Lead Developer",
-      image: "https://media.licdn.com/dms/image/v2/D5635AQH5ci5Ugk1vTw/profile-framedphoto-shrink_400_400/B56ZfvUFh9GUAc-/0/1752066710244?e=1764432000&v=beta&t=tKuFhdqPPrrcdpFEn9N8hDVCx1MTK5HeqUAbZ_ise8I",
-      skills: ["React", "Node.js", "Python", "AWS"],
-      gradient: "from-blue-500 to-blue-600"
-    },
-    {
-      name: "Anu Kumar",
-      role: "Senior UI/UX Designer",
-      image: "https://media.licdn.com/dms/image/v2/D5635AQHiirkL_Zj4Kg/profile-framedphoto-shrink_400_400/profile-framedphoto-shrink_400_400/0/1712624046763?e=1764432000&v=beta&t=8cpHTXKwpXe6DU-Gvd8Vf9kdWqGg2TJofno2wUZAVLs",
-      skills: ["Figma", "React", "Design Systems"],
-      gradient: "from-purple-500 to-purple-600"
-    },
-    {
-      name: "Kshitij Bhardwaj",
-      role: "Backend Architect",
-      image: "https://media.licdn.com/dms/image/v2/D5635AQFLeeMkFr5TQw/profile-framedphoto-shrink_400_400/B56Zitq2hlH0Ak-/0/1755260348813?e=1764432000&v=beta&t=r4fL3zagpQbN7L5-ubGA70k3szERV5yeJM0cLZTno-E",
-      skills: ["Vue.js", "Django", "PostgreSQL", "Docker"],
-      gradient: "from-green-500 to-green-600"
-    }
-  ];
-
-  const stats = [
-    {
-      number: "150+",
-      label: "Projects Completed",
-      description: "Successfully delivered across various industries"
-    },
-    {
-      number: "80+",
-      label: "Happy Clients",
-      description: "Long-term partnerships built on trust"
-    },
-    {
-      number: "98%",
-      label: "Success Rate",
-      description: "On-time delivery and quality assurance"
-    },
-    {
-      number: "24/7",
-      label: "Support Available",
-      description: "Round-the-clock technical assistance"
-    }
-  ];
-
-  const features = [
-    {
-      icon: "⚡",
-      title: "Agile Development",
-      description: "Fast, iterative development approach for rapid delivery"
-    },
-    {
-      icon: "🛡️",
-      title: "Quality Assurance",
-      description: "Rigorous testing and quality control processes"
-    },
-    {
-      icon: "🚀",
-      title: "Scalable Solutions",
-      description: "Future-proof architecture that grows with your business"
-    },
-    {
-      icon: "💡",
-      title: "Innovation Focus",
-      description: "Cutting-edge technologies and creative problem solving"
-    }
-  ];
 
   return (
     <section id="about" className="relative py-20 bg-gradient-to-br from-gray-50 via-slate-50 to-indigo-50 overflow-hidden">

@@ -1,5 +1,3 @@
-import React from 'react';
-
 export default function ActivityFeed({ activities }) {
     // Default activities if none provided
     const defaultActivities = [

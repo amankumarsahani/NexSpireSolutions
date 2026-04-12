@@ -1,12 +1,8 @@
-import { useEffect } from 'react';
 import { Helmet } from 'react-helmet-async';
 import { Link } from 'react-router-dom';
 import RelatedServices from '../../components/seo/RelatedServices';
 
 const AiTrends2026 = () => {
-    useEffect(() => {
-        window.scrollTo(0, 0);
-    }, []);
 
     const articleSchema = {
         "@context": "https://schema.org",

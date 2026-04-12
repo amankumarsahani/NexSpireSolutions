@@ -2,17 +2,11 @@ import { useEffect, useState, useRef, useCallback } from 'react';
 import { Link } from 'react-router-dom';
 import { Helmet } from 'react-helmet-async';
 import { motion, AnimatePresence } from 'framer-motion';
-import { clsx } from 'clsx';
-import { twMerge } from 'tailwind-merge';
+import { cn } from '../utils/cn';
 import LeadMagnet from '../components/LeadMagnet';
 import { blogAPI } from '../services/api';
 import Breadcrumbs from '../components/ui/Breadcrumbs';
 import BackToTop from '../components/ui/BackToTop';
-
-// Utility for tailwind class merging
-function cn(...inputs) {
-    return twMerge(clsx(inputs));
-}
 
 const FadeIn = ({ children, className, delay = 0 }) => {
     return (
@@ -61,7 +55,6 @@ const BlogPage = () => {
     };
 
     useEffect(() => {
-        window.scrollTo(0, 0);
         loadBlogs();
     }, []);
 

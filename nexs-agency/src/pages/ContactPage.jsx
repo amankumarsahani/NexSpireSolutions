@@ -1,15 +1,10 @@
 import { useEffect, useState } from 'react';
 import { Helmet } from 'react-helmet-async';
-import { motion, AnimatePresence, useScroll, useSpring } from 'framer-motion';
+import { motion, AnimatePresence } from 'framer-motion';
 import confetti from 'canvas-confetti';
-import { clsx } from 'clsx';
-import { twMerge } from 'tailwind-merge';
+import { cn } from '../utils/cn';
 import { inquiryAPI } from '../services/api';
-
-// Utility for tailwind class merging
-function cn(...inputs) {
-    return twMerge(clsx(inputs));
-}
+import ReadingProgress from '../components/ui/ReadingProgress';
 
 const FadeIn = ({ children, className, delay = 0 }) => {
     return (
@@ -26,16 +21,7 @@ const FadeIn = ({ children, className, delay = 0 }) => {
 };
 
 const ContactPage = () => {
-    useEffect(() => {
-        window.scrollTo(0, 0);
-    }, []);
 
-    const { scrollYProgress } = useScroll();
-    const scaleX = useSpring(scrollYProgress, {
-        stiffness: 100,
-        damping: 30,
-        restDelta: 0.001
-    });
 
     const [formState, setFormState] = useState({
         name: '',
@@ -109,10 +95,7 @@ const ContactPage = () => {
             </Helmet>
 
             {/* Scroll Progress Bar */}
-            <motion.div
-                className="fixed top-0 left-0 right-0 h-1 bg-blue-600 origin-left z-50"
-                style={{ scaleX }}
-            />
+            <ReadingProgress />
 
             {/* Hero Section - 3D Gradient Mesh Style */}
             <section className="relative min-h-[85vh] flex items-center pt-20 pb-32 overflow-hidden bg-gray-950 text-white">

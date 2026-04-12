@@ -1,9 +1,8 @@
-import { useEffect, useRef } from 'react';
+import { useRef } from 'react';
 import { Link } from 'react-router-dom';
 import { Helmet } from 'react-helmet-async';
-import { motion, useScroll, useSpring, useTransform } from 'framer-motion';
-import { clsx } from 'clsx';
-import { twMerge } from 'tailwind-merge';
+import { motion } from 'framer-motion';
+import { cn } from '../utils/cn';
 
 // Import Assets
 import officeImg from '../assets/office_collaboration.png';
@@ -13,11 +12,7 @@ import Timeline from '../components/Timeline';
 import Breadcrumbs from '../components/ui/Breadcrumbs';
 import BackToTop from '../components/ui/BackToTop';
 import TrustBadges from '../components/ui/TrustBadges';
-
-// Utility for tailwind class merging
-function cn(...inputs) {
-  return twMerge(clsx(inputs));
-}
+import ReadingProgress from '../components/ui/ReadingProgress';
 
 const FadeIn = ({ children, className, delay = 0 }) => {
   return (
@@ -34,16 +29,7 @@ const FadeIn = ({ children, className, delay = 0 }) => {
 };
 
 const AboutPage = () => {
-  useEffect(() => {
-    window.scrollTo(0, 0);
-  }, []);
 
-  const { scrollYProgress } = useScroll();
-  const scaleX = useSpring(scrollYProgress, {
-    stiffness: 100,
-    damping: 30,
-    restDelta: 0.001
-  });
 
   const stats = [
     { label: "Years of Innovation", value: "5+" },
@@ -92,10 +78,7 @@ const AboutPage = () => {
       </Helmet>
 
       {/* Scroll Progress Bar */}
-      <motion.div
-        className="fixed top-0 left-0 right-0 h-1 bg-blue-600 origin-left z-50"
-        style={{ scaleX }}
-      />
+      <ReadingProgress />
 
       {/* Hero Section - Consistent 3D Gradient Mesh */}
       <section className="relative min-h-[80vh] flex items-center pt-20 overflow-hidden bg-gray-950 text-white">

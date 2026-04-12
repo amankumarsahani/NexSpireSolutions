@@ -1,8 +1,9 @@
-import { lazy, Suspense, memo } from 'react';
+import { lazy, memo } from 'react';
 import { BrowserRouter, Routes, Route } from 'react-router-dom';
 import { Helmet } from 'react-helmet-async';
 import ScrollReveal from './components/ScrollReveal';
 import ScrollToTop from './components/ScrollToTop';
+import ErrorBoundary from './components/ErrorBoundary';
 
 // Critical components - load immediately (including all landing page sections)
 import Header from './components/Header';
@@ -124,6 +125,7 @@ function App() {
   return (
     <BrowserRouter>
       <ScrollToTop />
+      <ErrorBoundary>
       <Routes>
         <Route element={<PublicLayout />}>
           <Route path="/" element={<LandingPage />} />
@@ -153,6 +155,7 @@ function App() {
           <Route path="*" element={<NotFound />} />
         </Route>
       </Routes>
+      </ErrorBoundary>
     </BrowserRouter>
   );
 }

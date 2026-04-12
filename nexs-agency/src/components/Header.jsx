@@ -2,6 +2,26 @@ import { useState, useEffect } from 'react';
 import { Link, useLocation, useNavigate } from 'react-router-dom';
 import { useAuth } from '../context/AuthContext';
 
+const navItems = [
+  { label: 'Home', path: '/' },
+  {
+    label: 'Services',
+    path: '/services',
+    children: [
+      { label: 'Web Development', path: '/services/custom-web-development' },
+      { label: 'Mobile Apps', path: '/services/mobile-app-development' },
+      { label: 'AI & Machine Learning', path: '/services/ai-machine-learning' },
+      { label: 'Cloud Solutions', path: '/services/cloud-solutions' },
+      { label: 'E-commerce', path: '/services/ecommerce-development' },
+    ]
+  },
+  { label: 'NexCRM', path: '/nexcrm' },
+  { label: 'About', path: '/about' },
+  { label: 'Portfolio', path: '/portfolio' },
+  { label: 'Blog', path: '/blog' },
+  { label: 'Contact', path: '/contact' },
+];
+
 const Header = () => {
   const [isMenuOpen, setIsMenuOpen] = useState(false);
   const [activeDropdown, setActiveDropdown] = useState(null);
@@ -11,26 +31,6 @@ const Header = () => {
   const navigate = useNavigate();
   const { user, isAuthenticated } = useAuth();
   const showAdminBackups = isAuthenticated && user?.role === 'admin';
-
-  const navItems = [
-    { label: 'Home', path: '/' },
-    {
-      label: 'Services',
-      path: '/services',
-      children: [
-        { label: 'Web Development', path: '/services/custom-web-development' },
-        { label: 'Mobile Apps', path: '/services/mobile-app-development' },
-        { label: 'AI & Machine Learning', path: '/services/ai-machine-learning' },
-        { label: 'Cloud Solutions', path: '/services/cloud-solutions' },
-        { label: 'E-commerce', path: '/services/ecommerce-development' },
-      ]
-    },
-    { label: 'NexCRM', path: '/nexcrm' },
-    { label: 'About', path: '/about' },
-    { label: 'Portfolio', path: '/portfolio' },
-    { label: 'Blog', path: '/blog' },
-    { label: 'Contact', path: '/contact' },
-  ];
 
   useEffect(() => {
     const handleScroll = () => {

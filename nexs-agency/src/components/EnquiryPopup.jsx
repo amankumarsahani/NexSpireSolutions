@@ -322,19 +322,6 @@ const EnquiryPopup = () => {
                 </div>
             </div>
 
-            {/* Animation keyframes */}
-            <style>{`
-                @keyframes popupSlide {
-                    0% {
-                        opacity: 0;
-                        transform: scale(0.8) translateY(20px);
-                    }
-                    100% {
-                        opacity: 1;
-                        transform: scale(1) translateY(0);
-                    }
-                }
-            `}</style>
         </div>
     );
 };

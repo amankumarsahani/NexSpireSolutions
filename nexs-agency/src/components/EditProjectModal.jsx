@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from 'react';
+import { useState, useEffect } from 'react';
 
 export default function EditProjectModal({ isOpen, onClose, onSave, project, clients }) {
     const [formData, setFormData] = useState({
