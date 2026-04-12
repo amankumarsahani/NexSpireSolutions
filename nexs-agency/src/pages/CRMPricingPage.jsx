@@ -141,7 +141,7 @@ export default function CRMPricingPage() {
     const [loadingSettings, setLoadingSettings] = useState(true);
 
     // reCAPTCHA site key (same as EnquiryPopup)
-    const RECAPTCHA_SITE_KEY = '6LcrNTYsAAAAAAiRJyNE6h2kWSsof7HrIHRx4Z8z';
+    const RECAPTCHA_SITE_KEY = import.meta.env.VITE_RECAPTCHA_SITE_KEY;
 
     // Load reCAPTCHA v3 script and settings
     useEffect(() => {
@@ -172,14 +172,15 @@ export default function CRMPricingPage() {
     }, []);
 
     const getCaptchaToken = async () => {
-        if (!window.grecaptcha) return null;
+        if (!window.grecaptcha) {
+            throw new Error('reCAPTCHA failed to load. Please refresh the page and try again.');
+        }
 
         try {
             await new Promise(resolve => window.grecaptcha.ready(resolve));
             return await window.grecaptcha.execute(RECAPTCHA_SITE_KEY, { action: 'pricing_inquiry' });
-        } catch (err) {
-            console.warn('reCAPTCHA error:', err);
-            return null;
+        } catch {
+            throw new Error('reCAPTCHA verification failed. Please refresh the page and try again.');
         }
     };
 
@@ -215,7 +216,13 @@ export default function CRMPricingPage() {
             });
 
             if (response.data.success && response.data.url) {
-                window.location.href = response.data.url;
+                const paymentUrl = new URL(response.data.url, window.location.origin);
+                const allowedHosts = [window.location.hostname, 'razorpay.com', 'api.razorpay.com', 'checkout.razorpay.com'];
+                if (allowedHosts.some(h => paymentUrl.hostname === h || paymentUrl.hostname.endsWith('.' + h))) {
+                    window.location.href = response.data.url;
+                } else {
+                    showToast('Invalid checkout URL. Please contact support.');
+                }
             } else {
                 showToast(response.data.error || 'Failed to generate checkout link');
             }
@@ -600,7 +607,14 @@ export default function CRMPricingPage() {
                                     setSubmitting(true);
 
                                     // Get CAPTCHA token
-                                    const captchaToken = await getCaptchaToken();
+                                    let captchaToken;
+                                    try {
+                                        captchaToken = await getCaptchaToken();
+                                    } catch (captchaErr) {
+                                        showToast(captchaErr.message, 'error');
+                                        setSubmitting(false);
+                                        return;
+                                    }
 
                                     const formData = new FormData(e.target);
                                     const selectedPlanValue = formData.get('plan') || selectedPlan || 'General';
@@ -641,6 +655,8 @@ export default function CRMPricingPage() {
                                             type="text"
                                             name="name"
                                             required
+                                            minLength={2}
+                                            maxLength={100}
                                             className="w-full px-4 py-2.5 border border-slate-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500 outline-none transition-colors"
                                             placeholder="Your name"
                                         />
@@ -698,6 +714,7 @@ export default function CRMPricingPage() {
                                     <textarea
                                         name="message"
                                         rows={3}
+                                        maxLength={2000}
                                         className="w-full px-4 py-2.5 border border-slate-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500 outline-none transition-colors resize-none"
                                         placeholder="Tell us about your requirements..."
                                     />

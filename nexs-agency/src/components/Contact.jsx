@@ -146,6 +146,8 @@ const Contact = () => {
                           value={formData.name}
                           onChange={handleChange}
                           required
+                          minLength={2}
+                          maxLength={100}
                           className="w-full px-4 py-3 rounded-lg border border-gray-200 focus:ring-2 focus:ring-blue-500 focus:border-blue-500 transition-all bg-white text-sm"
                           placeholder="Name"
                         />
@@ -188,6 +190,7 @@ const Contact = () => {
                         name="company"
                         value={formData.company}
                         onChange={handleChange}
+                        maxLength={100}
                         className="w-full px-4 py-3 rounded-lg border border-gray-200 focus:ring-2 focus:ring-blue-500 focus:border-blue-500 transition-all bg-white text-sm"
                         placeholder="Your Company"
                       />
@@ -228,6 +231,8 @@ const Contact = () => {
                         value={formData.message}
                         onChange={handleChange}
                         required
+                        minLength={10}
+                        maxLength={2000}
                         className="w-full h-32 px-4 py-3 rounded-lg border border-gray-200 focus:ring-2 focus:ring-blue-500 focus:border-blue-500 transition-all resize-none bg-white text-sm"
                         placeholder="Tell us about your project..."
                       ></textarea>

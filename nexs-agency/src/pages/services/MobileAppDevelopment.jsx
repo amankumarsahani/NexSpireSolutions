@@ -80,6 +80,7 @@ const MobileAppDevelopment = () => {
                     <img
                         src="https://images.unsplash.com/photo-1551650975-87deedd944c3?q=80&w=1974&auto=format&fit=crop"
                         alt="Mobile Development Background"
+                        loading="lazy"
                         className="w-full h-full object-cover opacity-50 transform scale-105"
                     />
                     <div className="absolute inset-0 bg-gradient-to-b from-slate-900/50 via-slate-900/80 to-slate-900"></div>
@@ -146,6 +147,7 @@ const MobileAppDevelopment = () => {
                                 <img
                                     src="https://images.unsplash.com/photo-1512941937669-90a1b58e7e9c?auto=format&fit=crop&q=80&w=800"
                                     alt="Mobile UI Design"
+                                    loading="lazy"
                                     className="absolute inset-0 w-full h-full object-cover transition-transform duration-700 group-hover:scale-110"
                                 />
                                 <div className="absolute inset-0 bg-gradient-to-t from-slate-900/60 to-transparent"></div>
@@ -157,6 +159,7 @@ const MobileAppDevelopment = () => {
                                 <img
                                     src="https://images.unsplash.com/photo-1555774698-0b77e0d5fac6?auto=format&fit=crop&q=80&w=800"
                                     alt="Phone Mockup"
+                                    loading="lazy"
                                     className="absolute inset-0 w-full h-full object-cover transition-transform duration-700 group-hover:scale-110"
                                 />
                                 <div className="absolute inset-0 bg-purple-600/20 mix-blend-overlay"></div>

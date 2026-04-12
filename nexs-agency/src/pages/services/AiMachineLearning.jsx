@@ -80,6 +80,7 @@ const AiMachineLearning = () => {
                     <img
                         src="https://images.unsplash.com/photo-1620712943543-bcc4688e7485?q=80&w=1965&auto=format&fit=crop"
                         alt="AI Background"
+                        loading="lazy"
                         className="w-full h-full object-cover opacity-50 transform scale-105"
                     />
                     <div className="absolute inset-0 bg-gradient-to-b from-slate-900/50 via-slate-900/80 to-slate-900"></div>
@@ -146,6 +147,7 @@ const AiMachineLearning = () => {
                                 <img
                                     src="https://images.unsplash.com/photo-1677442136019-21780ecad995?auto=format&fit=crop&q=80&w=800"
                                     alt="AI Network"
+                                    loading="lazy"
                                     className="absolute inset-0 w-full h-full object-cover transition-transform duration-700 group-hover:scale-110"
                                 />
                                 <div className="absolute inset-0 bg-gradient-to-t from-slate-900/60 to-transparent"></div>
@@ -157,6 +159,7 @@ const AiMachineLearning = () => {
                                 <img
                                     src="https://images.unsplash.com/photo-1555255707-c07966088b7b?auto=format&fit=crop&q=80&w=800"
                                     alt="Data Visualization"
+                                    loading="lazy"
                                     className="absolute inset-0 w-full h-full object-cover transition-transform duration-700 group-hover:scale-110"
                                 />
                                 <div className="absolute inset-0 bg-emerald-600/20 mix-blend-overlay"></div>

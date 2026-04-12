@@ -64,6 +64,8 @@ const AiTrends2026 = () => {
                     <img
                         src="https://images.unsplash.com/photo-1677442136019-21780ecad995?w=1200&q=80"
                         alt="AI Trends 2026"
+                        loading="lazy"
+                        height={500}
                         className="w-full h-full object-cover"
                     />
                 </div>

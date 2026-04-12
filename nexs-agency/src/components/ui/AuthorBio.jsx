@@ -17,6 +17,9 @@ export default function AuthorBio({
                         <img
                             src={avatar}
                             alt={name}
+                            loading="lazy"
+                            width={80}
+                            height={80}
                             className="w-20 h-20 rounded-2xl object-cover shadow-lg"
                         />
                     ) : (

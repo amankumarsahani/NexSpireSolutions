@@ -1,7 +1,7 @@
 import { useState, useEffect, useCallback } from 'react';
 import { inquiryAPI } from '../services/api';
 
-const RECAPTCHA_SITE_KEY = '6LcrNTYsAAAAAAiRJyNE6h2kWSsof7HrIHRx4Z8z';
+const RECAPTCHA_SITE_KEY = import.meta.env.VITE_RECAPTCHA_SITE_KEY;
 const POPUP_DELAY_MS = 15000; // 15 seconds
 const SCROLL_THRESHOLD = 0.5; // 50% scroll
 const STORAGE_KEY = 'nexspire_popup_dismissed';
@@ -105,7 +105,17 @@ const EnquiryPopup = () => {
             // Get reCAPTCHA token
             let captchaToken = null;
             if (window.grecaptcha) {
-                captchaToken = await window.grecaptcha.execute(RECAPTCHA_SITE_KEY, { action: 'submit_inquiry' });
+                try {
+                    captchaToken = await window.grecaptcha.execute(RECAPTCHA_SITE_KEY, { action: 'submit_inquiry' });
+                } catch {
+                    setSubmitStatus({ type: 'error', message: 'reCAPTCHA verification failed. Please refresh and try again.' });
+                    setIsSubmitting(false);
+                    return;
+                }
+            } else {
+                setSubmitStatus({ type: 'error', message: 'reCAPTCHA failed to load. Please refresh the page and try again.' });
+                setIsSubmitting(false);
+                return;
             }
 
             await inquiryAPI.submit({
@@ -207,6 +217,8 @@ const EnquiryPopup = () => {
                                         value={formData.name}
                                         onChange={handleChange}
                                         required
+                                        minLength={2}
+                                        maxLength={100}
                                         placeholder="Your Name *"
                                         className="w-full px-4 py-3 bg-white/5 border border-white/10 rounded-lg text-white placeholder-gray-500 focus:ring-2 focus:ring-blue-500 focus:border-blue-500 transition-all text-sm"
                                     />
@@ -241,6 +253,8 @@ const EnquiryPopup = () => {
                                     value={formData.message}
                                     onChange={handleChange}
                                     required
+                                    minLength={10}
+                                    maxLength={2000}
                                     placeholder="Tell us about your project... *"
                                     rows={3}
                                     className="w-full px-4 py-3 bg-white/5 border border-white/10 rounded-lg text-white placeholder-gray-500 focus:ring-2 focus:ring-blue-500 focus:border-blue-500 transition-all resize-none text-sm"

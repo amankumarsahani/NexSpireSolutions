@@ -150,6 +150,8 @@ const AboutPage = () => {
               <img
                 src={officeImg}
                 alt="Our Team Collaborating"
+                loading="lazy"
+                height={500}
                 className="relative rounded-[3rem] shadow-2xl object-cover h-[500px] w-full"
               />
             </FadeIn>

@@ -80,6 +80,7 @@ const EcommerceDevelopment = () => {
                     <img
                         src="https://images.unsplash.com/photo-1556742049-0cfed4f7a07d?q=80&w=2070&auto=format&fit=crop"
                         alt="Ecommerce Background"
+                        loading="lazy"
                         className="w-full h-full object-cover opacity-50 transform scale-105"
                     />
                     <div className="absolute inset-0 bg-gradient-to-b from-slate-900/50 via-slate-900/80 to-slate-900"></div>
@@ -146,6 +147,7 @@ const EcommerceDevelopment = () => {
                                 <img
                                     src="https://images.unsplash.com/photo-1601933973783-43cf8a7d4c5f?auto=format&fit=crop&q=80&w=800"
                                     alt="Online Shopping"
+                                    loading="lazy"
                                     className="absolute inset-0 w-full h-full object-cover transition-transform duration-700 group-hover:scale-110"
                                 />
                                 <div className="absolute inset-0 bg-gradient-to-t from-slate-900/60 to-transparent"></div>
@@ -157,6 +159,7 @@ const EcommerceDevelopment = () => {
                                 <img
                                     src="https://images.unsplash.com/photo-1556742031-c6961e8560b0?auto=format&fit=crop&q=80&w=800"
                                     alt="Payment Terminal"
+                                    loading="lazy"
                                     className="absolute inset-0 w-full h-full object-cover transition-transform duration-700 group-hover:scale-110"
                                 />
                                 <div className="absolute inset-0 bg-orange-600/20 mix-blend-overlay"></div>

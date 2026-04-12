@@ -86,6 +86,7 @@ const CustomWebDevelopment = () => {
                     <img
                         src="https://images.unsplash.com/photo-1451187580459-43490279c0fa?q=80&w=2072&auto=format&fit=crop"
                         alt="Background"
+                        loading="lazy"
                         className="w-full h-full object-cover opacity-50"
                     />
                     <div className="absolute inset-0 bg-gradient-to-b from-slate-900/50 via-slate-900/80 to-slate-900"></div>
@@ -152,6 +153,7 @@ const CustomWebDevelopment = () => {
                                 <img
                                     src="https://images.unsplash.com/photo-1555099962-4199c345e5dd?q=80&w=2070&auto=format&fit=crop"
                                     alt="Coding Interface"
+                                    loading="lazy"
                                     className="absolute inset-0 w-full h-full object-cover transition-transform duration-700 group-hover:scale-110"
                                 />
                                 <div className="absolute inset-0 bg-gradient-to-t from-slate-900/60 to-transparent"></div>
@@ -163,6 +165,7 @@ const CustomWebDevelopment = () => {
                                 <img
                                     src="https://images.unsplash.com/photo-1460925895917-afdab827c52f?q=80&w=2015&auto=format&fit=crop"
                                     alt="Analytics Dashboard"
+                                    loading="lazy"
                                     className="absolute inset-0 w-full h-full object-cover transition-transform duration-700 group-hover:scale-110"
                                 />
                                 <div className="absolute inset-0 bg-blue-600/20 mix-blend-overlay"></div>

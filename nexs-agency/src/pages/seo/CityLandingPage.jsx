@@ -291,6 +291,7 @@ const CityLandingPage = () => {
                             <img
                                 src={data.image}
                                 alt={`${data.city} Skyline`}
+                                loading="lazy"
                                 className="w-full h-full object-cover opacity-50"
                             />
                         </motion.div>
@@ -437,6 +438,7 @@ const CityLandingPage = () => {
                                 <img
                                     src="https://images.unsplash.com/photo-1486406146926-c627a92ad1ab?auto=format&fit=crop&q=80&w=1200"
                                     alt="Corporate Architecture"
+                                    loading="lazy"
                                     className="absolute inset-0 w-full h-full object-cover opacity-40 hover:scale-105 transition-transform duration-700"
                                 />
                                 <div className="absolute inset-0 bg-gradient-to-t from-slate-900 via-slate-900/50 to-transparent"></div>

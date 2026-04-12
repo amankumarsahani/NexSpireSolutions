@@ -130,7 +130,7 @@ export default function NexCRMLandingPage() {
     const [contactEmail, setContactEmail] = useState('sales@nexspire.com');
     const [loadingSettings, setLoadingSettings] = useState(true);
 
-    const RECAPTCHA_SITE_KEY = '6LcrNTYsAAAAAAiRJyNE6h2kWSsof7HrIHRx4Z8z';
+    const RECAPTCHA_SITE_KEY = import.meta.env.VITE_RECAPTCHA_SITE_KEY;
 
     useEffect(() => {
         window.scrollTo(0, 0);
@@ -160,13 +160,14 @@ export default function NexCRMLandingPage() {
     }, []);
 
     const getCaptchaToken = async () => {
-        if (!window.grecaptcha) return null;
+        if (!window.grecaptcha) {
+            throw new Error('reCAPTCHA failed to load. Please refresh the page and try again.');
+        }
         try {
             await new Promise(resolve => window.grecaptcha.ready(resolve));
             return await window.grecaptcha.execute(RECAPTCHA_SITE_KEY, { action: 'pricing_inquiry' });
-        } catch (err) {
-            console.warn('reCAPTCHA error:', err);
-            return null;
+        } catch {
+            throw new Error('reCAPTCHA verification failed. Please refresh the page and try again.');
         }
     };
 
@@ -200,7 +201,13 @@ export default function NexCRMLandingPage() {
             });
 
             if (response.data.success && response.data.url) {
-                window.location.href = response.data.url;
+                const paymentUrl = new URL(response.data.url, window.location.origin);
+                const allowedHosts = [window.location.hostname, 'razorpay.com', 'api.razorpay.com', 'checkout.razorpay.com'];
+                if (allowedHosts.some(h => paymentUrl.hostname === h || paymentUrl.hostname.endsWith('.' + h))) {
+                    window.location.href = response.data.url;
+                } else {
+                    showToast('Invalid checkout URL. Please contact support.');
+                }
             } else {
                 showToast(response.data.error || 'Failed to generate checkout link');
             }
@@ -343,6 +350,7 @@ export default function NexCRMLandingPage() {
                                 <img
                                     src="https://images.unsplash.com/photo-1512941937669-90a1b58e7e9c?ixlib=rb-4.0.3&auto=format&fit=crop&w=900&q=80"
                                     alt="Mobile App"
+                                    loading="lazy"
                                     className="w-full h-full object-cover"
                                 />
                                 {/* Phone Overlay */}
@@ -583,7 +591,14 @@ export default function NexCRMLandingPage() {
                             <form className="space-y-5" onSubmit={async (e) => {
                                 e.preventDefault();
                                 setSubmitting(true);
-                                const captchaToken = await getCaptchaToken();
+                                let captchaToken;
+                                try {
+                                    captchaToken = await getCaptchaToken();
+                                } catch (captchaErr) {
+                                    showToast(captchaErr.message, 'error');
+                                    setSubmitting(false);
+                                    return;
+                                }
                                 const formData = new FormData(e.target);
                                 const data = {
                                     name: formData.get('name'),
@@ -606,13 +621,13 @@ export default function NexCRMLandingPage() {
                                 finally { setSubmitting(false); }
                             }}>
                                 <div className="space-y-4">
-                                    <input type="text" name="name" required placeholder="Full Name" className="w-full px-5 py-4 bg-slate-50 border border-slate-200 rounded-xl focus:ring-2 focus:ring-blue-500 focus:bg-white outline-none transition-all" />
+                                    <input type="text" name="name" required minLength={2} maxLength={100} placeholder="Full Name" className="w-full px-5 py-4 bg-slate-50 border border-slate-200 rounded-xl focus:ring-2 focus:ring-blue-500 focus:bg-white outline-none transition-all" />
                                     <input type="email" name="email" required placeholder="Work Email" className="w-full px-5 py-4 bg-slate-50 border border-slate-200 rounded-xl focus:ring-2 focus:ring-blue-500 focus:bg-white outline-none transition-all" />
                                     <div className="grid grid-cols-2 gap-4">
                                         <input type="tel" name="phone" placeholder="Phone" className="w-full px-5 py-4 bg-slate-50 border border-slate-200 rounded-xl focus:ring-2 focus:ring-blue-500 focus:bg-white outline-none transition-all" />
                                         <input type="text" name="company" placeholder="Company" className="w-full px-5 py-4 bg-slate-50 border border-slate-200 rounded-xl focus:ring-2 focus:ring-blue-500 focus:bg-white outline-none transition-all" />
                                     </div>
-                                    <textarea name="message" rows="3" placeholder="Additional details..." className="w-full px-5 py-4 bg-slate-50 border border-slate-200 rounded-xl focus:ring-2 focus:ring-blue-500 focus:bg-white outline-none resize-none transition-all"></textarea>
+                                    <textarea name="message" rows="3" maxLength={2000} placeholder="Additional details..." className="w-full px-5 py-4 bg-slate-50 border border-slate-200 rounded-xl focus:ring-2 focus:ring-blue-500 focus:bg-white outline-none resize-none transition-all"></textarea>
                                 </div>
                                 <button disabled={submitting} type="submit" className="w-full py-4 bg-slate-900 text-white font-bold rounded-xl hover:bg-slate-800 transition-colors disabled:opacity-70 flex items-center justify-center gap-3 shadow-lg hover:shadow-xl hover:-translate-y-0.5 transform duration-200">
                                     {submitting && <i className="ri-loader-4-line animate-spin"></i>}

@@ -64,6 +64,8 @@ const PwaBenefits = () => {
                     <img
                         src="https://images.unsplash.com/photo-1498050108023-c5249f4df085?w=1200&q=80"
                         alt="Progressive Web App"
+                        loading="lazy"
+                        height={500}
                         className="w-full h-full object-cover"
                     />
                 </div>

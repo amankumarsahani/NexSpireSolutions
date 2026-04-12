@@ -90,6 +90,9 @@ function Testimonials() {
               <img
                 src={testimonials[currentTestimonial].image}
                 alt={testimonials[currentTestimonial].name}
+                loading="lazy"
+                width={64}
+                height={64}
                 className="w-16 h-16 rounded-full object-cover object-top mr-4"
               />
               <div className="text-center">

@@ -272,6 +272,8 @@ const ContactPage = () => {
                                                 value={formState.name}
                                                 onChange={handleChange}
                                                 required
+                                                minLength={2}
+                                                maxLength={100}
                                                 className="w-full px-0 py-3 border-b-2 border-gray-100 focus:border-blue-600 focus:outline-none transition-colors bg-transparent placeholder-gray-300 font-medium text-lg"
                                                 placeholder="John Doe"
                                             />
@@ -309,6 +311,7 @@ const ContactPage = () => {
                                                     name="company"
                                                     value={formState.company}
                                                     onChange={handleChange}
+                                                    maxLength={100}
                                                     className="w-full px-0 py-3 border-b-2 border-gray-100 focus:border-blue-600 focus:outline-none transition-colors bg-transparent placeholder-gray-300 font-medium text-lg"
                                                     placeholder="Your Company"
                                                 />
@@ -322,6 +325,8 @@ const ContactPage = () => {
                                                 value={formState.message}
                                                 onChange={handleChange}
                                                 required
+                                                minLength={10}
+                                                maxLength={2000}
                                                 rows="4"
                                                 className="w-full px-0 py-3 border-b-2 border-gray-100 focus:border-blue-600 focus:outline-none transition-colors bg-transparent placeholder-gray-300 font-medium text-lg resize-none"
                                                 placeholder="Tell us about your project..."

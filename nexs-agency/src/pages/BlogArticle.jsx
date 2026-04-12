@@ -1,6 +1,7 @@
 import { useEffect, useState } from 'react';
 import { useParams, Link } from 'react-router-dom';
 import { Helmet } from 'react-helmet-async';
+import DOMPurify from 'dompurify';
 import { blogAPI } from '../services/api';
 import RelatedServices from '../components/seo/RelatedServices';
 import Breadcrumbs from '../components/ui/Breadcrumbs';
@@ -176,6 +177,8 @@ const BlogArticle = () => {
                         <img
                             src={blog.image}
                             alt={blog.title}
+                            loading="lazy"
+                            height={500}
                             className="w-full h-full object-cover"
                         />
                     </div>
@@ -189,7 +192,7 @@ const BlogArticle = () => {
                     <div className="flex-1 min-w-0">
                         <div
                             className="prose prose-lg prose-blue max-w-none mb-16"
-                            dangerouslySetInnerHTML={{ __html: addIdsToHeadings(blog.content) }}
+                            dangerouslySetInnerHTML={{ __html: DOMPurify.sanitize(addIdsToHeadings(blog.content), { ADD_ATTR: ['id', 'target'] }) }}
                         />
 
                         {/* Social Share (Inline) */}
@@ -232,6 +235,8 @@ const BlogArticle = () => {
                                             <img
                                                 src={post.image}
                                                 alt={post.title}
+                                                loading="lazy"
+                                                height={192}
                                                 className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-500"
                                             />
                                         </div>

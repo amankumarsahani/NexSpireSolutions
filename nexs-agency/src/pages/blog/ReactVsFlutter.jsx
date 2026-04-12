@@ -64,6 +64,8 @@ const ReactVsFlutter = () => {
                     <img
                         src="https://images.unsplash.com/photo-1512941937669-90a1b58e7e9c?w=1200&q=80"
                         alt="Mobile App Development"
+                        loading="lazy"
+                        height={500}
                         className="w-full h-full object-cover"
                     />
                 </div>

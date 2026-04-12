@@ -264,9 +264,23 @@ export default function AdminBackupsPage() {
             setOauthConnecting(true);
 
             try {
+                if (!form.oauth_client_secret && !pending.form.oauth_client_secret) {
+                    setForm((prev) => ({
+                        ...prev,
+                        ...pending.form
+                    }));
+                    if (pending.editingId) setEditingId(pending.editingId);
+                    setMessage('Google authorized successfully. Please re-enter the OAuth Client Secret and click "Connect Google Drive" again to complete the token exchange.', 'info');
+                    setOauthConnecting(false);
+                    sessionStorage.removeItem(GOOGLE_OAUTH_SESSION_KEY);
+                    clearGoogleOauthParams();
+                    return;
+                }
+
+                const clientSecret = form.oauth_client_secret || pending.form.oauth_client_secret;
                 const response = await adminAPI.exchangeGoogleOauthCode({
                     client_id: pending.form.oauth_client_id,
-                    client_secret: pending.form.oauth_client_secret,
+                    client_secret: clientSecret,
                     code,
                     redirect_uri: getRedirectUri()
                 });
@@ -406,7 +420,11 @@ export default function AdminBackupsPage() {
         sessionStorage.setItem(GOOGLE_OAUTH_SESSION_KEY, JSON.stringify({
             state,
             editingId,
-            form
+            form: {
+                ...form,
+                oauth_client_secret: '',
+                credentials_json: ''
+            }
         }));
 
         const params = new URLSearchParams({

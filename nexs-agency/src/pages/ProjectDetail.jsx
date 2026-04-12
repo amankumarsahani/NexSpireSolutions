@@ -60,6 +60,7 @@ const ProjectDetail = () => {
                         <img
                             src={project.image}
                             alt={project.title}
+                            loading="lazy"
                             className="w-full h-full object-cover"
                         />
                     </div>

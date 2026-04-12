@@ -15,7 +15,6 @@ function LoginModal({ isOpen, onClose, onSwitchToSignup }) {
 
   const handleSubmit = (e) => {
     e.preventDefault()
-    console.log('Login submitted:', formData)
     alert('Login functionality would be implemented here!')
     setFormData({ email: '', password: '' })
     onClose()
@@ -69,6 +68,7 @@ function LoginModal({ isOpen, onClose, onSwitchToSignup }) {
               value={formData.password}
               onChange={handleChange}
               required
+              minLength={8}
               className="w-full px-4 py-3 rounded-lg border border-gray-300 focus:ring-2 focus:ring-blue-500 focus:border-transparent transition-all"
               placeholder="Enter your password"
             />

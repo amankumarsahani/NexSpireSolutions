@@ -24,7 +24,6 @@ function SignUpModal({ isOpen, onClose, onSwitchToLogin }) {
       return
     }
 
-    console.log('Sign up submitted:', formData)
     alert('Sign up functionality would be implemented here!')
     setFormData({ firstName: '', lastName: '', email: '', password: '', confirmPassword: '' })
     onClose()
@@ -63,6 +62,8 @@ function SignUpModal({ isOpen, onClose, onSwitchToLogin }) {
                 value={formData.firstName}
                 onChange={handleChange}
                 required
+                minLength={2}
+                maxLength={50}
                 className="w-full px-4 py-3 rounded-lg border border-gray-300 focus:ring-2 focus:ring-blue-500 focus:border-transparent transition-all"
                 placeholder="John"
               />
@@ -78,6 +79,8 @@ function SignUpModal({ isOpen, onClose, onSwitchToLogin }) {
                 value={formData.lastName}
                 onChange={handleChange}
                 required
+                minLength={2}
+                maxLength={50}
                 className="w-full px-4 py-3 rounded-lg border border-gray-300 focus:ring-2 focus:ring-blue-500 focus:border-transparent transition-all"
                 placeholder="Doe"
               />
@@ -111,6 +114,7 @@ function SignUpModal({ isOpen, onClose, onSwitchToLogin }) {
               value={formData.password}
               onChange={handleChange}
               required
+              minLength={8}
               className="w-full px-4 py-3 rounded-lg border border-gray-300 focus:ring-2 focus:ring-blue-500 focus:border-transparent transition-all"
               placeholder="Create a strong password"
             />
@@ -127,6 +131,7 @@ function SignUpModal({ isOpen, onClose, onSwitchToLogin }) {
               value={formData.confirmPassword}
               onChange={handleChange}
               required
+              minLength={8}
               className="w-full px-4 py-3 rounded-lg border border-gray-300 focus:ring-2 focus:ring-blue-500 focus:border-transparent transition-all"
               placeholder="Confirm your password"
             />

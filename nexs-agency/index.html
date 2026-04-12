@@ -70,9 +70,15 @@
   <link rel="preconnect" href="https://fonts.googleapis.com" crossorigin>
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
   <link rel="preconnect" href="https://cdn.jsdelivr.net" crossorigin>
+  <link rel="preconnect" href="https://images.unsplash.com" crossorigin>
   <link rel="dns-prefetch" href="//fonts.googleapis.com">
   <link rel="dns-prefetch" href="//fonts.gstatic.com">
   <link rel="dns-prefetch" href="//cdn.jsdelivr.net">
+  <link rel="dns-prefetch" href="//images.unsplash.com">
+
+  <!-- Google Fonts - Non-blocking load -->
+  <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Pacifico&family=Inter:wght@300;400;500;600;700&family=Outfit:wght@300;400;500;600;700;800&display=swap" media="print" onload="this.media='all'">
+  <noscript><link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Pacifico&family=Inter:wght@300;400;500;600;700&family=Outfit:wght@300;400;500;600;700;800&display=swap"></noscript>
 
   <!-- Preload critical hero background -->
   <!-- Preload critical hero background -->
@@ -195,7 +201,7 @@
 <body>
   <div id="root"></div>
   <!-- Google reCAPTCHA v3 -->
-  <script src="https://www.google.com/recaptcha/api.js?render=6LcrNTYsAAAAAAiRJyNE6h2kWSsof7HrIHRx4Z8z"></script>
+  <script async defer src="https://www.google.com/recaptcha/api.js?render=6LcrNTYsAAAAAAiRJyNE6h2kWSsof7HrIHRx4Z8z"></script>
   <script type="module" src="/src/main.jsx"></script>
 </body>
 

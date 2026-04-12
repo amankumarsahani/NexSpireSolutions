@@ -97,13 +97,39 @@ export const messageAPI = {
 };
 
 // Document Management
+const ALLOWED_FILE_TYPES = [
+    'application/pdf',
+    'application/msword',
+    'application/vnd.openxmlformats-officedocument.wordprocessingml.document',
+    'application/vnd.ms-excel',
+    'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet',
+    'text/plain',
+    'text/csv',
+    'image/png',
+    'image/jpeg',
+    'image/gif',
+    'image/webp'
+];
+const MAX_FILE_SIZE = 10 * 1024 * 1024; // 10 MB
+
 export const documentAPI = {
     getAll: (params) => api.get('/documents', { params }),
     getById: (id) => api.get(`/documents/${id}`),
     getByProject: (projectId) => api.get(`/documents/project/${projectId}`),
-    upload: (formData) => api.post('/documents', formData, {
-        headers: { 'Content-Type': 'multipart/form-data' }
-    }),
+    upload: (formData) => {
+        const file = formData.get('file');
+        if (file) {
+            if (file.size > MAX_FILE_SIZE) {
+                return Promise.reject(new Error(`File size exceeds ${MAX_FILE_SIZE / (1024 * 1024)} MB limit.`));
+            }
+            if (!ALLOWED_FILE_TYPES.includes(file.type)) {
+                return Promise.reject(new Error('File type not allowed. Accepted: PDF, Word, Excel, CSV, TXT, PNG, JPEG, GIF, WebP.'));
+            }
+        }
+        return api.post('/documents', formData, {
+            headers: { 'Content-Type': 'multipart/form-data' }
+        });
+    },
     update: (id, data) => api.put(`/documents/${id}`, data),
     delete: (id) => api.delete(`/documents/${id}`),
     getStats: () => api.get('/documents/stats')

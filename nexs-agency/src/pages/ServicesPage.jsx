@@ -216,6 +216,7 @@ const ServicesPage = () => {
                     <img
                         src="https://images.unsplash.com/photo-1518770660439-4636190af475?q=80&w=2070&auto=format&fit=crop"
                         alt="Services Hero"
+                        loading="lazy"
                         className="w-full h-full object-cover opacity-50 transform scale-105"
                     />
                     <div className="absolute inset-0 bg-gradient-to-b from-slate-900/50 via-slate-900/80 to-slate-900"></div>

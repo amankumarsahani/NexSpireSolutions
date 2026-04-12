@@ -153,6 +153,8 @@ const Portfolio = memo(function Portfolio() {
                     <img
                       src={project.image}
                       alt={project.title}
+                      loading="lazy"
+                      height={192}
                       className="w-full h-40 sm:h-48 object-cover group-hover:scale-105 transition-transform duration-700"
                     />
                     {/* Gradient Overlay */}

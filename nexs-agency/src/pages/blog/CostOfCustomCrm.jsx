@@ -64,6 +64,8 @@ const CostOfCustomCrm = () => {
                     <img
                         src="https://images.unsplash.com/photo-1556742049-0cfed4f7a07d?w=1200&q=80"
                         alt="Custom CRM Dashboard"
+                        loading="lazy"
+                        height={500}
                         className="w-full h-full object-cover"
                     />
                 </div>
