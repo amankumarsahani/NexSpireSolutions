@@ -120,6 +120,7 @@ function FAQ() {
                   <button 
                     className="w-full px-6 py-5 text-left flex items-center justify-between group-hover:px-8 transition-all duration-300"
                     onClick={() => toggleFAQ(index)}
+                    aria-expanded={openFAQ === index}
                   >
                     <div className="flex items-center space-x-4 flex-1">
                       {/* Number Badge */}

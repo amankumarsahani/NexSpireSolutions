@@ -62,19 +62,20 @@ export default function AddTaskModal({ isOpen, onClose, onSave, projectId }) {
     if (!isOpen) return null;
 
     return (
-        <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50 p-4">
+        <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50 p-4" role="dialog" aria-modal="true" aria-labelledby="modal-title-addtask">
             <div
                 className="bg-white rounded-xl shadow-2xl max-w-2xl w-full max-h-[90vh] overflow-y-auto"
                 onClick={(e) => e.stopPropagation()}
             >
                 {/* Header */}
                 <div className="sticky top-0 bg-white border-b px-6 py-4 flex items-center justify-between">
-                    <h3 className="text-xl font-bold text-gray-900 flex items-center gap-2">
+                    <h3 id="modal-title-addtask" className="text-xl font-bold text-gray-900 flex items-center gap-2">
                         <i className="ri-task-line text-purple-600"></i>
                         Add Task
                     </h3>
                     <button
                         onClick={onClose}
+                        aria-label="Close"
                         className="text-gray-400 hover:text-gray-600 transition-colors"
                     >
                         <i className="ri-close-line text-2xl"></i>

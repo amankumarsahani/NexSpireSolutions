@@ -245,7 +245,7 @@ const Contact = () => {
                   <div className="mt-auto space-y-4">
                     {/* Status Message */}
                     {submitStatus.message && (
-                      <div className={`p-3 rounded-lg text-sm ${submitStatus.type === 'success'
+                      <div role="alert" className={`p-3 rounded-lg text-sm ${submitStatus.type === 'success'
                         ? 'bg-green-50 text-green-700 border border-green-200'
                         : 'bg-red-50 text-red-700 border border-red-200'
                         }`}>

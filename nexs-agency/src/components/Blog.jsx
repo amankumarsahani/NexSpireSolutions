@@ -401,6 +401,7 @@ function Blog() {
                         <input
                           type="email"
                           placeholder="Enter your email address"
+                          aria-label="Email address for newsletter"
                           className="w-full px-4 py-3 rounded-2xl text-gray-900 placeholder-gray-400 bg-white/80 backdrop-blur-3xl backdrop-saturate-150 border border-white/50 shadow-lg shadow-black/5 focus:outline-none focus:ring-2 focus:ring-white/70 focus:bg-white/90 focus:border-white/70 focus:shadow-xl transition-all duration-500 group-hover:bg-white/85"
                         />
                         <div className="absolute inset-0 bg-gradient-to-r from-white/5 via-white/10 to-white/5 rounded-2xl opacity-0 group-hover:opacity-100 transition-opacity duration-500 pointer-events-none"></div>

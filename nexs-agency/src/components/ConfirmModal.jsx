@@ -29,7 +29,7 @@ export default function ConfirmModal({
         : 'bg-blue-600 hover:bg-blue-700 text-white';
 
     return (
-        <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50 p-4">
+        <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50 p-4" role="dialog" aria-modal="true" aria-labelledby="modal-title-confirm">
             <div
                 className="bg-white rounded-xl shadow-2xl max-w-md w-full p-6 transform transition-all"
                 onClick={(e) => e.stopPropagation()}
@@ -42,7 +42,7 @@ export default function ConfirmModal({
                             }`}></i>
                     </div>
                     <div className="flex-1">
-                        <h3 className="text-lg font-bold text-gray-900">{title}</h3>
+                        <h3 id="modal-title-confirm" className="text-lg font-bold text-gray-900">{title}</h3>
                         <p className="text-gray-600 mt-1">{message}</p>
                     </div>
                 </div>

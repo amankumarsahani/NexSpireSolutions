@@ -18,7 +18,7 @@ export default function ConvertLeadModal({ isOpen, onClose, onConvert, lead }) {
     };
 
     return (
-        <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50 p-4">
+        <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50 p-4" role="dialog" aria-modal="true" aria-labelledby="modal-title-convertlead">
             <div
                 className="bg-white rounded-xl shadow-2xl max-w-lg w-full"
                 onClick={(e) => e.stopPropagation()}
@@ -26,12 +26,13 @@ export default function ConvertLeadModal({ isOpen, onClose, onConvert, lead }) {
                 {/* Header */}
                 <div className="bg-gradient-to-r from-green-600 to-emerald-600 text-white px-6 py-4 rounded-t-xl">
                     <div className="flex items-center justify-between">
-                        <h3 className="text-xl font-bold flex items-center gap-2">
+                        <h3 id="modal-title-convertlead" className="text-xl font-bold flex items-center gap-2">
                             <i className="ri-user-follow-line"></i>
                             Convert Lead to Client
                         </h3>
                         <button
                             onClick={onClose}
+                            aria-label="Close"
                             className="text-white/80 hover:text-white transition-colors"
                         >
                             <i className="ri-close-line text-2xl"></i>

@@ -81,7 +81,7 @@ const Hero = () => {
                 <span className="block mb-1 text-2xl sm:text-3xl md:text-4xl lg:text-5xl font-extrabold">Engineering Scalable</span>
                 <span className="block mb-1 text-2xl sm:text-3xl md:text-4xl lg:text-5xl font-extrabold">Digital Ecosystems for</span>
                 <span className="block relative text-3xl sm:text-4xl md:text-5xl lg:text-6xl xl:text-7xl">
-                  <span className="relative font-extrabold">
+                  <span className="relative font-extrabold" aria-live="polite" aria-atomic="true">
                     <span
                       className="bg-gradient-to-r from-cyan-400 via-blue-400 to-purple-400 bg-clip-text text-transparent"
                       style={{

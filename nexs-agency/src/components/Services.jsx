@@ -1,8 +1,10 @@
-import { useState, useEffect, memo } from 'react'
+import { useState, useEffect, useRef, useCallback, memo } from 'react'
 
 const Services = memo(function Services() {
   const [hoveredCard, setHoveredCard] = useState(null)
   const [currentSlide, setCurrentSlide] = useState(0)
+  const [isPaused, setIsPaused] = useState(false)
+  const intervalRef = useRef(null)
 
   const services = [
     {
@@ -62,13 +64,25 @@ const Services = memo(function Services() {
   ];
 
   // Auto slider functionality
-  useEffect(() => {
-    const timer = setInterval(() => {
+  const startAutoSlide = useCallback(() => {
+    if (intervalRef.current) clearInterval(intervalRef.current)
+    intervalRef.current = setInterval(() => {
       setCurrentSlide((prev) => (prev + 1) % Math.ceil(services.length / 3))
     }, 4000)
-
-    return () => clearInterval(timer)
   }, [services.length])
+
+  useEffect(() => {
+    if (!isPaused) {
+      startAutoSlide()
+    } else {
+      if (intervalRef.current) clearInterval(intervalRef.current)
+    }
+    return () => { if (intervalRef.current) clearInterval(intervalRef.current) }
+  }, [isPaused, startAutoSlide])
+
+  const togglePause = () => {
+    setIsPaused(prev => !prev)
+  }
 
   const goToSlide = (index) => {
     setCurrentSlide(index)
@@ -130,7 +144,7 @@ const Services = memo(function Services() {
         </div>
 
         {/* Enhanced Services Carousel */}
-        <div className="relative mb-16">
+        <div className="relative mb-16" role="region" aria-roledescription="carousel" aria-label="Our services">
           {/* Carousel Container */}
           <div className="overflow-hidden">
             <div
@@ -215,6 +229,7 @@ const Services = memo(function Services() {
           <div className="flex justify-center gap-4 mt-6 lg:hidden">
             <button
               onClick={() => goToSlide(currentSlide === 0 ? totalSlides - 1 : currentSlide - 1)}
+              aria-label="Previous service"
               className="w-10 h-10 bg-white/90 backdrop-blur-sm rounded-full shadow-lg hover:shadow-xl transition-all duration-300 flex items-center justify-center group hover:scale-110"
             >
               <i className="ri-arrow-left-line text-lg text-gray-700 group-hover:text-indigo-600 transition-colors"></i>
@@ -222,6 +237,7 @@ const Services = memo(function Services() {
 
             <button
               onClick={() => goToSlide(currentSlide === totalSlides - 1 ? 0 : currentSlide + 1)}
+              aria-label="Next service"
               className="w-10 h-10 bg-white/90 backdrop-blur-sm rounded-full shadow-lg hover:shadow-xl transition-all duration-300 flex items-center justify-center group hover:scale-110"
             >
               <i className="ri-arrow-right-line text-lg text-gray-700 group-hover:text-indigo-600 transition-colors"></i>
@@ -229,17 +245,28 @@ const Services = memo(function Services() {
           </div>
 
           {/* Carousel Navigation Dots */}
-          <div className="flex justify-center mt-6 space-x-3">
+          <div className="flex justify-center items-center mt-6 space-x-3">
             {Array.from({ length: totalSlides }).map((_, index) => (
               <button
                 key={index}
                 onClick={() => goToSlide(index)}
-                className={`w-3 h-3 rounded-full transition-all duration-300 ${currentSlide === index
+                aria-label={`Go to service ${index + 1}`}
+                aria-current={currentSlide === index}
+                className="w-8 h-8 flex items-center justify-center"
+              >
+                <span className={`w-3 h-3 rounded-full transition-all duration-300 ${currentSlide === index
                   ? 'bg-gradient-to-r from-indigo-500 to-purple-500 scale-125 shadow-lg'
                   : 'bg-gray-300 hover:bg-gray-400 hover:scale-110'
-                  }`}
-              />
+                  }`} />
+              </button>
             ))}
+            <button
+              aria-label={isPaused ? "Play carousel" : "Pause carousel"}
+              onClick={togglePause}
+              className="w-8 h-8 flex items-center justify-center rounded-full bg-white/90 backdrop-blur-sm shadow-md hover:shadow-lg transition-all duration-300 hover:scale-110 ml-2"
+            >
+              <i className={`${isPaused ? 'ri-play-line' : 'ri-pause-line'} text-gray-700`}></i>
+            </button>
           </div>
 
           {/* Carousel Progress Bar */}
@@ -255,6 +282,7 @@ const Services = memo(function Services() {
           {/* Navigation Arrows - Positioned outside of cards */}
           <button
             onClick={() => goToSlide(currentSlide === 0 ? totalSlides - 1 : currentSlide - 1)}
+            aria-label="Previous service"
             className="absolute -left-16 top-1/2 transform -translate-y-1/2 w-12 h-12 bg-white/90 backdrop-blur-sm rounded-full shadow-xl hover:shadow-2xl transition-all duration-300 flex items-center justify-center group hover:scale-110 lg:block hidden"
           >
             <i className="ri-arrow-left-line text-xl text-gray-700 group-hover:text-indigo-600 transition-colors"></i>
@@ -262,6 +290,7 @@ const Services = memo(function Services() {
 
           <button
             onClick={() => goToSlide(currentSlide === totalSlides - 1 ? 0 : currentSlide + 1)}
+            aria-label="Next service"
             className="absolute -right-16 top-1/2 transform -translate-y-1/2 w-12 h-12 bg-white/90 backdrop-blur-sm rounded-full shadow-xl hover:shadow-2xl transition-all duration-300 flex items-center justify-center group hover:scale-110 lg:block hidden"
           >
             <i className="ri-arrow-right-line text-xl text-gray-700 group-hover:text-indigo-600 transition-colors"></i>

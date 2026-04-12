@@ -23,11 +23,12 @@ function LoginModal({ isOpen, onClose, onSwitchToSignup }) {
   if (!isOpen) return null
 
   return (
-    <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50 p-4">
+    <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50 p-4" role="dialog" aria-modal="true" aria-labelledby="modal-title-login">
       <div className="bg-white rounded-2xl max-w-md w-full p-6 sm:p-8 relative mx-4">
         {/* Close Button */}
         <button
           onClick={onClose}
+          aria-label="Close"
           className="absolute top-4 right-4 text-gray-400 hover:text-gray-600 transition-colors"
         >
           <i className="ri-close-line text-2xl"></i>
@@ -35,7 +36,7 @@ function LoginModal({ isOpen, onClose, onSwitchToSignup }) {
 
         {/* Header */}
         <div className="text-center mb-6 sm:mb-8">
-          <h2 className="text-2xl sm:text-3xl font-bold text-gray-900 mb-2">Welcome Back</h2>
+          <h2 id="modal-title-login" className="text-2xl sm:text-3xl font-bold text-gray-900 mb-2">Welcome Back</h2>
           <p className="text-sm sm:text-base text-gray-600">Sign in to your account to continue</p>
         </div>
 

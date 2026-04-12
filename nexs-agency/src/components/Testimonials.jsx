@@ -72,7 +72,7 @@ function Testimonials() {
           </p>
         </div>
 
-        <div className="relative">
+        <div className="relative" role="region" aria-roledescription="carousel" aria-label="Client testimonials">
           <div className="bg-white rounded-2xl p-8 md:p-12 shadow-xl max-w-4xl mx-auto">
             <div className="flex items-center justify-center mb-6">
               <div className="flex space-x-1">
@@ -110,12 +110,14 @@ function Testimonials() {
           {/* Desktop Navigation Buttons */}
           <button
             onClick={prevTestimonial}
+            aria-label="Previous testimonial"
             className="hidden md:flex absolute -left-6 top-1/2 transform -translate-y-1/2 w-12 h-12 items-center justify-center bg-white rounded-full shadow-lg hover:bg-gray-50 transition-colors cursor-pointer"
           >
             <i className="ri-arrow-left-s-line text-gray-600 text-xl"></i>
           </button>
           <button
             onClick={nextTestimonial}
+            aria-label="Next testimonial"
             className="hidden md:flex absolute -right-6 top-1/2 transform -translate-y-1/2 w-12 h-12 items-center justify-center bg-white rounded-full shadow-lg hover:bg-gray-50 transition-colors cursor-pointer"
           >
             <i className="ri-arrow-right-s-line text-gray-600 text-xl"></i>
@@ -126,12 +128,14 @@ function Testimonials() {
         <div className="flex justify-center gap-4 mt-6 md:hidden">
           <button
             onClick={prevTestimonial}
+            aria-label="Previous testimonial"
             className="w-10 h-10 flex items-center justify-center bg-white rounded-full shadow-lg hover:bg-gray-50 transition-colors cursor-pointer"
           >
             <i className="ri-arrow-left-s-line text-gray-600 text-lg"></i>
           </button>
           <button
             onClick={nextTestimonial}
+            aria-label="Next testimonial"
             className="w-10 h-10 flex items-center justify-center bg-white rounded-full shadow-lg hover:bg-gray-50 transition-colors cursor-pointer"
           >
             <i className="ri-arrow-right-s-line text-gray-600 text-lg"></i>
@@ -143,9 +147,12 @@ function Testimonials() {
             <button
               key={index}
               onClick={() => goToTestimonial(index)}
-              className={`w-3 h-3 rounded-full cursor-pointer transition-colors ${currentTestimonial === index ? 'bg-blue-600' : 'bg-gray-300'
-                }`}
-            />
+              aria-label={`Go to testimonial ${index + 1}`}
+              aria-current={currentTestimonial === index}
+              className="w-8 h-8 flex items-center justify-center cursor-pointer"
+            >
+              <span className={`w-3 h-3 rounded-full transition-colors ${currentTestimonial === index ? 'bg-blue-600' : 'bg-gray-300'}`} />
+            </button>
           ))}
         </div>
 

@@ -18,15 +18,16 @@ export default function Modal({ isOpen, onClose, title, children }) {
     if (!isOpen) return null;
 
     return (
-        <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-black bg-opacity-30">
+        <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-black bg-opacity-30" role="dialog" aria-modal="true" aria-labelledby="modal-title-generic">
             <div
                 className="bg-white rounded-xl shadow-2xl w-full max-w-2xl max-h-[90vh] overflow-y-auto transform transition-all"
                 onClick={(e) => e.stopPropagation()}
             >
                 <div className="flex items-center justify-between p-6 border-b sticky top-0 bg-white z-10">
-                    <h3 className="text-xl font-bold text-gray-800">{title}</h3>
+                    <h3 id="modal-title-generic" className="text-xl font-bold text-gray-800">{title}</h3>
                     <button
                         onClick={onClose}
+                        aria-label="Close"
                         className="p-2 hover:bg-gray-100 rounded-full transition-colors"
                     >
                         <i className="ri-close-line text-2xl text-gray-500"></i>

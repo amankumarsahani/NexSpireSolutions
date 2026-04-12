@@ -150,6 +150,9 @@ const EnquiryPopup = () => {
             className={`fixed inset-0 z-[9999] flex items-center justify-center p-4 transition-all duration-300 ${isClosing ? 'opacity-0' : 'opacity-100'}`}
             style={{ background: 'rgba(0, 0, 0, 0.7)', backdropFilter: 'blur(8px)' }}
             onClick={closePopup}
+            role="dialog"
+            aria-modal="true"
+            aria-labelledby="modal-title-enquiry"
         >
             {/* Animated particles/sparkles */}
             <div className="absolute inset-0 overflow-hidden pointer-events-none">
@@ -184,6 +187,7 @@ const EnquiryPopup = () => {
                     {/* Close button */}
                     <button
                         onClick={closePopup}
+                        aria-label="Close"
                         className="absolute top-4 right-4 z-10 w-8 h-8 flex items-center justify-center rounded-full bg-white/10 hover:bg-white/20 transition-colors group"
                     >
                         <i className="ri-close-line text-white text-xl group-hover:scale-110 transition-transform"></i>
@@ -195,7 +199,7 @@ const EnquiryPopup = () => {
                             <span className="w-2 h-2 bg-green-400 rounded-full mr-2 animate-pulse"></span>
                             Limited Time Offer
                         </div>
-                        <h2 className="text-2xl md:text-3xl font-bold text-white mb-2">
+                        <h2 id="modal-title-enquiry" className="text-2xl md:text-3xl font-bold text-white mb-2">
                             Let's Build Something
                             <span className="block bg-gradient-to-r from-blue-400 via-purple-400 to-pink-400 bg-clip-text text-transparent mt-1">
                                 Amazing Together! ✨
@@ -220,6 +224,7 @@ const EnquiryPopup = () => {
                                         minLength={2}
                                         maxLength={100}
                                         placeholder="Your Name *"
+                                        aria-label="Full name"
                                         className="w-full px-4 py-3 bg-white/5 border border-white/10 rounded-lg text-white placeholder-gray-500 focus:ring-2 focus:ring-blue-500 focus:border-blue-500 transition-all text-sm"
                                     />
                                 </div>
@@ -231,6 +236,7 @@ const EnquiryPopup = () => {
                                         onChange={handleChange}
                                         required
                                         placeholder="Email *"
+                                        aria-label="Email address"
                                         className="w-full px-4 py-3 bg-white/5 border border-white/10 rounded-lg text-white placeholder-gray-500 focus:ring-2 focus:ring-blue-500 focus:border-blue-500 transition-all text-sm"
                                     />
                                 </div>
@@ -243,6 +249,7 @@ const EnquiryPopup = () => {
                                     value={formData.phone}
                                     onChange={handleChange}
                                     placeholder="Phone Number (Optional)"
+                                    aria-label="Phone number"
                                     className="w-full px-4 py-3 bg-white/5 border border-white/10 rounded-lg text-white placeholder-gray-500 focus:ring-2 focus:ring-blue-500 focus:border-blue-500 transition-all text-sm"
                                 />
                             </div>
@@ -257,13 +264,14 @@ const EnquiryPopup = () => {
                                     maxLength={2000}
                                     placeholder="Tell us about your project... *"
                                     rows={3}
+                                    aria-label="Your message"
                                     className="w-full px-4 py-3 bg-white/5 border border-white/10 rounded-lg text-white placeholder-gray-500 focus:ring-2 focus:ring-blue-500 focus:border-blue-500 transition-all resize-none text-sm"
                                 />
                             </div>
 
                             {/* Status Message */}
                             {submitStatus.message && (
-                                <div className={`p-3 rounded-lg text-sm ${submitStatus.type === 'success'
+                                <div role="alert" className={`p-3 rounded-lg text-sm ${submitStatus.type === 'success'
                                         ? 'bg-green-500/20 text-green-300 border border-green-500/30'
                                         : 'bg-red-500/20 text-red-300 border border-red-500/30'
                                     }`}>

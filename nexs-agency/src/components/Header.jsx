@@ -6,6 +6,7 @@ const Header = () => {
   const [isMenuOpen, setIsMenuOpen] = useState(false);
   const [activeDropdown, setActiveDropdown] = useState(null);
   const [scrolled, setScrolled] = useState(false);
+  const [isServicesOpen, setIsServicesOpen] = useState(false);
   const location = useLocation();
   const navigate = useNavigate();
   const { user, isAuthenticated } = useAuth();
@@ -114,6 +115,12 @@ const Header = () => {
                   <Link
                     to={item.path}
                     onClick={(e) => handleNavClick(e, item.path)}
+                    {...(item.children ? {
+                      'aria-haspopup': 'true',
+                      'aria-expanded': isServicesOpen,
+                      onFocus: () => setIsServicesOpen(true),
+                      onBlur: () => { setTimeout(() => setIsServicesOpen(false), 150); }
+                    } : {})}
                     className={`relative z-10 px-4 py-2 text-sm font-semibold rounded-full transition-all duration-300 inline-flex items-center gap-1 ${isActive(item.path)
                       ? 'bg-gradient-to-r from-blue-500 to-purple-500 text-white shadow-lg shadow-blue-500/25'
                       : 'text-slate-700 hover:text-white hover:bg-gradient-to-r hover:from-blue-400 hover:to-purple-400 hover:shadow-md hover:shadow-blue-400/20'
@@ -125,13 +132,15 @@ const Header = () => {
 
                   {/* Dropdown Menu */}
                   {item.children && (
-                    <div className="absolute top-full left-1/2 -translate-x-1/2 pt-4 opacity-0 invisible group-hover:opacity-100 group-hover:visible transition-all duration-300 w-64 transform translate-y-2 group-hover:translate-y-0">
+                    <div className={`absolute top-full left-1/2 -translate-x-1/2 pt-4 transition-all duration-300 w-64 transform ${isServicesOpen ? 'opacity-100 visible translate-y-0' : 'opacity-0 invisible translate-y-2'} group-hover:opacity-100 group-hover:visible group-hover:translate-y-0`}>
                       <div className="bg-white/90 backdrop-blur-xl rounded-2xl shadow-xl border border-white/20 overflow-hidden p-2">
                         <div className="flex flex-col gap-1">
                           {item.children.map((child) => (
                             <Link
                               key={child.label}
                               to={child.path}
+                              onFocus={() => setIsServicesOpen(true)}
+                              onBlur={() => { setTimeout(() => setIsServicesOpen(false), 150); }}
                               className="px-4 py-3 text-sm font-medium text-slate-700 hover:bg-blue-50 hover:text-blue-600 rounded-xl transition-colors text-left flex items-center justify-between group/item"
                             >
                               {child.label}
@@ -176,6 +185,8 @@ const Header = () => {
           {/* Minimal mobile menu button */}
           <button
             onClick={() => setIsMenuOpen(!isMenuOpen)}
+            aria-label="Toggle navigation menu"
+            aria-expanded={isMenuOpen}
             className="lg:hidden relative w-10 h-10 rounded-xl bg-gradient-to-br from-blue-100/60 via-purple-100/50 to-pink-100/60 backdrop-blur-sm flex items-center justify-center hover:from-blue-200/70 hover:via-purple-200/60 hover:to-pink-200/70 transition-all duration-300 shadow-md hover:shadow-lg"
           >
             <div className="w-4 h-3 relative flex flex-col justify-between">
@@ -198,13 +209,26 @@ const Header = () => {
               <div className="px-4 space-y-1">
                 {navItems.map((item) => (
                   <div key={item.label}>
+                    {item.children ? (
+                      <button
+                        onClick={() => {
+                          setActiveDropdown(activeDropdown === item.label ? null : item.label);
+                        }}
+                        aria-expanded={activeDropdown === item.label}
+                        className={`relative z-10 w-full text-left px-4 py-2 text-base font-semibold rounded-xl transition-all duration-300 cursor-pointer ${isActive(item.path)
+                          ? 'text-white bg-gradient-to-r from-blue-500 to-purple-500 shadow-lg shadow-blue-500/25'
+                          : 'text-slate-700 hover:text-white hover:bg-gradient-to-r hover:from-blue-400 hover:to-purple-400 hover:shadow-md hover:shadow-blue-400/20'
+                          }`}
+                      >
+                        <div className="flex items-center justify-between">
+                          <span>{item.label}</span>
+                          <i className={`ri-arrow-down-s-line transition-transform duration-300 ${activeDropdown === item.label ? 'rotate-180' : ''}`}></i>
+                        </div>
+                      </button>
+                    ) : (
                     <div
                       onClick={(e) => {
-                        if (item.children) {
-                          setActiveDropdown(activeDropdown === item.label ? null : item.label);
-                        } else {
-                          handleNavClick(e, item.path);
-                        }
+                        handleNavClick(e, item.path);
                       }}
                       className={`relative z-10 block px-4 py-2 text-base font-semibold rounded-xl transition-all duration-300 cursor-pointer ${isActive(item.path)
                         ? 'text-white bg-gradient-to-r from-blue-500 to-purple-500 shadow-lg shadow-blue-500/25'
@@ -213,13 +237,12 @@ const Header = () => {
                     >
                       <div className="flex items-center justify-between">
                         <span>{item.label}</span>
-                        {item.children ? (
-                          <i className={`ri-arrow-down-s-line transition-transform duration-300 ${activeDropdown === item.label ? 'rotate-180' : ''}`}></i>
-                        ) : isActive(item.path) && (
+                        {isActive(item.path) && (
                           <div className="w-2 h-2 bg-gradient-to-r from-purple-400 to-pink-400 rounded-full animate-pulse shadow-sm"></div>
                         )}
                       </div>
                     </div>
+                    )}
 
                     {item.children && (
                       <div className={`overflow-hidden transition-all duration-300 ${activeDropdown === item.label ? 'max-h-96 opacity-100 mt-1' : 'max-h-0 opacity-0'}`}>

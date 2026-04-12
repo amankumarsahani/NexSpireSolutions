@@ -118,7 +118,7 @@ const Footer = () => {
             </div>
             <form onSubmit={handleSubscribe} className="flex flex-col sm:flex-row gap-4 relative">
               {subscribed ? (
-                <div className="flex-1 bg-green-500/20 border border-green-500/50 text-green-400 px-6 py-3 rounded-lg flex items-center justify-center">
+                <div role="alert" className="flex-1 bg-green-500/20 border border-green-500/50 text-green-400 px-6 py-3 rounded-lg flex items-center justify-center">
                   <i className="ri-checkbox-circle-line mr-2"></i>
                   Subscribed successfully!
                 </div>
@@ -130,6 +130,7 @@ const Footer = () => {
                     value={email}
                     onChange={(e) => setEmail(e.target.value)}
                     required
+                    aria-label="Email address for newsletter"
                     className="flex-1 px-4 py-3 rounded-lg bg-gray-800 border border-gray-700 focus:ring-2 focus:ring-blue-500 focus:border-transparent text-white placeholder-gray-400 transition-all outline-none"
                   />
                   <button

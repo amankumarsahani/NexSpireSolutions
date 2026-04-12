@@ -54,19 +54,20 @@ export default function AddNoteModal({ isOpen, onClose, onSave, leadId }) {
     if (!isOpen) return null;
 
     return (
-        <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50 p-4">
+        <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50 p-4" role="dialog" aria-modal="true" aria-labelledby="modal-title-addnote">
             <div
                 className="bg-white rounded-xl shadow-2xl max-w-2xl w-full"
                 onClick={(e) => e.stopPropagation()}
             >
                 {/* Header */}
                 <div className="bg-white border-b px-6 py-4 flex items-center justify-between rounded-t-xl">
-                    <h3 className="text-xl font-bold text-gray-900 flex items-center gap-2">
+                    <h3 id="modal-title-addnote" className="text-xl font-bold text-gray-900 flex items-center gap-2">
                         <i className="ri-sticky-note-line text-orange-600"></i>
                         Add Note
                     </h3>
                     <button
                         onClick={onClose}
+                        aria-label="Close"
                         className="text-gray-400 hover:text-gray-600 transition-colors"
                     >
                         <i className="ri-close-line text-2xl"></i>
