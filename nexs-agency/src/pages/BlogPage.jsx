@@ -4,11 +4,10 @@ import { Link } from 'react-router-dom';
 import { Helmet } from 'react-helmet-async';
 import { motion, AnimatePresence } from 'framer-motion';
 import { cn } from '../utils/cn';
-import LeadMagnet from '../components/LeadMagnet';
 import { blogAPI } from '../services/api';
 import Breadcrumbs from '../components/ui/Breadcrumbs';
 import BackToTop from '../components/ui/BackToTop';
-import { SITE_URL } from '../constants/siteConfig';
+import { SITE_URL, siteConfig } from '../constants/siteConfig';
 
 const FadeIn = ({ children, className, delay = 0 }) => {
     return (
@@ -38,23 +37,6 @@ const BlogPage = () => {
     const [page, setPage] = useState(1);
     // const [page, setPage] = useState(1);
     const loaderRef = useRef(null);
-
-    // Newsletter state
-    const [email, setEmail] = useState('');
-    const [subscribeStatus, setSubscribeStatus] = useState('idle'); // idle, loading, success, error
-
-    const handleSubscribe = (e) => {
-        e.preventDefault();
-        if (!email) return;
-        setSubscribeStatus('loading');
-
-        // Simulate API call
-        setTimeout(() => {
-            setSubscribeStatus('success');
-            setEmail('');
-            setTimeout(() => setSubscribeStatus('idle'), 5000);
-        }, 1500);
-    };
 
     useEffect(() => {
         loadBlogs();
@@ -368,7 +350,7 @@ const BlogPage = () => {
                     )}
                 </div>
 
-                {/* Newsletter */}
+                {/* Follow Us on Social Media */}
                 <div className="mt-16 relative">
                     <div className="absolute inset-0 bg-gradient-to-r from-blue-600 to-purple-600 rounded-[3rem] transform rotate-1 opacity-50 blur-lg"></div>
                     <div className="bg-gray-900 rounded-[3rem] p-12 md:p-24 text-center text-white relative overflow-hidden shadow-2xl">
@@ -376,55 +358,31 @@ const BlogPage = () => {
                         <div className="absolute top-0 left-0 w-full h-full bg-gradient-to-br from-blue-900/50 to-purple-900/50"></div>
 
                         <div className="relative z-10 max-w-3xl mx-auto">
-                            <div className="w-20 h-20 bg-white/10 rounded-3xl flex items-center justify-center mx-auto mb-8 backdrop-blur-md animate-float">
-                                <i className="ri-mail-send-line text-4xl"></i>
+                            <div className="w-20 h-20 bg-white/10 rounded-3xl flex items-center justify-center mx-auto mb-8 backdrop-blur-md">
+                                <i className="ri-share-circle-line text-4xl"></i>
                             </div>
-                            <h2 className="text-4xl md:text-5xl font-bold mb-6 tracking-tight">Subscribe to our Newsletter</h2>
+                            <h2 className="text-4xl md:text-5xl font-bold mb-6 tracking-tight">Follow Us on Social Media</h2>
                             <p className="text-xl text-gray-300 mb-10 leading-relaxed">
-                                Join 5,000+ developers and designers. Get the latest insights, tutorials, and trends delivered straight to your inbox.
+                                Stay up to date with the latest insights, tutorials, and trends. Connect with us on your favorite platform.
                             </p>
-                            <form onSubmit={handleSubscribe} className="flex flex-col md:flex-row gap-4 max-w-xl mx-auto relative">
-                                {subscribeStatus === 'success' ? (
-                                    <div className="w-full bg-green-500/20 border border-green-500/50 text-white px-8 py-5 rounded-full flex items-center justify-center animate-fade-in">
-                                        <i className="ri-checkbox-circle-line mr-2 text-xl"></i>
-                                        <span className="font-medium text-lg">Thanks for subscribing!</span>
-                                    </div>
-                                ) : (
-                                    <>
-                                        <input
-                                            type="email"
-                                            placeholder="Enter your email address"
-                                            value={email}
-                                            onChange={(e) => setEmail(e.target.value)}
-                                            required
-                                            disabled={subscribeStatus === 'loading'}
-                                            className="flex-1 px-8 py-5 rounded-full text-gray-900 focus:outline-none focus:ring-4 focus:ring-blue-500/50 text-lg disabled:opacity-70"
-                                        />
-                                        <button
-                                            type="submit"
-                                            disabled={subscribeStatus === 'loading'}
-                                            className="px-10 py-5 bg-blue-600 text-white rounded-full font-bold hover:bg-blue-500 transition-all shadow-lg hover:shadow-blue-600/30 text-lg whitespace-nowrap disabled:opacity-70 disabled:cursor-not-allowed flex items-center justify-center min-w-[200px]"
-                                        >
-                                            {subscribeStatus === 'loading' ? (
-                                                <i className="ri-loader-4-line animate-spin text-2xl"></i>
-                                            ) : (
-                                                'Subscribe Now'
-                                            )}
-                                        </button>
-                                    </>
-                                )}
-                            </form>
-                            <p className="mt-6 text-sm text-gray-500">
-                                No spam, ever. Unsubscribe anytime.
-                            </p>
+                            <div className="flex items-center justify-center gap-6">
+                                {siteConfig.social.map((social, index) => (
+                                    <a
+                                        key={index}
+                                        href={social.href}
+                                        aria-label={social.label}
+                                        target="_blank"
+                                        rel="noopener noreferrer"
+                                        className="w-16 h-16 bg-white/10 backdrop-blur-md rounded-2xl flex items-center justify-center border border-white/20 hover:bg-white/20 hover:scale-110 transition-all duration-300 shadow-lg"
+                                    >
+                                        <i className={`${social.icon} text-3xl text-white`}></i>
+                                    </a>
+                                ))}
+                            </div>
                         </div>
                     </div>
                 </div>
             </section>
-            {/* Lead Magnet */}
-            <div className="bg-white">
-                <LeadMagnet />
-            </div>
 
             <BackToTop />
         </div>

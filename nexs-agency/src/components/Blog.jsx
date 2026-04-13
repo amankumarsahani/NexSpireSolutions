@@ -3,6 +3,7 @@ import { useState, useEffect, useMemo, memo } from 'react'
 import { Link } from 'react-router-dom'
 import { blogAPI } from '../services/api'
 import SectionBackground from './ui/SectionBackground'
+import { siteConfig } from '../constants/siteConfig'
 
 const dummyPosts = [
   {
@@ -285,150 +286,61 @@ const Blog = memo(function Blog() {
           </Link>
         </div>
 
-        {/* Glass Newsletter Banner */}
+        {/* Social Media CTA Banner */}
         <div className={`transition-all duration-1000 delay-900 transform ${isVisible ? 'translate-y-0 opacity-100' : 'translate-y-8 opacity-0'
           }`}>
           <div className="relative overflow-hidden">
-            {/* Enhanced Background Glow */}
             <div className="absolute -inset-4 bg-gradient-to-r from-blue-600/30 to-indigo-600/30 rounded-[3rem] blur-3xl animate-pulse [animation-duration:4s]"></div>
-            <div className="absolute -inset-6 bg-gradient-to-r from-purple-600/15 to-cyan-600/15 rounded-[4rem] blur-2xl animate-pulse [animation-duration:6s]" style={{ animationDelay: '2s' }}></div>
 
-            {/* Ultra Glass Container */}
             <div className="relative bg-gradient-to-br from-blue-600/85 via-indigo-600/80 to-purple-700/90 backdrop-blur-2xl backdrop-saturate-150 backdrop-brightness-110 rounded-3xl p-8 md:p-12 shadow-2xl border border-white/30 overflow-hidden before:absolute before:inset-0 before:bg-gradient-to-br before:from-white/5 before:via-transparent before:to-white/2 before:rounded-3xl">
 
-              {/* Complex Background Texture */}
               <div className="absolute inset-0">
-                {/* Gradient Mesh */}
                 <div className="absolute inset-0 bg-gradient-to-br from-blue-500/30 via-transparent to-purple-600/30"></div>
                 <div className="absolute inset-0 bg-gradient-to-tl from-indigo-500/20 via-transparent to-cyan-500/20"></div>
-
-                {/* Noise Texture Pattern */}
-                <div className="absolute inset-0 opacity-[0.15]">
-                  <svg className="w-full h-full" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 100 100">
-                    <defs>
-                      <pattern id="noise-texture" x="0" y="0" width="20" height="20" patternUnits="userSpaceOnUse">
-                        <circle cx="3" cy="5" r="0.5" fill="currentColor" opacity="0.4" />
-                        <circle cx="8" cy="2" r="0.3" fill="currentColor" opacity="0.6" />
-                        <circle cx="15" cy="8" r="0.4" fill="currentColor" opacity="0.3" />
-                        <circle cx="12" cy="15" r="0.2" fill="currentColor" opacity="0.5" />
-                        <circle cx="18" cy="12" r="0.3" fill="currentColor" opacity="0.4" />
-                        <circle cx="5" cy="18" r="0.4" fill="currentColor" opacity="0.3" />
-                        <circle cx="1" cy="12" r="0.2" fill="currentColor" opacity="0.5" />
-                        <circle cx="10" cy="7" r="0.3" fill="currentColor" opacity="0.4" />
-                        <path d="M2 1l16 16M18 3L4 17" stroke="currentColor" strokeWidth="0.1" opacity="0.2" />
-                      </pattern>
-                    </defs>
-                    <rect width="100%" height="100%" fill="url(#noise-texture)" className="text-white" />
-                  </svg>
-                </div>
-
-                {/* Geometric Grid */}
-                <div className="absolute inset-0 opacity-[0.08]">
-                  <svg className="w-full h-full" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 60 60">
-                    <defs>
-                      <pattern id="geometric-grid" x="0" y="0" width="60" height="60" patternUnits="userSpaceOnUse">
-                        <circle cx="30" cy="30" r="2" fill="currentColor" opacity="0.4" />
-                        <circle cx="15" cy="15" r="1" fill="currentColor" opacity="0.3" />
-                        <circle cx="45" cy="45" r="1" fill="currentColor" opacity="0.3" />
-                        <circle cx="45" cy="15" r="1" fill="currentColor" opacity="0.2" />
-                        <circle cx="15" cy="45" r="1" fill="currentColor" opacity="0.2" />
-                        <path d="M30 0v60M0 30h60M15 15l30 30M45 15L15 45" stroke="currentColor" strokeWidth="0.3" opacity="0.15" />
-                        <rect x="14" y="14" width="2" height="2" fill="currentColor" opacity="0.1" />
-                        <rect x="44" y="44" width="2" height="2" fill="currentColor" opacity="0.1" />
-                      </pattern>
-                    </defs>
-                    <rect width="100%" height="100%" fill="url(#geometric-grid)" className="text-white" />
-                  </svg>
-                </div>
-
-                {/* Animated Wave Overlay */}
-                <div className="absolute inset-0 opacity-[0.06]">
-                  <svg className="w-full h-full animate-pulse [animation-duration:8s]" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 400 200">
-                    <defs>
-                      <linearGradient id="wave-gradient" x1="0%" y1="0%" x2="100%" y2="0%">
-                        <stop offset="0%" stopColor="currentColor" stopOpacity="0.1" />
-                        <stop offset="50%" stopColor="currentColor" stopOpacity="0.3" />
-                        <stop offset="100%" stopColor="currentColor" stopOpacity="0.1" />
-                      </linearGradient>
-                    </defs>
-                    <path d="M0,100 Q100,50 200,100 T400,100 L400,200 L0,200 Z" fill="url(#wave-gradient)" className="text-white" />
-                    <path d="M0,120 Q100,80 200,120 T400,120 L400,200 L0,200 Z" fill="url(#wave-gradient)" className="text-white" opacity="0.5" />
-                  </svg>
-                </div>
               </div>
-
-              {/* Enhanced Floating Elements */}
-              <div className="absolute top-4 right-4 w-2 h-2 bg-white/40 rounded-full animate-pulse shadow-lg"></div>
-              <div className="absolute bottom-6 left-6 w-1 h-1 bg-white/30 rounded-full animate-ping shadow-sm"></div>
-              <div className="absolute top-8 left-1/3 w-1.5 h-1.5 bg-white/35 rounded-full animate-bounce shadow-md [animation-duration:4s]" style={{ animationDelay: '2s' }}></div>
-              <div className="absolute bottom-4 right-1/3 w-1 h-1 bg-cyan-300/30 rounded-full animate-pulse [animation-duration:3s]" style={{ animationDelay: '1s' }}></div>
-              <div className="absolute top-1/2 right-8 w-0.5 h-0.5 bg-purple-300/40 rounded-full animate-ping" style={{ animationDelay: '3s' }}></div>
 
               <div className="relative z-10 max-w-4xl mx-auto">
                 <div className="flex flex-col lg:flex-row items-center justify-between gap-8">
 
-                  {/* Left Content */}
                   <div className="text-center lg:text-left lg:flex-1">
                     <div className="flex items-center justify-center lg:justify-start mb-4 group">
-                      <div className="w-14 h-14 bg-white/15 backdrop-blur-2xl backdrop-saturate-200 rounded-2xl flex items-center justify-center mr-4 border border-white/40 shadow-lg shadow-white/10 group-hover:scale-110 group-hover:bg-white/25 group-hover:shadow-xl group-hover:shadow-white/20 transition-all duration-500">
-                        <i className="ri-mail-line text-2xl text-white group-hover:animate-pulse drop-shadow-sm"></i>
+                      <div className="w-14 h-14 bg-white/15 backdrop-blur-2xl backdrop-saturate-200 rounded-2xl flex items-center justify-center mr-4 border border-white/40 shadow-lg shadow-white/10 group-hover:scale-110 group-hover:bg-white/25 transition-all duration-500">
+                        <i className="ri-share-circle-line text-2xl text-white drop-shadow-sm"></i>
                       </div>
                       <div>
-                        <h3 className="text-2xl md:text-3xl font-bold text-white drop-shadow-lg group-hover:scale-105 transition-transform duration-300">
+                        <h3 className="text-2xl md:text-3xl font-bold text-white drop-shadow-lg">
                           Stay In The Loop
                         </h3>
                         <p className="text-white/90 text-sm drop-shadow-md">
-                          Weekly insights & updates
+                          Follow us on social media
                         </p>
                       </div>
                     </div>
                     <p className="text-white/85 text-lg leading-relaxed max-w-md mx-auto lg:mx-0 drop-shadow-md">
-                      Get the latest tech trends, development tips, and industry insights delivered to your inbox every week.
+                      Get the latest tech trends, development tips, and industry insights by following us on your favorite platform.
                     </p>
                   </div>
 
-                  {/* Right Form */}
-                  <div className="lg:flex-1 w-full max-w-lg">
-                    <div className="flex flex-col sm:flex-row gap-3">
-                      <div className="relative flex-1 group">
-                        <input
-                          type="email"
-                          placeholder="Enter your email address"
-                          aria-label="Email address for newsletter"
-                          className="w-full px-4 py-3 rounded-2xl text-gray-900 placeholder-gray-400 bg-white/80 backdrop-blur-3xl backdrop-saturate-150 border border-white/50 shadow-lg shadow-black/5 focus:outline-none focus:ring-2 focus:ring-white/70 focus:bg-white/90 focus:border-white/70 focus:shadow-xl transition-all duration-500 group-hover:bg-white/85"
-                        />
-                        <div className="absolute inset-0 bg-gradient-to-r from-white/5 via-white/10 to-white/5 rounded-2xl opacity-0 group-hover:opacity-100 transition-opacity duration-500 pointer-events-none"></div>
-                      </div>
-                      <button className="group relative bg-white/85 backdrop-blur-3xl backdrop-saturate-150 text-blue-600 px-6 py-3 rounded-2xl font-semibold border border-white/50 shadow-lg shadow-black/5 hover:bg-white/95 hover:border-white/70 hover:shadow-xl hover:scale-105 transition-all duration-500 whitespace-nowrap overflow-hidden">
-                        <span className="relative z-10 flex items-center">
-                          Subscribe Free
-                          <i className="ri-arrow-right-line ml-2 group-hover:translate-x-1 transition-transform duration-300"></i>
-                        </span>
-                        <div className="absolute inset-0 bg-gradient-to-r from-blue-50/50 via-white/30 to-indigo-50/50 opacity-0 group-hover:opacity-100 transition-opacity duration-500"></div>
-                        <div className="absolute inset-0 bg-white/20 opacity-0 group-hover:opacity-100 transition-opacity duration-500"></div>
-                      </button>
-                    </div>
-
-                    {/* Trust Line */}
-                    <div className="flex items-center justify-center sm:justify-start mt-4 text-white/80 text-sm">
-                      <i className="ri-shield-check-line mr-2 animate-pulse drop-shadow-sm"></i>
-                      <span className="hover:text-white transition-colors duration-300 drop-shadow-sm">
-                        No spam • Unsubscribe anytime • 10,000+ subscribers
-                      </span>
-                    </div>
+                  <div className="flex items-center gap-4">
+                    {siteConfig.social.map((social, index) => (
+                      <a
+                        key={index}
+                        href={social.href}
+                        aria-label={social.label}
+                        target="_blank"
+                        rel="noopener noreferrer"
+                        className="w-14 h-14 bg-white/15 backdrop-blur-2xl rounded-2xl flex items-center justify-center border border-white/30 shadow-lg hover:bg-white/30 hover:scale-110 transition-all duration-300"
+                      >
+                        <i className={`${social.icon} text-2xl text-white`}></i>
+                      </a>
+                    ))}
                   </div>
 
                 </div>
               </div>
 
-              {/* Enhanced Glass Highlights */}
               <div className="absolute top-0 left-0 right-0 h-px bg-gradient-to-r from-transparent via-white/40 to-transparent"></div>
               <div className="absolute bottom-0 left-0 right-0 h-px bg-gradient-to-r from-transparent via-white/20 to-transparent"></div>
-              <div className="absolute top-0 left-0 bottom-0 w-px bg-gradient-to-b from-transparent via-white/20 to-transparent"></div>
-              <div className="absolute top-0 right-0 bottom-0 w-px bg-gradient-to-b from-transparent via-white/20 to-transparent"></div>
-
-              {/* Inner Glass Reflection */}
-              <div className="absolute inset-2 bg-gradient-to-br from-white/5 via-transparent to-transparent rounded-2xl pointer-events-none"></div>
             </div>
           </div>
         </div>

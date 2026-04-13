@@ -1,36 +1,9 @@
-import { useState, useRef, useEffect, memo } from 'react';
+import { memo } from 'react';
 import { Link } from 'react-router-dom';
 import { siteConfig } from '../constants/siteConfig';
 
 const Footer = memo(function Footer() {
   const currentYear = new Date().getFullYear();
-  const [email, setEmail] = useState('');
-  const [subscribed, setSubscribed] = useState(false);
-  const [isSubmitting, setIsSubmitting] = useState(false);
-  const submitTimeoutRef = useRef(null);
-  const resetTimeoutRef = useRef(null);
-
-  useEffect(() => {
-    return () => {
-      if (submitTimeoutRef.current) clearTimeout(submitTimeoutRef.current);
-      if (resetTimeoutRef.current) clearTimeout(resetTimeoutRef.current);
-    };
-  }, []);
-
-  // TODO: Replace fake newsletter submission with real API call
-  const handleSubscribe = (e) => {
-    e.preventDefault();
-    if (!email) return;
-
-    setIsSubmitting(true);
-    // Simulate API call
-    submitTimeoutRef.current = setTimeout(() => {
-      setIsSubmitting(false);
-      setSubscribed(true);
-      setEmail('');
-      resetTimeoutRef.current = setTimeout(() => setSubscribed(false), 5000);
-    }, 1000);
-  };
 
   const footerLinks = {
     Services: [
@@ -114,46 +87,29 @@ const Footer = memo(function Footer() {
           </div>
         </div>
 
-        {/* Newsletter Section */}
+        {/* Stay Connected Section */}
         <div className="border-t border-gray-800 py-8">
-          <div className="grid md:grid-cols-2 gap-8 items-center">
+          <div className="flex flex-col md:flex-row justify-between items-center gap-6">
             <div>
-              <h3 className="text-xl font-semibold mb-2">Stay Updated</h3>
+              <h3 className="text-xl font-semibold mb-2">Stay Connected</h3>
               <p className="text-gray-400">
-                Get the latest news and updates about our services and industry insights.
+                Follow us on social media for the latest updates, insights, and behind-the-scenes content.
               </p>
             </div>
-            <form onSubmit={handleSubscribe} className="flex flex-col sm:flex-row gap-4 relative">
-              {subscribed ? (
-                <div role="alert" className="flex-1 bg-green-500/20 border border-green-500/50 text-green-400 px-6 py-3 rounded-lg flex items-center justify-center">
-                  <i className="ri-checkbox-circle-line mr-2"></i>
-                  Subscribed successfully!
-                </div>
-              ) : (
-                <>
-                  <input
-                    type="email"
-                    placeholder="Enter your email"
-                    value={email}
-                    onChange={(e) => setEmail(e.target.value)}
-                    required
-                    aria-label="Email address for newsletter"
-                    className="flex-1 px-4 py-3 rounded-lg bg-gray-800 border border-gray-700 focus:ring-2 focus:ring-blue-500 focus:border-transparent text-white placeholder-gray-400 transition-all outline-none"
-                  />
-                  <button
-                    type="submit"
-                    disabled={isSubmitting}
-                    className="bg-gradient-to-r from-blue-600 to-purple-600 text-white px-6 py-3 rounded-lg font-semibold hover:shadow-lg hover:shadow-blue-500/25 transition-all duration-300 whitespace-nowrap cursor-pointer disabled:opacity-70 disabled:cursor-not-allowed flex items-center justify-center min-w-[120px]"
-                  >
-                    {isSubmitting ? (
-                      <i className="ri-loader-4-line animate-spin text-xl"></i>
-                    ) : (
-                      'Subscribe'
-                    )}
-                  </button>
-                </>
-              )}
-            </form>
+            <div className="flex space-x-4">
+              {socialLinks.map((social, index) => (
+                <a
+                  key={index}
+                  href={social.href}
+                  aria-label={social.label}
+                  target="_blank"
+                  rel="noopener noreferrer"
+                  className="w-12 h-12 bg-gray-800 rounded-full flex items-center justify-center hover:bg-blue-600 transition-colors duration-300"
+                >
+                  <i className={`${social.icon} text-xl`}></i>
+                </a>
+              ))}
+            </div>
           </div>
         </div>
 

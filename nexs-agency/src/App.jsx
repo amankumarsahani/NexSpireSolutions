@@ -1,8 +1,8 @@
 import { lazy, memo } from 'react';
 import { BrowserRouter, Routes, Route } from 'react-router-dom';
 import { Helmet } from 'react-helmet-async';
+import { motion } from 'framer-motion';
 import { SITE_URL } from './constants/siteConfig';
-import ScrollReveal from './components/ScrollReveal';
 import ScrollToTop from './components/ScrollToTop';
 import ErrorBoundary from './components/ErrorBoundary';
 
@@ -82,42 +82,41 @@ const LandingPage = memo(function LandingPage() {
       {/* Hero loads immediately for faster FCP */}
       <Hero />
 
-      {/* Sections with scroll-reveal animations (no lazy loading for reliability) */}
-      <ScrollReveal animation="fade-up" delay={0}>
+      <motion.div initial={{ opacity: 0, y: 40 }} whileInView={{ opacity: 1, y: 0 }} viewport={{ once: true }} transition={{ duration: 0.6 }}>
         <Services />
-      </ScrollReveal>
+      </motion.div>
 
-      <ScrollReveal animation="fade-up" delay={100}>
+      <motion.div initial={{ opacity: 0, y: 40 }} whileInView={{ opacity: 1, y: 0 }} viewport={{ once: true }} transition={{ duration: 0.6, delay: 0.1 }}>
         <About />
-      </ScrollReveal>
+      </motion.div>
 
-      <ScrollReveal animation="zoom" delay={0}>
+      <motion.div initial={{ opacity: 0, scale: 0.9 }} whileInView={{ opacity: 1, scale: 1 }} viewport={{ once: true }} transition={{ duration: 0.6 }}>
         <Portfolio />
-      </ScrollReveal>
+      </motion.div>
 
-      <ScrollReveal animation="fade-up" delay={0}>
+      <motion.div initial={{ opacity: 0, y: 40 }} whileInView={{ opacity: 1, y: 0 }} viewport={{ once: true }} transition={{ duration: 0.6 }}>
         <Technologies />
-      </ScrollReveal>
+      </motion.div>
 
-      <ScrollReveal animation="fade-left" delay={0}>
+      <motion.div initial={{ opacity: 0, x: -40 }} whileInView={{ opacity: 1, x: 0 }} viewport={{ once: true }} transition={{ duration: 0.6 }}>
         <Testimonials />
-      </ScrollReveal>
+      </motion.div>
 
-      <ScrollReveal animation="fade-up" delay={0}>
+      <motion.div initial={{ opacity: 0, y: 40 }} whileInView={{ opacity: 1, y: 0 }} viewport={{ once: true }} transition={{ duration: 0.6 }}>
         <Blog />
-      </ScrollReveal>
+      </motion.div>
 
-      <ScrollReveal animation="fade-right" delay={0}>
+      <motion.div initial={{ opacity: 0, x: 40 }} whileInView={{ opacity: 1, x: 0 }} viewport={{ once: true }} transition={{ duration: 0.6 }}>
         <FAQ />
-      </ScrollReveal>
+      </motion.div>
 
-      <ScrollReveal animation="zoom" delay={0}>
+      <motion.div initial={{ opacity: 0, scale: 0.9 }} whileInView={{ opacity: 1, scale: 1 }} viewport={{ once: true }} transition={{ duration: 0.6 }}>
         <Partners />
-      </ScrollReveal>
+      </motion.div>
 
-      <ScrollReveal animation="fade-up" delay={0}>
+      <motion.div initial={{ opacity: 0, y: 40 }} whileInView={{ opacity: 1, y: 0 }} viewport={{ once: true }} transition={{ duration: 0.6 }}>
         <Contact />
-      </ScrollReveal>
+      </motion.div>
     </div>
   );
 });
