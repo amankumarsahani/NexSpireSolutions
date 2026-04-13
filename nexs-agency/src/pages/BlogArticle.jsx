@@ -152,7 +152,7 @@ const BlogArticle = () => {
                             {blog.category}
                         </span>
                     )}
-                    <h1 className="text-4xl md:text-6xl font-bold leading-tight mb-6 text-slate-800">
+                    <h1 className="text-4xl md:text-6xl font-bold font-serif leading-tight mb-6 text-slate-800">
                         {blog.title}
                     </h1>
                     <div className="flex items-center justify-center gap-6 text-slate-500 font-medium flex-wrap">
@@ -200,7 +200,7 @@ const BlogArticle = () => {
                     {/* Article Content */}
                     <div className="flex-1 min-w-0">
                         <div
-                            className="prose prose-lg prose-blue max-w-none mb-16"
+                            className="prose prose-lg prose-blue max-w-none mb-16 prose-dropcap"
                             dangerouslySetInnerHTML={{ __html: DOMPurify.sanitize(addIdsToHeadings(blog.content), { ADD_ATTR: ['id', 'target'] }) }}
                         />
 
@@ -254,10 +254,10 @@ const BlogArticle = () => {
                                         <span className="text-xs font-bold text-[#0F766E] uppercase tracking-wider">
                                             {post.category}
                                         </span>
-                                        <h3 className="text-lg font-bold mt-2 group-hover:text-[#0F766E] transition-colors line-clamp-2">
+                                        <h3 className="text-lg font-bold font-serif mt-2 group-hover:text-[#0F766E] transition-colors line-clamp-2">
                                             {post.title}
                                         </h3>
-                                        <p className="text-slate-500 text-sm mt-2 line-clamp-2">
+                                        <p className="text-slate-500 text-sm mt-2 line-clamp-2 leading-relaxed">
                                             {post.excerpt}
                                         </p>
                                     </div>

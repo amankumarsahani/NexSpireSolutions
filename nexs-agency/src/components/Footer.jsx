@@ -56,7 +56,8 @@ const Footer = memo(function Footer() {
                     aria-label={social.label}
                     target="_blank"
                     rel="noopener noreferrer"
-                    className="w-10 h-10 bg-slate-800 rounded-full flex items-center justify-center hover:bg-[#0F766E] transition-colors duration-300"
+                    className="w-10 h-10 bg-slate-800 rounded-full flex items-center justify-center hover:bg-[#0F766E] transition-all duration-300 hover:scale-[1.15] active:scale-100"
+                    style={{ transitionTimingFunction: 'cubic-bezier(0.34, 1.56, 0.64, 1)' }}
                   >
                     <i className={`${social.icon} text-lg`}></i>
                   </a>
@@ -100,7 +101,8 @@ const Footer = memo(function Footer() {
                   aria-label={social.label}
                   target="_blank"
                   rel="noopener noreferrer"
-                  className="w-12 h-12 bg-slate-800 rounded-full flex items-center justify-center hover:bg-[#0F766E] transition-colors duration-300"
+                  className="w-12 h-12 bg-slate-800 rounded-full flex items-center justify-center hover:bg-[#0F766E] transition-all duration-300 hover:scale-[1.15] active:scale-100"
+                  style={{ transitionTimingFunction: 'cubic-bezier(0.34, 1.56, 0.64, 1)' }}
                 >
                   <i className={`${social.icon} text-xl`}></i>
                 </a>

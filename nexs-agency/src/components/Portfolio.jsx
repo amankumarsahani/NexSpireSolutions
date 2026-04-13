@@ -112,7 +112,7 @@ const Portfolio = memo(function Portfolio() {
                     alt={project.title}
                     loading="lazy"
                     height={192}
-                    className="w-full h-40 sm:h-48 object-cover group- transition-transform duration-700"
+                    className="w-full h-40 sm:h-48 object-cover transition-transform duration-700 group-hover:-translate-y-2"
                   />
                   <div className="absolute inset-0 bg-gradient-to-t from-black/50 via-transparent to-transparent opacity-0 group-hover:opacity-100 transition-opacity duration-300"></div>
 
@@ -132,7 +132,7 @@ const Portfolio = memo(function Portfolio() {
                   </div>
                 </div>
 
-                <div className="p-6">
+                <div className="p-6 border-l-2 border-transparent transition-colors duration-300 group-hover:border-[#0F766E]">
                   <h3 className="text-xl font-bold mb-3 text-slate-800">
                     {project.title}
                   </h3>

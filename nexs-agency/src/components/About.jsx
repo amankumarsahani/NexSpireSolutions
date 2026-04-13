@@ -1,4 +1,46 @@
-import { useState, useEffect, memo } from 'react'
+import { useState, useEffect, useRef, useCallback, memo } from 'react'
+
+const useCountUp = (target, duration = 2000, shouldAnimate = false) => {
+  const [count, setCount] = useState(0)
+  const rafRef = useRef(null)
+
+  useEffect(() => {
+    if (!shouldAnimate) return
+
+    const startTime = performance.now()
+    const easeOutQuart = (t) => 1 - Math.pow(1 - t, 4)
+
+    const animate = (now) => {
+      const elapsed = now - startTime
+      const progress = Math.min(elapsed / duration, 1)
+      const easedProgress = easeOutQuart(progress)
+      setCount(Math.round(target * easedProgress))
+
+      if (progress < 1) {
+        rafRef.current = requestAnimationFrame(animate)
+      }
+    }
+
+    rafRef.current = requestAnimationFrame(animate)
+    return () => { if (rafRef.current) cancelAnimationFrame(rafRef.current) }
+  }, [target, duration, shouldAnimate])
+
+  return count
+}
+
+const StatNumber = memo(function StatNumber({ stat, isVisible }) {
+  // Parse the number from strings like "150+", "80+", "98%", "24/7"
+  const isSpecial = stat.number === '24/7'
+  const numericValue = parseInt(stat.number.replace(/[^0-9]/g, ''), 10)
+  const suffix = stat.number.replace(/[0-9]/g, '')
+  const count = useCountUp(isSpecial ? 0 : numericValue, 2000, isVisible)
+
+  return (
+    <div className="text-5xl font-bold text-[#D97706] mb-2">
+      {isSpecial ? '24/7' : `${count}${suffix}`}
+    </div>
+  )
+})
 
 const teamMembers = [
   {
@@ -37,6 +79,8 @@ const features = [
 
 const About = memo(function About() {
   const [isVisible, setIsVisible] = useState(false)
+  const [statsVisible, setStatsVisible] = useState(false)
+  const statsRef = useRef(null)
 
   useEffect(() => {
     const observer = new IntersectionObserver(
@@ -51,6 +95,21 @@ const About = memo(function About() {
     const element = document.getElementById('about')
     if (element) observer.observe(element)
 
+    return () => observer.disconnect()
+  }, [])
+
+  useEffect(() => {
+    const observer = new IntersectionObserver(
+      ([entry]) => {
+        if (entry.isIntersecting) {
+          setStatsVisible(true)
+          observer.disconnect()
+        }
+      },
+      { threshold: 0.3 }
+    )
+
+    if (statsRef.current) observer.observe(statsRef.current)
     return () => observer.disconnect()
   }, [])
 
@@ -195,7 +254,7 @@ const About = memo(function About() {
             </p>
           </div>
 
-          <div className="grid sm:grid-cols-2 lg:grid-cols-4 gap-6 sm:gap-8 lg:gap-12">
+          <div ref={statsRef} className="grid sm:grid-cols-2 lg:grid-cols-4 gap-6 sm:gap-8 lg:gap-12">
             {stats.map((stat, index) => (
               <div key={index} className="group relative">
                 <div className="relative bg-white rounded-2xl p-8 border border-slate-200 shadow-lg hover:shadow-xl hover:-translate-y-1 transition-all duration-300">
@@ -208,9 +267,7 @@ const About = memo(function About() {
                   </div>
 
                   <div className="text-center mb-4">
-                    <div className="text-5xl font-bold text-[#D97706] mb-2">
-                      {stat.number}
-                    </div>
+                    <StatNumber stat={stat} isVisible={statsVisible} />
                     <div className="h-1 w-16 mx-auto rounded-full bg-[#0F766E]"></div>
                   </div>
 

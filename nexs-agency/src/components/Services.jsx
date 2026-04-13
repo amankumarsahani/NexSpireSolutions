@@ -1,15 +1,31 @@
 import { useState, useEffect, useRef, useCallback, memo } from 'react'
 import { Link } from 'react-router-dom'
+import { motion } from 'framer-motion'
+import MagneticButton from './ui/MagneticButton'
 
-const ServiceCard = memo(function ServiceCard({ service }) {
+const cardVariants = {
+  hidden: { opacity: 0, y: 30 },
+  visible: (i) => ({
+    opacity: 1,
+    y: 0,
+    transition: { duration: 0.5, delay: i * 0.15, ease: [0.25, 0.46, 0.45, 0.94] }
+  })
+}
+
+const ServiceCard = memo(function ServiceCard({ service, index }) {
   return (
-    <div
+    <motion.div
+      custom={index}
+      variants={cardVariants}
+      initial="hidden"
+      whileInView="visible"
+      viewport={{ once: true }}
       className="group relative bg-white rounded-2xl p-6 sm:p-8 shadow-lg hover:shadow-xl transition-all duration-300 hover:-translate-y-1 border border-slate-200 overflow-hidden"
     >
-      <div className="absolute top-0 left-0 w-full h-1 bg-[#0F766E]"></div>
+      <div className="absolute top-0 left-0 w-full h-[2px] bg-[#0F766E] transition-all duration-300 group-hover:h-[3px] group-hover:shadow-[0_0_8px_rgba(15,118,110,0.4)]"></div>
 
       <div className="relative mb-8">
-        <div className="relative w-16 h-16 sm:w-20 sm:h-20 bg-[#0F766E] rounded-2xl flex items-center justify-center shadow-lg">
+        <div className="relative w-16 h-16 sm:w-20 sm:h-20 bg-[#0F766E] rounded-2xl flex items-center justify-center shadow-lg transition-transform duration-300 group-hover:rotate-[5deg]">
           <i className={`${service.icon} text-2xl sm:text-3xl text-white`}></i>
         </div>
       </div>
@@ -34,7 +50,7 @@ const ServiceCard = memo(function ServiceCard({ service }) {
         Learn More
         <i className="ri-arrow-right-line ml-1 text-[#0F766E]"></i>
       </Link>
-    </div>
+    </motion.div>
   )
 })
 
@@ -150,7 +166,7 @@ const Services = memo(function Services() {
                     {services.slice(slideIndex * servicesPerSlide, (slideIndex + 1) * servicesPerSlide).map((service, index) => {
                       const actualIndex = slideIndex * servicesPerSlide + index;
                       return (
-                        <ServiceCard key={actualIndex} service={service} />
+                        <ServiceCard key={actualIndex} service={service} index={index} />
                       );
                     })}
                   </div>
@@ -241,13 +257,13 @@ const Services = memo(function Services() {
             </p>
 
             <div className="flex flex-col sm:flex-row gap-4 justify-center">
-              <a
+              <MagneticButton
                 href="#contact"
-                className="group bg-white text-[#0F766E] px-8 py-4 rounded-xl font-bold hover:bg-[#FAF9F6] transition-all duration-300 inline-flex items-center justify-center shadow-xl text-base"
+                className="group bg-white text-[#0F766E] px-8 py-4 rounded-xl font-bold hover:bg-[#FAF9F6] transition-colors duration-300 inline-flex items-center justify-center shadow-xl text-base"
               >
                 Start Your Project
                 <i className="ri-arrow-right-line ml-2 text-lg group-hover:translate-x-1 transition-transform duration-300"></i>
-              </a>
+              </MagneticButton>
 
               <a href="tel:+917696309551" className="group bg-white/15 text-white border-2 border-white/30 px-8 py-4 rounded-xl font-bold hover:bg-white/25 hover:border-white/50 transition-all duration-300 inline-flex items-center justify-center text-base">
                 <i className="ri-phone-line mr-2 text-lg"></i>

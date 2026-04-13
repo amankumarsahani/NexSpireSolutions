@@ -1,4 +1,5 @@
 import { useState, useEffect, memo } from 'react'
+import MagneticButton from './ui/MagneticButton'
 
 const rotatingTexts = [
   "AI-Powered Software Solutions",
@@ -89,13 +90,13 @@ const Hero = memo(function Hero() {
             </div>
 
             <div className="flex flex-col sm:flex-row gap-3 sm:gap-4 justify-center lg:justify-start mt-6 sm:mt-8">
-              <a
+              <MagneticButton
                 href="#contact"
-                className="bg-[#0F766E] text-white px-8 sm:px-8 lg:px-6 py-4 sm:py-4 lg:py-3 rounded-xl text-base sm:text-lg lg:text-base font-semibold shadow-xl inline-flex items-center justify-center hover:bg-[#0D6B63] active:scale-95 transition-all duration-300 group"
+                className="bg-[#0F766E] text-white px-8 sm:px-8 lg:px-6 py-4 sm:py-4 lg:py-3 rounded-xl text-base sm:text-lg lg:text-base font-semibold shadow-xl inline-flex items-center justify-center hover:bg-[#0D6B63] active:scale-95 transition-colors duration-300 group"
               >
                 Start Your Project
                 <i className="ri-arrow-right-line ml-2 text-lg group-hover:translate-x-1 transition-transform duration-300"></i>
-              </a>
+              </MagneticButton>
 
               <a
                 href="#portfolio"

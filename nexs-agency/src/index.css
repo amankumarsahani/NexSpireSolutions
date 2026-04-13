@@ -172,3 +172,15 @@ h6 {
 .container-custom {
   @apply max-w-7xl mx-auto px-4 sm:px-6 lg:px-8;
 }
+
+/* Blog article drop cap */
+.prose-dropcap > p:first-of-type::first-letter {
+  font-family: var(--font-serif);
+  float: left;
+  font-size: 3.5em;
+  line-height: 0.8;
+  margin-right: 0.12em;
+  margin-top: 0.07em;
+  color: #0F766E;
+  font-weight: 700;
+}

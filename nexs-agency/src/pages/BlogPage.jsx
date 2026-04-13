@@ -204,7 +204,7 @@ const BlogPage = () => {
                             <span className="inline-block px-4 py-2 bg-blue-600 text-white text-sm font-bold rounded-full mb-6 shadow-lg shadow-lg">
                                 Featured Article
                             </span>
-                            <h1 className="text-5xl md:text-7xl font-bold text-white mb-6 max-w-5xl leading-tight group-hover:text-blue-400 transition-colors duration-300">
+                            <h1 className="text-5xl md:text-7xl font-bold font-serif text-white mb-6 max-w-5xl leading-tight group-hover:text-blue-400 transition-colors duration-300">
                                 {featuredPost.title}
                             </h1>
                             <p className="text-xl text-gray-300 mb-8 max-w-2xl line-clamp-2 leading-relaxed">
@@ -273,11 +273,12 @@ const BlogPage = () => {
 
                 <motion.div
                     layout
-                    className="grid md:grid-cols-2 lg:grid-cols-3 gap-8"
+                    className="grid md:grid-cols-2 lg:grid-cols-3 gap-8 divide-y-0 md:divide-y-0"
                 >
                     <AnimatePresence mode="popLayout">
                         {nonFeaturedDisplayed.map((post, index) => (
-                            <Link key={post.id} to={`/blog/${post.slug}`} className="h-full block">
+                            <Link key={post.id} to={`/blog/${post.slug}`} className="h-full block relative">
+                                {index >= 3 && <div className="absolute -top-4 left-0 right-0 h-px bg-slate-200 hidden lg:block" />}
                                 <motion.article
                                     layout
                                     initial={{ opacity: 0, scale: 0.9, y: 20 }}
@@ -305,10 +306,10 @@ const BlogPage = () => {
                                             <span className="w-1 h-1 bg-gray-300 rounded-full"></span>
                                             <span>{post.readTime}</span>
                                         </div>
-                                        <h3 className="text-2xl font-bold text-slate-800 mb-4 group-hover:text-[#0F766E] transition-colors leading-tight">
+                                        <h3 className="text-2xl font-bold font-serif text-slate-800 mb-4 group-hover:text-[#0F766E] transition-colors leading-tight">
                                             {post.title}
                                         </h3>
-                                        <p className="text-slate-600 mb-6 line-clamp-3 flex-1 leading-relaxed">
+                                        <p className="text-slate-600 mb-6 line-clamp-3 flex-1 leading-loose">
                                             {post.excerpt}
                                         </p>
                                         <div className="flex items-center justify-between pt-6 border-t border-slate-200 mt-auto">
