@@ -67,7 +67,7 @@ const AboutPage = () => {
   ];
 
   return (
-    <div className="min-h-screen bg-white font-sans text-gray-900 selection:bg-blue-600 selection:text-white overflow-hidden">
+    <div className="min-h-screen bg-white font-sans text-slate-800 selection:bg-blue-600 selection:text-white overflow-hidden">
       <Helmet>
         <title>About Nexspire Solutions – Global Software Agency</title>
         <meta name="description" content="Discover Nexspire Solutions, a top software development agency delivering web, mobile, AI, cloud, and enterprise solutions to clients globally. Founded in 2020, serving startups, SMEs, and enterprises across North America, Europe, Middle East, and Asia-Pacific." />
@@ -106,7 +106,7 @@ const AboutPage = () => {
       <section className="relative min-h-[80vh] flex items-center pt-20 overflow-hidden bg-gray-950 text-white">
         {/* CSS-based Animated Background */}
         <div className="absolute inset-0 z-0">
-          <div className="absolute inset-0 bg-gradient-to-br from-gray-900 via-blue-950 to-purple-950"></div>
+          <div className="absolute inset-0 bg-slate-900"></div>
           <div className="absolute inset-0 bg-[url('https://grainy-gradients.vercel.app/noise.svg')] opacity-20 mix-blend-overlay"></div>
           <div className="absolute inset-0 bg-[url('https://images.unsplash.com/photo-1522071820081-009f0129c71c?q=80&w=2070&auto=format&fit=crop&fm=webp')] bg-cover bg-center opacity-30 mix-blend-soft-light"></div>
         </div>
@@ -123,9 +123,9 @@ const AboutPage = () => {
             </span>
             <h1 className="text-6xl md:text-8xl font-bold tracking-tighter leading-tight mb-8">
               Architects of the <br />
-              <span className="text-transparent bg-clip-text bg-gradient-to-r from-blue-400 via-purple-400 to-pink-400">Digital Future.</span>
+              <span className="text-[#D97706]">Digital Future.</span>
             </h1>
-            <p className="text-xl text-gray-400 max-w-2xl mx-auto leading-relaxed">
+            <p className="text-xl text-slate-400 max-w-2xl mx-auto leading-relaxed">
               Nexspire is more than an agency. We are a collective of dreamers, doers, and creators dedicated to building software that matters.
             </p>
           </motion.div>
@@ -133,13 +133,13 @@ const AboutPage = () => {
       </section>
 
       {/* Stats Section */}
-      <section className="py-10 bg-white border-b border-gray-100">
+      <section className="py-10 bg-white border-b border-slate-200">
         <div className="container-custom">
           <div className="grid grid-cols-2 md:grid-cols-4 gap-12 text-center">
             {stats.map((stat, i) => (
               <FadeIn key={i} delay={i * 0.1}>
-                <div className="text-4xl md:text-5xl font-bold text-blue-600 mb-2">{stat.value}</div>
-                <div className="text-sm text-gray-500 uppercase tracking-widest font-medium">{stat.label}</div>
+                <div className="text-4xl md:text-5xl font-bold text-[#0F766E] mb-2">{stat.value}</div>
+                <div className="text-sm text-slate-500 uppercase tracking-widest font-medium">{stat.label}</div>
               </FadeIn>
             ))}
           </div>
@@ -164,14 +164,14 @@ const AboutPage = () => {
             <div className="space-y-12">
               <FadeIn>
                 <h2 className="text-4xl md:text-5xl font-bold mb-6">The Origin Story</h2>
-                <p className="text-xl text-gray-600 leading-relaxed">
+                <p className="text-xl text-slate-600 leading-relaxed">
                   Founded in 2020, Nexspire began as a collective of passionate engineers and designers tired of the status quo. We saw a gap in the market for a development partner that truly understood both the <strong>technical</strong> and <strong>business</strong> aspects of building digital products.
                 </p>
               </FadeIn>
 
               <FadeIn delay={0.2}>
                 <h3 className="text-2xl font-bold mb-4">Our Mission</h3>
-                <p className="text-lg text-gray-600 leading-relaxed">
+                <p className="text-lg text-slate-600 leading-relaxed">
                   To empower businesses with cutting-edge technology that drives growth, efficiency, and innovation. We believe in building software that is not only functional but also delightful to use.
                 </p>
               </FadeIn>
@@ -184,23 +184,23 @@ const AboutPage = () => {
       <Timeline />
 
       {/* Values - Grid Layout */}
-      <section className="py-32 bg-gray-50 relative">
+      <section className="py-32 bg-[#FAF9F6] relative">
         <div className="container-custom">
           <FadeIn className="text-center mb-20">
             <h2 className="text-4xl md:text-5xl font-bold tracking-tight mb-6">Our Core Values</h2>
-            <p className="text-xl text-gray-500 max-w-2xl mx-auto">
+            <p className="text-xl text-slate-500 max-w-2xl mx-auto">
               The principles that guide every line of code we write and every pixel we design.
             </p>
           </FadeIn>
 
           <div className="grid md:grid-cols-2 gap-8">
             {values.map((value, i) => (
-              <FadeIn key={i} delay={i * 0.1} className="bg-white p-10 rounded-[2rem] shadow-sm hover:shadow-xl transition-all duration-300 border border-gray-100 group">
-                <div className={`w-16 h-16 rounded-2xl bg-${value.color}-50 flex items-center justify-center text-3xl text-${value.color}-600 mb-6 group-hover:scale-110 transition-transform`}>
+              <FadeIn key={i} delay={i * 0.1} className="bg-white p-10 rounded-[2rem] shadow-sm hover:shadow-xl transition-all duration-300 border border-slate-200 group">
+                <div className={`w-16 h-16 rounded-2xl bg-${value.color}-50 flex items-center justify-center text-3xl text-${value.color}-600 mb-6 group- transition-transform`}>
                   <i className={value.icon}></i>
                 </div>
                 <h3 className="text-2xl font-bold mb-4">{value.title}</h3>
-                <p className="text-gray-600 text-lg leading-relaxed">{value.description}</p>
+                <p className="text-slate-600 text-lg leading-relaxed">{value.description}</p>
               </FadeIn>
             ))}
           </div>
@@ -208,17 +208,17 @@ const AboutPage = () => {
       </section>
 
       {/* Trust Badges */}
-      <section className="py-12 bg-white border-t border-gray-100">
+      <section className="py-12 bg-white border-t border-slate-200">
         <TrustBadges />
       </section>
 
       {/* CTA Section */}
-      <section className="py-32 bg-gray-900 text-white text-center relative overflow-hidden">
+      <section className="py-32 bg-slate-900 text-white text-center relative overflow-hidden">
         <div className="absolute inset-0 bg-[url('https://grainy-gradients.vercel.app/noise.svg')] opacity-10"></div>
         <div className="container-custom relative z-10">
           <FadeIn>
             <h2 className="text-5xl md:text-7xl font-bold mb-12 tracking-tighter">Ready to innovate?</h2>
-            <Link to="/contact" className="inline-flex items-center gap-4 px-12 py-6 bg-white text-black rounded-full text-xl font-bold hover:bg-blue-600 hover:text-white transition-all duration-300 group">
+            <Link to="/contact" className="inline-flex items-center gap-4 px-12 py-6 bg-white text-black rounded-full text-xl font-bold hover:bg-[#0F766E] hover:text-white transition-all duration-300 group">
               Let's Talk
               <i className="ri-arrow-right-line group-hover:translate-x-2 transition-transform"></i>
             </Link>

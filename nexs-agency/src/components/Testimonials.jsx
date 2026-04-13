@@ -61,13 +61,13 @@ const Testimonials = memo(function Testimonials() {
   }
 
   return (
-    <section id="testimonials" className="py-20 bg-blue-50">
+    <section id="testimonials" className="py-20 bg-[#FAF9F6]">
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
         <div className="text-center mb-16">
-          <h2 className="text-4xl font-bold text-gray-900 mb-4">
+          <h2 className="text-4xl font-bold text-slate-800 mb-4">
             What Our Clients Say
           </h2>
-          <p className="text-xl text-gray-600 max-w-3xl mx-auto">
+          <p className="text-xl text-slate-600 max-w-3xl mx-auto">
             Don't just take our word for it. Here's what our satisfied clients have to say about working with us.
           </p>
         </div>
@@ -83,7 +83,7 @@ const Testimonials = memo(function Testimonials() {
                 <i className="ri-star-fill text-yellow-400"></i>
               </div>
             </div>
-            <blockquote className="text-xl md:text-2xl text-gray-700 leading-relaxed text-center mb-8">
+            <blockquote className="text-xl md:text-2xl text-slate-600 leading-relaxed text-center mb-8">
               "{testimonials[currentTestimonial].text}"
             </blockquote>
             <div className="flex items-center justify-center">
@@ -96,11 +96,11 @@ const Testimonials = memo(function Testimonials() {
                 className="w-16 h-16 rounded-full object-cover object-top mr-4"
               />
               <div className="text-center">
-                <div className="font-semibold text-gray-900 text-lg">
+                <div className="font-semibold text-slate-800 text-lg">
                   {testimonials[currentTestimonial].name}
                 </div>
-                <div className="text-blue-600 mb-1">{testimonials[currentTestimonial].position}</div>
-                <div className="text-gray-500 text-sm">
+                <div className="text-[#0F766E] mb-1">{testimonials[currentTestimonial].position}</div>
+                <div className="text-slate-500 text-sm">
                   Project: {testimonials[currentTestimonial].project}
                 </div>
               </div>
@@ -111,16 +111,16 @@ const Testimonials = memo(function Testimonials() {
           <button
             onClick={prevTestimonial}
             aria-label="Previous testimonial"
-            className="hidden md:flex absolute -left-6 top-1/2 transform -translate-y-1/2 w-12 h-12 items-center justify-center bg-white rounded-full shadow-lg hover:bg-gray-50 transition-colors cursor-pointer"
+            className="hidden md:flex absolute -left-6 top-1/2 transform -translate-y-1/2 w-12 h-12 items-center justify-center bg-white rounded-full shadow-lg hover:bg-[#FAF9F6] transition-colors cursor-pointer"
           >
-            <i className="ri-arrow-left-s-line text-gray-600 text-xl"></i>
+            <i className="ri-arrow-left-s-line text-slate-600 text-xl"></i>
           </button>
           <button
             onClick={nextTestimonial}
             aria-label="Next testimonial"
-            className="hidden md:flex absolute -right-6 top-1/2 transform -translate-y-1/2 w-12 h-12 items-center justify-center bg-white rounded-full shadow-lg hover:bg-gray-50 transition-colors cursor-pointer"
+            className="hidden md:flex absolute -right-6 top-1/2 transform -translate-y-1/2 w-12 h-12 items-center justify-center bg-white rounded-full shadow-lg hover:bg-[#FAF9F6] transition-colors cursor-pointer"
           >
-            <i className="ri-arrow-right-s-line text-gray-600 text-xl"></i>
+            <i className="ri-arrow-right-s-line text-slate-600 text-xl"></i>
           </button>
         </div>
 
@@ -129,16 +129,16 @@ const Testimonials = memo(function Testimonials() {
           <button
             onClick={prevTestimonial}
             aria-label="Previous testimonial"
-            className="w-10 h-10 flex items-center justify-center bg-white rounded-full shadow-lg hover:bg-gray-50 transition-colors cursor-pointer"
+            className="w-10 h-10 flex items-center justify-center bg-white rounded-full shadow-lg hover:bg-[#FAF9F6] transition-colors cursor-pointer"
           >
-            <i className="ri-arrow-left-s-line text-gray-600 text-lg"></i>
+            <i className="ri-arrow-left-s-line text-slate-600 text-lg"></i>
           </button>
           <button
             onClick={nextTestimonial}
             aria-label="Next testimonial"
-            className="w-10 h-10 flex items-center justify-center bg-white rounded-full shadow-lg hover:bg-gray-50 transition-colors cursor-pointer"
+            className="w-10 h-10 flex items-center justify-center bg-white rounded-full shadow-lg hover:bg-[#FAF9F6] transition-colors cursor-pointer"
           >
-            <i className="ri-arrow-right-s-line text-gray-600 text-lg"></i>
+            <i className="ri-arrow-right-s-line text-slate-600 text-lg"></i>
           </button>
         </div>
 
@@ -151,23 +151,23 @@ const Testimonials = memo(function Testimonials() {
               aria-current={currentTestimonial === index}
               className="w-8 h-8 flex items-center justify-center cursor-pointer"
             >
-              <span className={`w-3 h-3 rounded-full transition-colors ${currentTestimonial === index ? 'bg-blue-600' : 'bg-gray-300'}`} />
+              <span className={`w-3 h-3 rounded-full transition-colors ${currentTestimonial === index ? 'bg-[#0F766E]' : 'bg-slate-300'}`} />
             </button>
           ))}
         </div>
 
         <div className="grid md:grid-cols-3 gap-8 mt-16">
           <div className="text-center">
-            <div className="text-4xl font-bold text-blue-600 mb-2">98%</div>
-            <div className="text-gray-600">Client Satisfaction Rate</div>
+            <div className="text-4xl font-bold text-[#D97706] mb-2">98%</div>
+            <div className="text-slate-600">Client Satisfaction Rate</div>
           </div>
           <div className="text-center">
-            <div className="text-4xl font-bold text-blue-600 mb-2">150+</div>
-            <div className="text-gray-600">Projects Completed</div>
+            <div className="text-4xl font-bold text-[#D97706] mb-2">150+</div>
+            <div className="text-slate-600">Projects Completed</div>
           </div>
           <div className="text-center">
-            <div className="text-4xl font-bold text-blue-600 mb-2">24h</div>
-            <div className="text-gray-600">Average Response Time</div>
+            <div className="text-4xl font-bold text-[#D97706] mb-2">24h</div>
+            <div className="text-slate-600">Average Response Time</div>
           </div>
         </div>
       </div>

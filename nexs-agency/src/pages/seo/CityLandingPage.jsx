@@ -58,7 +58,7 @@ const cityData = {
             reasons: [
                 { title: "Enterprise Grade", desc: "Security and stability for high-stakes industries.", icon: "ri-building-4-line" },
                 { title: "Cutting-Edge Stack", desc: "React, Next.js, and GenAI to keep you ahead of the curve.", icon: "ri-stack-line" },
-                { title: "Agile Speed", desc: "Bi-weekly sprints designed for fast-paced NYC startups.", icon: "ri-rocket-line" },
+                { title: "Agile Speed", desc: "Bi-weekly sprints designed for fast-paced NYC startups.", icon: "ri-arrow-right-up-line" },
                 { title: "Hybrid Delivery", desc: "Onshore management with offshore execution excellence.", icon: "ri-earth-line" }
             ]
         }
@@ -336,7 +336,7 @@ const CityLandingPage = () => {
                                 className="text-5xl md:text-8xl font-bold tracking-tight leading-none mb-6 relative z-30"
                             >
                                 <span className="block text-3xl md:text-4xl font-light text-slate-300 mb-2">{greeting}, {data.city}.</span>
-                                <span className="text-transparent bg-clip-text bg-gradient-to-r from-blue-400 via-indigo-400 to-purple-400">
+                                <span className="text-[#D97706]">
                                     We Build the Future Here.
                                 </span>
                             </motion.h1>
@@ -358,7 +358,7 @@ const CityLandingPage = () => {
                             >
                                 <Link
                                     to="/contact"
-                                    className="px-8 py-4 bg-blue-600 rounded-full font-bold text-white hover:bg-blue-500 transition-all shadow-lg hover:shadow-blue-500/30 flex items-center gap-2 group"
+                                    className="px-8 py-4 bg-blue-600 rounded-full font-bold text-white hover:bg-[#FAF9F6]0 transition-all shadow-lg hover:shadow-lg flex items-center gap-2 group"
                                 >
                                     Start Project in {data.city} <i className="ri-arrow-right-line group-hover:translate-x-1 transition-transform"></i>
                                 </Link>
@@ -376,7 +376,7 @@ const CityLandingPage = () => {
                     <div className="bg-white/90 backdrop-blur-xl rounded-[2rem] shadow-2xl p-8 md:p-10 border border-white/50 grid grid-cols-2 lg:grid-cols-4 gap-8 max-w-6xl mx-auto hover:transform hover:-translate-y-2 transition-transform duration-500 pointer-events-auto">
                         {data.stats && data.stats.map((stat, i) => (
                             <FadeIn key={i} delay={0.3 + (i * 0.1)} className="text-center group cursor-default relative">
-                                <div className="text-4xl md:text-5xl font-bold text-slate-900 group-hover:text-transparent group-hover:bg-clip-text group-hover:bg-gradient-to-r group-hover:from-blue-600 group-hover:to-purple-600 transition-all duration-300 mb-2 font-display">
+                                <div className="text-4xl md:text-5xl font-bold text-slate-900 group-hover:text-[#0F766E] transition-all duration-300 mb-2 font-display">
                                     {stat.value}
                                 </div>
                                 <div className="text-slate-500 font-bold text-xs md:text-sm uppercase tracking-widest group-hover:text-slate-800">
@@ -397,12 +397,12 @@ const CityLandingPage = () => {
                     <div className="flex flex-col lg:flex-row gap-16 items-start">
                         {/* Text Content */}
                         <FadeIn className="lg:w-1/2">
-                            <span className="flex items-center gap-2 text-blue-600 font-bold tracking-widest uppercase text-sm mb-4">
+                            <span className="flex items-center gap-2 text-[#0F766E] font-bold tracking-widest uppercase text-sm mb-4">
                                 <span className="w-8 h-px bg-blue-600"></span>
                                 Strategic Hub
                             </span>
                             <h2 className="text-4xl md:text-5xl font-bold text-slate-900 leading-tight mb-6">
-                                Delivering Excellence in <span className="text-blue-600">{data.city}</span>.
+                                Delivering Excellence in <span className="text-[#0F766E]">{data.city}</span>.
                             </h2>
                             <p className="text-lg text-slate-600 leading-relaxed mb-8">
                                 {data.content} As your local technology partner, we bridge the gap between complex business requirements and cutting-edge digital solutions.
@@ -413,7 +413,7 @@ const CityLandingPage = () => {
                                     <i className="ri-map-pin-line text-9xl"></i>
                                 </div>
                                 <h3 className="text-xl font-bold text-slate-900 mb-6 flex items-center gap-2">
-                                    <i className="ri-briefcase-4-line text-blue-600"></i>
+                                    <i className="ri-briefcase-4-line text-[#0F766E]"></i>
                                     Key Capabilities
                                 </h3>
                                 <div className="grid sm:grid-cols-2 gap-4 relative z-10">
@@ -434,14 +434,14 @@ const CityLandingPage = () => {
                                     src="https://images.unsplash.com/photo-1486406146926-c627a92ad1ab?auto=format&fit=crop&q=80&w=1200&fm=webp"
                                     alt="Corporate Architecture"
                                     loading="lazy"
-                                    className="absolute inset-0 w-full h-full object-cover opacity-40 hover:scale-105 transition-transform duration-700"
+                                    className="absolute inset-0 w-full h-full object-cover opacity-40  transition-transform duration-700"
                                 />
                                 <div className="absolute inset-0 bg-gradient-to-t from-slate-900 via-slate-900/50 to-transparent"></div>
 
                                 <div className="absolute bottom-0 left-0 p-8 w-full">
-                                    <div className="glass-card bg-white/10 backdrop-blur-md rounded-2xl p-6 border border-white/10">
+                                    <div className="bg-white border border-slate-200 bg-white/10 backdrop-blur-md rounded-2xl p-6 border border-white/10">
                                         <div className="flex items-center gap-4 mb-4">
-                                            <div className="w-12 h-12 rounded-full bg-blue-600 flex items-center justify-center text-white shadow-lg shadow-blue-600/30">
+                                            <div className="w-12 h-12 rounded-full bg-blue-600 flex items-center justify-center text-white shadow-lg shadow-lg">
                                                 <i className="ri-global-line text-2xl"></i>
                                             </div>
                                             <div>
@@ -478,15 +478,15 @@ const CityLandingPage = () => {
 
                 <div className="container-custom relative z-10">
                     <div className="text-center mb-20">
-                        <span className="text-blue-600 font-bold tracking-widest uppercase text-sm">The Nexspire Advantage</span>
+                        <span className="text-[#0F766E] font-bold tracking-widest uppercase text-sm">The Nexspire Advantage</span>
                         <h2 className="text-4xl font-bold mt-2 text-slate-900">{data.whyUs?.title}</h2>
                     </div>
 
                     <div className="grid md:grid-cols-2 gap-8">
                         {data.whyUs?.reasons.map((reason, idx) => (
-                            <FadeIn key={idx} delay={idx * 0.1} className="group p-8 rounded-[2rem] bg-white border border-slate-100 hover:shadow-xl hover:shadow-blue-500/5 hover:-translate-y-1 transition-all duration-300">
+                            <FadeIn key={idx} delay={idx * 0.1} className="group p-8 rounded-[2rem] bg-white border border-slate-100 hover:shadow-xl hover:shadow-lg hover:-translate-y-1 transition-all duration-300">
                                 <div className="flex gap-6 items-start">
-                                    <div className="w-16 h-16 rounded-2xl bg-slate-50 flex items-center justify-center text-3xl text-blue-600 group-hover:bg-blue-600 group-hover:text-white transition-all duration-300 shrink-0">
+                                    <div className="w-16 h-16 rounded-2xl bg-slate-50 flex items-center justify-center text-3xl text-[#0F766E] group-hover:bg-[#0F766E] group-hover:text-white transition-all duration-300 shrink-0">
                                         <i className={reason.icon}></i>
                                     </div>
                                     <div>
@@ -517,7 +517,7 @@ const CityLandingPage = () => {
                     <div className="flex flex-col sm:flex-row gap-6 justify-center">
                         <Link
                             to="/contact"
-                            className="inline-flex items-center justify-center gap-4 px-10 py-5 bg-blue-600 text-white rounded-full text-lg font-bold hover:bg-blue-500 shadow-lg hover:shadow-blue-500/25 transition-all duration-300 hover:scale-105"
+                            className="inline-flex items-center justify-center gap-4 px-10 py-5 bg-blue-600 text-white rounded-full text-lg font-bold hover:bg-[#FAF9F6]0 shadow-lg hover:shadow-lg transition-all duration-300 "
                         >
                             Start Your Project
                             <i className="ri-arrow-right-line"></i>

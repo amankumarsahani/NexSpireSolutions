@@ -44,9 +44,9 @@ const AreasWeServe = () => {
         <section className="py-20 bg-white">
             <div className="container-custom">
                 <div className="text-center mb-16">
-                    <span className="text-blue-600 font-bold tracking-wider uppercase text-sm">Global Footprint</span>
-                    <h2 className="text-4xl font-bold text-gray-900 mt-2 mb-4">We Serve Global Markets</h2>
-                    <p className="text-gray-500 max-w-2xl mx-auto">
+                    <span className="text-[#0F766E] font-bold tracking-wider uppercase text-sm">Global Footprint</span>
+                    <h2 className="text-4xl font-bold text-slate-800 mt-2 mb-4">We Serve Global Markets</h2>
+                    <p className="text-slate-500 max-w-2xl mx-auto">
                         Delivering world-class software solutions to clients across major tech hubs.
                     </p>
                 </div>
@@ -64,7 +64,7 @@ const AreasWeServe = () => {
                                     src={city.image}
                                     alt={`${city.name} skyline`}
                                     loading="lazy"
-                                    className="w-full h-full object-cover transition-transform duration-700 group-hover:scale-110"
+                                    className="w-full h-full object-cover transition-transform duration-700 group-"
                                 />
                                 <div className="absolute inset-0 bg-gradient-to-t from-gray-900 via-gray-900/40 to-transparent opacity-80 group-hover:opacity-70 transition-opacity duration-500"></div>
                             </div>

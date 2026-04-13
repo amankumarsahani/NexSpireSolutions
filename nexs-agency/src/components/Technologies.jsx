@@ -1,5 +1,4 @@
 import { useState, useEffect, useRef, memo } from 'react'
-import SectionBackground from './ui/SectionBackground'
 
 const Technologies = memo(function Technologies() {
   const [activeTab, setActiveTab] = useState("Frontend")
@@ -94,24 +93,23 @@ const Technologies = memo(function Technologies() {
   }, [activeTab])
 
   return (
-    <section id="technologies" className="relative py-12 sm:py-16 lg:py-20 bg-gradient-to-br from-gray-50 via-slate-50 to-indigo-50 overflow-hidden">
-      <SectionBackground gridId="tech-grid" />
+    <section id="technologies" className="relative py-12 sm:py-16 lg:py-20 bg-[#FAF9F6] overflow-hidden">
 
       <div className="relative z-10 max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
         {/* Modern Header */}
         <div className={`text-center mb-8 sm:mb-12 lg:mb-16 transition-all duration-1000 transform ${isVisible ? 'translate-y-0 opacity-100' : 'translate-y-8 opacity-0'
           }`}>
-          <div className="inline-flex items-center bg-gradient-to-r from-cyan-500/10 via-blue-500/10 to-indigo-500/10 backdrop-blur-xl border border-white/20 text-gray-800 text-sm font-bold px-8 py-4 rounded-full mb-8 shadow-2xl hover:shadow-cyan-500/20 transition-all duration-500">
-            <div className="w-3 h-3 bg-gradient-to-r from-cyan-500 to-indigo-500 rounded-full mr-3 animate-pulse shadow-lg"></div>
+          <div className="inline-flex items-center bg-[#0F766E]/10 border border-slate-200 text-slate-800 text-sm font-bold px-8 py-4 rounded-full mb-8">
+            <div className="w-3 h-3 bg-[#0F766E] rounded-full mr-3"></div>
             Our Tech Stack
           </div>
-          <h2 className="text-2xl sm:text-3xl md:text-4xl font-bold text-gray-900 mb-4 sm:mb-6 leading-tight tracking-tight">
+          <h2 className="text-2xl sm:text-3xl md:text-4xl font-bold text-slate-800 mb-4 sm:mb-6 leading-tight tracking-tight">
             <span className="block text-gray-800 font-bold">Technologies We</span>
-            <span className="block bg-gradient-to-r from-cyan-600 via-blue-600 to-indigo-600 bg-clip-text text-transparent mt-2 font-bold">
+            <span className="block text-[#0F766E] mt-2 font-bold">
               Master & Excel
             </span>
           </h2>
-          <p className="text-base sm:text-lg lg:text-xl text-gray-600 max-w-3xl mx-auto leading-relaxed px-4 sm:px-0">
+          <p className="text-base sm:text-lg lg:text-xl text-slate-600 max-w-3xl mx-auto leading-relaxed px-4 sm:px-0">
             We leverage cutting-edge technologies and industry best practices to build scalable solutions
           </p>
         </div>
@@ -127,13 +125,13 @@ const Technologies = memo(function Technologies() {
               aria-selected={activeTab === tab}
               id={`tab-${tab}`}
               aria-controls={`tabpanel-${tab}`}
-              className={`px-4 sm:px-6 py-2 sm:py-3 rounded-2xl text-sm sm:text-base font-semibold transition-all duration-500 whitespace-nowrap backdrop-blur-sm border ${activeTab === tab
-                ? 'bg-gradient-to-r from-cyan-500 to-indigo-600 text-white shadow-lg shadow-cyan-500/30 border-cyan-400/50 scale-105'
-                : 'bg-white/60 text-gray-700 hover:bg-white/80 border-white/30 hover:shadow-lg'
+              className={`px-4 sm:px-6 py-2 sm:py-3 rounded-2xl text-sm sm:text-base font-semibold transition-all duration-300 whitespace-nowrap border ${activeTab === tab
+                ? 'bg-[#0F766E] text-white shadow-lg border-[#0F766E]'
+                : 'bg-white text-slate-600 hover:bg-[#FAF9F6] border-slate-200 hover:shadow-lg'
                 }`}
             >
               <div className="flex items-center space-x-2">
-                <div className={`w-2 h-2 rounded-full transition-all duration-300 ${activeTab === tab ? 'bg-white' : 'bg-cyan-500'
+                <div className={`w-2 h-2 rounded-full transition-all duration-300 ${activeTab === tab ? 'bg-white' : 'bg-[#0F766E]'
                   }`}></div>
                 <span>{tab}</span>
               </div>
@@ -146,11 +144,11 @@ const Technologies = memo(function Technologies() {
           }`} role="tabpanel" id={`tabpanel-${activeTab}`} aria-labelledby={`tab-${activeTab}`}>
           {/* Category Title */}
           <div className="text-center mb-12">
-            <div className="inline-flex items-center bg-white/70 backdrop-blur-lg border border-gray-200/50 text-gray-700 text-lg font-bold px-8 py-4 rounded-2xl mb-6 shadow-lg">
+            <div className="inline-flex items-center bg-white/70 backdrop-blur-lg border border-slate-200/50 text-slate-600 text-lg font-bold px-8 py-4 rounded-2xl mb-6 shadow-lg">
               <div className="w-3 h-3 bg-cyan-500 rounded-full mr-3 animate-pulse"></div>
               {techStacks[activeTab].title}
             </div>
-            <p className="text-gray-600 max-w-2xl mx-auto">
+            <p className="text-slate-600 max-w-2xl mx-auto">
               {techStacks[activeTab].description}
             </p>
           </div>
@@ -181,12 +179,12 @@ const Technologies = memo(function Technologies() {
 
                       {/* Icon */}
                       <div className="flex flex-col items-center justify-center h-full space-y-3">
-                        <div className={`w-10 h-10 sm:w-14 sm:h-14 flex items-center justify-center bg-gradient-to-br ${tech.color} rounded-xl shadow-md group-hover:shadow-lg group-hover:scale-110 transition-all duration-300`}>
+                        <div className={`w-10 h-10 sm:w-14 sm:h-14 flex items-center justify-center bg-gradient-to-br ${tech.color} rounded-xl shadow-md group-hover:shadow-lg group- transition-all duration-300`}>
                           <i className={`${tech.icon} text-lg sm:text-2xl text-white`}></i>
                         </div>
 
                         {/* Tech Name */}
-                        <h4 className="text-xs sm:text-sm font-semibold text-gray-700 text-center leading-tight group-hover:text-gray-900 transition-colors duration-300">
+                        <h4 className="text-xs sm:text-sm font-semibold text-slate-600 text-center leading-tight group-hover:text-slate-800 transition-colors duration-300">
                           {tech.name}
                         </h4>
                       </div>
@@ -204,28 +202,28 @@ const Technologies = memo(function Technologies() {
           {/* Tech Stack Info */}
           <div className="mt-16 max-w-4xl mx-auto">
             <div className="grid md:grid-cols-3 gap-8">
-              <div className="text-center p-6 bg-white/60 backdrop-blur-sm rounded-2xl border border-white/30 shadow-lg">
-                <div className="w-12 h-12 bg-gradient-to-r from-blue-500 to-cyan-500 rounded-2xl flex items-center justify-center mx-auto mb-4 shadow-xl">
+              <div className="text-center p-6 bg-white rounded-2xl border border-slate-200 shadow-lg">
+                <div className="w-12 h-12 bg-[#0F766E] rounded-2xl flex items-center justify-center mx-auto mb-4 shadow-lg">
                   <i className="ri-code-line text-2xl text-white"></i>
                 </div>
-                <h4 className="text-lg font-bold text-gray-900 mb-2">Modern Stack</h4>
-                <p className="text-sm text-gray-600">Latest versions and cutting-edge technologies</p>
+                <h4 className="text-lg font-bold text-slate-800 mb-2">Modern Stack</h4>
+                <p className="text-sm text-slate-600">Latest versions and cutting-edge technologies</p>
               </div>
 
-              <div className="text-center p-6 bg-white/60 backdrop-blur-sm rounded-2xl border border-white/30 shadow-lg">
-                <div className="w-12 h-12 bg-gradient-to-r from-purple-500 to-pink-500 rounded-2xl flex items-center justify-center mx-auto mb-4 shadow-xl">
-                  <i className="ri-rocket-2-line text-2xl text-white"></i>
+              <div className="text-center p-6 bg-white rounded-2xl border border-slate-200 shadow-lg">
+                <div className="w-12 h-12 bg-[#0F766E] rounded-2xl flex items-center justify-center mx-auto mb-4 shadow-lg">
+                  <i className="ri-arrow-right-up-line text-2xl text-white"></i>
                 </div>
-                <h4 className="text-lg font-bold text-gray-900 mb-2">High Performance</h4>
-                <p className="text-sm text-gray-600">Optimized for speed and scalability</p>
+                <h4 className="text-lg font-bold text-slate-800 mb-2">High Performance</h4>
+                <p className="text-sm text-slate-600">Optimized for speed and scalability</p>
               </div>
 
-              <div className="text-center p-6 bg-white/60 backdrop-blur-sm rounded-2xl border border-white/30 shadow-lg">
-                <div className="w-12 h-12 bg-gradient-to-r from-green-500 to-emerald-500 rounded-2xl flex items-center justify-center mx-auto mb-4 shadow-xl">
+              <div className="text-center p-6 bg-white rounded-2xl border border-slate-200 shadow-lg">
+                <div className="w-12 h-12 bg-[#0F766E] rounded-2xl flex items-center justify-center mx-auto mb-4 shadow-lg">
                   <i className="ri-shield-check-line text-2xl text-white"></i>
                 </div>
-                <h4 className="text-lg font-bold text-gray-900 mb-2">Production Ready</h4>
-                <p className="text-sm text-gray-600">Battle-tested in enterprise environments</p>
+                <h4 className="text-lg font-bold text-slate-800 mb-2">Production Ready</h4>
+                <p className="text-sm text-slate-600">Battle-tested in enterprise environments</p>
               </div>
             </div>
           </div>

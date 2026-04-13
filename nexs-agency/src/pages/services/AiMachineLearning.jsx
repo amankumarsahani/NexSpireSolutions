@@ -1,12 +1,12 @@
 import ServicePageTemplate from '../../components/ServicePageTemplate';
 
 const data = {
-    themeColor: 'emerald',
+    themeColor: 'teal',
     badge: { icon: 'ri-brain-line', label: 'Artificial Intelligence' },
     hero: {
         h1Line1: 'Intelligence,',
         h1Line2: 'Integrated.',
-        gradient: 'from-emerald-400 via-teal-400 to-cyan-400',
+        gradient: 'from-[#0F766E] to-[#0D6B63]',
         paragraph: 'Transform your business with next-gen AI. From automating workflows to predicting market trends, we build intelligent systems that drive value.',
         ctaText: 'Consult AI Expert',
         bgImage: 'https://images.unsplash.com/photo-1620712943543-bcc4688e7485',

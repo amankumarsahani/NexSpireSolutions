@@ -6,7 +6,7 @@ const milestones = [
         year: '2020',
         title: 'Founded',
         description: 'Nexspire Solutions was born with a vision to deliver exceptional software.',
-        icon: 'ri-rocket-2-line',
+        icon: 'ri-arrow-right-up-line',
         color: 'blue'
     },
     {
@@ -40,8 +40,8 @@ const milestones = [
 ];
 
 const colorMap = {
-    blue: { bg: 'bg-blue-100', text: 'text-blue-600', border: 'border-blue-500' },
-    purple: { bg: 'bg-purple-100', text: 'text-purple-600', border: 'border-purple-500' },
+    blue: { bg: 'bg-[#0F766E]/10', text: 'text-[#0F766E]', border: 'border-[#0F766E]' },
+    purple: { bg: 'bg-[#D97706]/10', text: 'text-[#D97706]', border: 'border-[#D97706]' },
     emerald: { bg: 'bg-emerald-100', text: 'text-emerald-600', border: 'border-emerald-500' },
     orange: { bg: 'bg-orange-100', text: 'text-orange-600', border: 'border-orange-500' },
     pink: { bg: 'bg-pink-100', text: 'text-pink-600', border: 'border-pink-500' }
@@ -49,23 +49,22 @@ const colorMap = {
 
 const Timeline = memo(function Timeline({ className = '' }) {
     return (
-        <section className={`py-24 bg-gradient-to-b from-gray-50 to-white ${className}`}>
+        <section className={`py-24 bg-[#FAF9F6] ${className}`}>
             <div className="container-custom">
                 <div className="text-center mb-16">
-                    <span className="inline-block px-4 py-2 bg-blue-100 text-blue-700 rounded-full text-sm font-bold mb-4">
+                    <span className="inline-block px-4 py-2 bg-[#0F766E]/10 text-[#0F766E] rounded-full text-sm font-bold mb-4">
                         Our Journey
                     </span>
-                    <h2 className="text-4xl md:text-5xl font-bold text-gray-900 mb-4">
+                    <h2 className="text-4xl md:text-5xl font-bold text-slate-800 mb-4">
                         Milestones That Define Us
                     </h2>
-                    <p className="text-gray-500 text-lg max-w-2xl mx-auto">
+                    <p className="text-slate-500 text-lg max-w-2xl mx-auto">
                         From a small team with big dreams to a global software agency.
                     </p>
                 </div>
 
                 <div className="relative">
-                    {/* Vertical Timeline Line */}
-                    <div className="hidden md:block absolute left-1/2 top-0 bottom-0 w-0.5 bg-gradient-to-b from-blue-200 via-purple-200 via-emerald-200 to-pink-200 transform -translate-x-1/2" />
+                    <div className="hidden md:block absolute left-1/2 top-0 bottom-0 w-0.5 bg-slate-200 transform -translate-x-1/2" />
 
                     <div className="space-y-12 md:space-y-0">
                         {milestones.map((milestone, index) => {
@@ -84,15 +83,15 @@ const Timeline = memo(function Timeline({ className = '' }) {
                                 >
                                     {/* Content Card */}
                                     <div className={`w-full md:w-5/12 ${isEven ? 'md:text-right md:pr-12' : 'md:text-left md:pl-12'}`}>
-                                        <div className={`inline-block bg-white rounded-2xl p-6 shadow-lg border border-gray-100 hover:shadow-xl transition-shadow ${isEven ? 'md:ml-auto' : ''
+                                        <div className={`inline-block bg-white rounded-2xl p-6 shadow-lg border border-slate-200 hover:shadow-xl transition-shadow ${isEven ? 'md:ml-auto' : ''
                                             }`}>
                                             <span className={`text-sm font-bold ${colors.text}`}>
                                                 {milestone.year}
                                             </span>
-                                            <h3 className="text-xl font-bold text-gray-900 mt-1 mb-2">
+                                            <h3 className="text-xl font-bold text-slate-800 mt-1 mb-2">
                                                 {milestone.title}
                                             </h3>
-                                            <p className="text-gray-500 text-sm">
+                                            <p className="text-slate-500 text-sm">
                                                 {milestone.description}
                                             </p>
                                         </div>

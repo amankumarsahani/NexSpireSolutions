@@ -85,7 +85,7 @@ const ContactPage = () => {
     ];
 
     return (
-        <div className="min-h-screen bg-white font-sans text-gray-900 selection:bg-blue-600 selection:text-white overflow-hidden">
+        <div className="min-h-screen bg-white font-sans text-slate-800 selection:bg-blue-600 selection:text-white overflow-hidden">
             <Helmet>
                 <title>Contact Nexspire - Hire Experts in Mohali, London, NYC & Dubai</title>
                 <meta name="description" content="Ready to innovate? Contact Nexspire Solutions. We have a physical presence in Mohali (India) and serve clients globally in London, New York, Dubai, Toronto, and Sydney. Hire top-tier software developers today." />
@@ -123,7 +123,7 @@ const ContactPage = () => {
             <section className="relative min-h-[85vh] flex items-center pt-20 pb-32 overflow-hidden bg-gray-950 text-white">
                 {/* CSS-based Animated Background */}
                 <div className="absolute inset-0 z-0">
-                    <div className="absolute inset-0 bg-gradient-to-br from-gray-900 via-blue-950 to-purple-950"></div>
+                    <div className="absolute inset-0 bg-slate-900"></div>
                     <motion.div
                         animate={{
                             scale: [1, 1.2, 1],
@@ -157,7 +157,7 @@ const ContactPage = () => {
                         </span>
                         <h1 className="text-5xl md:text-7xl font-bold mb-6 tracking-tight">
                             Let's Build <br />
-                            <span className="text-transparent bg-clip-text bg-gradient-to-r from-blue-400 to-purple-400">Something Great.</span>
+                            <span className="text-[#D97706]">Something Great.</span>
                         </h1>
                         <p className="text-xl text-blue-100/80 max-w-2xl mx-auto">
                             From Mohali to the World. We build software that empowers businesses everywhere.
@@ -167,7 +167,7 @@ const ContactPage = () => {
             </section>
 
             <div className="container-custom -mt-20 relative z-20 pb-24">
-                <div className="bg-white rounded-[2.5rem] shadow-2xl overflow-hidden grid lg:grid-cols-2 min-h-[800px] border border-gray-100">
+                <div className="bg-white rounded-[2.5rem] shadow-2xl overflow-hidden grid lg:grid-cols-2 min-h-[800px] border border-slate-200">
 
                     {/* Left: Contact Info & Map */}
                     <div className="relative bg-blue-600 text-white p-12 lg:p-16 flex flex-col justify-between overflow-hidden">
@@ -184,13 +184,13 @@ const ContactPage = () => {
                                 className="w-full h-full object-cover"
                             ></iframe>
                         </div>
-                        <div className="absolute inset-0 bg-gradient-to-b from-blue-900/90 via-blue-800/80 to-blue-900/90 pointer-events-none"></div>
+                        <div className="absolute inset-0 bg-slate-900/90 pointer-events-none"></div>
 
                         <div className="relative z-10">
                             <h2 className="text-3xl font-bold mb-8">Contact Information</h2>
                             <div className="space-y-10">
                                 <div className="flex items-start gap-6 group">
-                                    <div className="w-14 h-14 rounded-2xl bg-white/10 backdrop-blur-md flex items-center justify-center text-white group-hover:bg-white group-hover:text-blue-600 transition-all duration-300 shadow-lg">
+                                    <div className="w-14 h-14 rounded-2xl bg-white/10 backdrop-blur-md flex items-center justify-center text-white group-hover:bg-white group-hover:text-[#0F766E] transition-all duration-300 shadow-lg">
                                         <i className="ri-mail-send-line text-2xl"></i>
                                     </div>
                                     <div>
@@ -200,7 +200,7 @@ const ContactPage = () => {
                                 </div>
 
                                 <div className="flex items-start gap-6 group">
-                                    <div className="w-14 h-14 rounded-2xl bg-white/10 backdrop-blur-md flex items-center justify-center text-white group-hover:bg-white group-hover:text-blue-600 transition-all duration-300 shadow-lg">
+                                    <div className="w-14 h-14 rounded-2xl bg-white/10 backdrop-blur-md flex items-center justify-center text-white group-hover:bg-white group-hover:text-[#0F766E] transition-all duration-300 shadow-lg">
                                         <i className="ri-phone-line text-2xl"></i>
                                     </div>
                                     <div>
@@ -211,7 +211,7 @@ const ContactPage = () => {
                                 </div>
 
                                 <div className="flex items-start gap-6 group">
-                                    <div className="w-14 h-14 rounded-2xl bg-white/10 backdrop-blur-md flex items-center justify-center text-white group-hover:bg-white group-hover:text-blue-600 transition-all duration-300 shadow-lg">
+                                    <div className="w-14 h-14 rounded-2xl bg-white/10 backdrop-blur-md flex items-center justify-center text-white group-hover:bg-white group-hover:text-[#0F766E] transition-all duration-300 shadow-lg">
                                         <i className="ri-map-pin-line text-2xl"></i>
                                     </div>
                                     <div>
@@ -231,7 +231,7 @@ const ContactPage = () => {
                                     { icon: 'ri-linkedin-fill', href: 'https://www.linkedin.com/company/nexspire-solution', label: 'LinkedIn' },
                                     { icon: 'ri-instagram-fill', href: 'https://www.instagram.com/nexspire_solutions/', label: 'Instagram' }
                                 ].map((social, i) => (
-                                    <a key={i} href={social.href} target="_blank" rel="noopener noreferrer" aria-label={social.label} className="w-12 h-12 rounded-full border border-white/20 flex items-center justify-center hover:bg-white hover:text-blue-900 transition-all transform hover:scale-110 hover:shadow-lg backdrop-blur-sm">
+                                    <a key={i} href={social.href} target="_blank" rel="noopener noreferrer" aria-label={social.label} className="w-12 h-12 rounded-full border border-white/20 flex items-center justify-center hover:bg-white hover:text-blue-900 transition-all transform  hover:shadow-lg backdrop-blur-sm">
                                         <i className={`${social.icon} text-xl`}></i>
                                     </a>
                                 ))}
@@ -252,13 +252,13 @@ const ContactPage = () => {
                                     <div className="w-24 h-24 bg-green-100 text-green-600 rounded-full flex items-center justify-center mx-auto mb-8 animate-bounce">
                                         <i className="ri-check-line text-5xl"></i>
                                     </div>
-                                    <h2 className="text-4xl font-bold text-gray-900 mb-4">Message Sent!</h2>
-                                    <p className="text-xl text-gray-500 mb-12">
+                                    <h2 className="text-4xl font-bold text-slate-800 mb-4">Message Sent!</h2>
+                                    <p className="text-xl text-slate-500 mb-12">
                                         Thanks for reaching out. We'll get back to you within 24 hours.
                                     </p>
                                     <button
                                         onClick={() => setIsSuccess(false)}
-                                        className="px-8 py-4 bg-gray-900 text-white rounded-xl font-bold hover:bg-blue-600 transition-all shadow-lg"
+                                        className="px-8 py-4 bg-slate-900 text-white rounded-xl font-bold hover:bg-[#0F766E] transition-all shadow-lg"
                                     >
                                         Send Another Message
                                     </button>
@@ -269,12 +269,12 @@ const ContactPage = () => {
                                     animate={{ opacity: 1 }}
                                     exit={{ opacity: 0 }}
                                 >
-                                    <h2 className="text-3xl font-bold text-gray-900 mb-2">Send us a Message</h2>
-                                    <p className="text-gray-500 mb-10">We'd love to hear about your project.</p>
+                                    <h2 className="text-3xl font-bold text-slate-800 mb-2">Send us a Message</h2>
+                                    <p className="text-slate-500 mb-10">We'd love to hear about your project.</p>
 
                                     <form onSubmit={handleSubmit} className="space-y-8">
                                         <div className="space-y-2 group">
-                                            <label className="text-xs font-bold text-gray-500 uppercase tracking-widest group-focus-within:text-blue-600 transition-colors">Full Name</label>
+                                            <label className="text-xs font-bold text-slate-500 uppercase tracking-widest group-focus-within:text-[#0F766E] transition-colors">Full Name</label>
                                             <input
                                                 type="text"
                                                 name="name"
@@ -283,52 +283,52 @@ const ContactPage = () => {
                                                 required
                                                 minLength={2}
                                                 maxLength={100}
-                                                className="w-full px-0 py-3 border-b-2 border-gray-100 focus:border-blue-600 focus:outline-none transition-colors bg-transparent placeholder-gray-300 font-medium text-lg"
+                                                className="w-full px-0 py-3 border-b-2 border-slate-200 focus:border-blue-600 focus:outline-none transition-colors bg-transparent placeholder-gray-300 font-medium text-lg"
                                                 placeholder="John Doe"
                                             />
                                         </div>
 
                                         <div className="space-y-2 group">
-                                            <label className="text-xs font-bold text-gray-500 uppercase tracking-widest group-focus-within:text-blue-600 transition-colors">Email Address</label>
+                                            <label className="text-xs font-bold text-slate-500 uppercase tracking-widest group-focus-within:text-[#0F766E] transition-colors">Email Address</label>
                                             <input
                                                 type="email"
                                                 name="email"
                                                 value={formState.email}
                                                 onChange={handleChange}
                                                 required
-                                                className="w-full px-0 py-3 border-b-2 border-gray-100 focus:border-blue-600 focus:outline-none transition-colors bg-transparent placeholder-gray-300 font-medium text-lg"
+                                                className="w-full px-0 py-3 border-b-2 border-slate-200 focus:border-blue-600 focus:outline-none transition-colors bg-transparent placeholder-gray-300 font-medium text-lg"
                                                 placeholder="john@example.com"
                                             />
                                         </div>
 
                                         <div className="grid md:grid-cols-2 gap-8">
                                             <div className="space-y-2 group">
-                                                <label className="text-xs font-bold text-gray-500 uppercase tracking-widest group-focus-within:text-blue-600 transition-colors">Phone (Optional)</label>
+                                                <label className="text-xs font-bold text-slate-500 uppercase tracking-widest group-focus-within:text-[#0F766E] transition-colors">Phone (Optional)</label>
                                                 <input
                                                     type="tel"
                                                     name="phone"
                                                     value={formState.phone}
                                                     onChange={handleChange}
-                                                    className="w-full px-0 py-3 border-b-2 border-gray-100 focus:border-blue-600 focus:outline-none transition-colors bg-transparent placeholder-gray-300 font-medium text-lg"
+                                                    className="w-full px-0 py-3 border-b-2 border-slate-200 focus:border-blue-600 focus:outline-none transition-colors bg-transparent placeholder-gray-300 font-medium text-lg"
                                                     placeholder="+91 12345 67890"
                                                 />
                                             </div>
                                             <div className="space-y-2 group">
-                                                <label className="text-xs font-bold text-gray-500 uppercase tracking-widest group-focus-within:text-blue-600 transition-colors">Company (Optional)</label>
+                                                <label className="text-xs font-bold text-slate-500 uppercase tracking-widest group-focus-within:text-[#0F766E] transition-colors">Company (Optional)</label>
                                                 <input
                                                     type="text"
                                                     name="company"
                                                     value={formState.company}
                                                     onChange={handleChange}
                                                     maxLength={100}
-                                                    className="w-full px-0 py-3 border-b-2 border-gray-100 focus:border-blue-600 focus:outline-none transition-colors bg-transparent placeholder-gray-300 font-medium text-lg"
+                                                    className="w-full px-0 py-3 border-b-2 border-slate-200 focus:border-blue-600 focus:outline-none transition-colors bg-transparent placeholder-gray-300 font-medium text-lg"
                                                     placeholder="Your Company"
                                                 />
                                             </div>
                                         </div>
 
                                         <div className="space-y-2 group">
-                                            <label className="text-xs font-bold text-gray-500 uppercase tracking-widest group-focus-within:text-blue-600 transition-colors">Message</label>
+                                            <label className="text-xs font-bold text-slate-500 uppercase tracking-widest group-focus-within:text-[#0F766E] transition-colors">Message</label>
                                             <textarea
                                                 name="message"
                                                 value={formState.message}
@@ -337,7 +337,7 @@ const ContactPage = () => {
                                                 minLength={10}
                                                 maxLength={2000}
                                                 rows="4"
-                                                className="w-full px-0 py-3 border-b-2 border-gray-100 focus:border-blue-600 focus:outline-none transition-colors bg-transparent placeholder-gray-300 font-medium text-lg resize-none"
+                                                className="w-full px-0 py-3 border-b-2 border-slate-200 focus:border-blue-600 focus:outline-none transition-colors bg-transparent placeholder-gray-300 font-medium text-lg resize-none"
                                                 placeholder="Tell us about your project..."
                                             ></textarea>
                                         </div>
@@ -354,7 +354,7 @@ const ContactPage = () => {
 
                                         <button
                                             disabled={isSubmitting}
-                                            className="w-full bg-gray-900 text-white py-5 rounded-xl font-bold hover:bg-blue-600 transition-all duration-300 flex items-center justify-center gap-2 shadow-xl transform hover:-translate-y-1 disabled:opacity-70 disabled:cursor-not-allowed"
+                                            className="w-full bg-slate-900 text-white py-5 rounded-xl font-bold hover:bg-[#0F766E] transition-all duration-300 flex items-center justify-center gap-2 shadow-xl transform hover:-translate-y-1 disabled:opacity-70 disabled:cursor-not-allowed"
                                         >
                                             {isSubmitting ? (
                                                 <span className="flex items-center gap-2">
@@ -388,10 +388,10 @@ const ContactPage = () => {
                                 viewport={{ once: true }}
                                 transition={{ delay: index * 0.1 }}
                                 key={index}
-                                className="bg-white p-8 rounded-2xl shadow-sm border border-gray-100 hover:shadow-lg hover:border-blue-100 transition-all duration-300"
+                                className="bg-white p-8 rounded-2xl shadow-sm border border-slate-200 hover:shadow-lg hover:border-slate-200 transition-all duration-300"
                             >
-                                <h3 className="text-lg font-bold text-gray-900 mb-2">{faq.question}</h3>
-                                <p className="text-gray-600 leading-relaxed">{faq.answer}</p>
+                                <h3 className="text-lg font-bold text-slate-800 mb-2">{faq.question}</h3>
+                                <p className="text-slate-600 leading-relaxed">{faq.answer}</p>
                             </motion.div>
                         ))}
                     </div>

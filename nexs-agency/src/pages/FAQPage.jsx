@@ -104,7 +104,7 @@ const FAQPage = () => {
     };
 
     return (
-        <div className="min-h-screen bg-white font-sans text-gray-900 selection:bg-blue-600 selection:text-white overflow-hidden">
+        <div className="min-h-screen bg-white font-sans text-slate-800 selection:bg-blue-600 selection:text-white overflow-hidden">
             <Helmet>
                 <title>FAQ - Frequently Asked Questions | Nexspire Solutions</title>
                 <meta name="description" content="Get answers to common questions about Nexspire Solutions' software development services, technologies, project timelines, support, and more. Learn about our web, mobile, AI, and cloud solutions." />
@@ -129,7 +129,7 @@ const FAQPage = () => {
             {/* Hero Section */}
             <section className="relative min-h-[50vh] flex items-center pt-20 overflow-hidden bg-gray-950 text-white">
                 <div className="absolute inset-0 z-0">
-                    <div className="absolute inset-0 bg-gradient-to-br from-gray-900 via-blue-950 to-purple-950"></div>
+                    <div className="absolute inset-0 bg-slate-900"></div>
                     <div className="absolute inset-0 bg-[url('https://grainy-gradients.vercel.app/noise.svg')] opacity-20 mix-blend-overlay"></div>
                 </div>
 
@@ -145,9 +145,9 @@ const FAQPage = () => {
                         </span>
                         <h1 className="text-5xl md:text-7xl font-bold tracking-tighter leading-tight mb-8">
                             Frequently Asked <br />
-                            <span className="text-transparent bg-clip-text bg-gradient-to-r from-blue-400 via-purple-400 to-pink-400">Questions</span>
+                            <span className="text-[#D97706]">Questions</span>
                         </h1>
-                        <p className="text-xl text-gray-400 max-w-2xl mx-auto leading-relaxed">
+                        <p className="text-xl text-slate-400 max-w-2xl mx-auto leading-relaxed">
                             Find answers to common questions about our services, process, and how we can help your business grow.
                         </p>
                     </motion.div>
@@ -155,7 +155,7 @@ const FAQPage = () => {
             </section>
 
             {/* FAQ Section */}
-            <section className="py-20 bg-gray-50">
+            <section className="py-20 bg-[#FAF9F6]">
                 <div className="container-custom max-w-4xl">
                     {/* Breadcrumbs */}
                     <div className="mb-8">
@@ -170,13 +170,13 @@ const FAQPage = () => {
                                 placeholder="Search for answers..."
                                 value={searchQuery}
                                 onChange={(e) => setSearchQuery(e.target.value)}
-                                className="w-full px-6 py-4 pl-14 rounded-2xl bg-white border border-gray-200 focus:border-blue-500 focus:ring-2 focus:ring-blue-500/20 shadow-sm transition-all text-lg outline-none"
+                                className="w-full px-6 py-4 pl-14 rounded-2xl bg-white border border-slate-200 focus:border-[#0F766E] focus:ring-2 focus:ring-[#0F766E]/20 shadow-sm transition-all text-lg outline-none"
                             />
-                            <i className="ri-search-line absolute left-5 top-1/2 -translate-y-1/2 text-gray-400 text-xl"></i>
+                            <i className="ri-search-line absolute left-5 top-1/2 -translate-y-1/2 text-slate-400 text-xl"></i>
                             {searchQuery && (
                                 <button
                                     onClick={() => setSearchQuery('')}
-                                    className="absolute right-5 top-1/2 -translate-y-1/2 text-gray-400 hover:text-gray-600"
+                                    className="absolute right-5 top-1/2 -translate-y-1/2 text-slate-400 hover:text-slate-600"
                                 >
                                     <i className="ri-close-line text-xl"></i>
                                 </button>
@@ -191,8 +191,8 @@ const FAQPage = () => {
                                 key={category}
                                 onClick={() => setActiveCategory(category)}
                                 className={`px-5 py-2.5 rounded-full text-sm font-bold transition-all duration-300 ${activeCategory === category
-                                        ? 'bg-blue-600 text-white shadow-lg shadow-blue-500/30'
-                                        : 'bg-white text-gray-600 hover:bg-gray-100 border border-gray-200'
+                                        ? 'bg-blue-600 text-white shadow-lg shadow-lg'
+                                        : 'bg-white text-slate-600 hover:bg-gray-100 border border-slate-200'
                                     }`}
                             >
                                 {category}
@@ -201,12 +201,12 @@ const FAQPage = () => {
                     </div>
 
                     {/* Results count */}
-                    <div className="mb-4 text-sm text-gray-500">
+                    <div className="mb-4 text-sm text-slate-500">
                         Showing {filteredFaqs.length} of {faqs.length} questions
                     </div>
 
                     {/* FAQ List */}
-                    <div className="bg-white rounded-[2rem] shadow-xl border border-gray-100 overflow-hidden">
+                    <div className="bg-white rounded-[2rem] shadow-xl border border-slate-200 overflow-hidden">
                         <AnimatePresence mode="wait">
                             {filteredFaqs.length === 0 ? (
                                 <motion.div
@@ -215,8 +215,8 @@ const FAQPage = () => {
                                     className="p-12 text-center"
                                 >
                                     <i className="ri-search-eye-line text-6xl text-gray-200 mb-4 block"></i>
-                                    <h3 className="text-xl font-bold text-gray-900 mb-2">No results found</h3>
-                                    <p className="text-gray-500">Try adjusting your search or filter to find what you're looking for.</p>
+                                    <h3 className="text-xl font-bold text-slate-800 mb-2">No results found</h3>
+                                    <p className="text-slate-500">Try adjusting your search or filter to find what you're looking for.</p>
                                 </motion.div>
                             ) : (
                                 filteredFaqs.map((faq, index) => (
@@ -225,26 +225,26 @@ const FAQPage = () => {
                                         initial={{ opacity: 0, y: 10 }}
                                         animate={{ opacity: 1, y: 0 }}
                                         transition={{ delay: index * 0.03 }}
-                                        className="border-b border-gray-100 last:border-0"
+                                        className="border-b border-slate-200 last:border-0"
                                     >
                                         <button
                                             onClick={() => setExpandedIndex(expandedIndex === index ? null : index)}
-                                            className="w-full p-6 text-left flex items-start gap-4 hover:bg-gray-50 transition-colors"
+                                            className="w-full p-6 text-left flex items-start gap-4 hover:bg-[#FAF9F6] transition-colors"
                                         >
-                                            <span className="flex-shrink-0 w-8 h-8 rounded-lg bg-blue-100 text-blue-600 flex items-center justify-center font-bold text-sm">
+                                            <span className="flex-shrink-0 w-8 h-8 rounded-lg bg-[#0F766E]/10 text-[#0F766E] flex items-center justify-center font-bold text-sm">
                                                 Q
                                             </span>
                                             <div className="flex-1">
                                                 <div className="flex items-center gap-3 mb-1">
-                                                    <span className="text-xs font-medium px-2 py-0.5 rounded-full bg-gray-100 text-gray-500">
+                                                    <span className="text-xs font-medium px-2 py-0.5 rounded-full bg-gray-100 text-slate-500">
                                                         {faq.category}
                                                     </span>
                                                 </div>
-                                                <h3 className="text-lg font-bold text-gray-900 pr-8">
+                                                <h3 className="text-lg font-bold text-slate-800 pr-8">
                                                     {faq.question}
                                                 </h3>
                                             </div>
-                                            <i className={`ri-arrow-down-s-line text-2xl text-gray-400 transition-transform duration-300 ${expandedIndex === index ? 'rotate-180' : ''}`}></i>
+                                            <i className={`ri-arrow-down-s-line text-2xl text-slate-400 transition-transform duration-300 ${expandedIndex === index ? 'rotate-180' : ''}`}></i>
                                         </button>
 
                                         <AnimatePresence>
@@ -257,24 +257,24 @@ const FAQPage = () => {
                                                     className="overflow-hidden"
                                                 >
                                                     <div className="px-6 pb-6 pl-[4.5rem]">
-                                                        <p className="text-gray-600 leading-relaxed mb-4">
+                                                        <p className="text-slate-600 leading-relaxed mb-4">
                                                             {faq.answer}
                                                         </p>
 
                                                         {/* Helpful feedback */}
-                                                        <div className="flex items-center gap-4 pt-4 border-t border-gray-100">
-                                                            <span className="text-sm text-gray-400">Was this helpful?</span>
+                                                        <div className="flex items-center gap-4 pt-4 border-t border-slate-200">
+                                                            <span className="text-sm text-slate-400">Was this helpful?</span>
                                                             {helpfulFeedback[index] === undefined ? (
                                                                 <>
                                                                     <button
                                                                         onClick={() => handleFeedback(index, true)}
-                                                                        className="text-gray-400 hover:text-green-500 transition-colors"
+                                                                        className="text-slate-400 hover:text-green-500 transition-colors"
                                                                     >
                                                                         <i className="ri-thumb-up-line text-lg"></i>
                                                                     </button>
                                                                     <button
                                                                         onClick={() => handleFeedback(index, false)}
-                                                                        className="text-gray-400 hover:text-red-500 transition-colors"
+                                                                        className="text-slate-400 hover:text-red-500 transition-colors"
                                                                     >
                                                                         <i className="ri-thumb-down-line text-lg"></i>
                                                                     </button>
@@ -302,7 +302,7 @@ const FAQPage = () => {
             <section className="py-20 bg-white text-center">
                 <div className="container-custom">
                     <h2 className="text-4xl font-bold mb-6">Still have questions?</h2>
-                    <p className="text-xl text-gray-500 mb-10 max-w-2xl mx-auto">
+                    <p className="text-xl text-slate-500 mb-10 max-w-2xl mx-auto">
                         We're here to help! Contact us for a free consultation and let's discuss your project.
                     </p>
                     <Link

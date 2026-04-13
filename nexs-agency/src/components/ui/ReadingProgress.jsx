@@ -5,7 +5,7 @@ export default function ReadingProgress() {
 
     return (
         <motion.div
-            className="fixed top-0 left-0 right-0 h-1 bg-gradient-to-r from-blue-600 via-purple-600 to-pink-600 origin-left z-[60]"
+            className="fixed top-0 left-0 right-0 h-1 bg-[#0F766E] origin-left z-[60]"
             style={{ scaleX: scrollYProgress }}
         />
     );

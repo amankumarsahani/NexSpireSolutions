@@ -1,5 +1,4 @@
 import { useState, useEffect, memo } from 'react'
-import SectionBackground from './ui/SectionBackground'
 
 const teamMembers = [
   {
@@ -7,36 +6,33 @@ const teamMembers = [
     role: "Founder & Lead Developer",
     image: "https://images.unsplash.com/photo-1507003211169-0a1dd7228f2d?w=200&h=200&fit=crop&fm=webp",
     skills: ["React", "Node.js", "Python", "AWS"],
-    gradient: "from-blue-500 to-blue-600"
   },
   {
     name: "Anu Kumar",
     role: "Senior UI/UX Designer",
     image: "https://images.unsplash.com/photo-1506794778202-cad84cf45f1d?w=200&h=200&fit=crop&fm=webp",
     skills: ["Figma", "React", "Design Systems"],
-    gradient: "from-purple-500 to-purple-600"
   },
   {
     name: "Kshitij Bhardwaj",
     role: "Backend Architect",
     image: "https://images.unsplash.com/photo-1472099645785-5658abf4ff4e?w=200&h=200&fit=crop&fm=webp",
     skills: ["Vue.js", "Django", "PostgreSQL", "Docker"],
-    gradient: "from-green-500 to-green-600"
   }
 ];
 
 const stats = [
-  { number: "150+", label: "Projects Completed", description: "Successfully delivered across various industries" },
-  { number: "80+", label: "Happy Clients", description: "Long-term partnerships built on trust" },
-  { number: "98%", label: "Success Rate", description: "On-time delivery and quality assurance" },
-  { number: "24/7", label: "Support Available", description: "Round-the-clock technical assistance" }
+  { number: "150+", label: "Projects Completed", icon: "ri-bar-chart-box-line" },
+  { number: "80+", label: "Happy Clients", icon: "ri-heart-line" },
+  { number: "98%", label: "Success Rate", icon: "ri-flashlight-line" },
+  { number: "24/7", label: "Support Available", icon: "ri-customer-service-line" }
 ];
 
 const features = [
-  { icon: "⚡", title: "Agile Development", description: "Fast, iterative development approach for rapid delivery" },
-  { icon: "🛡️", title: "Quality Assurance", description: "Rigorous testing and quality control processes" },
-  { icon: "🚀", title: "Scalable Solutions", description: "Future-proof architecture that grows with your business" },
-  { icon: "💡", title: "Innovation Focus", description: "Cutting-edge technologies and creative problem solving" }
+  { icon: "ri-flashlight-line", title: "Agile Development", description: "Fast, iterative development approach for rapid delivery" },
+  { icon: "ri-shield-check-line", title: "Quality Assurance", description: "Rigorous testing and quality control processes" },
+  { icon: "ri-arrow-right-up-line", title: "Scalable Solutions", description: "Future-proof architecture that grows with your business" },
+  { icon: "ri-lightbulb-line", title: "Innovation Focus", description: "Cutting-edge technologies and creative problem solving" }
 ];
 
 const About = memo(function About() {
@@ -59,68 +55,58 @@ const About = memo(function About() {
   }, [])
 
   return (
-    <section id="about" className="relative py-20 bg-gradient-to-br from-gray-50 via-slate-50 to-indigo-50 overflow-hidden">
-      <SectionBackground gridId="about-grid" />
+    <section id="about" className="relative py-20 bg-white overflow-hidden">
 
       <div className="relative z-10 max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
 
-        {/* Professional Header */}
-        <div className={`text-center mb-16 transition-all duration-1000 transform ${isVisible ? 'translate-y-0 opacity-100' : 'translate-y-8 opacity-0'
+        <div className={`text-left mb-16 transition-all duration-1000 transform ${isVisible ? 'translate-y-0 opacity-100' : 'translate-y-8 opacity-0'
           }`}>
-          <div className="inline-flex items-center bg-blue-100/80 backdrop-blur-sm border border-blue-200/60 text-blue-700 text-sm font-semibold px-6 py-3 rounded-full mb-6 shadow-lg">
-            <div className="w-2 h-2 bg-blue-600 rounded-full mr-2 animate-pulse"></div>
-            More Than An Agency
-          </div>
+          <span className="text-sm font-semibold text-[#0F766E] uppercase tracking-wider">More Than An Agency</span>
 
-          <h2 className="text-4xl md:text-5xl lg:text-6xl font-bold text-gray-900 mb-6 leading-tight">
+          <h2 className="text-4xl md:text-5xl lg:text-6xl font-bold text-slate-800 mb-6 mt-4 leading-tight">
             We Are Your Technical
-            <span className="block bg-gradient-to-r from-blue-600 to-purple-600 bg-clip-text text-transparent mt-2">
+            <span className="block text-[#0F766E] mt-2">
               Co-Founders & Partners
             </span>
           </h2>
 
-          <p className="text-xl text-gray-600 max-w-3xl mx-auto leading-relaxed">
+          <p className="text-xl text-slate-600 max-w-3xl leading-relaxed">
             Most agencies just take tickets. We take ownership. We build the infrastructure that allows visionary companies to scale without limits.
           </p>
         </div>
 
-        {/* Main Content Grid */}
-        <div className={`grid lg:grid-cols-2 gap-16 items-center mb-20 transition-all duration-1000 delay-300 transform ${isVisible ? 'translate-y-0 opacity-100' : 'translate-y-8 opacity-0'
+        <div className={`grid lg:grid-cols-12 gap-16 items-center mb-20 transition-all duration-1000 delay-300 transform ${isVisible ? 'translate-y-0 opacity-100' : 'translate-y-8 opacity-0'
           }`}>
 
-          {/* Left: Company Image */}
-          <div className="relative group">
-            <div className="absolute -inset-4 bg-gradient-to-r from-blue-400/20 to-purple-400/20 rounded-2xl blur-2xl opacity-0 group-hover:opacity-100 transition-opacity duration-700"></div>
-            <div className="relative bg-white/80 backdrop-blur-sm rounded-2xl p-6 shadow-xl border border-white/50">
+          <div className="lg:col-span-5 relative group">
+            <div className="relative bg-white rounded-2xl p-6 shadow-xl border border-slate-200">
               <img
                 src="https://images.unsplash.com/photo-1522071820081-009f0129c71c?w=600&h=400&fit=crop&q=80&fm=webp"
                 alt="Our professional team at work"
                 loading="lazy"
-                className="rounded-xl shadow-lg object-cover w-full h-80 transition-transform duration-700 group-hover:scale-[1.02]"
+                className="rounded-xl shadow-lg object-cover w-full h-80"
               />
 
-              {/* Floating Stats Cards */}
-              <div className="absolute -bottom-4 -right-4 bg-white/95 backdrop-blur-sm rounded-xl p-4 shadow-xl border border-white/30 transform group-hover:scale-105 transition-all duration-500">
+              <div className="absolute -bottom-4 -right-4 bg-white rounded-xl p-4 shadow-xl border border-slate-200">
                 <div className="text-center">
-                  <div className="text-2xl font-bold text-blue-600">5+</div>
-                  <div className="text-xs text-gray-600 font-medium">Years Experience</div>
+                  <div className="text-2xl font-bold text-[#0F766E]">5+</div>
+                  <div className="text-xs text-slate-600 font-medium">Years Experience</div>
                 </div>
               </div>
 
-              <div className="absolute -top-4 -left-4 bg-white/95 backdrop-blur-sm rounded-xl p-4 shadow-xl border border-white/30 transform group-hover:scale-105 transition-all duration-500">
+              <div className="absolute -top-4 -left-4 bg-white rounded-xl p-4 shadow-xl border border-slate-200">
                 <div className="text-center">
-                  <div className="text-2xl font-bold text-purple-600">150+</div>
-                  <div className="text-xs text-gray-600 font-medium">Projects Done</div>
+                  <div className="text-2xl font-bold text-[#D97706]">150+</div>
+                  <div className="text-xs text-slate-600 font-medium">Projects Done</div>
                 </div>
               </div>
             </div>
           </div>
 
-          {/* Right: Company Information */}
-          <div className="space-y-8">
+          <div className="lg:col-span-7 space-y-8">
             <div>
-              <h3 className="text-3xl font-bold text-gray-900 mb-6">Who We Are</h3>
-              <div className="space-y-4 text-lg text-gray-700 leading-relaxed">
+              <h3 className="text-3xl font-bold text-slate-800 mb-6">Who We Are</h3>
+              <div className="space-y-4 text-lg text-slate-600 leading-relaxed">
                 <p>
                   With over 5 years of experience in the software development industry, Nexspire Solution has
                   established itself as a <strong>leading AI-powered development agency</strong>, trusted by Fortune 500 companies
@@ -134,24 +120,23 @@ const About = memo(function About() {
               </div>
             </div>
 
-            {/* Mission & Vision */}
-            <div className="bg-white/70 backdrop-blur-sm rounded-xl p-6 border border-white/50 shadow-lg">
+            <div className="bg-[#FAF9F6] rounded-xl p-6 border border-slate-200">
               <div className="grid md:grid-cols-2 gap-6">
                 <div>
-                  <h4 className="text-lg font-semibold text-gray-900 mb-2 flex items-center">
-                    <span className="w-2 h-2 bg-blue-600 rounded-full mr-2"></span>
+                  <h4 className="text-lg font-semibold text-slate-800 mb-2 flex items-center">
+                    <span className="w-2 h-2 bg-[#0F766E] rounded-full mr-2"></span>
                     Our Mission
                   </h4>
-                  <p className="text-sm text-gray-600">
+                  <p className="text-sm text-slate-600">
                     To eliminate technical debt and accelerate go-to-market speed for ambitious global brands.
                   </p>
                 </div>
                 <div>
-                  <h4 className="text-lg font-semibold text-gray-900 mb-2 flex items-center">
-                    <span className="w-2 h-2 bg-purple-600 rounded-full mr-2"></span>
+                  <h4 className="text-lg font-semibold text-slate-800 mb-2 flex items-center">
+                    <span className="w-2 h-2 bg-[#D97706] rounded-full mr-2"></span>
                     Our Vision
                   </h4>
-                  <p className="text-sm text-gray-600">
+                  <p className="text-sm text-slate-600">
                     To be the infrastructure partner behind the next generation of Fortune 500 digital products.
                   </p>
                 </div>
@@ -160,187 +145,83 @@ const About = memo(function About() {
           </div>
         </div>
 
-        {/* Creative Why Choose Nexspire Solution */}
         <div className={`mb-24 transition-all duration-1000 delay-500 transform ${isVisible ? 'translate-y-0 opacity-100' : 'translate-y-8 opacity-0'
           }`}>
-          <div className="text-center mb-16">
-            <div className="inline-flex items-center bg-white/60 backdrop-blur-lg border border-gray-200/50 text-gray-700 text-sm font-semibold px-6 py-3 rounded-2xl mb-8 shadow-lg">
-              <div className="w-2 h-2 bg-blue-500 rounded-full mr-2"></div>
-              Why Choose Nexspire Solution
-            </div>
-            <h3 className="text-3xl md:text-4xl font-bold text-gray-900 mb-6">
-              What Makes Us <span className="text-blue-600">Different</span>
+          <div className="text-left mb-16">
+            <span className="text-sm font-semibold text-[#0F766E] uppercase tracking-wider">Why Choose Nexspire Solution</span>
+            <h3 className="text-3xl md:text-4xl font-bold text-slate-800 mb-6 mt-4">
+              What Makes Us <span className="text-[#D97706]">Different</span>
             </h3>
-            <p className="text-lg text-gray-600 max-w-2xl mx-auto">
+            <p className="text-lg text-slate-600 max-w-2xl">
               Four core principles that drive our success and your satisfaction
             </p>
           </div>
 
-          {/* Horizontal Layout */}
-          <div className="max-w-6xl mx-auto">
+          <div className="max-w-6xl">
             <div className="grid md:grid-cols-2 gap-8">
-              {features.map((feature, index) => {
-                const isLeft = index % 2 === 0;
-                const featureIcons = ['ri-flashlight-line', 'ri-shield-check-line', 'ri-rocket-2-line', 'ri-lightbulb-line'];
-                const colors = ['blue', 'purple', 'green', 'orange'];
-
-                return (
-                  <div key={index} className={`flex ${isLeft ? 'flex-row' : 'flex-row-reverse'} items-center gap-6 group`}>
-                    {/* Icon Section */}
-                    <div className="flex-shrink-0">
-                      <div className={`relative w-16 h-16 bg-gradient-to-br from-${colors[index]}-400 to-${colors[index]}-600 rounded-xl flex items-center justify-center shadow-lg transform rotate-3 group-hover:rotate-6 transition-transform duration-300`}>
-                        <i className={`${featureIcons[index]} text-2xl text-white`}></i>
-                        {/* Floating decoration */}
-                        <div className={`absolute -top-1 -right-1 w-4 h-4 bg-${colors[index]}-300 rounded-full opacity-80 animate-bounce`}></div>
-                      </div>
-                    </div>
-
-                    {/* Content Section */}
-                    <div className={`flex-1 ${isLeft ? 'text-left' : 'text-right'}`}>
-                      <div className={`bg-white/70 backdrop-blur-sm rounded-xl p-6 shadow-lg border border-white/50 ${isLeft ? 'ml-4' : 'mr-4'}`}>
-                        <h4 className={`text-xl font-bold text-gray-900 mb-3 ${isLeft ? 'text-left' : 'text-right'}`}>
-                          {feature.title}
-                        </h4>
-                        <p className={`text-gray-600 leading-relaxed ${isLeft ? 'text-left' : 'text-right'}`}>
-                          {feature.description}
-                        </p>
-
-                        {/* Progress bar */}
-                        <div className={`mt-4 ${isLeft ? 'text-left' : 'text-right'}`}>
-                          <div className={`h-1 bg-gray-200 rounded-full ${isLeft ? '' : 'ml-auto'} w-24`}>
-                            <div className={`h-full bg-gradient-to-r from-${colors[index]}-400 to-${colors[index]}-600 rounded-full animate-pulse`} style={{ width: `${85 + index * 5}%` }}></div>
-                          </div>
-                        </div>
-                      </div>
-
-                      {/* Connection Line */}
-                      <div className={`hidden md:block absolute top-1/2 ${isLeft ? 'right-0 translate-x-3' : 'left-0 -translate-x-3'} w-6 h-0.5 bg-gradient-to-r from-${colors[index]}-300 to-${colors[index]}-500`}></div>
+              {features.map((feature, index) => (
+                <div key={index} className="flex items-start gap-6 group">
+                  <div className="flex-shrink-0">
+                    <div className="relative w-16 h-16 bg-[#0F766E] rounded-xl flex items-center justify-center shadow-lg">
+                      <i className={`${feature.icon} text-2xl text-white`}></i>
                     </div>
                   </div>
-                )
-              })}
-            </div>
 
-            {/* Central Design Element */}
-            <div className="absolute left-1/2 top-1/2 transform -translate-x-1/2 -translate-y-1/2 hidden lg:block">
-              <div className="w-32 h-32 bg-gradient-to-br from-blue-100 to-purple-100 rounded-full opacity-20 animate-pulse"></div>
-              <div className="absolute inset-0 w-24 h-24 bg-white/50 rounded-full top-4 left-4 backdrop-blur-sm border border-white/30"></div>
-              <div className="absolute inset-0 w-16 h-16 bg-gradient-to-br from-blue-400 to-purple-500 rounded-full top-8 left-8 flex items-center justify-center">
-                <i className="ri-award-line text-2xl text-white"></i>
-              </div>
+                  <div className="flex-1">
+                    <div className="bg-white rounded-xl p-6 shadow-lg border border-slate-200 hover:shadow-xl hover:-translate-y-0.5 transition-all duration-300">
+                      <h4 className="text-xl font-bold text-slate-800 mb-3">
+                        {feature.title}
+                      </h4>
+                      <p className="text-slate-600 leading-relaxed">
+                        {feature.description}
+                      </p>
+                    </div>
+                  </div>
+                </div>
+              ))}
             </div>
           </div>
         </div>
 
-        {/* Ultra Modern Track Record Section */}
         <div className={`mb-24 transition-all duration-1000 delay-700 transform ${isVisible ? 'translate-y-0 opacity-100' : 'translate-y-8 opacity-0'
           }`}>
           <div className="text-center mb-16">
-            <div className="inline-flex items-center bg-gradient-to-r from-indigo-500/10 via-purple-500/10 to-pink-500/10 backdrop-blur-xl border border-white/20 text-gray-800 text-sm font-bold px-8 py-4 rounded-full mb-8 shadow-2xl hover:shadow-indigo-500/20 transition-all duration-500">
-              <div className="w-3 h-3 bg-gradient-to-r from-indigo-500 to-purple-500 rounded-full mr-3 animate-pulse shadow-lg"></div>
-              Performance Metrics
-            </div>
-            <h3 className="text-3xl md:text-4xl font-bold text-gray-900 mb-6 leading-tight tracking-tight">
-              <span className="block text-gray-800 font-bold">Numbers That</span>
-              <span className="block bg-gradient-to-r from-indigo-600 via-purple-600 to-pink-600 bg-clip-text text-transparent mt-2 font-bold">
-                Define Excellence
-              </span>
+            <span className="text-sm font-semibold text-[#0F766E] uppercase tracking-wider">Performance Metrics</span>
+            <h3 className="text-3xl md:text-4xl font-bold text-slate-800 mb-6 mt-4 leading-tight tracking-tight">
+              Numbers That Define <span className="text-[#0F766E]">Excellence</span>
             </h3>
-            <p className="text-xl text-gray-600 max-w-3xl mx-auto leading-relaxed">
+            <p className="text-xl text-slate-600 max-w-3xl mx-auto leading-relaxed">
               Our achievements speak volumes about our dedication to delivering exceptional results
             </p>
           </div>
 
           <div className="grid sm:grid-cols-2 lg:grid-cols-4 gap-6 sm:gap-8 lg:gap-12">
-            {stats.map((stat, index) => {
-              const colors = [
-                { primary: '#6366f1', secondary: '#8b5cf6', bg: 'from-indigo-500/20 to-purple-500/20' },
-                { primary: '#8b5cf6', secondary: '#ec4899', bg: 'from-purple-500/20 to-pink-500/20' },
-                { primary: '#10b981', secondary: '#06b6d4', bg: 'from-emerald-500/20 to-cyan-500/20' },
-                { primary: '#f59e0b', secondary: '#ef4444', bg: 'from-amber-500/20 to-red-500/20' }
-              ];
-              const icons = [
-                'ri-bar-chart-box-line',
-                'ri-rocket-line',
-                'ri-flashlight-line',
-                'ri-rocket-2-line'
-              ];
-
-              return (
-                <div key={index} className="group relative">
-                  {/* Main Container */}
-                  <div className="relative">
-                    {/* Background Glow */}
-                    <div className={`absolute -inset-4 bg-gradient-to-r ${colors[index].bg} rounded-3xl blur-2xl opacity-60 transition-all duration-700`}></div>
-
-                    {/* Glass Card */}
-                    <div className="relative bg-white/10 backdrop-blur-2xl rounded-3xl p-8 border border-white/40 transition-all duration-500 transform -translate-y-2">
-
-                      {/* Icon */}
-                      <div className="text-center mb-6">
-                        <div className="relative w-16 h-16 mx-auto mb-4">
-                          <div
-                            className="w-full h-full rounded-2xl flex items-center justify-center shadow-xl scale-110 transition-transform duration-300"
-                            style={{
-                              background: `linear-gradient(135deg, ${colors[index].primary}, ${colors[index].secondary})`
-                            }}
-                          >
-                            <i className={`${icons[index]} text-3xl text-white`}></i>
-                          </div>
-                          {/* Icon Glow */}
-                          <div
-                            className="absolute inset-0 rounded-2xl blur-lg opacity-40"
-                            style={{
-                              background: `linear-gradient(135deg, ${colors[index].primary}, ${colors[index].secondary})`
-                            }}
-                          ></div>
-                        </div>
+            {stats.map((stat, index) => (
+              <div key={index} className="group relative">
+                <div className="relative bg-white rounded-2xl p-8 border border-slate-200 shadow-lg hover:shadow-xl hover:-translate-y-1 transition-all duration-300">
+                  <div className="text-center mb-6">
+                    <div className="relative w-16 h-16 mx-auto mb-4">
+                      <div className="w-full h-full rounded-2xl bg-[#0F766E] flex items-center justify-center shadow-lg">
+                        <i className={`${stat.icon} text-3xl text-white`}></i>
                       </div>
-
-                      {/* Animated Counter */}
-                      <div className="text-center mb-6">
-                        <div className="relative">
-                          <div
-                            className="text-5xl font-black mb-2 scale-105 transition-all duration-300"
-                            style={{
-                              background: `linear-gradient(135deg, ${colors[index].primary}, ${colors[index].secondary})`,
-                              WebkitBackgroundClip: 'text',
-                              WebkitTextFillColor: 'transparent',
-                              backgroundClip: 'text'
-                            }}
-                          >
-                            {stat.number}
-                          </div>
-
-                          {/* Animated Underline */}
-                          <div
-                            className="h-1 w-16 mx-auto rounded-full transition-all duration-500"
-                            style={{ backgroundColor: colors[index].primary }}
-                          ></div>
-                        </div>
-                      </div>
-
-                      {/* Label */}
-                      <div className="text-center">
-                        <h4 className="text-lg font-bold text-gray-900 transition-colors duration-300">
-                          {stat.label}
-                        </h4>
-                      </div>
-
-                      {/* Floating Elements */}
-                      <div
-                        className="absolute top-4 right-4 w-4 h-4 rounded-full opacity-70 transition-all duration-500 animate-pulse"
-                        style={{ backgroundColor: colors[index].primary }}
-                      ></div>
-                      <div
-                        className="absolute bottom-4 left-4 w-3 h-3 rounded-full opacity-50 transition-all duration-700"
-                        style={{ backgroundColor: colors[index].secondary }}
-                      ></div>
                     </div>
                   </div>
+
+                  <div className="text-center mb-4">
+                    <div className="text-5xl font-bold text-[#D97706] mb-2">
+                      {stat.number}
+                    </div>
+                    <div className="h-1 w-16 mx-auto rounded-full bg-[#0F766E]"></div>
+                  </div>
+
+                  <div className="text-center">
+                    <h4 className="text-lg font-bold text-slate-800">
+                      {stat.label}
+                    </h4>
+                  </div>
                 </div>
-              )
-            })}
+              </div>
+            ))}
           </div>
         </div>
 

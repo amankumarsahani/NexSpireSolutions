@@ -12,7 +12,7 @@ export default function ServerSnapshot({ servers }) {
                     <div key={server.id} className="rounded-3xl border border-slate-200 bg-slate-50/80 p-5">
                         <div className="flex flex-wrap items-center gap-3">
                             <h3 className="text-lg font-semibold text-slate-900">{server.name}</h3>
-                            {server.is_primary ? <span className="rounded-full bg-blue-100 px-3 py-1 text-xs font-semibold text-blue-700">Primary</span> : null}
+                            {server.is_primary ? <span className="rounded-full bg-[#0F766E]/10 px-3 py-1 text-xs font-semibold text-[#0F766E]">Primary</span> : null}
                             <span className={`rounded-full px-3 py-1 text-xs font-semibold ${server.is_active ? 'bg-emerald-100 text-emerald-700' : 'bg-slate-200 text-slate-700'}`}>
                                 {server.is_active ? 'Active' : 'Inactive'}
                             </span>

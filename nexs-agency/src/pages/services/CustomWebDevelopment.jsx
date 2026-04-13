@@ -1,12 +1,12 @@
 import ServicePageTemplate from '../../components/ServicePageTemplate';
 
 const data = {
-    themeColor: 'blue',
+    themeColor: 'teal',
     badge: { icon: 'ri-code-s-slash-line', label: 'Web Engineering' },
     hero: {
         h1Line1: 'Scalable',
         h1Line2: 'Web Applications.',
-        gradient: 'from-blue-400 via-purple-400 to-pink-400',
+        gradient: 'from-[#0F766E] to-[#0D6B63]',
         paragraph: 'We define the digital standard for your business with robust, secure, and high-performance web solutions tailored to your unique goals.',
         ctaText: 'Start Project',
         bgImage: 'https://images.unsplash.com/photo-1451187580459-43490279c0fa',

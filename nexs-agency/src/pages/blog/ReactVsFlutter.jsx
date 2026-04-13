@@ -27,7 +27,7 @@ const ReactVsFlutter = () => {
     };
 
     return (
-        <div className="min-h-screen bg-white font-sans text-gray-900 selection:bg-purple-600 selection:text-white pt-20">
+        <div className="min-h-screen bg-white font-sans text-slate-800 selection:bg-purple-600 selection:text-white pt-20">
             <Helmet>
                 <title>React Native vs Flutter 2026: Comparison Guide | Nexspire Blog</title>
                 <meta name="description" content="Deciding between React Native and Flutter? We compare performance, developer cost, and time-to-market to help you choose the right stack for your mobile app in 2026." />
@@ -50,10 +50,10 @@ const ReactVsFlutter = () => {
                     <span className="inline-block px-4 py-1.5 bg-purple-100 text-purple-700 font-bold rounded-full text-sm mb-6">
                         Mobile Development
                     </span>
-                    <h1 className="text-4xl md:text-6xl font-bold leading-tight mb-6 text-gray-900">
+                    <h1 className="text-4xl md:text-6xl font-bold leading-tight mb-6 text-slate-800">
                         React Native vs. Flutter: A CEO's Guide for 2026
                     </h1>
-                    <div className="flex items-center justify-center gap-6 text-gray-500 font-medium">
+                    <div className="flex items-center justify-center gap-6 text-slate-500 font-medium">
                         <div className="flex items-center gap-2">
                             <div className="w-8 h-8 rounded-full bg-purple-600 text-white flex items-center justify-center font-bold">K</div>
                             <span>Kshitij Bhardwaj</span>
@@ -76,7 +76,7 @@ const ReactVsFlutter = () => {
                 </div>
 
                 <div className="prose prose-lg prose-purple mx-auto">
-                    <p className="lead text-xl text-gray-600 mb-8">
+                    <p className="lead text-xl text-slate-600 mb-8">
                         The cross-platform mobile development war has two main contenders: Meta's React Native and Google's Flutter. Both allow you to build iOS and Android apps from a single codebase, but they approach it very differently.
                     </p>
 
@@ -103,7 +103,7 @@ const ReactVsFlutter = () => {
                         <li><strong>Flutter:</strong> Uses bespoke widgets. You can make pixel-perfect designs that look exactly the same on both platforms. Great for strong brand identity.</li>
                     </ul>
 
-                    <div className="bg-purple-50 border-l-4 border-purple-600 p-8 my-8 rounded-r-xl">
+                    <div className="bg-[#FAF9F6] border-l-4 border-purple-600 p-8 my-8 rounded-r-xl">
                         <h4 className="text-xl font-bold text-purple-900 mb-2">Unsure which to pick?</h4>
                         <p className="text-purple-800 mb-0">
                             Our mobile architects can assess your specific needs. <Link to="/services/mobile-app-development" className="underline font-bold">Book a technical consultation</Link>.
@@ -118,7 +118,7 @@ const ReactVsFlutter = () => {
                     <h2>Verdict: Which one for 2026?</h2>
 
                     <div className="grid md:grid-cols-2 gap-6 my-8">
-                        <div className="p-6 bg-blue-50 rounded-xl">
+                        <div className="p-6 bg-[#FAF9F6] rounded-xl">
                             <h4 className="font-bold text-blue-800 mb-2">Choose React Native if:</h4>
                             <ul className="text-sm list-disc pl-4 text-blue-900">
                                 <li>You already have a web team (React).</li>
@@ -143,7 +143,7 @@ const ReactVsFlutter = () => {
             </article>
 
             {/* Internal Linking to Services */}
-            <div className="bg-gray-50 py-16">
+            <div className="bg-[#FAF9F6] py-16">
                 <div className="container-custom">
                     <h2 className="text-3xl font-bold text-center mb-12">Build Your Next App</h2>
                     <RelatedServices currentService="Mobile App Development" />

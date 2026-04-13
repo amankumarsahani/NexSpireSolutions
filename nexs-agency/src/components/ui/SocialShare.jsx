@@ -46,14 +46,14 @@ export default function SocialShare({ url, title, className = '' }) {
 
     return (
         <div className={`flex items-center gap-2 ${className}`}>
-            <span className="text-sm font-medium text-gray-500 mr-2">Share:</span>
+            <span className="text-sm font-medium text-slate-500 mr-2">Share:</span>
             {shareLinks.map((link) => (
                 <a
                     key={link.name}
                     href={link.href}
                     target="_blank"
                     rel="noopener noreferrer"
-                    className={`w-10 h-10 rounded-full bg-gray-100 flex items-center justify-center text-gray-600 transition-all duration-300 ${link.color}`}
+                    className={`w-10 h-10 rounded-full bg-gray-100 flex items-center justify-center text-slate-600 transition-all duration-300 ${link.color}`}
                     title={`Share on ${link.name}`}
                 >
                     <i className={`${link.icon} text-lg`}></i>
@@ -63,7 +63,7 @@ export default function SocialShare({ url, title, className = '' }) {
                 onClick={handleCopyLink}
                 className={`w-10 h-10 rounded-full flex items-center justify-center transition-all duration-300 ${copied
                         ? 'bg-green-500 text-white'
-                        : 'bg-gray-100 text-gray-600 hover:bg-gray-200'
+                        : 'bg-gray-100 text-slate-600 hover:bg-gray-200'
                     }`}
                 title={copied ? 'Copied!' : 'Copy link'}
             >
@@ -119,7 +119,7 @@ export function FloatingSocialShare({ url, title }) {
                     href={link.href}
                     target="_blank"
                     rel="noopener noreferrer"
-                    className={`w-10 h-10 rounded-full bg-white shadow-lg border border-gray-100 flex items-center justify-center text-gray-500 transition-all duration-300 hover:text-white hover:scale-110 ${link.color}`}
+                    className={`w-10 h-10 rounded-full bg-white shadow-lg border border-slate-200 flex items-center justify-center text-slate-500 transition-all duration-300 hover:text-white  ${link.color}`}
                     title={`Share on ${link.name}`}
                 >
                     <i className={`${link.icon} text-lg`}></i>
@@ -127,9 +127,9 @@ export function FloatingSocialShare({ url, title }) {
             ))}
             <button
                 onClick={handleCopyLink}
-                className={`w-10 h-10 rounded-full shadow-lg border flex items-center justify-center transition-all duration-300 hover:scale-110 ${copied
+                className={`w-10 h-10 rounded-full shadow-lg border flex items-center justify-center transition-all duration-300  ${copied
                         ? 'bg-green-500 text-white border-green-500'
-                        : 'bg-white text-gray-500 border-gray-100 hover:bg-gray-100'
+                        : 'bg-white text-slate-500 border-slate-200 hover:bg-gray-100'
                     }`}
                 title={copied ? 'Copied!' : 'Copy link'}
             >

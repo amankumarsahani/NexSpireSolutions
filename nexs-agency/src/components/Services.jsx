@@ -1,37 +1,28 @@
 import { useState, useEffect, useRef, useCallback, memo } from 'react'
 import { Link } from 'react-router-dom'
-import SectionBackground from './ui/SectionBackground'
 
 const ServiceCard = memo(function ServiceCard({ service }) {
-  const [isHovered, setIsHovered] = useState(false)
   return (
     <div
-      className={`group relative bg-white/90 backdrop-blur-md rounded-2xl p-6 sm:p-8 shadow-lg hover:shadow-xl transition-all duration-500 transform hover:-translate-y-2 border border-white/60 overflow-hidden ${isHovered ? 'scale-[1.02] shadow-2xl' : ''}`}
-      onMouseEnter={() => setIsHovered(true)}
-      onMouseLeave={() => setIsHovered(false)}
+      className="group relative bg-white rounded-2xl p-6 sm:p-8 shadow-lg hover:shadow-xl transition-all duration-300 hover:-translate-y-1 border border-slate-200 overflow-hidden"
     >
-      <div className={`absolute inset-0 ${service.bgPattern} opacity-0 group-hover:opacity-20 transition-opacity duration-700`}></div>
-      <div className={`absolute top-0 left-0 w-full h-1 bg-gradient-to-r ${service.gradient}`}></div>
-      <div className={`absolute bottom-0 right-0 w-1/2 h-0.5 bg-gradient-to-l ${service.gradient} opacity-60`}></div>
+      <div className="absolute top-0 left-0 w-full h-1 bg-[#0F766E]"></div>
 
       <div className="relative mb-8">
-        <div className={`relative w-16 h-16 sm:w-20 sm:h-20 bg-gradient-to-br ${service.gradient} rounded-3xl flex items-center justify-center group-hover:scale-110 group-hover:rotate-3 transition-all duration-300 shadow-xl group-hover:shadow-2xl`}>
-          <i className={`${service.icon} text-2xl sm:text-3xl text-white group-hover:scale-110 transition-transform duration-300`}></i>
-          <div className={`absolute inset-0 bg-gradient-to-br ${service.gradient} rounded-3xl blur-md opacity-0 group-hover:opacity-30 transition-opacity duration-300`}></div>
+        <div className="relative w-16 h-16 sm:w-20 sm:h-20 bg-[#0F766E] rounded-2xl flex items-center justify-center shadow-lg">
+          <i className={`${service.icon} text-2xl sm:text-3xl text-white`}></i>
         </div>
-        <div className="absolute -top-1 -right-1 w-4 h-4 bg-gradient-to-r from-yellow-400 to-orange-500 rounded-full opacity-0 group-hover:opacity-100 transition-all duration-300 animate-bounce shadow-lg"></div>
-        <div className="absolute -bottom-1 -left-1 w-3 h-3 bg-gradient-to-r from-emerald-400 to-cyan-500 rounded-full opacity-0 group-hover:opacity-100 transition-all duration-300 animate-bounce shadow-lg" style={{ animationDelay: '0.2s' }}></div>
       </div>
 
-      <h3 className="relative z-10 text-xl sm:text-2xl font-bold text-gray-900 mb-3 sm:mb-4 group-hover:text-gray-800 transition-colors duration-300">
-        <Link to={service.link} className="hover:text-indigo-600 transition-colors">{service.title}</Link>
+      <h3 className="relative z-10 text-xl sm:text-2xl font-bold text-slate-800 mb-3 sm:mb-4">
+        <Link to={service.link} className="hover:text-[#0F766E] transition-colors">{service.title}</Link>
       </h3>
-      <p className="relative z-10 text-gray-600 mb-4 sm:mb-6 leading-relaxed group-hover:text-gray-700 transition-colors duration-300 text-sm sm:text-base">{service.description}</p>
+      <p className="relative z-10 text-slate-600 mb-4 sm:mb-6 leading-relaxed text-sm sm:text-base">{service.description}</p>
 
       <ul className="relative z-10 space-y-2 sm:space-y-3 mb-4 sm:mb-6">
         {service.features.map((feature, featureIndex) => (
-          <li key={featureIndex} className="flex items-center text-sm text-gray-700 group-hover:text-gray-800 transition-colors duration-300">
-            <div className={`w-5 h-5 bg-gradient-to-r ${service.gradient} rounded-full flex items-center justify-center mr-4 group-hover:scale-110 transition-transform duration-300 shadow-md`}>
+          <li key={featureIndex} className="flex items-center text-sm text-slate-700">
+            <div className="w-5 h-5 bg-[#0F766E] rounded-full flex items-center justify-center mr-4 shadow-sm">
               <i className="ri-check-line text-white text-xs"></i>
             </div>
             <span className="font-semibold">{feature}</span>
@@ -39,13 +30,10 @@ const ServiceCard = memo(function ServiceCard({ service }) {
         ))}
       </ul>
 
-      <Link to={service.link} className={`relative z-10 inline-flex items-center text-sm font-bold bg-gradient-to-r ${service.gradient} bg-clip-text text-transparent hover:opacity-80 transition-opacity duration-300`}>
+      <Link to={service.link} className="relative z-10 inline-flex items-center text-sm font-bold text-[#0F766E] hover:opacity-80 transition-opacity duration-300">
         Learn More
-        <i className="ri-arrow-right-line ml-1 text-indigo-500"></i>
+        <i className="ri-arrow-right-line ml-1 text-[#0F766E]"></i>
       </Link>
-
-      <div className={`absolute inset-0 bg-gradient-to-br ${service.gradient} opacity-0 group-hover:opacity-5 transition-opacity duration-500 rounded-2xl`}></div>
-      <div className="absolute inset-0 rounded-2xl opacity-0 group-hover:opacity-100 transition-opacity duration-500" style={{ background: 'linear-gradient(145deg, transparent 0%, rgba(255,255,255,0.1) 50%, transparent 100%)', backdropFilter: 'blur(1px)' }}></div>
     </div>
   )
 })
@@ -56,9 +44,6 @@ const services = [
     title: "Web Development",
     description: "Modern, responsive websites built with cutting-edge technologies and industry best practices for optimal performance.",
     features: ["React & Next.js", "Node.js & Python", "Mobile-First Design", "Performance Optimization"],
-    gradient: "from-blue-500 to-cyan-500",
-    bgPattern: "bg-blue-50",
-    accentColor: "blue",
     link: "/services/custom-web-development"
   },
   {
@@ -66,9 +51,6 @@ const services = [
     title: "Mobile Apps",
     description: "Native and cross-platform mobile applications that deliver exceptional user experiences across all devices.",
     features: ["iOS & Android", "React Native", "Flutter Development", "App Store Deployment"],
-    gradient: "from-purple-500 to-pink-500",
-    bgPattern: "bg-purple-50",
-    accentColor: "purple",
     link: "/services/mobile-app-development"
   },
   {
@@ -76,9 +58,6 @@ const services = [
     title: "Cloud Solutions",
     description: "Scalable cloud infrastructure and DevOps solutions that grow with your business needs and requirements.",
     features: ["AWS & Azure", "Docker & Kubernetes", "CI/CD Pipelines", "Auto-scaling Systems"],
-    gradient: "from-green-500 to-teal-500",
-    bgPattern: "bg-green-50",
-    accentColor: "green",
     link: "/services/cloud-solutions"
   },
   {
@@ -86,9 +65,6 @@ const services = [
     title: "UI/UX Design",
     description: "Beautiful, intuitive designs that enhance user experience and drive engagement through thoughtful interface design.",
     features: ["User Research", "Interactive Prototypes", "Design Systems", "Accessibility Focus"],
-    gradient: "from-orange-500 to-red-500",
-    bgPattern: "bg-orange-50",
-    accentColor: "orange",
     link: "/services"
   },
   {
@@ -96,9 +72,6 @@ const services = [
     title: "E-commerce Solutions",
     description: "Complete e-commerce platforms with advanced payment integration and comprehensive inventory management systems.",
     features: ["Custom E-commerce", "Payment Integration", "Inventory Management", "Analytics Dashboard"],
-    gradient: "from-indigo-500 to-blue-500",
-    bgPattern: "bg-indigo-50",
-    accentColor: "indigo",
     link: "/services/ecommerce-development"
   },
   {
@@ -106,9 +79,6 @@ const services = [
     title: "Security & Testing",
     description: "Comprehensive security audits and rigorous testing protocols to ensure your applications are secure and reliable.",
     features: ["Security Audits", "Penetration Testing", "Code Quality Reviews", "Compliance Standards"],
-    gradient: "from-emerald-500 to-green-500",
-    bgPattern: "bg-emerald-50",
-    accentColor: "emerald",
     link: "/services"
   }
 ];
@@ -118,7 +88,6 @@ const Services = memo(function Services() {
   const [isPaused, setIsPaused] = useState(false)
   const intervalRef = useRef(null)
 
-  // Auto slider functionality
   const startAutoSlide = useCallback(() => {
     if (intervalRef.current) clearInterval(intervalRef.current)
     intervalRef.current = setInterval(() => {
@@ -147,37 +116,27 @@ const Services = memo(function Services() {
   const totalSlides = Math.ceil(services.length / servicesPerSlide)
 
   return (
-    <section id="services" className="relative py-12 sm:py-16 lg:py-20 bg-gradient-to-br from-gray-50 via-slate-50 to-indigo-50 overflow-hidden">
-      <SectionBackground gridId="services-grid" />
+    <section id="services" className="relative py-12 sm:py-16 lg:py-20 bg-[#FAF9F6] overflow-hidden">
 
       <div className="relative z-10 max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-        {/* Enhanced Header */}
         <div className="text-center mb-8 sm:mb-12 lg:mb-16">
-          <div className="inline-flex items-center bg-gradient-to-r from-indigo-100/80 via-purple-100/70 to-pink-100/80 backdrop-blur-sm border border-indigo-200/60 rounded-full px-8 py-4 text-indigo-700 font-semibold text-sm mb-8 hover:shadow-xl hover:shadow-indigo-500/10 transition-all duration-300 group">
-            <i className="ri-service-line mr-2 group-hover:rotate-12 transition-transform"></i>
-            Our Expert Services
-            <div className="w-2 h-2 bg-gradient-to-r from-indigo-500 to-purple-500 rounded-full ml-3 animate-pulse"></div>
-          </div>
+          <span className="text-sm font-semibold text-[#0F766E] uppercase tracking-wider">Our Expert Services</span>
 
-          <h2 className="text-2xl sm:text-3xl md:text-4xl lg:text-5xl font-bold text-gray-900 mb-4 sm:mb-6 leading-tight">
-            <span className="block mb-1">Comprehensive</span>
-            <span className="block bg-gradient-to-r from-indigo-600 via-purple-600 to-pink-600 bg-clip-text text-transparent font-extrabold" style={{
-              filter: 'drop-shadow(0 0 6px rgba(79, 70, 229, 0.2)) drop-shadow(0 0 12px rgba(147, 51, 234, 0.15))'
-            }}>
+          <h2 className="text-2xl sm:text-3xl md:text-4xl lg:text-5xl font-bold text-slate-800 mb-4 sm:mb-6 mt-4 leading-tight">
+            Comprehensive
+            <span className="block text-[#0F766E]">
               Digital Solutions
             </span>
           </h2>
 
-          <p className="text-base sm:text-lg text-gray-600 max-w-3xl mx-auto leading-relaxed px-4 sm:px-0">
+          <p className="text-base sm:text-lg text-slate-600 max-w-3xl mx-auto leading-relaxed px-4 sm:px-0">
             From innovative web development to cutting-edge mobile apps, we deliver
-            <span className="font-semibold bg-gradient-to-r from-indigo-600 to-purple-600 bg-clip-text text-transparent"> end-to-end solutions</span> that transform
+            <span className="font-semibold text-[#0F766E]"> end-to-end solutions</span> that transform
             your business and drive sustainable growth in the digital landscape.
           </p>
         </div>
 
-        {/* Enhanced Services Carousel */}
         <div className="relative mb-16" role="region" aria-roledescription="carousel" aria-label="Our services">
-          {/* Carousel Container */}
           <div className="overflow-hidden">
             <div
               className="flex transition-transform duration-700 ease-in-out"
@@ -200,26 +159,24 @@ const Services = memo(function Services() {
             </div>
           </div>
 
-          {/* Mobile Navigation Arrows - Below cards */}
           <div className="flex justify-center gap-4 mt-6 lg:hidden">
             <button
               onClick={() => goToSlide(currentSlide === 0 ? totalSlides - 1 : currentSlide - 1)}
               aria-label="Previous service"
-              className="w-10 h-10 bg-white/90 backdrop-blur-sm rounded-full shadow-lg hover:shadow-xl transition-all duration-300 flex items-center justify-center group hover:scale-110"
+              className="w-10 h-10 bg-white rounded-full shadow-lg hover:shadow-xl transition-all duration-300 flex items-center justify-center group"
             >
-              <i className="ri-arrow-left-line text-lg text-gray-700 group-hover:text-indigo-600 transition-colors"></i>
+              <i className="ri-arrow-left-line text-lg text-slate-700 group-hover:text-[#0F766E] transition-colors"></i>
             </button>
 
             <button
               onClick={() => goToSlide(currentSlide === totalSlides - 1 ? 0 : currentSlide + 1)}
               aria-label="Next service"
-              className="w-10 h-10 bg-white/90 backdrop-blur-sm rounded-full shadow-lg hover:shadow-xl transition-all duration-300 flex items-center justify-center group hover:scale-110"
+              className="w-10 h-10 bg-white rounded-full shadow-lg hover:shadow-xl transition-all duration-300 flex items-center justify-center group"
             >
-              <i className="ri-arrow-right-line text-lg text-gray-700 group-hover:text-indigo-600 transition-colors"></i>
+              <i className="ri-arrow-right-line text-lg text-slate-700 group-hover:text-[#0F766E] transition-colors"></i>
             </button>
           </div>
 
-          {/* Carousel Navigation Dots */}
           <div className="flex justify-center items-center mt-6 space-x-3">
             {Array.from({ length: totalSlides }).map((_, index) => (
               <button
@@ -230,66 +187,55 @@ const Services = memo(function Services() {
                 className="w-8 h-8 flex items-center justify-center"
               >
                 <span className={`w-3 h-3 rounded-full transition-all duration-300 ${currentSlide === index
-                  ? 'bg-gradient-to-r from-indigo-500 to-purple-500 scale-125 shadow-lg'
-                  : 'bg-gray-300 hover:bg-gray-400 hover:scale-110'
+                  ? 'bg-[#0F766E] scale-125 shadow-lg'
+                  : 'bg-slate-300 hover:bg-slate-400'
                   }`} />
               </button>
             ))}
             <button
               aria-label={isPaused ? "Play carousel" : "Pause carousel"}
               onClick={togglePause}
-              className="w-8 h-8 flex items-center justify-center rounded-full bg-white/90 backdrop-blur-sm shadow-md hover:shadow-lg transition-all duration-300 hover:scale-110 ml-2"
+              className="w-8 h-8 flex items-center justify-center rounded-full bg-white shadow-md hover:shadow-lg transition-all duration-300 ml-2"
             >
-              <i className={`${isPaused ? 'ri-play-line' : 'ri-pause-line'} text-gray-700`}></i>
+              <i className={`${isPaused ? 'ri-play-line' : 'ri-pause-line'} text-slate-700`}></i>
             </button>
           </div>
 
-          {/* Carousel Progress Bar */}
           <div className="flex justify-center mt-4">
-            <div className="w-48 h-1 bg-gray-200 rounded-full overflow-hidden">
+            <div className="w-48 h-1 bg-slate-200 rounded-full overflow-hidden">
               <div
-                className="h-full bg-gradient-to-r from-indigo-500 to-purple-500 rounded-full transition-all duration-300 ease-out"
+                className="h-full bg-[#0F766E] rounded-full transition-all duration-300 ease-out"
                 style={{ width: `${((currentSlide + 1) / totalSlides) * 100}%` }}
               />
             </div>
           </div>
 
-          {/* Navigation Arrows - Positioned outside of cards */}
           <button
             onClick={() => goToSlide(currentSlide === 0 ? totalSlides - 1 : currentSlide - 1)}
             aria-label="Previous service"
-            className="absolute -left-16 top-1/2 transform -translate-y-1/2 w-12 h-12 bg-white/90 backdrop-blur-sm rounded-full shadow-xl hover:shadow-2xl transition-all duration-300 flex items-center justify-center group hover:scale-110 lg:block hidden"
+            className="absolute -left-16 top-1/2 transform -translate-y-1/2 w-12 h-12 bg-white rounded-full shadow-xl hover:shadow-2xl transition-all duration-300 flex items-center justify-center group lg:block hidden"
           >
-            <i className="ri-arrow-left-line text-xl text-gray-700 group-hover:text-indigo-600 transition-colors"></i>
+            <i className="ri-arrow-left-line text-xl text-slate-700 group-hover:text-[#0F766E] transition-colors"></i>
           </button>
 
           <button
             onClick={() => goToSlide(currentSlide === totalSlides - 1 ? 0 : currentSlide + 1)}
             aria-label="Next service"
-            className="absolute -right-16 top-1/2 transform -translate-y-1/2 w-12 h-12 bg-white/90 backdrop-blur-sm rounded-full shadow-xl hover:shadow-2xl transition-all duration-300 flex items-center justify-center group hover:scale-110 lg:block hidden"
+            className="absolute -right-16 top-1/2 transform -translate-y-1/2 w-12 h-12 bg-white rounded-full shadow-xl hover:shadow-2xl transition-all duration-300 flex items-center justify-center group lg:block hidden"
           >
-            <i className="ri-arrow-right-line text-xl text-gray-700 group-hover:text-indigo-600 transition-colors"></i>
+            <i className="ri-arrow-right-line text-xl text-slate-700 group-hover:text-[#0F766E] transition-colors"></i>
           </button>
         </div>
 
-        {/* Enhanced Call-to-Action Section */}
         <div className="relative">
-          {/* Background with multiple gradients */}
-          <div className="absolute inset-0 bg-gradient-to-r from-indigo-600 via-purple-600 to-pink-600 rounded-3xl"></div>
-          <div className="absolute inset-0 bg-gradient-to-br from-transparent via-blue-600/20 to-transparent rounded-3xl"></div>
-          <div className="absolute inset-0 bg-black/5 rounded-3xl"></div>
+          <div className="absolute inset-0 bg-[#0F766E] rounded-3xl"></div>
 
           <div className="relative z-10 text-center p-12 text-white overflow-hidden rounded-3xl">
-            <h3 className="text-3xl md:text-4xl font-bold mb-5" style={{
-              background: 'linear-gradient(135deg, #ffffff 0%, #f3e8ff 50%, #ffffff 100%)',
-              WebkitBackgroundClip: 'text',
-              WebkitTextFillColor: 'transparent',
-              filter: 'drop-shadow(0 2px 4px rgba(0,0,0,0.1))'
-            }}>
+            <h3 className="text-3xl md:text-4xl font-bold mb-5 text-white">
               Ready to Transform Your Business?
             </h3>
 
-            <p className="text-indigo-100 text-lg mb-8 max-w-2xl mx-auto leading-relaxed">
+            <p className="text-white/90 text-lg mb-8 max-w-2xl mx-auto leading-relaxed">
               Let's discuss your project and create a custom solution that drives results.
               Get a <span className="font-semibold text-white">free consultation</span> with our experts today.
             </p>
@@ -297,39 +243,18 @@ const Services = memo(function Services() {
             <div className="flex flex-col sm:flex-row gap-4 justify-center">
               <a
                 href="#contact"
-                className="group bg-white text-indigo-600 px-8 py-4 rounded-xl font-bold hover:bg-gray-50 transition-all duration-300 transform hover:scale-105 hover:-translate-y-1 inline-flex items-center justify-center shadow-xl hover:shadow-2xl text-base"
+                className="group bg-white text-[#0F766E] px-8 py-4 rounded-xl font-bold hover:bg-[#FAF9F6] transition-all duration-300 inline-flex items-center justify-center shadow-xl text-base"
               >
                 Start Your Project
-                <i className="ri-rocket-2-line ml-2 text-lg group-hover:translate-x-1 group-hover:-translate-y-1 transition-transform duration-300"></i>
+                <i className="ri-arrow-right-line ml-2 text-lg group-hover:translate-x-1 transition-transform duration-300"></i>
               </a>
 
-              <a href="tel:+917696309551" className="group bg-white/15 backdrop-blur-md text-white border-2 border-white/30 px-8 py-4 rounded-xl font-bold hover:bg-white/25 hover:border-white/50 transition-all duration-300 inline-flex items-center justify-center transform hover:scale-105 hover:-translate-y-1 text-base shadow-lg">
-                <i className="ri-phone-line mr-2 text-lg group-hover:rotate-12 transition-transform duration-300"></i>
+              <a href="tel:+917696309551" className="group bg-white/15 text-white border-2 border-white/30 px-8 py-4 rounded-xl font-bold hover:bg-white/25 hover:border-white/50 transition-all duration-300 inline-flex items-center justify-center text-base">
+                <i className="ri-phone-line mr-2 text-lg"></i>
                 Schedule Call
               </a>
             </div>
           </div>
-
-          {/* Enhanced background decorations */}
-          <div className="absolute top-8 right-8 w-32 h-32 border-2 border-white/20 rounded-full animate-spin-slow opacity-60"></div>
-          <div className="absolute bottom-8 left-8 w-24 h-24 border-2 border-white/15 rounded-full animate-pulse"></div>
-          <div className="absolute top-1/2 left-12 w-3 h-3 bg-white/40 rounded-full animate-ping"></div>
-          <div className="absolute top-12 right-1/3 w-2 h-2 bg-white/50 rounded-full animate-pulse"></div>
-          <div className="absolute bottom-1/3 right-12 w-4 h-4 bg-gradient-to-r from-yellow-400 to-orange-400 rounded-full animate-bounce opacity-80"></div>
-
-          {/* Floating particles */}
-          {Array.from({ length: 8 }).map((_, i) => (
-            <div
-              key={i}
-              className="absolute w-1 h-1 bg-white/30 rounded-full animate-twinkle"
-              style={{
-                left: `${Math.random() * 100}%`,
-                top: `${Math.random() * 100}%`,
-                animationDelay: `${Math.random() * 3}s`,
-                animationDuration: `${2 + Math.random() * 2}s`
-              }}
-            />
-          ))}
         </div>
       </div>
     </section>

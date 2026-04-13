@@ -27,7 +27,7 @@ const PwaBenefits = () => {
     };
 
     return (
-        <div className="min-h-screen bg-white font-sans text-gray-900 selection:bg-blue-600 selection:text-white pt-20">
+        <div className="min-h-screen bg-white font-sans text-slate-800 selection:bg-blue-600 selection:text-white pt-20">
             <Helmet>
                 <title>Benefits of Progressive Web Apps (PWA) | Nexspire Web Dev</title>
                 <meta name="description" content="Progressive Web Apps (PWAs) offer the best of web and mobile. Learn how they boost conversion rates, improve SEO, and cut development costs." />
@@ -47,13 +47,13 @@ const PwaBenefits = () => {
 
             <article className="max-w-4xl mx-auto px-6 py-12">
                 <div className="mb-12 text-center">
-                    <span className="inline-block px-4 py-1.5 bg-blue-100 text-blue-700 font-bold rounded-full text-sm mb-6">
+                    <span className="inline-block px-4 py-1.5 bg-[#0F766E]/10 text-[#0F766E] font-bold rounded-full text-sm mb-6">
                         Web Development
                     </span>
-                    <h1 className="text-4xl md:text-6xl font-bold leading-tight mb-6 text-gray-900">
+                    <h1 className="text-4xl md:text-6xl font-bold leading-tight mb-6 text-slate-800">
                         Why Your Business Needs a Progressive Web App (PWA) in 2026
                     </h1>
-                    <div className="flex items-center justify-center gap-6 text-gray-500 font-medium">
+                    <div className="flex items-center justify-center gap-6 text-slate-500 font-medium">
                         <div className="flex items-center gap-2">
                             <div className="w-8 h-8 rounded-full bg-purple-600 text-white flex items-center justify-center font-bold">K</div>
                             <span>Kshitij Bhardwaj</span>
@@ -76,7 +76,7 @@ const PwaBenefits = () => {
                 </div>
 
                 <div className="prose prose-lg prose-blue mx-auto">
-                    <p className="lead text-xl text-gray-600 mb-8">
+                    <p className="lead text-xl text-slate-600 mb-8">
                         Is it a website? Is it an app? It's both. Progressive Web Apps (PWAs) have quietly become the gold standard for modern web development, adopted by giants like Uber, Pinterest, and Starbucks. Here is why you should care.
                     </p>
 
@@ -102,7 +102,7 @@ const PwaBenefits = () => {
                         Thanks to Service Workers, PWAs can cache content. If a user loses internet connection in a tunnel, your app still works. This is crucial for e-commerce and field service apps.
                     </p>
 
-                    <div className="bg-blue-50 border-l-4 border-blue-600 p-8 my-8 rounded-r-xl">
+                    <div className="bg-[#FAF9F6] border-l-4 border-blue-600 p-8 my-8 rounded-r-xl">
                         <h4 className="text-xl font-bold text-blue-900 mb-2">Go Mobile, Fast</h4>
                         <p className="text-blue-800 mb-0">
                             We can turn your existing website into a PWA in weeks, not months. <Link to="/services/custom-web-development" className="underline font-bold">See our PWA Services</Link>.
@@ -127,7 +127,7 @@ const PwaBenefits = () => {
             </article>
 
             {/* Internal Linking to Services */}
-            <div className="bg-gray-50 py-16">
+            <div className="bg-[#FAF9F6] py-16">
                 <div className="container-custom">
                     <h2 className="text-3xl font-bold text-center mb-12">Upgrade Your Web Presence</h2>
                     <RelatedServices currentService="Custom Web Development" />

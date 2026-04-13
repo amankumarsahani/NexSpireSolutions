@@ -20,21 +20,21 @@ const TermsOfService = () => {
                 <meta name="twitter:description" content="Read the Nexspire Solutions terms of service. Understand the terms and conditions for using our website and services." />
             </Helmet>
             <div className="max-w-3xl mx-auto px-4 sm:px-6 lg:px-8">
-                <h1 className="text-4xl font-bold text-gray-900 mb-8">Terms of Service</h1>
-                <div className="prose prose-lg prose-blue text-gray-600">
-                    <p className="lead text-xl text-gray-500 mb-8">
+                <h1 className="text-4xl font-bold text-slate-800 mb-8">Terms of Service</h1>
+                <div className="prose prose-lg prose-blue text-slate-600">
+                    <p className="lead text-xl text-slate-500 mb-8">
                         Last updated: March 15, 2025
                     </p>
 
                     <section className="mb-12">
-                        <h2 className="text-2xl font-bold text-gray-900 mb-4">1. Agreement to Terms</h2>
+                        <h2 className="text-2xl font-bold text-slate-800 mb-4">1. Agreement to Terms</h2>
                         <p className="mb-4">
                             By accessing our website at Nexspire Solution, you agree to be bound by these terms of service, all applicable laws and regulations, and agree that you are responsible for compliance with any applicable local laws.
                         </p>
                     </section>
 
                     <section className="mb-12">
-                        <h2 className="text-2xl font-bold text-gray-900 mb-4">2. Use License</h2>
+                        <h2 className="text-2xl font-bold text-slate-800 mb-4">2. Use License</h2>
                         <p className="mb-4">
                             Permission is granted to temporarily download one copy of the materials (information or software) on Nexspire Solution's website for personal, non-commercial transitory viewing only.
                         </p>
@@ -51,14 +51,14 @@ const TermsOfService = () => {
                     </section>
 
                     <section className="mb-12">
-                        <h2 className="text-2xl font-bold text-gray-900 mb-4">3. Disclaimer</h2>
+                        <h2 className="text-2xl font-bold text-slate-800 mb-4">3. Disclaimer</h2>
                         <p className="mb-4">
                             The materials on Nexspire Solution's website are provided on an 'as is' basis. Nexspire Solution makes no warranties, expressed or implied, and hereby disclaims and negates all other warranties including, without limitation, implied warranties or conditions of merchantability, fitness for a particular purpose, or non-infringement of intellectual property or other violation of rights.
                         </p>
                     </section>
 
                     <section className="mb-12">
-                        <h2 className="text-2xl font-bold text-gray-900 mb-4">4. Limitations</h2>
+                        <h2 className="text-2xl font-bold text-slate-800 mb-4">4. Limitations</h2>
                         <p className="mb-4">
                             In no event shall Nexspire Solution or its suppliers be liable for any damages (including, without limitation, damages for loss of data or profit, or due to business interruption) arising out of the use or inability to use the materials on Nexspire Solution's website.
                         </p>

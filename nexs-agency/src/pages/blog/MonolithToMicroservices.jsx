@@ -27,7 +27,7 @@ const MonolithToMicroservices = () => {
     };
 
     return (
-        <div className="min-h-screen bg-white font-sans text-gray-900 selection:bg-cyan-600 selection:text-white pt-20">
+        <div className="min-h-screen bg-white font-sans text-slate-800 selection:bg-cyan-600 selection:text-white pt-20">
             <Helmet>
                 <title>Monolith to Microservices Migration Guide | Nexspire Cloud</title>
                 <meta name="description" content="Is your legacy monolith slowing you down? Learn the risks and rewards of migrating to a microservices architecture in 2026." />
@@ -50,10 +50,10 @@ const MonolithToMicroservices = () => {
                     <span className="inline-block px-4 py-1.5 bg-cyan-100 text-cyan-700 font-bold rounded-full text-sm mb-6">
                         Cloud Architecture
                     </span>
-                    <h1 className="text-4xl md:text-6xl font-bold leading-tight mb-6 text-gray-900">
+                    <h1 className="text-4xl md:text-6xl font-bold leading-tight mb-6 text-slate-800">
                         Migrating Legacy Monoliths to Microservices: A Strategic Guide
                     </h1>
-                    <div className="flex items-center justify-center gap-6 text-gray-500 font-medium">
+                    <div className="flex items-center justify-center gap-6 text-slate-500 font-medium">
                         <div className="flex items-center gap-2">
                             <div className="w-8 h-8 rounded-full bg-blue-600 text-white flex items-center justify-center font-bold">A</div>
                             <span>Aman Kumar</span>
@@ -76,7 +76,7 @@ const MonolithToMicroservices = () => {
                 </div>
 
                 <div className="prose prose-lg prose-cyan mx-auto">
-                    <p className="lead text-xl text-gray-600 mb-8">
+                    <p className="lead text-xl text-slate-600 mb-8">
                         The phrase "Monolith to Microservices" is a cliché in tech circles, but for CTOs of established companies, it represents the single biggest challenge to scalability. Here's how to navigate the transition without breaking production.
                     </p>
 
@@ -126,7 +126,7 @@ const MonolithToMicroservices = () => {
             </article>
 
             {/* Internal Linking to Services */}
-            <div className="bg-gray-50 py-16">
+            <div className="bg-[#FAF9F6] py-16">
                 <div className="container-custom">
                     <h2 className="text-3xl font-bold text-center mb-12">Modernize Your Infrastructure</h2>
                     <RelatedServices currentService="Cloud Solutions" />

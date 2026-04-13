@@ -9,12 +9,12 @@ import { SITE_URL } from '../constants/siteConfig';
 
 // --- Data ---
 const industries = [
-    { name: "Digital Agencies", icon: "ri-briefcase-4-line", color: "text-blue-600", bg: "bg-blue-50" },
-    { name: "Freelancers", icon: "ri-macbook-line", color: "text-purple-600", bg: "bg-purple-50" },
+    { name: "Digital Agencies", icon: "ri-briefcase-4-line", color: "text-[#0F766E]", bg: "bg-[#FAF9F6]" },
+    { name: "Freelancers", icon: "ri-macbook-line", color: "text-[#0F766E]", bg: "bg-[#FAF9F6]" },
     { name: "E-commerce", icon: "ri-store-2-line", color: "text-emerald-600", bg: "bg-emerald-50" },
     { name: "Consultants", icon: "ri-discuss-line", color: "text-amber-600", bg: "bg-amber-50" },
     { name: "Real Estate", icon: "ri-building-2-line", color: "text-rose-600", bg: "bg-rose-50" },
-    { name: "SaaS Startups", icon: "ri-rocket-line", color: "text-indigo-600", bg: "bg-indigo-50" },
+    { name: "SaaS Startups", icon: "ri-arrow-right-up-line", color: "text-[#0F766E]", bg: "bg-indigo-50" },
     { name: "Marketing Teams", icon: "ri-megaphone-line", color: "text-cyan-600", bg: "bg-cyan-50" },
     { name: "Event Planners", icon: "ri-calendar-event-line", color: "text-pink-600", bg: "bg-pink-50" }
 ];
@@ -127,7 +127,7 @@ export default function NexCRMLandingPage() {
     };
 
     return (
-        <div className="min-h-screen bg-white font-sans text-slate-900 overflow-x-hidden selection:bg-blue-100">
+        <div className="min-h-screen bg-white font-sans text-slate-900 overflow-x-hidden selection:bg-[#0F766E]/10">
             <Helmet>
                 <title>NexCRM - The Operating System for Modern Agencies</title>
                 <meta name="description" content="Streamline your agency with NexCRM. Integrated project management, CRM, invoicing, and client portals." />
@@ -162,7 +162,7 @@ export default function NexCRMLandingPage() {
                 <div className="absolute inset-0 bg-white/90 backdrop-blur-sm z-0"></div>
 
                 {/* Background Elements */}
-                <div className="absolute top-0 left-1/2 -translate-x-1/2 w-[1000px] h-[600px] bg-gradient-to-b from-blue-100/40 to-transparent rounded-full blur-3xl opacity-60 pointer-events-none z-0" />
+                <div className="absolute top-0 left-1/2 -translate-x-1/2 w-[1000px] h-[600px] bg-gradient-to-b from-[#0F766E]/10 to-transparent rounded-full blur-3xl opacity-60 pointer-events-none z-0" />
 
                 <div className="container-custom px-6 max-w-7xl mx-auto relative z-10 text-center">
                     <motion.div
@@ -173,12 +173,12 @@ export default function NexCRMLandingPage() {
                         <div className="inline-flex items-center gap-2 px-4 py-1.5 rounded-full bg-white border border-slate-200 text-slate-600 text-sm font-medium mb-8 hover:shadow-md transition-all cursor-default relative overflow-hidden">
                             <span className="w-2 h-2 rounded-full bg-emerald-500 animate-pulse relative z-10"></span>
                             <span className="relative z-10">v2.0 is now live</span>
-                            <div className="absolute inset-0 bg-gradient-to-r from-blue-50 to-purple-50 opacity-50"></div>
+                            <div className="absolute inset-0 bg-[#FAF9F6] opacity-50"></div>
                         </div>
 
                         <h1 className="text-5xl md:text-7xl font-bold tracking-tight text-slate-900 mb-8 leading-[1.1]">
                             The Operating System for <br className="hidden md:block" />
-                            <span className="bg-clip-text text-transparent bg-gradient-to-r from-blue-600 via-indigo-600 to-purple-600">running your agency.</span>
+                            <span className="text-[#0F766E]">running your agency.</span>
                         </h1>
 
                         <p className="text-lg md:text-xl text-slate-600 max-w-2xl mx-auto mb-10 leading-relaxed font-medium">
@@ -186,7 +186,7 @@ export default function NexCRMLandingPage() {
                         </p>
 
                         <div className="flex flex-col sm:flex-row gap-4 justify-center items-center">
-                            <button onClick={() => document.getElementById('pricing').scrollIntoView({ behavior: 'smooth' })} className="px-8 py-4 bg-slate-900 text-white rounded-xl font-semibold shadow-xl shadow-slate-900/20 hover:bg-slate-800 hover:scale-105 transition-all duration-300 ring-4 ring-slate-900/10">
+                            <button onClick={() => document.getElementById('pricing').scrollIntoView({ behavior: 'smooth' })} className="px-8 py-4 bg-slate-900 text-white rounded-xl font-semibold shadow-xl shadow-slate-900/20 hover:bg-slate-800  transition-all duration-300 ring-4 ring-slate-900/10">
                                 Start Free Trial
                             </button>
                             <a href="/contact" className="px-8 py-4 bg-white text-slate-700 border border-slate-200 rounded-xl font-semibold hover:bg-slate-50 hover:border-slate-300 transition-all duration-300 shadow-sm">
@@ -209,7 +209,7 @@ export default function NexCRMLandingPage() {
                                 srcSet="https://images.unsplash.com/photo-1460925895917-afdab827c52f?w=640&fm=webp 640w, https://images.unsplash.com/photo-1460925895917-afdab827c52f?w=1024&fm=webp 1024w, https://images.unsplash.com/photo-1460925895917-afdab827c52f?w=1920&fm=webp 1920w"
                                 sizes="(max-width: 640px) 640px, (max-width: 1024px) 1024px, 1920px"
                                 alt="Dashboard Preview"
-                                className="w-full h-full object-cover opacity-90 transition-transform duration-700 group-hover:scale-105"
+                                className="w-full h-full object-cover opacity-90 transition-transform duration-700 group-"
                             />
                             <div className="absolute inset-0 bg-gradient-to-t from-slate-900/20 to-transparent pointer-events-none"></div>
                         </div>
@@ -238,26 +238,26 @@ export default function NexCRMLandingPage() {
 
                 <div className="container-custom px-6 max-w-7xl mx-auto relative z-10">
                     <div className="max-w-3xl mx-auto text-center mb-24">
-                        <span className="text-blue-600 font-bold tracking-wider uppercase text-sm mb-4 block">Capabilities</span>
-                        <h2 className="text-3xl md:text-5xl font-bold text-slate-900 mb-6 font-display">Everything you need to <span className="text-blue-600">scale.</span></h2>
+                        <span className="text-[#0F766E] font-bold tracking-wider uppercase text-sm mb-4 block">Capabilities</span>
+                        <h2 className="text-3xl md:text-5xl font-bold text-slate-900 mb-6 font-display">Everything you need to <span className="text-[#0F766E]">scale.</span></h2>
                         <p className="text-xl text-slate-600 font-light">Unified tools that replace your fragmented tech stack.</p>
                     </div>
 
                     <div className="grid grid-cols-1 md:grid-cols-3 gap-8 auto-rows-[340px]">
                         {/* Large Feature - Dashboard */}
-                        <div className="md:col-span-2 md:row-span-1 rounded-[2rem] border border-slate-200 shadow-xl shadow-slate-200/50 hover:shadow-2xl hover:border-blue-200 transition-all group overflow-hidden relative">
-                            <div className="absolute inset-0 bg-[url('https://images.unsplash.com/photo-1551288049-bebda4e38f71?ixlib=rb-4.0.3&auto=format&fit=crop&w=2600&q=80&fm=webp')] bg-cover bg-center transition-transform duration-700 group-hover:scale-105"></div>
+                        <div className="md:col-span-2 md:row-span-1 rounded-[2rem] border border-slate-200 shadow-xl shadow-slate-200/50 hover:shadow-2xl hover:border-slate-200 transition-all group overflow-hidden relative">
+                            <div className="absolute inset-0 bg-[url('https://images.unsplash.com/photo-1551288049-bebda4e38f71?ixlib=rb-4.0.3&auto=format&fit=crop&w=2600&q=80&fm=webp')] bg-cover bg-center transition-transform duration-700 group-"></div>
                             <div className="absolute inset-0 bg-gradient-to-r from-white via-white/90 to-transparent"></div>
 
                             <div className="relative z-10 p-10 h-full flex flex-col justify-center max-w-md">
-                                <div className="w-14 h-14 bg-blue-600 text-white rounded-2xl flex items-center justify-center text-2xl mb-6 shadow-lg shadow-blue-600/20"><i className="ri-dashboard-3-line"></i></div>
+                                <div className="w-14 h-14 bg-blue-600 text-white rounded-2xl flex items-center justify-center text-2xl mb-6 shadow-lg shadow-lg"><i className="ri-dashboard-3-line"></i></div>
                                 <h3 className="text-3xl font-bold text-slate-900 mb-4">Centralized Operations</h3>
                                 <p className="text-slate-600 text-lg leading-relaxed font-medium">See everything in one place. Revenue, project status, leads, and support tickets at a glance.</p>
                             </div>
                         </div>
 
                         {/* Tall Feature - Mobile App */}
-                        <div className="md:col-span-1 md:row-span-2 bg-slate-900 rounded-[2rem] p-8 border border-slate-800 text-white hover:shadow-2xl hover:shadow-blue-900/20 transition-all relative overflow-hidden group flex flex-col items-center text-center">
+                        <div className="md:col-span-1 md:row-span-2 bg-slate-900 rounded-[2rem] p-8 border border-slate-800 text-white hover:shadow-2xl hover:shadow-lg transition-all relative overflow-hidden group flex flex-col items-center text-center">
                             <div className="relative z-10 mb-8">
                                 <div className="w-14 h-14 bg-white/10 text-white rounded-2xl flex items-center justify-center text-2xl mb-6 mx-auto backdrop-blur-md border border-white/10"><i className="ri-smartphone-line"></i></div>
                                 <h3 className="text-2xl font-bold mb-3">Mobile App</h3>
@@ -288,20 +288,20 @@ export default function NexCRMLandingPage() {
 
                         {/* Standard Feature - Invoicing */}
                         <div className="md:col-span-1 bg-white rounded-[2rem] p-10 border border-slate-100 shadow-xl shadow-slate-200/50 hover:translate-y-[-4px] hover:shadow-2xl transition-all group">
-                            <div className="w-14 h-14 bg-purple-50 text-purple-600 rounded-2xl flex items-center justify-center text-2xl mb-6 group-hover:scale-110 transition-transform"><i className="ri-bank-card-line"></i></div>
+                            <div className="w-14 h-14 bg-[#FAF9F6] text-[#0F766E] rounded-2xl flex items-center justify-center text-2xl mb-6 group- transition-transform"><i className="ri-bank-card-line"></i></div>
                             <h3 className="text-xl font-bold text-slate-900 mb-3">Invoicing & Payments</h3>
                             <p className="text-slate-600 font-medium leading-relaxed">Accept payments via Razorpay with UPI, cards, and net banking.</p>
                         </div>
 
                         {/* Standard Feature - Pipeline */}
                         <div className="md:col-span-1 bg-white rounded-[2rem] p-10 border border-slate-100 shadow-xl shadow-slate-200/50 hover:translate-y-[-4px] hover:shadow-2xl transition-all group">
-                            <div className="w-14 h-14 bg-emerald-50 text-emerald-600 rounded-2xl flex items-center justify-center text-2xl mb-6 group-hover:scale-110 transition-transform"><i className="ri-user-follow-line"></i></div>
+                            <div className="w-14 h-14 bg-emerald-50 text-emerald-600 rounded-2xl flex items-center justify-center text-2xl mb-6 group- transition-transform"><i className="ri-user-follow-line"></i></div>
                             <h3 className="text-xl font-bold text-slate-900 mb-3">Lead Pipeline</h3>
                             <p className="text-slate-600 font-medium leading-relaxed">Drag-and-drop kanban board to track deals from lead to close.</p>
                         </div>
 
                         {/* Wide Feature - AI Automation */}
-                        <div className="md:col-span-3 rounded-[2rem] p-10 border border-slate-200 hover:border-blue-200 hover:shadow-lg transition-all flex flex-col md:flex-row items-center gap-10 overflow-hidden relative group">
+                        <div className="md:col-span-3 rounded-[2rem] p-10 border border-slate-200 hover:border-slate-200 hover:shadow-lg transition-all flex flex-col md:flex-row items-center gap-10 overflow-hidden relative group">
                             {/* Background Image */}
                             <div className="absolute inset-0 bg-[url('https://images.unsplash.com/photo-1620712943543-bcc4688e7485?ixlib=rb-4.0.3&auto=format&fit=crop&w=1000&q=80&fm=webp')] bg-cover bg-center opacity-10 group-hover:opacity-20 transition-opacity duration-500"></div>
                             <div className="absolute inset-0 bg-gradient-to-r from-white via-white to-transparent"></div>
@@ -314,14 +314,14 @@ export default function NexCRMLandingPage() {
 
                             <div className="flex-1 w-full max-w-md bg-white rounded-2xl shadow-lg border border-slate-100 p-6 relative z-10 transform translate-y-4 group-hover:translate-y-0 transition-transform duration-500">
                                 <div className="flex items-start gap-4 mb-6">
-                                    <div className="w-10 h-10 rounded-full bg-blue-100 flex-shrink-0 flex items-center justify-center text-blue-600 font-bold border-2 border-white shadow-sm"><i className="ri-robot-line"></i></div>
+                                    <div className="w-10 h-10 rounded-full bg-[#0F766E]/10 flex-shrink-0 flex items-center justify-center text-[#0F766E] font-bold border-2 border-white shadow-sm"><i className="ri-robot-line"></i></div>
                                     <div className="bg-slate-50 p-4 rounded-2xl rounded-tl-none text-slate-700 font-medium shadow-inner text-sm leading-relaxed border border-slate-100">
                                         "I noticed the client hasn't replied to the proposal sent 3 days ago. Should I send a follow-up email?"
                                     </div>
                                 </div>
                                 <div className="flex gap-3 justify-end">
                                     <button className="bg-slate-100 text-slate-600 px-4 py-2 rounded-lg text-sm font-semibold hover:bg-slate-200 transition-colors">Edit</button>
-                                    <button className="bg-blue-600 text-white px-6 py-2 rounded-lg text-sm font-semibold hover:bg-blue-700 transition-colors shadow-md shadow-blue-600/20">Yes, Send it</button>
+                                    <button className="bg-blue-600 text-white px-6 py-2 rounded-lg text-sm font-semibold hover:bg-blue-700 transition-colors shadow-md shadow-lg">Yes, Send it</button>
                                 </div>
                             </div>
                         </div>
@@ -365,11 +365,11 @@ export default function NexCRMLandingPage() {
 
                                 <div className="mb-8 relative">
                                     {tier.isCustom ? (
-                                        <div className="h-16 flex items-center"><span className="text-4xl font-extrabold text-slate-900">Custom</span></div>
+                                        <div className="h-16 flex items-center"><span className="text-4xl font-bold text-slate-900">Custom</span></div>
                                     ) : (
                                         <div className="h-16">
                                             <div className="flex items-baseline">
-                                                <span className="text-4xl font-extrabold text-slate-900 tracking-tight">
+                                                <span className="text-4xl font-bold text-slate-900 tracking-tight">
                                                     {tier.currency}{isYearly ? tier.price.yearly : tier.price.monthly}
                                                 </span>
                                                 <span className="text-slate-500 font-medium ml-1">/mo</span>
@@ -400,7 +400,7 @@ export default function NexCRMLandingPage() {
 
                                 <button
                                     onClick={() => handleAction(tier.name)}
-                                    className={`w-full py-4 rounded-xl font-bold transition-all duration-300 transform active:scale-95 border ${tier.popular ? 'bg-blue-600 text-white border-blue-600 hover:bg-blue-700 shadow-lg hover:shadow-blue-600/30' : 'bg-white text-slate-900 border-slate-200 hover:border-slate-300 hover:bg-slate-50 hover:shadow-md'}`}
+                                    className={`w-full py-4 rounded-xl font-bold transition-all duration-300 transform active:scale-95 border ${tier.popular ? 'bg-blue-600 text-white border-blue-600 hover:bg-blue-700 shadow-lg hover:shadow-lg' : 'bg-white text-slate-900 border-slate-200 hover:border-slate-300 hover:bg-slate-50 hover:shadow-md'}`}
                                 >
                                     {tier.cta}
                                 </button>
@@ -434,12 +434,12 @@ export default function NexCRMLandingPage() {
                                 {Object.keys(features).map((category) => (
                                     <>
                                         <tr key={category} className="bg-slate-50/80">
-                                            <td colSpan={5} className="py-3 px-8 text-xs font-extrabold text-slate-400 uppercase tracking-widest bg-slate-50/50 backdrop-blur-sm sticky left-0">
+                                            <td colSpan={5} className="py-3 px-8 text-xs font-bold text-slate-400 uppercase tracking-widest bg-slate-50/50 backdrop-blur-sm sticky left-0">
                                                 {category.charAt(0).toUpperCase() + category.slice(1)}
                                             </td>
                                         </tr>
                                         {features[category].map((feature) => (
-                                            <tr key={feature.name} className="hover:bg-blue-50/30 transition-colors group duration-150">
+                                            <tr key={feature.name} className="hover:bg-[#FAF9F6]/30 transition-colors group duration-150">
                                                 <td className="py-4 px-8 text-sm text-slate-600 font-medium group-hover:text-blue-900 group-hover:pl-9 transition-all">
                                                     {feature.name}
                                                     {feature.soon && <span className="ml-2 text-[10px] uppercase bg-amber-100 text-amber-700 px-1.5 py-0.5 rounded-full font-bold tracking-wide border border-amber-200">Soon</span>}
@@ -462,7 +462,7 @@ export default function NexCRMLandingPage() {
             <section className="py-32 px-6">
                 <div className="max-w-5xl mx-auto bg-slate-900 rounded-[2.5rem] p-12 md:p-20 text-center relative overflow-hidden shadow-2xl">
                     {/* Glow effects */}
-                    <div className="absolute top-0 left-1/2 -translate-x-1/2 w-full h-full bg-gradient-to-b from-blue-500/20 to-transparent pointer-events-none" />
+                    <div className="absolute top-0 left-1/2 -translate-x-1/2 w-full h-full bg-gradient-to-b from-[#0F766E]/10 to-transparent pointer-events-none" />
 
                     <div className="relative z-10">
                         <h2 className="text-4xl md:text-5xl font-bold text-white mb-6 tracking-tight">
@@ -472,7 +472,7 @@ export default function NexCRMLandingPage() {
                             Join 2,000+ agencies using NexCRM to scale their operations.
                         </p>
                         <div className="flex flex-col sm:flex-row gap-4 justify-center">
-                            <button onClick={() => document.getElementById('pricing').scrollIntoView({ behavior: 'smooth' })} className="px-10 py-5 bg-blue-600 text-white rounded-xl font-bold text-lg hover:bg-blue-500 hover:scale-105 transition-all shadow-lg shadow-blue-500/30">
+                            <button onClick={() => document.getElementById('pricing').scrollIntoView({ behavior: 'smooth' })} className="px-10 py-5 bg-blue-600 text-white rounded-xl font-bold text-lg hover:bg-[#FAF9F6]0  transition-all shadow-lg shadow-lg">
                                 Get Started Now
                             </button>
                         </div>
@@ -494,7 +494,7 @@ export default function NexCRMLandingPage() {
                         </button>
 
                         <div className="text-center mb-8">
-                            <div className="w-14 h-14 bg-gradient-to-br from-blue-100 to-indigo-100 rounded-2xl flex items-center justify-center mx-auto mb-6 text-blue-600 text-2xl shadow-inner"><i className="ri-mail-send-line"></i></div>
+                            <div className="w-14 h-14 bg-[#0F766E]/10 rounded-2xl flex items-center justify-center mx-auto mb-6 text-[#0F766E] text-2xl shadow-inner"><i className="ri-mail-send-line"></i></div>
                             <h3 className="text-2xl font-bold text-slate-900">Contact Sales</h3>
                             <p className="text-slate-500 mt-2">Let's simplify your agency operations.</p>
                         </div>
@@ -540,13 +540,13 @@ export default function NexCRMLandingPage() {
                                 finally { setSubmitting(false); }
                             }}>
                                 <div className="space-y-4">
-                                    <input type="text" name="name" required minLength={2} maxLength={100} placeholder="Full Name" aria-label="Full name" className="w-full px-5 py-4 bg-slate-50 border border-slate-200 rounded-xl focus:ring-2 focus:ring-blue-500 focus:bg-white outline-none transition-all" />
-                                    <input type="email" name="email" required placeholder="Work Email" aria-label="Email address" className="w-full px-5 py-4 bg-slate-50 border border-slate-200 rounded-xl focus:ring-2 focus:ring-blue-500 focus:bg-white outline-none transition-all" />
+                                    <input type="text" name="name" required minLength={2} maxLength={100} placeholder="Full Name" aria-label="Full name" className="w-full px-5 py-4 bg-slate-50 border border-slate-200 rounded-xl focus:ring-2 focus:ring-[#0F766E] focus:bg-white outline-none transition-all" />
+                                    <input type="email" name="email" required placeholder="Work Email" aria-label="Email address" className="w-full px-5 py-4 bg-slate-50 border border-slate-200 rounded-xl focus:ring-2 focus:ring-[#0F766E] focus:bg-white outline-none transition-all" />
                                     <div className="grid grid-cols-2 gap-4">
-                                        <input type="tel" name="phone" placeholder="Phone" aria-label="Phone number" className="w-full px-5 py-4 bg-slate-50 border border-slate-200 rounded-xl focus:ring-2 focus:ring-blue-500 focus:bg-white outline-none transition-all" />
-                                        <input type="text" name="company" placeholder="Company" aria-label="Company name" className="w-full px-5 py-4 bg-slate-50 border border-slate-200 rounded-xl focus:ring-2 focus:ring-blue-500 focus:bg-white outline-none transition-all" />
+                                        <input type="tel" name="phone" placeholder="Phone" aria-label="Phone number" className="w-full px-5 py-4 bg-slate-50 border border-slate-200 rounded-xl focus:ring-2 focus:ring-[#0F766E] focus:bg-white outline-none transition-all" />
+                                        <input type="text" name="company" placeholder="Company" aria-label="Company name" className="w-full px-5 py-4 bg-slate-50 border border-slate-200 rounded-xl focus:ring-2 focus:ring-[#0F766E] focus:bg-white outline-none transition-all" />
                                     </div>
-                                    <textarea name="message" rows="3" maxLength={2000} placeholder="Additional details..." aria-label="Your message" className="w-full px-5 py-4 bg-slate-50 border border-slate-200 rounded-xl focus:ring-2 focus:ring-blue-500 focus:bg-white outline-none resize-none transition-all"></textarea>
+                                    <textarea name="message" rows="3" maxLength={2000} placeholder="Additional details..." aria-label="Your message" className="w-full px-5 py-4 bg-slate-50 border border-slate-200 rounded-xl focus:ring-2 focus:ring-[#0F766E] focus:bg-white outline-none resize-none transition-all"></textarea>
                                 </div>
                                 <button disabled={submitting} type="submit" className="w-full py-4 bg-slate-900 text-white font-bold rounded-xl hover:bg-slate-800 transition-colors disabled:opacity-70 flex items-center justify-center gap-3 shadow-lg hover:shadow-xl hover:-translate-y-0.5 transform duration-200">
                                     {submitting && <i className="ri-loader-4-line animate-spin"></i>}

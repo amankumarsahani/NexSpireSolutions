@@ -1,12 +1,12 @@
 import ServicePageTemplate from '../../components/ServicePageTemplate';
 
 const data = {
-    themeColor: 'cyan',
+    themeColor: 'teal',
     badge: { icon: 'ri-cloud-windy-line', label: 'Cloud Infrastructure' },
     hero: {
         h1Line1: 'Scale Without',
         h1Line2: 'Limits.',
-        gradient: 'from-cyan-400 via-blue-400 to-indigo-400',
+        gradient: 'from-[#0F766E] to-[#0D6B63]',
         paragraph: 'Build, deploy, and manage your applications with the speed and reliability of modern cloud infrastructure.',
         ctaText: 'Plan Your Migration',
         bgImage: 'https://images.unsplash.com/photo-1451187580459-43490279c0fa',

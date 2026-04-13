@@ -27,7 +27,7 @@ const AiTrends2026 = () => {
     };
 
     return (
-        <div className="min-h-screen bg-white font-sans text-gray-900 selection:bg-blue-600 selection:text-white pt-20">
+        <div className="min-h-screen bg-white font-sans text-slate-800 selection:bg-blue-600 selection:text-white pt-20">
             <Helmet>
                 <title>Top 10 AI Trends Shaping Business in 2026 | Nexspire Insights</title>
                 <meta name="description" content="Discover the top AI trends for 2026 including Generative AI, Predictive Analytics, and Autonomous Agents. Learn how enterprises are leveraging these technologies." />
@@ -47,13 +47,13 @@ const AiTrends2026 = () => {
 
             <article className="max-w-4xl mx-auto px-6 py-12">
                 <div className="mb-12 text-center">
-                    <span className="inline-block px-4 py-1.5 bg-blue-100 text-blue-700 font-bold rounded-full text-sm mb-6">
+                    <span className="inline-block px-4 py-1.5 bg-[#0F766E]/10 text-[#0F766E] font-bold rounded-full text-sm mb-6">
                         Artificial Intelligence
                     </span>
-                    <h1 className="text-4xl md:text-6xl font-bold leading-tight mb-6 text-gray-900">
+                    <h1 className="text-4xl md:text-6xl font-bold leading-tight mb-6 text-slate-800">
                         Top 10 AI Trends Shaping Global Business in 2026
                     </h1>
-                    <div className="flex items-center justify-center gap-6 text-gray-500 font-medium">
+                    <div className="flex items-center justify-center gap-6 text-slate-500 font-medium">
                         <div className="flex items-center gap-2">
                             <div className="w-8 h-8 rounded-full bg-blue-600 text-white flex items-center justify-center font-bold">A</div>
                             <span>Aman Kumar</span>
@@ -76,7 +76,7 @@ const AiTrends2026 = () => {
                 </div>
 
                 <div className="prose prose-lg prose-blue mx-auto">
-                    <p className="lead text-xl text-gray-600 mb-8">
+                    <p className="lead text-xl text-slate-600 mb-8">
                         Artificial Intelligence is no longer just a buzzword; it's the fundamental operating system of modern enterprise. As we move into 2026, the shift from "experimentation" to "strategic integration" is complete. Here are the top 10 trends defining this era.
                     </p>
 
@@ -105,7 +105,7 @@ const AiTrends2026 = () => {
                         Processing data on-device (IoT sensors, mobile phones) rather than in the cloud reduces latency and improves privacy. This is critical for autonomous vehicles and smart factories.
                     </p>
 
-                    <div className="bg-blue-50 border-l-4 border-blue-600 p-8 my-8 rounded-r-xl">
+                    <div className="bg-[#FAF9F6] border-l-4 border-blue-600 p-8 my-8 rounded-r-xl">
                         <h4 className="text-xl font-bold text-blue-900 mb-2">Need an AI Strategy?</h4>
                         <p className="text-blue-800 mb-0">
                             Nexspire specializes in building custom AI solutions for enterprises. <Link to="/services/ai-machine-learning" className="underline font-bold">Explore our AI Services</Link>.
@@ -147,7 +147,7 @@ const AiTrends2026 = () => {
             </article>
 
             {/* Internal Linking to Services */}
-            <div className="bg-gray-50 py-16">
+            <div className="bg-[#FAF9F6] py-16">
                 <div className="container-custom">
                     <h2 className="text-3xl font-bold text-center mb-12">Ready to Implement AI?</h2>
                     <RelatedServices currentService="none" />

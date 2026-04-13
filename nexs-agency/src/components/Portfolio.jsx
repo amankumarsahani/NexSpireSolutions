@@ -1,6 +1,5 @@
 import { useState, useEffect, useMemo, memo } from 'react'
 import { Link } from 'react-router-dom'
-import SectionBackground from './ui/SectionBackground'
 
 const Portfolio = memo(function Portfolio() {
   const [activeCategory, setActiveCategory] = useState("All")
@@ -68,38 +67,32 @@ const Portfolio = memo(function Portfolio() {
     : projects.filter(project => project.category === activeCategory), [activeCategory])
 
   return (
-    <section id="portfolio" className="relative py-12 sm:py-16 lg:py-20 bg-gradient-to-br from-gray-50 via-slate-50 to-indigo-50 overflow-hidden">
-      <SectionBackground gridId="portfolio-grid" />
+    <section id="portfolio" className="relative py-12 sm:py-16 lg:py-20 bg-[#FAF9F6] overflow-hidden">
 
       <div className="relative z-10 max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-        {/* Modern Header */}
-        <div className={`text-center mb-8 sm:mb-12 lg:mb-16 transition-all duration-1000 transform ${isVisible ? 'translate-y-0 opacity-100' : 'translate-y-8 opacity-0'
+        <div className={`text-left mb-8 sm:mb-12 lg:mb-16 transition-all duration-1000 transform ${isVisible ? 'translate-y-0 opacity-100' : 'translate-y-8 opacity-0'
           }`}>
-          <div className="inline-flex items-center bg-gradient-to-r from-violet-500/10 via-purple-500/10 to-fuchsia-500/10 backdrop-blur-xl border border-white/20 text-gray-800 text-sm font-bold px-8 py-4 rounded-full mb-8 shadow-2xl hover:shadow-violet-500/20 transition-all duration-500">
-            <div className="w-3 h-3 bg-gradient-to-r from-violet-500 to-fuchsia-500 rounded-full mr-3 animate-pulse shadow-lg"></div>
-            Our Portfolio
-          </div>
-          <h2 className="text-2xl sm:text-3xl md:text-4xl font-bold text-gray-900 mb-4 sm:mb-6 leading-tight tracking-tight">
-            <span className="block text-gray-800 font-bold">Showcasing Our</span>
-            <span className="block bg-gradient-to-r from-violet-600 via-purple-600 to-fuchsia-600 bg-clip-text text-transparent mt-2 font-bold">
+          <span className="text-sm font-semibold text-[#0F766E] uppercase tracking-wider">Our Portfolio</span>
+          <h2 className="text-2xl sm:text-3xl md:text-4xl font-bold text-slate-800 mb-4 sm:mb-6 mt-4 leading-tight tracking-tight">
+            Showcasing Our
+            <span className="block text-[#0F766E] mt-2">
               Digital Masterpieces
             </span>
           </h2>
-          <p className="text-base sm:text-lg lg:text-xl text-gray-600 max-w-3xl mx-auto leading-relaxed px-4 sm:px-0">
+          <p className="text-base sm:text-lg lg:text-xl text-slate-600 max-w-3xl leading-relaxed">
             Discover the innovative solutions we've crafted for businesses across various industries
           </p>
         </div>
 
-        {/* Modern Filter Buttons */}
         <div className={`flex flex-wrap justify-center gap-2 sm:gap-3 mb-8 sm:mb-12 lg:mb-16 transition-all duration-1000 delay-300 transform ${isVisible ? 'translate-y-0 opacity-100' : 'translate-y-8 opacity-0'
           }`}>
           {categories.map((category, index) => (
             <button
               key={index}
               onClick={() => setActiveCategory(category)}
-              className={`px-4 sm:px-6 py-2 sm:py-3 rounded-2xl text-sm sm:text-base font-semibold transition-all duration-300 backdrop-blur-sm border ${activeCategory === category
-                ? 'bg-gradient-to-r from-violet-500 to-purple-600 text-white shadow-lg shadow-violet-500/30 border-violet-400/50'
-                : 'bg-white/60 text-gray-700 hover:bg-white/80 border-white/30 hover:shadow-lg'
+              className={`px-4 sm:px-6 py-2 sm:py-3 rounded-2xl text-sm sm:text-base font-semibold transition-all duration-300 border ${activeCategory === category
+                ? 'bg-[#0F766E] text-white shadow-lg border-[#0F766E]'
+                : 'bg-white text-slate-700 hover:bg-[#FAF9F6] border-slate-200 hover:shadow-lg'
                 }`}
             >
               {category}
@@ -107,117 +100,75 @@ const Portfolio = memo(function Portfolio() {
           ))}
         </div>
 
-        {/* Enhanced Portfolio Grid */}
         <div className={`grid sm:grid-cols-2 lg:grid-cols-3 gap-4 sm:gap-6 lg:gap-8 mb-8 sm:mb-12 lg:mb-16 transition-all duration-1000 delay-500 transform ${isVisible ? 'translate-y-0 opacity-100' : 'translate-y-8 opacity-0'
           }`}>
-          {filteredProjects.map((project, index) => {
-            const cardColors = [
-              { primary: '#8b5cf6', secondary: '#a855f7', bg: 'from-violet-500/15 to-purple-500/15' },
-              { primary: '#ec4899', secondary: '#f43f5e', bg: 'from-pink-500/15 to-rose-500/15' },
-              { primary: '#06b6d4', secondary: '#0891b2', bg: 'from-cyan-500/15 to-sky-500/15' },
-              { primary: '#f59e0b', secondary: '#d97706', bg: 'from-amber-500/15 to-orange-500/15' },
-              { primary: '#10b981', secondary: '#059669', bg: 'from-emerald-500/15 to-green-500/15' },
-              { primary: '#6366f1', secondary: '#4f46e5', bg: 'from-indigo-500/15 to-blue-500/15' }
-            ];
-            const colorIndex = index % cardColors.length;
+          {filteredProjects.map((project, index) => (
+            <div key={index} className="group relative">
+              <div className="relative bg-white rounded-2xl overflow-hidden shadow-lg border border-slate-200 hover:shadow-xl transition-all duration-300 hover:-translate-y-1">
 
-            return (
-              <div key={index} className="group relative">
-                {/* Background Glow */}
-                <div className={`absolute -inset-2 bg-gradient-to-r ${cardColors[colorIndex].bg} rounded-3xl blur-xl opacity-0 group-hover:opacity-60 transition-all duration-500`}></div>
+                <div className="relative overflow-hidden">
+                  <img
+                    src={project.image}
+                    alt={project.title}
+                    loading="lazy"
+                    height={192}
+                    className="w-full h-40 sm:h-48 object-cover group- transition-transform duration-700"
+                  />
+                  <div className="absolute inset-0 bg-gradient-to-t from-black/50 via-transparent to-transparent opacity-0 group-hover:opacity-100 transition-opacity duration-300"></div>
 
-                {/* Main Card */}
-                <div className="relative bg-white/80 backdrop-blur-xl rounded-2xl overflow-hidden shadow-xl border border-white/50 group-hover:shadow-2xl transition-all duration-500 transform group-hover:-translate-y-2">
-
-                  {/* Image Section */}
-                  <div className="relative overflow-hidden">
-                    <img
-                      src={project.image}
-                      alt={project.title}
-                      loading="lazy"
-                      height={192}
-                      className="w-full h-40 sm:h-48 object-cover group-hover:scale-105 transition-transform duration-700"
-                    />
-                    {/* Gradient Overlay */}
-                    <div className="absolute inset-0 bg-gradient-to-t from-black/50 via-transparent to-transparent opacity-0 group-hover:opacity-100 transition-opacity duration-300"></div>
-
-                    {/* Action Buttons */}
-                    <div className="absolute inset-0 flex items-center justify-center opacity-0 group-hover:opacity-100 transition-all duration-300">
-                      <Link
-                        to={`/portfolio/${project.slug}`}
-                        className="w-12 h-12 bg-white/90 backdrop-blur-sm rounded-full flex items-center justify-center hover:bg-white transition-all duration-300 shadow-lg hover:scale-110"
-                        style={{ color: cardColors[colorIndex].primary }}
-                      >
-                        <i className="ri-eye-line text-xl"></i>
-                      </Link>
-                    </div>
-
-                    {/* Category Badge */}
-                    <div className="absolute top-4 left-4">
-                      <span
-                        className="text-xs font-bold text-white px-3 py-1.5 rounded-full backdrop-blur-sm border border-white/20"
-                        style={{ backgroundColor: `${cardColors[colorIndex].primary}80` }}
-                      >
-                        {project.category}
-                      </span>
-                    </div>
-                  </div>
-
-                  {/* Content Section */}
-                  <div className="p-6">
-                    <h3
-                      className="text-xl font-bold mb-3 group-hover:scale-105 transition-transform duration-300"
-                      style={{
-                        background: `linear-gradient(135deg, ${cardColors[colorIndex].primary}, ${cardColors[colorIndex].secondary})`,
-                        WebkitBackgroundClip: 'text',
-                        WebkitTextFillColor: 'transparent',
-                        backgroundClip: 'text'
-                      }}
+                  <div className="absolute inset-0 flex items-center justify-center opacity-0 group-hover:opacity-100 transition-all duration-300">
+                    <Link
+                      to={`/portfolio/${project.slug}`}
+                      className="w-12 h-12 bg-white/90 rounded-full flex items-center justify-center hover:bg-white transition-all duration-300 shadow-lg text-[#0F766E]"
                     >
-                      {project.title}
-                    </h3>
-
-                    <p className="text-gray-600 mb-4 leading-relaxed text-sm">
-                      {project.description}
-                    </p>
-
-                    {/* Tech Stack */}
-                    <div className="flex flex-wrap gap-2">
-                      {project.technologies.slice(0, 3).map((tech, techIndex) => (
-                        <span
-                          key={techIndex}
-                          className="text-xs bg-gray-100/80 text-gray-700 px-3 py-1.5 rounded-full border border-gray-200/50 backdrop-blur-sm"
-                        >
-                          {tech}
-                        </span>
-                      ))}
-                      {project.technologies.length > 3 && (
-                        <span className="text-xs bg-gray-100/80 text-gray-500 px-3 py-1.5 rounded-full border border-gray-200/50">
-                          +{project.technologies.length - 3}
-                        </span>
-                      )}
-                    </div>
+                      <i className="ri-eye-line text-xl"></i>
+                    </Link>
                   </div>
 
-                  {/* Bottom Accent */}
-                  <div className="absolute bottom-0 left-0 right-0 h-1 bg-gradient-to-r opacity-0 group-hover:opacity-100 transition-opacity duration-300"
-                    style={{ background: `linear-gradient(90deg, ${cardColors[colorIndex].primary}, ${cardColors[colorIndex].secondary})` }}
-                  ></div>
+                  <div className="absolute top-4 left-4">
+                    <span className="text-xs font-bold text-white px-3 py-1.5 rounded-full bg-[#0F766E]/80">
+                      {project.category}
+                    </span>
+                  </div>
+                </div>
+
+                <div className="p-6">
+                  <h3 className="text-xl font-bold mb-3 text-slate-800">
+                    {project.title}
+                  </h3>
+
+                  <p className="text-slate-600 mb-4 leading-relaxed text-sm">
+                    {project.description}
+                  </p>
+
+                  <div className="flex flex-wrap gap-2">
+                    {project.technologies.slice(0, 3).map((tech, techIndex) => (
+                      <span
+                        key={techIndex}
+                        className="text-xs bg-[#FAF9F6] text-slate-700 px-3 py-1.5 rounded-full border border-slate-200"
+                      >
+                        {tech}
+                      </span>
+                    ))}
+                    {project.technologies.length > 3 && (
+                      <span className="text-xs bg-[#FAF9F6] text-slate-500 px-3 py-1.5 rounded-full border border-slate-200">
+                        +{project.technologies.length - 3}
+                      </span>
+                    )}
+                  </div>
                 </div>
               </div>
-            )
-          })}
+            </div>
+          ))}
         </div>
 
-        {/* Enhanced View More Button */}
         <div className={`text-center transition-all duration-1000 delay-700 transform ${isVisible ? 'translate-y-0 opacity-100' : 'translate-y-8 opacity-0'
           }`}>
-          <Link to="/portfolio" className="group relative inline-block bg-gradient-to-r from-violet-600 via-purple-600 to-fuchsia-600 text-white px-10 py-4 rounded-2xl font-bold shadow-2xl shadow-violet-500/30 hover:shadow-violet-500/50 transition-all duration-300 transform hover:scale-105 overflow-hidden">
+          <Link to="/portfolio" className="group relative inline-block bg-[#0F766E] hover:bg-[#0D6B63] text-white px-10 py-4 rounded-2xl font-bold shadow-lg transition-all duration-300 overflow-hidden">
             <span className="relative z-10 flex items-center">
               View More Projects
               <i className="ri-arrow-right-line ml-2 group-hover:translate-x-1 transition-transform duration-300"></i>
             </span>
-            <div className="absolute inset-0 bg-gradient-to-r from-fuchsia-600 via-purple-600 to-violet-600 opacity-0 group-hover:opacity-100 transition-opacity duration-300"></div>
           </Link>
         </div>
       </div>

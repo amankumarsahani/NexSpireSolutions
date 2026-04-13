@@ -20,21 +20,21 @@ const PrivacyPolicy = () => {
                 <meta name="twitter:description" content="Read the Nexspire Solutions privacy policy. Learn how we collect, use, and protect your personal data." />
             </Helmet>
             <div className="max-w-3xl mx-auto px-4 sm:px-6 lg:px-8">
-                <h1 className="text-4xl font-bold text-gray-900 mb-8">Privacy Policy</h1>
-                <div className="prose prose-lg prose-blue text-gray-600">
-                    <p className="lead text-xl text-gray-500 mb-8">
+                <h1 className="text-4xl font-bold text-slate-800 mb-8">Privacy Policy</h1>
+                <div className="prose prose-lg prose-blue text-slate-600">
+                    <p className="lead text-xl text-slate-500 mb-8">
                         Last updated: March 15, 2025
                     </p>
 
                     <section className="mb-12">
-                        <h2 className="text-2xl font-bold text-gray-900 mb-4">1. Introduction</h2>
+                        <h2 className="text-2xl font-bold text-slate-800 mb-4">1. Introduction</h2>
                         <p className="mb-4">
                             Welcome to Nexspire Solution. We respect your privacy and are committed to protecting your personal data. This privacy policy will inform you as to how we look after your personal data when you visit our website and tell you about your privacy rights and how the law protects you.
                         </p>
                     </section>
 
                     <section className="mb-12">
-                        <h2 className="text-2xl font-bold text-gray-900 mb-4">2. Data We Collect</h2>
+                        <h2 className="text-2xl font-bold text-slate-800 mb-4">2. Data We Collect</h2>
                         <p className="mb-4">
                             We may collect, use, store and transfer different kinds of personal data about you which we have grouped together follows:
                         </p>
@@ -46,7 +46,7 @@ const PrivacyPolicy = () => {
                     </section>
 
                     <section className="mb-12">
-                        <h2 className="text-2xl font-bold text-gray-900 mb-4">3. How We Use Your Data</h2>
+                        <h2 className="text-2xl font-bold text-slate-800 mb-4">3. How We Use Your Data</h2>
                         <p className="mb-4">
                             We will only use your personal data when the law allows us to. Most commonly, we will use your personal data in the following circumstances:
                         </p>
@@ -58,12 +58,12 @@ const PrivacyPolicy = () => {
                     </section>
 
                     <section className="mb-12">
-                        <h2 className="text-2xl font-bold text-gray-900 mb-4">4. Contact Us</h2>
+                        <h2 className="text-2xl font-bold text-slate-800 mb-4">4. Contact Us</h2>
                         <p className="mb-4">
                             If you have any questions about this privacy policy or our privacy practices, please contact us at:
                         </p>
-                        <div className="bg-gray-50 p-6 rounded-xl border border-gray-100">
-                            <p className="font-semibold text-gray-900">Nexspire Solution</p>
+                        <div className="bg-[#FAF9F6] p-6 rounded-xl border border-slate-200">
+                            <p className="font-semibold text-slate-800">Nexspire Solution</p>
                             <p>Email: nexspiretechsolutions@gmail.com</p>
                             <p>Address: Mohali, SAS Nagar, Punjab, IN</p>
                         </div>

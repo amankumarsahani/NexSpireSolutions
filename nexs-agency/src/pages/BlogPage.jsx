@@ -146,7 +146,7 @@ const BlogPage = () => {
     }
 
     return (
-        <div className="min-h-screen bg-white font-sans text-gray-900 selection:bg-blue-600 selection:text-white">
+        <div className="min-h-screen bg-white font-sans text-slate-800 selection:bg-blue-600 selection:text-white">
             <Helmet>
                 <title>Blog - Tech Insights & Trends | Nexspire Solutions</title>
                 <meta name="description" content="Stay updated with the latest trends in AI, Web Development, Mobile Apps, and Enterprise Software. Expert insights from Nexspire Solutions." />
@@ -201,7 +201,7 @@ const BlogPage = () => {
                             animate={{ opacity: 1, y: 0 }}
                             transition={{ duration: 0.8, delay: 0.2 }}
                         >
-                            <span className="inline-block px-4 py-2 bg-blue-600 text-white text-sm font-bold rounded-full mb-6 shadow-lg shadow-blue-600/20">
+                            <span className="inline-block px-4 py-2 bg-blue-600 text-white text-sm font-bold rounded-full mb-6 shadow-lg shadow-lg">
                                 Featured Article
                             </span>
                             <h1 className="text-5xl md:text-7xl font-bold text-white mb-6 max-w-5xl leading-tight group-hover:text-blue-400 transition-colors duration-300">
@@ -211,9 +211,9 @@ const BlogPage = () => {
                                 {featuredPost.excerpt}
                             </p>
 
-                            <div className="flex items-center gap-8 text-sm text-gray-400 font-medium">
+                            <div className="flex items-center gap-8 text-sm text-slate-400 font-medium">
                                 <div className="flex items-center gap-3">
-                                    <div className="w-10 h-10 rounded-full bg-gradient-to-br from-blue-500 to-purple-500 flex items-center justify-center text-white font-bold text-lg">
+                                    <div className="w-10 h-10 rounded-full bg-[#0F766E] flex items-center justify-center text-white font-bold text-lg">
                                         {featuredPost.author.charAt(0)}
                                     </div>
                                     <span className="text-white">{featuredPost.author}</span>
@@ -246,8 +246,8 @@ const BlogPage = () => {
                                         className={cn(
                                             "px-5 py-2.5 rounded-full text-sm font-bold transition-all duration-300",
                                             activeCategory === cat
-                                                ? "bg-gray-900 text-white shadow-lg scale-105"
-                                                : "bg-gray-100 text-gray-600 hover:bg-gray-200"
+                                                ? "bg-slate-900 text-white shadow-lg scale-105"
+                                                : "bg-gray-100 text-slate-600 hover:bg-gray-200"
                                         )}
                                     >
                                         {cat}
@@ -264,9 +264,9 @@ const BlogPage = () => {
                                 placeholder="Search articles..."
                                 value={searchQuery}
                                 onChange={(e) => setSearchQuery(e.target.value)}
-                                className="w-full md:w-80 pl-12 pr-6 py-4 rounded-full bg-gray-50 border border-gray-200 focus:border-blue-600 focus:outline-none shadow-sm transition-all focus:shadow-lg focus:bg-white"
+                                className="w-full md:w-80 pl-12 pr-6 py-4 rounded-full bg-[#FAF9F6] border border-slate-200 focus:border-blue-600 focus:outline-none shadow-sm transition-all focus:shadow-lg focus:bg-white"
                             />
-                            <i className="ri-search-line absolute left-5 top-1/2 -translate-y-1/2 text-gray-400 text-lg"></i>
+                            <i className="ri-search-line absolute left-5 top-1/2 -translate-y-1/2 text-slate-400 text-lg"></i>
                         </FadeIn>
                     </div>
                 </div>
@@ -284,41 +284,41 @@ const BlogPage = () => {
                                     animate={{ opacity: 1, scale: 1, y: 0 }}
                                     exit={{ opacity: 0, scale: 0.9 }}
                                     transition={{ duration: 0.4, delay: index % POSTS_PER_PAGE * 0.05 }}
-                                    className="bg-white rounded-[2rem] overflow-hidden shadow-sm hover:shadow-2xl transition-all duration-500 group border border-gray-100 flex flex-col h-full hover:-translate-y-2"
+                                    className="bg-white rounded-[2rem] overflow-hidden shadow-sm hover:shadow-2xl transition-all duration-500 group border border-slate-200 flex flex-col h-full hover:-translate-y-2"
                                 >
                                     <div className="relative h-64 overflow-hidden">
                                         <img
                                             src={post.image}
                                             alt={post.title}
-                                            className="w-full h-full object-cover transition-transform duration-700 group-hover:scale-110"
+                                            className="w-full h-full object-cover transition-transform duration-700 group-"
                                             loading="lazy"
                                         />
                                         <div className="absolute top-4 left-4">
-                                            <span className="px-3 py-1 bg-white/90 backdrop-blur-md text-gray-900 text-xs font-bold rounded-full shadow-sm">
+                                            <span className="px-3 py-1 bg-white/90 backdrop-blur-md text-slate-800 text-xs font-bold rounded-full shadow-sm">
                                                 {post.category}
                                             </span>
                                         </div>
                                     </div>
                                     <div className="p-8 flex-1 flex flex-col">
-                                        <div className="flex items-center gap-3 text-xs text-gray-500 mb-4 font-medium uppercase tracking-wider">
+                                        <div className="flex items-center gap-3 text-xs text-slate-500 mb-4 font-medium uppercase tracking-wider">
                                             <span>{post.date}</span>
                                             <span className="w-1 h-1 bg-gray-300 rounded-full"></span>
                                             <span>{post.readTime}</span>
                                         </div>
-                                        <h3 className="text-2xl font-bold text-gray-900 mb-4 group-hover:text-blue-600 transition-colors leading-tight">
+                                        <h3 className="text-2xl font-bold text-slate-800 mb-4 group-hover:text-[#0F766E] transition-colors leading-tight">
                                             {post.title}
                                         </h3>
-                                        <p className="text-gray-600 mb-6 line-clamp-3 flex-1 leading-relaxed">
+                                        <p className="text-slate-600 mb-6 line-clamp-3 flex-1 leading-relaxed">
                                             {post.excerpt}
                                         </p>
-                                        <div className="flex items-center justify-between pt-6 border-t border-gray-100 mt-auto">
+                                        <div className="flex items-center justify-between pt-6 border-t border-slate-200 mt-auto">
                                             <div className="flex items-center gap-2">
-                                                <div className="w-8 h-8 rounded-full bg-gray-100 flex items-center justify-center text-gray-600 font-bold text-xs">
+                                                <div className="w-8 h-8 rounded-full bg-gray-100 flex items-center justify-center text-slate-600 font-bold text-xs">
                                                     {post.author.charAt(0)}
                                                 </div>
-                                                <span className="text-sm font-bold text-gray-900">{post.author}</span>
+                                                <span className="text-sm font-bold text-slate-800">{post.author}</span>
                                             </div>
-                                            <button className="text-blue-600 font-bold text-sm group-hover:translate-x-1 transition-transform flex items-center gap-1">
+                                            <button className="text-[#0F766E] font-bold text-sm group-hover:translate-x-1 transition-transform flex items-center gap-1">
                                                 Read Article <i className="ri-arrow-right-line"></i>
                                             </button>
                                         </div>
@@ -334,28 +334,28 @@ const BlogPage = () => {
                     {loadingMore && (
                         <div className="flex items-center gap-3">
                             <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-blue-600"></div>
-                            <span className="text-gray-500 font-medium">Loading more articles...</span>
+                            <span className="text-slate-500 font-medium">Loading more articles...</span>
                         </div>
                     )}
                     {!hasMore && nonFeaturedDisplayed.length > 0 && (
-                        <p className="text-gray-400 text-sm font-medium">
+                        <p className="text-slate-400 text-sm font-medium">
                             You've reached the end • {nonFeaturedDisplayed.length} articles shown
                         </p>
                     )}
                     {nonFeaturedDisplayed.length === 0 && !loading && (
                         <div className="text-center py-12">
                             <i className="ri-article-line text-6xl text-gray-300 mb-4 block"></i>
-                            <p className="text-gray-500 text-lg">No articles found matching your criteria</p>
+                            <p className="text-slate-500 text-lg">No articles found matching your criteria</p>
                         </div>
                     )}
                 </div>
 
                 {/* Follow Us on Social Media */}
                 <div className="mt-16 relative">
-                    <div className="absolute inset-0 bg-gradient-to-r from-blue-600 to-purple-600 rounded-[3rem] transform rotate-1 opacity-50 blur-lg"></div>
-                    <div className="bg-gray-900 rounded-[3rem] p-12 md:p-24 text-center text-white relative overflow-hidden shadow-2xl">
+                    <div className="absolute inset-0 bg-[#0F766E] rounded-[3rem] transform rotate-1 opacity-50 blur-lg"></div>
+                    <div className="bg-slate-900 rounded-[3rem] p-12 md:p-24 text-center text-white relative overflow-hidden shadow-2xl">
                         <div className="absolute inset-0 bg-[url('https://grainy-gradients.vercel.app/noise.svg')] opacity-10"></div>
-                        <div className="absolute top-0 left-0 w-full h-full bg-gradient-to-br from-blue-900/50 to-purple-900/50"></div>
+                        <div className="absolute top-0 left-0 w-full h-full bg-slate-900/70"></div>
 
                         <div className="relative z-10 max-w-3xl mx-auto">
                             <div className="w-20 h-20 bg-white/10 rounded-3xl flex items-center justify-center mx-auto mb-8 backdrop-blur-md">
@@ -373,7 +373,7 @@ const BlogPage = () => {
                                         aria-label={social.label}
                                         target="_blank"
                                         rel="noopener noreferrer"
-                                        className="w-16 h-16 bg-white/10 backdrop-blur-md rounded-2xl flex items-center justify-center border border-white/20 hover:bg-white/20 hover:scale-110 transition-all duration-300 shadow-lg"
+                                        className="w-16 h-16 bg-white/10 backdrop-blur-md rounded-2xl flex items-center justify-center border border-white/20 hover:bg-white/20  transition-all duration-300 shadow-lg"
                                     >
                                         <i className={`${social.icon} text-3xl text-white`}></i>
                                     </a>

@@ -38,12 +38,12 @@ const ProjectCard = ({ project, index }) => {
                             'md:col-span-1'
                 )}
             >
-                <div className="absolute inset-0 bg-gray-900/30 group-hover:bg-gray-900/60 transition-colors duration-500 z-10" />
+                <div className="absolute inset-0 bg-slate-900/30 group-hover:bg-slate-900/60 transition-colors duration-500 z-10" />
                 <img
                     src={project.image}
                     alt={project.title}
                     loading="lazy"
-                    className="w-full h-full object-cover transform group-hover:scale-110 transition-transform duration-700 ease-out"
+                    className="w-full h-full object-cover transform group- transition-transform duration-700 ease-out"
                 />
 
                 {/* Metrics Badge */}
@@ -72,7 +72,7 @@ const ProjectCard = ({ project, index }) => {
 
                         {/* View Case Study Button */}
                         <div className="opacity-0 group-hover:opacity-100 transition-opacity duration-300 delay-200">
-                            <span className="inline-flex items-center gap-2 px-5 py-2.5 bg-white text-gray-900 rounded-full text-sm font-bold hover:bg-blue-600 hover:text-white transition-colors">
+                            <span className="inline-flex items-center gap-2 px-5 py-2.5 bg-white text-slate-800 rounded-full text-sm font-bold hover:bg-[#0F766E] hover:text-white transition-colors">
                                 View Case Study
                                 <i className="ri-arrow-right-line"></i>
                             </span>
@@ -166,7 +166,7 @@ const PortfolioPage = () => {
     ];
 
     return (
-        <div className="min-h-screen bg-white font-sans text-gray-900 selection:bg-blue-600 selection:text-white">
+        <div className="min-h-screen bg-white font-sans text-slate-800 selection:bg-blue-600 selection:text-white">
             <Helmet>
                 <title>Portfolio - Custom Software Case Studies | Nexspire Solutions</title>
                 <meta name="description" content="Explore our portfolio of successful projects including E-commerce platforms, HealthTech apps, and AI-Powered CRM systems. See how Nexspire Solutions delivers measurable results for global clients." />
@@ -205,7 +205,7 @@ const PortfolioPage = () => {
             <section className="relative min-h-[85vh] flex items-center pt-20 overflow-hidden bg-gray-950 text-white">
                 <div className="absolute inset-0 bg-[url('https://grainy-gradients.vercel.app/noise.svg')] opacity-20"></div>
                 <div className="absolute inset-0 bg-[url('https://images.unsplash.com/photo-1558655146-d09347e92766?q=80&w=2070&auto=format&fit=crop&fm=webp')] bg-cover bg-center opacity-30 mix-blend-soft-light"></div>
-                <div className="absolute top-0 right-0 w-2/3 h-full bg-gradient-to-l from-blue-900/30 to-transparent"></div>
+                <div className="absolute top-0 right-0 w-2/3 h-full bg-gradient-to-l from-slate-900/30 to-transparent"></div>
 
                 <div className="container-custom relative z-10">
                     <FadeIn>
@@ -214,9 +214,9 @@ const PortfolioPage = () => {
                         </span>
                         <h1 className="text-6xl md:text-8xl font-bold tracking-tighter leading-tight mb-8">
                             We Create <br />
-                            <span className="text-transparent bg-clip-text bg-gradient-to-r from-blue-400 to-purple-400">Digital Legacies.</span>
+                            <span className="text-[#D97706]">Digital Legacies.</span>
                         </h1>
-                        <p className="text-xl text-gray-400 max-w-2xl mb-8">
+                        <p className="text-xl text-slate-400 max-w-2xl mb-8">
                             Real results for real businesses. Explore our portfolio of successful projects across web, mobile, and AI.
                         </p>
                     </FadeIn>
@@ -226,11 +226,11 @@ const PortfolioPage = () => {
             {/* Stats Bar */}
             <section className="relative -mt-16 z-30 px-6 mb-12">
                 <div className="container-custom">
-                    <div className="bg-white rounded-2xl shadow-xl p-8 border border-gray-100 grid grid-cols-2 md:grid-cols-4 gap-8">
+                    <div className="bg-white rounded-2xl shadow-xl p-8 border border-slate-200 grid grid-cols-2 md:grid-cols-4 gap-8">
                         {stats.map((stat, i) => (
                             <div key={i} className="text-center">
-                                <div className="text-3xl md:text-4xl font-bold text-gray-900 mb-1">{stat.value}</div>
-                                <div className="text-sm text-gray-500 font-medium">{stat.label}</div>
+                                <div className="text-3xl md:text-4xl font-bold text-slate-800 mb-1">{stat.value}</div>
+                                <div className="text-sm text-slate-500 font-medium">{stat.label}</div>
                             </div>
                         ))}
                     </div>
@@ -238,7 +238,7 @@ const PortfolioPage = () => {
             </section>
 
             {/* Filter & Grid */}
-            <section className="py-10 bg-gray-50 min-h-screen">
+            <section className="py-10 bg-[#FAF9F6] min-h-screen">
                 <div className="container-custom">
                     {/* Breadcrumbs */}
                     <div className="mb-8">
@@ -254,8 +254,8 @@ const PortfolioPage = () => {
                                 className={cn(
                                     "px-6 py-3 rounded-full text-sm font-bold transition-all duration-300",
                                     activeFilter === filter
-                                        ? "bg-gray-900 text-white shadow-lg scale-105"
-                                        : "bg-white text-gray-600 hover:bg-gray-100 border border-gray-200"
+                                        ? "bg-slate-900 text-white shadow-lg scale-105"
+                                        : "bg-white text-slate-600 hover:bg-gray-100 border border-slate-200"
                                 )}
                             >
                                 {filter}
@@ -282,10 +282,10 @@ const PortfolioPage = () => {
                 <div className="container-custom relative z-10">
                     <FadeIn>
                         <h2 className="text-5xl md:text-7xl font-bold mb-8 tracking-tighter">Have a vision?</h2>
-                        <p className="text-xl text-gray-500 mb-12 max-w-2xl mx-auto">
+                        <p className="text-xl text-slate-500 mb-12 max-w-2xl mx-auto">
                             Let's collaborate to turn your boldest ideas into reality. We are ready when you are.
                         </p>
-                        <Link to="/contact" className="inline-flex items-center gap-4 px-12 py-6 bg-gray-900 text-white rounded-full text-xl font-bold hover:bg-blue-600 transition-all duration-300 group shadow-2xl">
+                        <Link to="/contact" className="inline-flex items-center gap-4 px-12 py-6 bg-slate-900 text-white rounded-full text-xl font-bold hover:bg-[#0F766E] transition-all duration-300 group shadow-2xl">
                             Start a Project
                             <i className="ri-arrow-right-line group-hover:translate-x-2 transition-transform"></i>
                         </Link>

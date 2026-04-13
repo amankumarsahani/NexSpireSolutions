@@ -33,7 +33,7 @@ export default function ServicePageTemplate({ data }) {
     };
 
     return (
-        <div className={`min-h-screen bg-slate-50 font-sans text-slate-900 selection:bg-${themeColor}-600 selection:text-white`}>
+        <div className={`min-h-screen bg-slate-50 font-sans text-slate-900 selection:bg-teal-700 selection:text-white`}>
             <Helmet>
                 <title>{seo.title}</title>
                 <meta name="description" content={seo.description} />
@@ -76,10 +76,10 @@ export default function ServicePageTemplate({ data }) {
 
                         <motion.h1 initial={{ opacity: 0, y: 30 }} animate={{ opacity: 1, y: 0 }} transition={{ delay: 0.1 }} className="text-5xl md:text-7xl font-bold mb-8 tracking-tight leading-tight">
                             {hero.h1Line1} <br />
-                            <span className={`text-transparent bg-clip-text bg-gradient-to-r ${hero.gradient}`}>{hero.h1Line2}</span>
+                            <span className={`text-[#0F766E]`}>{hero.h1Line2}</span>
                         </motion.h1>
 
-                        <motion.p initial={{ opacity: 0, y: 30 }} animate={{ opacity: 1, y: 0 }} transition={{ delay: 0.2 }} className="text-xl text-gray-400 max-w-2xl leading-relaxed mb-10">
+                        <motion.p initial={{ opacity: 0, y: 30 }} animate={{ opacity: 1, y: 0 }} transition={{ delay: 0.2 }} className="text-xl text-slate-400 max-w-2xl leading-relaxed mb-10">
                             {hero.paragraph}
                         </motion.p>
 
@@ -121,7 +121,7 @@ export default function ServicePageTemplate({ data }) {
                                     src={overview.bento.largeImage.src}
                                     alt={overview.bento.largeImage.alt}
                                     loading="lazy"
-                                    className="absolute inset-0 w-full h-full object-cover transition-transform duration-700 group-hover:scale-110"
+                                    className="absolute inset-0 w-full h-full object-cover transition-transform duration-700 group-"
                                 />
                                 <div className="absolute inset-0 bg-gradient-to-t from-slate-900/60 to-transparent"></div>
                                 <div className="absolute bottom-6 left-6 text-white font-bold text-lg">{overview.bento.largeImage.label}</div>
@@ -132,7 +132,7 @@ export default function ServicePageTemplate({ data }) {
                                     src={overview.bento.smallImage.src}
                                     alt={overview.bento.smallImage.alt}
                                     loading="lazy"
-                                    className="absolute inset-0 w-full h-full object-cover transition-transform duration-700 group-hover:scale-110"
+                                    className="absolute inset-0 w-full h-full object-cover transition-transform duration-700 group-"
                                 />
                                 <div className={`absolute inset-0 bg-${themeColor}-600/20 mix-blend-overlay`}></div>
                             </div>
@@ -162,7 +162,7 @@ export default function ServicePageTemplate({ data }) {
                     <div className="grid md:grid-cols-2 gap-6">
                         {capabilities.map((cap, i) => (
                             <FadeIn key={i} delay={i * 0.1} className={`group p-8 rounded-[2rem] bg-slate-50 border border-slate-100 hover:bg-white hover:shadow-xl hover:shadow-${themeColor}-200/50 hover:-translate-y-1 transition-all duration-300`}>
-                                <div className={`w-14 h-14 rounded-2xl flex items-center justify-center text-2xl mb-6 transition-transform group-hover:scale-110 bg-${cap.color}-100 text-${cap.color}-600`}>
+                                <div className={`w-14 h-14 rounded-2xl flex items-center justify-center text-2xl mb-6 transition-transform group- bg-${cap.color}-100 text-${cap.color}-600`}>
                                     <i className={cap.icon}></i>
                                 </div>
                                 <h3 className="text-2xl font-bold mb-3 text-slate-900">{cap.title}</h3>
@@ -198,7 +198,7 @@ export default function ServicePageTemplate({ data }) {
                 <div className="container-custom">
                     <h2 className="text-4xl md:text-5xl font-bold mb-8">{cta.h2}</h2>
                     <p className="text-slate-400 mb-10 text-lg max-w-xl mx-auto">{cta.paragraph}</p>
-                    <Link to="/contact" className="inline-flex items-center gap-3 px-10 py-5 bg-white text-slate-900 rounded-full text-lg font-bold hover:scale-105 transition-transform">
+                    <Link to="/contact" className="inline-flex items-center gap-3 px-10 py-5 bg-white text-slate-900 rounded-full text-lg font-bold  transition-transform">
                         {cta.buttonText}
                     </Link>
                 </div>

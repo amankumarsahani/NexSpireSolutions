@@ -27,12 +27,12 @@ export default function TrustBadges({ className = '' }) {
             {badges.map((badge, index) => (
                 <div
                     key={index}
-                    className="flex items-center gap-3 text-gray-500"
+                    className="flex items-center gap-3 text-slate-500"
                 >
-                    <i className={`${badge.icon} text-2xl text-blue-600`}></i>
+                    <i className={`${badge.icon} text-2xl text-[#0F766E]`}></i>
                     <div className="text-left">
-                        <div className="text-sm font-semibold text-gray-700">{badge.title}</div>
-                        <div className="text-xs text-gray-400">{badge.subtitle}</div>
+                        <div className="text-sm font-semibold text-slate-600">{badge.title}</div>
+                        <div className="text-xs text-slate-400">{badge.subtitle}</div>
                     </div>
                 </div>
             ))}
@@ -51,7 +51,7 @@ export function TrustBadgesCompact({ className = '' }) {
     return (
         <div className={`flex items-center gap-4 ${className}`}>
             {badges.map((badge, index) => (
-                <div key={index} className="flex items-center gap-1.5 text-gray-400">
+                <div key={index} className="flex items-center gap-1.5 text-slate-400">
                     <i className={`${badge.icon} text-green-500`}></i>
                     <span className="text-xs font-medium">{badge.label}</span>
                 </div>

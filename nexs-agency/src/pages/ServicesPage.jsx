@@ -14,22 +14,22 @@ import { SITE_URL } from '../constants/siteConfig';
 // Refined Premium Styles
 const serviceStyles = {
     blue: {
-        gradient: "from-blue-500 to-indigo-600",
-        shadow: "shadow-blue-500/20",
-        text: "text-blue-600",
-        bg: "bg-blue-50",
-        icon: "text-blue-500"
+        gradient: "from-[#0F766E] to-[#0D6B63]",
+        shadow: "shadow-lg",
+        text: "text-[#0F766E]",
+        bg: "bg-[#FAF9F6]",
+        icon: "text-[#0F766E]"
     },
     purple: {
-        gradient: "from-purple-500 to-fuchsia-600",
-        shadow: "shadow-purple-500/20",
-        text: "text-purple-600",
-        bg: "bg-purple-50",
+        gradient: "from-[#0F766E] to-[#0D6B63]",
+        shadow: "shadow-lg",
+        text: "text-[#0F766E]",
+        bg: "bg-[#FAF9F6]",
         icon: "text-purple-500"
     },
     emerald: {
         gradient: "from-emerald-500 to-teal-600",
-        shadow: "shadow-emerald-500/20",
+        shadow: "shadow-lg",
         text: "text-emerald-600",
         bg: "bg-emerald-50",
         icon: "text-emerald-500"
@@ -42,8 +42,8 @@ const serviceStyles = {
         icon: "text-orange-500"
     },
     cyan: {
-        gradient: "from-cyan-500 to-blue-500",
-        shadow: "shadow-cyan-500/20",
+        gradient: "from-[#0F766E] to-[#0D6B63]",
+        shadow: "shadow-lg",
         text: "text-cyan-600",
         bg: "bg-cyan-50",
         icon: "text-cyan-500"
@@ -79,7 +79,7 @@ const ServiceCard = ({ service, index }) => {
 
                 {/* Icon Container */}
                 <div className="relative mb-8 inline-block">
-                    <div className={`relative z-10 w-20 h-20 rounded-2xl ${styles.bg} flex items-center justify-center text-3xl ${styles.icon} transition-transform duration-500 group-hover:scale-110 group-hover:rotate-3 shadow-sm`}>
+                    <div className={`relative z-10 w-20 h-20 rounded-2xl ${styles.bg} flex items-center justify-center text-3xl ${styles.icon} transition-transform duration-500 group- group-hover:rotate-3 shadow-sm`}>
                         <i className={service.icon}></i>
                     </div>
                     <div className={`absolute inset-0 bg-gradient-to-br ${styles.gradient} opacity-20 blur-xl rounded-2xl transform scale-0 group-hover:scale-125 transition-transform duration-500`}></div>
@@ -87,19 +87,19 @@ const ServiceCard = ({ service, index }) => {
 
                 {/* Content */}
                 <div className="relative z-10">
-                    <h3 className="text-2xl font-bold text-gray-900 mb-4 group-hover:text-transparent group-hover:bg-clip-text group-hover:bg-gradient-to-r group-hover:scale-[1.02] origin-left transition-all duration-300" style={{ backgroundImage: `linear-gradient(to right, var(--tw-gradient-stops))` }}>
-                        <span className={`bg-gradient-to-r ${styles.gradient} bg-clip-text`}>
+                    <h3 className="text-2xl font-bold text-slate-800 mb-4 group-hover:text-[#0F766E] transition-all duration-300">
+                        <span>
                             {service.title}
                         </span>
                     </h3>
 
                     <div className="mb-4">
-                        <span className={`inline-block px-3 py-1 rounded-full text-xs font-bold bg-white border border-gray-100 shadow-sm ${styles.text}`}>
-                            Starts from <span className="font-extrabold">{service.price}</span>
+                        <span className={`inline-block px-3 py-1 rounded-full text-xs font-bold bg-white border border-slate-200 shadow-sm ${styles.text}`}>
+                            Starts from <span className="font-bold">{service.price}</span>
                         </span>
                     </div>
 
-                    <p className="text-gray-600 leading-relaxed mb-8 min-h-[4.5rem]">
+                    <p className="text-slate-600 leading-relaxed mb-8 min-h-[4.5rem]">
                         {service.description}
                     </p>
 
@@ -108,7 +108,7 @@ const ServiceCard = ({ service, index }) => {
                         {service.features.map((feature, idx) => (
                             <div key={idx} className="flex items-center gap-3">
                                 <div className={`w-1.5 h-1.5 rounded-full bg-gradient-to-r ${styles.gradient}`}></div>
-                                <span className="text-sm font-medium text-gray-500 group-hover:text-gray-700 transition-colors">
+                                <span className="text-sm font-medium text-slate-500 group-hover:text-slate-600 transition-colors">
                                     {feature}
                                 </span>
                             </div>
@@ -117,10 +117,10 @@ const ServiceCard = ({ service, index }) => {
 
                     {/* CTA Button */}
                     <div className="flex items-center text-sm font-bold mt-auto group/btn">
-                        <span className={`bg-gradient-to-r ${styles.gradient} bg-clip-text text-transparent mr-2`}>
+                        <span className={`text-[#0F766E] mr-2`}>
                             Explore Service
                         </span>
-                        <div className={`w-8 h-8 rounded-full flex items-center justify-center bg-gray-50 group-hover/btn:bg-gray-100 transition-colors`}>
+                        <div className={`w-8 h-8 rounded-full flex items-center justify-center bg-[#FAF9F6] group-hover/btn:bg-gray-100 transition-colors`}>
                             <i className={`ri-arrow-right-line ${styles.text} group-hover/btn:translate-x-1 transition-transform`}></i>
                         </div>
                     </div>
@@ -188,7 +188,7 @@ const ServicesPage = () => {
     ];
 
     return (
-        <div className="min-h-screen bg-[#FDFDFD] font-sans text-gray-900 selection:bg-blue-600 selection:text-white">
+        <div className="min-h-screen bg-[#FDFDFD] font-sans text-slate-800 selection:bg-blue-600 selection:text-white">
             <Helmet>
                 <title>Our Services - Web, Mobile, AI & Cloud | Nexspire Solutions</title>
                 <meta name="description" content="Explore our comprehensive software development services. From custom web and mobile apps to AI integration and cloud solutions." />
@@ -253,7 +253,7 @@ const ServicesPage = () => {
                         transition={{ delay: 0.1 }}
                         className="text-5xl md:text-7xl font-bold mb-8 tracking-tight leading-tight"
                     >
-                        We Engineer <span className="text-transparent bg-clip-text bg-gradient-to-r from-blue-400 via-purple-400 to-pink-400">Digital Growth</span> <br className="hidden md:block" />
+                        We Engineer <span className="text-[#D97706]">Digital Growth</span> <br className="hidden md:block" />
                         For Global Brands.
                     </motion.h1>
 
@@ -261,7 +261,7 @@ const ServicesPage = () => {
                         initial={{ opacity: 0, y: 30 }}
                         animate={{ opacity: 1, y: 0 }}
                         transition={{ delay: 0.2 }}
-                        className="max-w-2xl mx-auto text-xl text-gray-400 leading-relaxed mb-12"
+                        className="max-w-2xl mx-auto text-xl text-slate-400 leading-relaxed mb-12"
                     >
                         Strategic software solutions that solve complex business problems. Built for scale, security, and performance.
                     </motion.p>
@@ -274,10 +274,10 @@ const ServicesPage = () => {
                     <div className="bg-white rounded-2xl shadow-xl shadow-slate-200/50 p-8 md:p-10 border border-slate-100 grid grid-cols-2 md:grid-cols-4 gap-8 backdrop-blur-xl">
                         {stats.map((stat, i) => (
                             <div key={i} className="text-center group cursor-default">
-                                <div className="text-4xl md:text-5xl font-bold text-slate-900 group-hover:text-blue-600 transition-colors duration-300 mb-2 font-display">
+                                <div className="text-4xl md:text-5xl font-bold text-slate-900 group-hover:text-[#0F766E] transition-colors duration-300 mb-2 font-display">
                                     {stat.value}
                                 </div>
-                                <div className="text-gray-500 font-medium text-xs md:text-sm uppercase tracking-widest">
+                                <div className="text-slate-500 font-medium text-xs md:text-sm uppercase tracking-widest">
                                     {stat.label}
                                 </div>
                             </div>
@@ -291,8 +291,8 @@ const ServicesPage = () => {
                 <div className="absolute top-1/2 left-0 w-full h-px bg-gradient-to-r from-transparent via-slate-200 to-transparent"></div>
                 <div className="container-custom relative z-10">
                     <div className="text-center mb-16">
-                        <h2 className="text-3xl md:text-4xl font-bold text-gray-900 mb-4">Our Core Capabilities</h2>
-                        <p className="text-gray-500 max-w-2xl mx-auto">Providing end-to-end development services to help you scale your business.</p>
+                        <h2 className="text-3xl md:text-4xl font-bold text-slate-800 mb-4">Our Core Capabilities</h2>
+                        <p className="text-slate-500 max-w-2xl mx-auto">Providing end-to-end development services to help you scale your business.</p>
                     </div>
 
                     <div className="grid md:grid-cols-2 lg:grid-cols-3 gap-8">
@@ -312,7 +312,7 @@ const ServicesPage = () => {
             {/* Tech Stack Marquee */}
             <section className="py-20 bg-slate-50 border-y border-slate-100 overflow-hidden">
                 <div className="text-center mb-10">
-                    <h2 className="text-lg font-semibold text-gray-400 uppercase tracking-widest">Trusted Technology Stack</h2>
+                    <h2 className="text-lg font-semibold text-slate-400 uppercase tracking-widest">Trusted Technology Stack</h2>
                 </div>
                 <div className="flex animate-marquee gap-16 whitespace-nowrap opacity-50 hover:opacity-80 transition-opacity">
                     {[
@@ -332,7 +332,7 @@ const ServicesPage = () => {
                     <div className="mb-20">
                         <div className="flex items-center justify-between mb-8">
                             <h2 className="text-2xl font-bold">Related Capabilities</h2>
-                            <Link to="/services" className="text-blue-600 font-medium hover:underline">View All Services</Link>
+                            <Link to="/services" className="text-[#0F766E] font-medium hover:underline">View All Services</Link>
                         </div>
                         <RelatedServices currentService="Services Overview" />
                     </div>
@@ -351,10 +351,10 @@ const ServicesPage = () => {
 
                 <div className="container-custom relative z-10">
                     <h2 className="text-5xl md:text-7xl font-bold mb-8 tracking-tight">Ready to Scale?</h2>
-                    <p className="text-xl text-gray-400 mb-12 max-w-2xl mx-auto">
+                    <p className="text-xl text-slate-400 mb-12 max-w-2xl mx-auto">
                         Book a free 30-minute consultation with our technical team.
                     </p>
-                    <Link to="/contact" className="group inline-flex items-center gap-3 px-10 py-5 bg-white text-slate-900 rounded-full text-lg font-bold transition-all hover:scale-105 shadow-2xl hover:shadow-white/20">
+                    <Link to="/contact" className="group inline-flex items-center gap-3 px-10 py-5 bg-white text-slate-900 rounded-full text-lg font-bold transition-all  shadow-2xl hover:shadow-white/20">
                         Get Your Free Quote
                         <i className="ri-arrow-right-line group-hover:translate-x-1 transition-transform"></i>
                     </Link>

@@ -1,12 +1,12 @@
 import ServicePageTemplate from '../../components/ServicePageTemplate';
 
 const data = {
-    themeColor: 'orange',
+    themeColor: 'teal',
     badge: { icon: 'ri-shopping-cart-2-line', label: 'Digital Commerce' },
     hero: {
         h1Line1: 'Sell Smarter.',
         h1Line2: 'Grow Faster.',
-        gradient: 'from-orange-400 via-red-400 to-pink-400',
+        gradient: 'from-[#0F766E] to-[#0D6B63]',
         paragraph: 'We build data-driven e-commerce experiences that turn visitors into loyal customers. From headless storefronts to complex marketplaces.',
         ctaText: 'Start Selling',
         bgImage: 'https://images.unsplash.com/photo-1556742049-0cfed4f7a07d',
@@ -60,7 +60,7 @@ const data = {
             title: 'Headless Commerce',
             description: 'Decoupled frontend experiences powered by best-in-class commerce backends.',
             tech: ['Medusa.js', 'Contentful', 'Sanity', 'Vercel'],
-            icon: 'ri-rocket-line',
+            icon: 'ri-arrow-right-up-line',
             color: 'purple',
         },
     ],

@@ -27,7 +27,7 @@ const CostOfCustomCrm = () => {
     };
 
     return (
-        <div className="min-h-screen bg-white font-sans text-gray-900 selection:bg-blue-600 selection:text-white pt-20">
+        <div className="min-h-screen bg-white font-sans text-slate-800 selection:bg-blue-600 selection:text-white pt-20">
             <Helmet>
                 <title>Cost of Building a Custom CRM 2026 | Nexspire Blog</title>
                 <meta name="description" content="How much does it cost to build a custom CRM in 2026? We break down the costs for MVPs, mid-sized, and enterprise solutions, plus hidden costs to watch for." />
@@ -50,10 +50,10 @@ const CostOfCustomCrm = () => {
                     <span className="inline-block px-4 py-1.5 bg-orange-100 text-orange-700 font-bold rounded-full text-sm mb-6">
                         Enterprise Software
                     </span>
-                    <h1 className="text-4xl md:text-6xl font-bold leading-tight mb-6 text-gray-900">
+                    <h1 className="text-4xl md:text-6xl font-bold leading-tight mb-6 text-slate-800">
                         Cost of Building a Custom CRM in 2026: A Complete Guide
                     </h1>
-                    <div className="flex items-center justify-center gap-6 text-gray-500 font-medium">
+                    <div className="flex items-center justify-center gap-6 text-slate-500 font-medium">
                         <div className="flex items-center gap-2">
                             <div className="w-8 h-8 rounded-full bg-blue-600 text-white flex items-center justify-center font-bold">A</div>
                             <span>Aman Kumar</span>
@@ -76,7 +76,7 @@ const CostOfCustomCrm = () => {
                 </div>
 
                 <div className="prose prose-lg prose-orange mx-auto">
-                    <p className="lead text-xl text-gray-600 mb-8">
+                    <p className="lead text-xl text-slate-600 mb-8">
                         Off-the-shelf CRMs like Salesforce or HubSpot are powerful but expensive and rigid. For many businesses, a custom CRM offering tailored workflows and zero license fees is the smarter long-term investment. But what's the price tag?
                     </p>
 
@@ -88,7 +88,7 @@ const CostOfCustomCrm = () => {
                     <div className="overflow-x-auto my-8">
                         <table className="min-w-full text-sm">
                             <thead>
-                                <tr className="bg-gray-100 border-b border-gray-200 text-left">
+                                <tr className="bg-gray-100 border-b border-slate-200 text-left">
                                     <th className="py-3 px-4 font-bold">Type</th>
                                     <th className="py-3 px-4 font-bold">Est. Cost</th>
                                     <th className="py-3 px-4 font-bold">Timeline</th>
@@ -96,13 +96,13 @@ const CostOfCustomCrm = () => {
                                 </tr>
                             </thead>
                             <tbody>
-                                <tr className="border-b border-gray-100">
+                                <tr className="border-b border-slate-200">
                                     <td className="py-3 px-4">MVP CRM</td>
                                     <td className="py-3 px-4">$30k - $50k</td>
                                     <td className="py-3 px-4">2-3 Months</td>
                                     <td className="py-3 px-4">Startups, Small Agencies</td>
                                 </tr>
-                                <tr className="border-b border-gray-100">
+                                <tr className="border-b border-slate-200">
                                     <td className="py-3 px-4">Mid-Market</td>
                                     <td className="py-3 px-4">$50k - $100k</td>
                                     <td className="py-3 px-4">4-6 Months</td>
@@ -148,7 +148,7 @@ const CostOfCustomCrm = () => {
             </article>
 
             {/* Internal Linking to Services */}
-            <div className="bg-gray-50 py-16">
+            <div className="bg-[#FAF9F6] py-16">
                 <div className="container-custom">
                     <h2 className="text-3xl font-bold text-center mb-12">Looking for Enterprise Software?</h2>
                     <RelatedServices currentService="none" />
