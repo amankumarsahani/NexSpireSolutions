@@ -6,7 +6,7 @@ const dummyPosts = [
   {
     title: "Mobile App Development: Native vs Cross-Platform in 2024",
     category: "Mobile Development",
-    image: "https://images.unsplash.com/photo-1512941937669-90a1b58e7e9c?w=400&h=250&fit=crop",
+    image: "https://images.unsplash.com/photo-1512941937669-90a1b58e7e9c?w=400&h=250&fit=crop&fm=webp",
     description: "A comprehensive comparison of native and cross-platform development approaches to help you make the right choice.",
     tags: ["React Native", "Flutter", "iOS", "Android"],
     author: "Anu Kumar",
@@ -18,7 +18,7 @@ const dummyPosts = [
   {
     title: "UI/UX Design Principles for Modern Web Applications",
     category: "Design",
-    image: "https://images.unsplash.com/photo-1586717791821-3f44a563fa4c?w=400&h=250&fit=crop",
+    image: "https://images.unsplash.com/photo-1586717791821-3f44a563fa4c?w=400&h=250&fit=crop&fm=webp",
     description: "Discover essential design principles that create intuitive and engaging user experiences in modern web applications.",
     tags: ["UX Design", "UI Design", "Figma", "Prototyping"],
     author: "Anu Kumar",
@@ -30,7 +30,7 @@ const dummyPosts = [
   {
     title: "Cybersecurity Best Practices for Web Applications",
     category: "Security",
-    image: "https://images.unsplash.com/photo-1555949963-aa79dcee981c?w=400&h=250&fit=crop",
+    image: "https://images.unsplash.com/photo-1555949963-aa79dcee981c?w=400&h=250&fit=crop&fm=webp",
     description: "Essential security measures every developer should implement to protect web applications from common vulnerabilities.",
     tags: ["Security", "OWASP", "Authentication", "Encryption"],
     author: "Anu Kumar",
@@ -74,7 +74,7 @@ function Blog() {
           return {
             title: blog.title,
             category: blog.category || "Technology",
-            image: blog.image_url || blog.image || `https://images.unsplash.com/photo-1517180102446-f3ece451e9d8?w=400&h=250&fit=crop`,
+            image: blog.image_url || blog.image || `https://images.unsplash.com/photo-1517180102446-f3ece451e9d8?w=400&h=250&fit=crop&fm=webp`,
             description: blog.excerpt || blog.title,
             tags: blog.category ? [blog.category] : ["Technology"],
             author: blog.author || "Nexspire Team",

@@ -6,42 +6,42 @@ const testimonials = [
     name: "Sarah Johnson",
     position: "CEO, TechStart Inc.",
     project: "E-commerce Platform",
-    image: "https://images.unsplash.com/photo-1573496359142-b8d87734a5a2?w=100&h=100&fit=crop&q=80"
+    image: "https://images.unsplash.com/photo-1573496359142-b8d87734a5a2?w=100&h=100&fit=crop&q=80&fm=webp"
   },
   {
     text: "The mobile app they developed for us has been a game-changer. User engagement increased by 300% after launch. Their understanding of user experience and technical implementation is remarkable.",
     name: "Michael Rodriguez",
     position: "CTO, FitTech Solutions",
     project: "Mobile Fitness App",
-    image: "https://images.unsplash.com/photo-1560250097-0b93528c311a?w=100&h=100&fit=crop&q=80"
+    image: "https://images.unsplash.com/photo-1560250097-0b93528c311a?w=100&h=100&fit=crop&q=80&fm=webp"
   },
   {
     text: "Our cloud migration project was seamless thanks to their expertise. They reduced our infrastructure costs by 40% while improving performance significantly. Highly recommended for enterprise solutions.",
     name: "Emily Chen",
     position: "Director of IT, GlobalCorp",
     project: "Cloud Migration",
-    image: "https://images.unsplash.com/photo-1580489944761-15a19d654956?w=100&h=100&fit=crop&q=80"
+    image: "https://images.unsplash.com/photo-1580489944761-15a19d654956?w=100&h=100&fit=crop&q=80&fm=webp"
   },
   {
     text: "The custom CRM system they built has transformed our sales process. Our team productivity increased by 50% and customer satisfaction scores are at an all-time high.",
     name: "David Thompson",
     position: "Sales Director, InnovateSales",
     project: "Custom CRM System",
-    image: "https://images.unsplash.com/photo-1519085360753-af0119f7cbe7?w=100&h=100&fit=crop&q=80"
+    image: "https://images.unsplash.com/photo-1519085360753-af0119f7cbe7?w=100&h=100&fit=crop&q=80&fm=webp"
   },
   {
     text: "Their AI integration project exceeded our expectations. The machine learning models they implemented have improved our operational efficiency by 60%. True technical innovators.",
     name: "Lisa Park",
     position: "Head of Operations, DataFlow Inc.",
     project: "AI Integration",
-    image: "https://images.unsplash.com/photo-1594744803329-e58b31de8bf5?w=100&h=100&fit=crop&q=80"
+    image: "https://images.unsplash.com/photo-1594744803329-e58b31de8bf5?w=100&h=100&fit=crop&q=80&fm=webp"
   },
   {
     text: "The web application they developed has revolutionized our customer service. Response times are down 70% and customer satisfaction is up 85%. Outstanding work from start to finish.",
     name: "Robert Wilson",
     position: "Customer Success Manager, ServicePro",
     project: "Customer Service Platform",
-    image: "https://images.unsplash.com/photo-1500648767791-00dcc994a43e?w=100&h=100&fit=crop&q=80"
+    image: "https://images.unsplash.com/photo-1500648767791-00dcc994a43e?w=100&h=100&fit=crop&q=80&fm=webp"
   }
 ]
 

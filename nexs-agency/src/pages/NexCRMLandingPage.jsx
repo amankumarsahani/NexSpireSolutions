@@ -155,7 +155,7 @@ export default function NexCRMLandingPage() {
             </AnimatePresence>
 
             {/* Hero Section */}
-            <section className="relative pt-32 pb-20 lg:pt-48 lg:pb-32 overflow-hidden bg-[url('https://images.unsplash.com/photo-1557804506-669a67965ba0?ixlib=rb-4.0.3&auto=format&fit=crop&w=2600&q=80')] bg-cover bg-center">
+            <section className="relative pt-32 pb-20 lg:pt-48 lg:pb-32 overflow-hidden bg-[url('https://images.unsplash.com/photo-1557804506-669a67965ba0?ixlib=rb-4.0.3&auto=format&fit=crop&w=2600&q=80&fm=webp')] bg-cover bg-center">
                 {/* Hero Overlay */}
                 <div className="absolute inset-0 bg-white/90 backdrop-blur-sm z-0"></div>
 
@@ -203,7 +203,9 @@ export default function NexCRMLandingPage() {
                     >
                         <div className="relative rounded-2xl border-[6px] border-slate-900 bg-slate-900 shadow-2xl overflow-hidden aspect-[16/9] group ring-1 ring-slate-900/50">
                             <img
-                                src="https://images.unsplash.com/photo-1460925895917-afdab827c52f?ixlib=rb-4.0.3&auto=format&fit=crop&w=2426&q=80"
+                                src="https://images.unsplash.com/photo-1460925895917-afdab827c52f?ixlib=rb-4.0.3&auto=format&fit=crop&w=2426&q=80&fm=webp"
+                                srcSet="https://images.unsplash.com/photo-1460925895917-afdab827c52f?w=640&fm=webp 640w, https://images.unsplash.com/photo-1460925895917-afdab827c52f?w=1024&fm=webp 1024w, https://images.unsplash.com/photo-1460925895917-afdab827c52f?w=1920&fm=webp 1920w"
+                                sizes="(max-width: 640px) 640px, (max-width: 1024px) 1024px, 1920px"
                                 alt="Dashboard Preview"
                                 className="w-full h-full object-cover opacity-90 transition-transform duration-700 group-hover:scale-105"
                             />
@@ -242,7 +244,7 @@ export default function NexCRMLandingPage() {
                     <div className="grid grid-cols-1 md:grid-cols-3 gap-8 auto-rows-[340px]">
                         {/* Large Feature - Dashboard */}
                         <div className="md:col-span-2 md:row-span-1 rounded-[2rem] border border-slate-200 shadow-xl shadow-slate-200/50 hover:shadow-2xl hover:border-blue-200 transition-all group overflow-hidden relative">
-                            <div className="absolute inset-0 bg-[url('https://images.unsplash.com/photo-1551288049-bebda4e38f71?ixlib=rb-4.0.3&auto=format&fit=crop&w=2600&q=80')] bg-cover bg-center transition-transform duration-700 group-hover:scale-105"></div>
+                            <div className="absolute inset-0 bg-[url('https://images.unsplash.com/photo-1551288049-bebda4e38f71?ixlib=rb-4.0.3&auto=format&fit=crop&w=2600&q=80&fm=webp')] bg-cover bg-center transition-transform duration-700 group-hover:scale-105"></div>
                             <div className="absolute inset-0 bg-gradient-to-r from-white via-white/90 to-transparent"></div>
 
                             <div className="relative z-10 p-10 h-full flex flex-col justify-center max-w-md">
@@ -263,7 +265,7 @@ export default function NexCRMLandingPage() {
                             <div className="w-56 flex-grow bg-slate-800 rounded-t-[2.5rem] border-[8px] border-slate-700 overflow-hidden relative shadow-2xl group-hover:translate-y-2 transition-transform duration-500">
                                 <div className="absolute top-0 left-1/2 -translate-x-1/2 w-24 h-6 bg-slate-700 rounded-b-xl z-20"></div>
                                 <img
-                                    src="https://images.unsplash.com/photo-1512941937669-90a1b58e7e9c?ixlib=rb-4.0.3&auto=format&fit=crop&w=900&q=80"
+                                    src="https://images.unsplash.com/photo-1512941937669-90a1b58e7e9c?ixlib=rb-4.0.3&auto=format&fit=crop&w=900&q=80&fm=webp"
                                     alt="Mobile App"
                                     loading="lazy"
                                     className="w-full h-full object-cover"
@@ -299,7 +301,7 @@ export default function NexCRMLandingPage() {
                         {/* Wide Feature - AI Automation */}
                         <div className="md:col-span-3 rounded-[2rem] p-10 border border-slate-200 hover:border-blue-200 hover:shadow-lg transition-all flex flex-col md:flex-row items-center gap-10 overflow-hidden relative group">
                             {/* Background Image */}
-                            <div className="absolute inset-0 bg-[url('https://images.unsplash.com/photo-1620712943543-bcc4688e7485?ixlib=rb-4.0.3&auto=format&fit=crop&w=1000&q=80')] bg-cover bg-center opacity-10 group-hover:opacity-20 transition-opacity duration-500"></div>
+                            <div className="absolute inset-0 bg-[url('https://images.unsplash.com/photo-1620712943543-bcc4688e7485?ixlib=rb-4.0.3&auto=format&fit=crop&w=1000&q=80&fm=webp')] bg-cover bg-center opacity-10 group-hover:opacity-20 transition-opacity duration-500"></div>
                             <div className="absolute inset-0 bg-gradient-to-r from-white via-white to-transparent"></div>
 
                             <div className="flex-1 relative z-10 pl-4">

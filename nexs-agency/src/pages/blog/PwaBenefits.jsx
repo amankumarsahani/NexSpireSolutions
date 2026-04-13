@@ -8,7 +8,7 @@ const PwaBenefits = () => {
         "@context": "https://schema.org",
         "@type": "Article",
         "headline": "Why Your Business Needs a Progressive Web App (PWA) in 2026",
-        "image": "https://images.unsplash.com/photo-1498050108023-c5249f4df085?w=1200&q=80",
+        "image": "https://images.unsplash.com/photo-1498050108023-c5249f4df085?w=1200&q=80&fm=webp",
         "author": {
             "@type": "Person",
             "name": "Kshitij Bhardwaj"
@@ -66,7 +66,7 @@ const PwaBenefits = () => {
 
                 <div className="rounded-[2rem] overflow-hidden shadow-2xl mb-16 h-[500px]">
                     <img
-                        src="https://images.unsplash.com/photo-1498050108023-c5249f4df085?w=1200&q=80"
+                        src="https://images.unsplash.com/photo-1498050108023-c5249f4df085?w=1200&q=80&fm=webp"
                         alt="Progressive Web App"
                         loading="lazy"
                         height={500}

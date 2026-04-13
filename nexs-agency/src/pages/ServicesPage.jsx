@@ -224,7 +224,7 @@ const ServicesPage = () => {
                 {/* Background Image */}
                 <div className="absolute inset-0 z-0">
                     <img
-                        src="https://images.unsplash.com/photo-1518770660439-4636190af475?q=80&w=2070&auto=format&fit=crop"
+                        src="https://images.unsplash.com/photo-1518770660439-4636190af475?q=80&w=2070&auto=format&fit=crop&fm=webp"
                         alt="Services Hero"
                         loading="lazy"
                         className="w-full h-full object-cover opacity-50 transform scale-105"

@@ -6,9 +6,7 @@ export default {
   ],
   theme: {
     extend: {
-      fontFamily: {
-        'pacifico': ['Pacifico', 'cursive'],
-      },
+      fontFamily: {},
       animation: {
         'gradient-x': 'gradient-x 15s ease infinite',
         'bounce': 'bounce 1s infinite',
@@ -17,13 +15,14 @@ export default {
       },
       keyframes: {
         'gradient-x': {
-          '0%, 100%': {
-            'background-size': '200% 200%',
-            'background-position': 'left center'
+          '0%': {
+            opacity: '0.7',
           },
           '50%': {
-            'background-size': '200% 200%',
-            'background-position': 'right center'
+            opacity: '1',
+          },
+          '100%': {
+            opacity: '0.7',
           },
         },
       },

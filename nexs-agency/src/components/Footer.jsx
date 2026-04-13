@@ -69,7 +69,7 @@ const Footer = () => {
             <div className="lg:col-span-1">
               <Link
                 to="/"
-                className="text-2xl font-['Pacifico'] bg-gradient-to-r from-blue-400 to-purple-400 bg-clip-text text-transparent mb-4 inline-block"
+                className="text-2xl font-extrabold italic bg-gradient-to-r from-blue-400 to-purple-400 bg-clip-text text-transparent mb-4 inline-block"
               >
                 Nexspire Solution
               </Link>

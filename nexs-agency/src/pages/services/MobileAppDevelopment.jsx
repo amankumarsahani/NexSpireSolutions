@@ -72,7 +72,9 @@ const MobileAppDevelopment = () => {
                 {/* Hero Background Image */}
                 <div className="absolute inset-0 z-0">
                     <img
-                        src="https://images.unsplash.com/photo-1551650975-87deedd944c3?q=80&w=1974&auto=format&fit=crop"
+                        src="https://images.unsplash.com/photo-1551650975-87deedd944c3?q=80&w=1974&auto=format&fit=crop&fm=webp"
+                        srcSet="https://images.unsplash.com/photo-1551650975-87deedd944c3?w=640&fm=webp 640w, https://images.unsplash.com/photo-1551650975-87deedd944c3?w=1024&fm=webp 1024w, https://images.unsplash.com/photo-1551650975-87deedd944c3?w=1920&fm=webp 1920w"
+                        sizes="100vw"
                         alt="Mobile Development Background"
                         loading="lazy"
                         className="w-full h-full object-cover opacity-50 transform scale-105"
@@ -139,7 +141,7 @@ const MobileAppDevelopment = () => {
                             {/* Large Image */}
                             <div className="row-span-2 relative group overflow-hidden rounded-[2rem] shadow-xl">
                                 <img
-                                    src="https://images.unsplash.com/photo-1512941937669-90a1b58e7e9c?auto=format&fit=crop&q=80&w=800"
+                                    src="https://images.unsplash.com/photo-1512941937669-90a1b58e7e9c?auto=format&fit=crop&q=80&w=800&fm=webp"
                                     alt="Mobile UI Design"
                                     loading="lazy"
                                     className="absolute inset-0 w-full h-full object-cover transition-transform duration-700 group-hover:scale-110"
@@ -151,7 +153,7 @@ const MobileAppDevelopment = () => {
                             {/* Top Small Image */}
                             <div className="relative group overflow-hidden rounded-[2rem] shadow-xl">
                                 <img
-                                    src="https://images.unsplash.com/photo-1555774698-0b77e0d5fac6?auto=format&fit=crop&q=80&w=800"
+                                    src="https://images.unsplash.com/photo-1555774698-0b77e0d5fac6?auto=format&fit=crop&q=80&w=800&fm=webp"
                                     alt="Phone Mockup"
                                     loading="lazy"
                                     className="absolute inset-0 w-full h-full object-cover transition-transform duration-700 group-hover:scale-110"

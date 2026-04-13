@@ -73,7 +73,9 @@ const CustomWebDevelopment = () => {
                 {/* Hero Background Image */}
                 <div className="absolute inset-0 z-0">
                     <img
-                        src="https://images.unsplash.com/photo-1451187580459-43490279c0fa?q=80&w=2072&auto=format&fit=crop"
+                        src="https://images.unsplash.com/photo-1451187580459-43490279c0fa?q=80&w=2072&auto=format&fit=crop&fm=webp"
+                        srcSet="https://images.unsplash.com/photo-1451187580459-43490279c0fa?w=640&fm=webp 640w, https://images.unsplash.com/photo-1451187580459-43490279c0fa?w=1024&fm=webp 1024w, https://images.unsplash.com/photo-1451187580459-43490279c0fa?w=1920&fm=webp 1920w"
+                        sizes="100vw"
                         alt="Background"
                         loading="lazy"
                         className="w-full h-full object-cover opacity-50"
@@ -140,7 +142,7 @@ const CustomWebDevelopment = () => {
                             {/* Large Image */}
                             <div className="row-span-2 relative group overflow-hidden rounded-[2rem] shadow-xl">
                                 <img
-                                    src="https://images.unsplash.com/photo-1555099962-4199c345e5dd?q=80&w=2070&auto=format&fit=crop"
+                                    src="https://images.unsplash.com/photo-1555099962-4199c345e5dd?q=80&w=2070&auto=format&fit=crop&fm=webp"
                                     alt="Coding Interface"
                                     loading="lazy"
                                     className="absolute inset-0 w-full h-full object-cover transition-transform duration-700 group-hover:scale-110"
@@ -152,7 +154,7 @@ const CustomWebDevelopment = () => {
                             {/* Top Small Image */}
                             <div className="relative group overflow-hidden rounded-[2rem] shadow-xl">
                                 <img
-                                    src="https://images.unsplash.com/photo-1460925895917-afdab827c52f?q=80&w=2015&auto=format&fit=crop"
+                                    src="https://images.unsplash.com/photo-1460925895917-afdab827c52f?q=80&w=2015&auto=format&fit=crop&fm=webp"
                                     alt="Analytics Dashboard"
                                     loading="lazy"
                                     className="absolute inset-0 w-full h-full object-cover transition-transform duration-700 group-hover:scale-110"

@@ -81,8 +81,7 @@ export default function ScrollReveal({
             style={{
                 ...currentStyle,
                 transition: `opacity ${duration}ms ease-out, transform ${duration}ms ease-out`,
-                transitionDelay: `${delay}ms`,
-                willChange: 'opacity, transform'
+                transitionDelay: `${delay}ms`
             }}
         >
             {children}

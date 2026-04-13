@@ -23,7 +23,7 @@ const ProjectDetail = () => {
             { label: "Cost Reduction", value: "-20%" }
         ],
         technologies: ["React", "Node.js", "AWS", "MongoDB"],
-        image: "https://images.unsplash.com/photo-1563986768609-322da13575f3?w=1200&q=80",
+        image: "https://images.unsplash.com/photo-1563986768609-322da13575f3?w=1200&q=80&fm=webp",
         testimonial: {
             text: "Nexspire transformed our digital presence. The team is incredibly talented and delivered beyond our expectations.",
             author: "Jane Doe, CTO"

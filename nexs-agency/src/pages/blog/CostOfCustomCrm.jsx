@@ -8,7 +8,7 @@ const CostOfCustomCrm = () => {
         "@context": "https://schema.org",
         "@type": "Article",
         "headline": "Cost of Building a Custom CRM in 2026: A Complete Guide",
-        "image": "https://images.unsplash.com/photo-1556742049-0cfed4f7a07d?w=1200&q=80",
+        "image": "https://images.unsplash.com/photo-1556742049-0cfed4f7a07d?w=1200&q=80&fm=webp",
         "author": {
             "@type": "Person",
             "name": "Aman Kumar"
@@ -66,7 +66,7 @@ const CostOfCustomCrm = () => {
 
                 <div className="rounded-[2rem] overflow-hidden shadow-2xl mb-16 h-[500px]">
                     <img
-                        src="https://images.unsplash.com/photo-1556742049-0cfed4f7a07d?w=1200&q=80"
+                        src="https://images.unsplash.com/photo-1556742049-0cfed4f7a07d?w=1200&q=80&fm=webp"
                         alt="Custom CRM Dashboard"
                         loading="lazy"
                         height={500}

@@ -15,7 +15,7 @@ const cityData = {
         heroText: 'Digital Excellence for London\'s Finest.',
         content: 'Nexspire Solutions is a strategic technology partner for London\'s fast-moving business ecosystem. We combine British market understanding with global engineering talent to deliver software that scales.',
         services: ['Custom Web Platforms', 'Fintech & Banking Apps', 'AI-Driven Analytics', 'Cloud Migration (AWS/Azure)', 'Enterprise CRM Solutions'],
-        image: 'https://images.unsplash.com/photo-1513635269975-59663e0ac1ad?auto=format&fit=crop&q=80&w=1200',
+        image: 'https://images.unsplash.com/photo-1513635269975-59663e0ac1ad?auto=format&fit=crop&q=80&w=1200&fm=webp',
         coordinates: { lat: 51.5074, lng: -0.1278 },
         color: 'blue',
         stats: [
@@ -43,7 +43,7 @@ const cityData = {
         heroText: 'Engineering the Future of NYC Business.',
         content: 'In the city that never sleeps, your software needs to perform 24/7. We build robust, high-frequency, and secure systems tailored for New York\'s finance, media, and tech sectors.',
         services: ['Enterprise Web Apps', 'iOS & Android Development', 'Machine Learning Solutions', 'AWS Cloud Architecture', 'Digital Transformation'],
-        image: 'https://images.unsplash.com/photo-1496442226666-8d4d0e62e6e9?auto=format&fit=crop&q=80&w=1200',
+        image: 'https://images.unsplash.com/photo-1496442226666-8d4d0e62e6e9?auto=format&fit=crop&q=80&w=1200&fm=webp',
         coordinates: { lat: 40.7128, lng: -74.0060 },
         color: 'indigo',
         stats: [
@@ -71,7 +71,7 @@ const cityData = {
         heroText: 'Silicon Valley Quality, Local Expertise.',
         content: 'Located in the heart of India\'s tech capital, we bring world-class engineering to local startups and enterprises. From MVP to IPO, we are the technical co-founder you need.',
         services: ['React & Next.js Development', 'Flutter & React Native Apps', 'AI & ML Integration', 'Cloud Migration', 'Startup MVP Development'],
-        image: 'https://images.unsplash.com/photo-1596176530529-78163a4f7af2?auto=format&fit=crop&q=80&w=1200',
+        image: 'https://images.unsplash.com/photo-1596176530529-78163a4f7af2?auto=format&fit=crop&q=80&w=1200&fm=webp',
         coordinates: { lat: 12.9716, lng: 77.5946 },
         color: 'orange',
         stats: [
@@ -99,7 +99,7 @@ const cityData = {
         heroText: 'Smart Solutions for a Smart City.',
         content: 'Nexspire Solutions empowers Dubai\'s vision with futuristic technologies. We build bilingual, compliant, and scalable digital platforms for government, retail, and real estate.',
         services: ['Arabic-Enabled Apps', 'Mobile App Development', 'Smart City AI', 'E-commerce Solutions', 'Fintech Development'],
-        image: 'https://images.unsplash.com/photo-1512453979798-5ea266f8880c?auto=format&fit=crop&q=80&w=1200',
+        image: 'https://images.unsplash.com/photo-1512453979798-5ea266f8880c?auto=format&fit=crop&q=80&w=1200&fm=webp',
         coordinates: { lat: 25.2048, lng: 55.2708 },
         color: 'emerald',
         stats: [
@@ -127,7 +127,7 @@ const cityData = {
         heroText: 'Digital Innovation Down Under.',
         content: 'We help Australian businesses bridge the gap between concept and code. Our solutions are built to rigorous standards, ensuring reliability and scalability for the Aussie market.',
         services: ['Custom Web Development', 'iOS & Android Apps', 'Cloud Infrastructure', 'Healthcare Software', 'E-commerce Platforms'],
-        image: 'https://images.unsplash.com/photo-1506973035872-a4ec16b8e8d9?auto=format&fit=crop&q=80&w=1200',
+        image: 'https://images.unsplash.com/photo-1506973035872-a4ec16b8e8d9?auto=format&fit=crop&q=80&w=1200&fm=webp',
         coordinates: { lat: -33.8688, lng: 151.2093 },
         color: 'cyan',
         stats: [
@@ -155,7 +155,7 @@ const cityData = {
         heroText: 'Tech Excellence for the North.',
         content: 'From the Financial District to the tech hubs of Waterloo, we provide the high-performance software backbone that Canadian businesses need to compete globally.',
         services: ['Web Application Development', 'Cross-Platform Mobile Apps', 'AI & Machine Learning', 'SaaS Development', 'Enterprise Solutions'],
-        image: 'https://images.unsplash.com/photo-1517090504332-eac35b2cc8ab?auto=format&fit=crop&q=80&w=1200',
+        image: 'https://images.unsplash.com/photo-1517090504332-eac35b2cc8ab?auto=format&fit=crop&q=80&w=1200&fm=webp',
         coordinates: { lat: 43.65107, lng: -79.347015 },
         color: 'red',
         stats: [
@@ -430,7 +430,7 @@ const CityLandingPage = () => {
                         <FadeIn delay={0.2} className="lg:w-1/2 w-full">
                             <div className="relative rounded-[2.5rem] overflow-hidden shadow-2xl bg-slate-900 min-h-[500px] border-4 border-white">
                                 <img
-                                    src="https://images.unsplash.com/photo-1486406146926-c627a92ad1ab?auto=format&fit=crop&q=80&w=1200"
+                                    src="https://images.unsplash.com/photo-1486406146926-c627a92ad1ab?auto=format&fit=crop&q=80&w=1200&fm=webp"
                                     alt="Corporate Architecture"
                                     loading="lazy"
                                     className="absolute inset-0 w-full h-full object-cover opacity-40 hover:scale-105 transition-transform duration-700"

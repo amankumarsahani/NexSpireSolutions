@@ -141,7 +141,7 @@ const ContactPage = () => {
                         className="absolute bottom-[-20%] left-[-10%] w-[600px] h-[600px] bg-purple-600/20 rounded-full blur-[100px]"
                     />
                     <div className="absolute inset-0 bg-[url('https://grainy-gradients.vercel.app/noise.svg')] opacity-20 mix-blend-overlay"></div>
-                    <div className="absolute inset-0 bg-[url('https://images.unsplash.com/photo-1423666639041-f142fcb93461?q=80&w=2070&auto=format&fit=crop')] bg-cover bg-center opacity-30 mix-blend-soft-light"></div>
+                    <div className="absolute inset-0 bg-[url('https://images.unsplash.com/photo-1423666639041-f142fcb93461?q=80&w=2070&auto=format&fit=crop&fm=webp')] bg-cover bg-center opacity-30 mix-blend-soft-light"></div>
                 </div>
 
                 <div className="container-custom relative z-10 text-center">

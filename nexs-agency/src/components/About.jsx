@@ -4,21 +4,21 @@ const teamMembers = [
   {
     name: "Aman Kumar Sahani",
     role: "Founder & Lead Developer",
-    image: "https://media.licdn.com/dms/image/v2/D5635AQH5ci5Ugk1vTw/profile-framedphoto-shrink_400_400/B56ZfvUFh9GUAc-/0/1752066710244?e=1764432000&v=beta&t=tKuFhdqPPrrcdpFEn9N8hDVCx1MTK5HeqUAbZ_ise8I",
+    image: "https://images.unsplash.com/photo-1507003211169-0a1dd7228f2d?w=200&h=200&fit=crop&fm=webp",
     skills: ["React", "Node.js", "Python", "AWS"],
     gradient: "from-blue-500 to-blue-600"
   },
   {
     name: "Anu Kumar",
     role: "Senior UI/UX Designer",
-    image: "https://media.licdn.com/dms/image/v2/D5635AQHiirkL_Zj4Kg/profile-framedphoto-shrink_400_400/profile-framedphoto-shrink_400_400/0/1712624046763?e=1764432000&v=beta&t=8cpHTXKwpXe6DU-Gvd8Vf9kdWqGg2TJofno2wUZAVLs",
+    image: "https://images.unsplash.com/photo-1506794778202-cad84cf45f1d?w=200&h=200&fit=crop&fm=webp",
     skills: ["Figma", "React", "Design Systems"],
     gradient: "from-purple-500 to-purple-600"
   },
   {
     name: "Kshitij Bhardwaj",
     role: "Backend Architect",
-    image: "https://media.licdn.com/dms/image/v2/D5635AQFLeeMkFr5TQw/profile-framedphoto-shrink_400_400/B56Zitq2hlH0Ak-/0/1755260348813?e=1764432000&v=beta&t=r4fL3zagpQbN7L5-ubGA70k3szERV5yeJM0cLZTno-E",
+    image: "https://images.unsplash.com/photo-1472099645785-5658abf4ff4e?w=200&h=200&fit=crop&fm=webp",
     skills: ["Vue.js", "Django", "PostgreSQL", "Docker"],
     gradient: "from-green-500 to-green-600"
   }
@@ -113,7 +113,7 @@ const About = () => {
             <div className="absolute -inset-4 bg-gradient-to-r from-blue-400/20 to-purple-400/20 rounded-2xl blur-2xl opacity-0 group-hover:opacity-100 transition-opacity duration-700"></div>
             <div className="relative bg-white/80 backdrop-blur-sm rounded-2xl p-6 shadow-xl border border-white/50">
               <img
-                src="https://images.unsplash.com/photo-1522071820081-009f0129c71c?w=600&h=400&fit=crop&q=80"
+                src="https://images.unsplash.com/photo-1522071820081-009f0129c71c?w=600&h=400&fit=crop&q=80&fm=webp"
                 alt="Our professional team at work"
                 loading="lazy"
                 className="rounded-xl shadow-lg object-cover w-full h-80 transition-transform duration-700 group-hover:scale-[1.02]"

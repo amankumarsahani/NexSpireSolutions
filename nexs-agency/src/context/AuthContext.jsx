@@ -10,7 +10,8 @@ export const AuthProvider = ({ children }) => {
 
     useEffect(() => {
         let cancelled = false;
-        if (token) {
+        const storedToken = localStorage.getItem('token');
+        if (token && storedToken) {
             const doFetch = async () => {
                 try {
                     const response = await authAPI.getMe();

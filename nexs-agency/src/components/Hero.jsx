@@ -49,12 +49,13 @@ const Hero = () => {
     <section id="home" className="relative min-h-screen lg:h-screen overflow-hidden">
       {/* Static Image Background */}
       <div className="absolute inset-0">
-        <div
-          className="absolute inset-0 bg-cover bg-center bg-no-repeat"
-          style={{
-            backgroundImage: `url('https://images.unsplash.com/photo-1519389950473-47ba0277781c?q=80&w=1920&auto=format&fit=crop')`,
-          }}
-        ></div>
+        <img
+          src="https://images.unsplash.com/photo-1519389950473-47ba0277781c?q=80&w=1920&auto=format&fit=crop&fm=webp"
+          srcSet="https://images.unsplash.com/photo-1519389950473-47ba0277781c?q=80&w=640&fm=webp 640w, https://images.unsplash.com/photo-1519389950473-47ba0277781c?q=80&w=1024&fm=webp 1024w, https://images.unsplash.com/photo-1519389950473-47ba0277781c?q=80&w=1920&fm=webp 1920w"
+          sizes="100vw"
+          alt=""
+          className="absolute inset-0 w-full h-full object-cover"
+        />
 
         {/* Overlay for better text contrast */}
         <div className="absolute inset-0 bg-black/60"></div>

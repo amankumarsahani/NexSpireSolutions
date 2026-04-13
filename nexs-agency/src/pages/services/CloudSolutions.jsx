@@ -72,7 +72,9 @@ const CloudSolutions = () => {
                 {/* Hero Background Image */}
                 <div className="absolute inset-0 z-0">
                     <img
-                        src="https://images.unsplash.com/photo-1451187580459-43490279c0fa?q=80&w=2072&auto=format&fit=crop"
+                        src="https://images.unsplash.com/photo-1451187580459-43490279c0fa?q=80&w=2072&auto=format&fit=crop&fm=webp"
+                        srcSet="https://images.unsplash.com/photo-1451187580459-43490279c0fa?w=640&fm=webp 640w, https://images.unsplash.com/photo-1451187580459-43490279c0fa?w=1024&fm=webp 1024w, https://images.unsplash.com/photo-1451187580459-43490279c0fa?w=1920&fm=webp 1920w"
+                        sizes="100vw"
                         alt="Background"
                         loading="lazy"
                         className="w-full h-full object-cover opacity-50 transform scale-105"
@@ -139,7 +141,7 @@ const CloudSolutions = () => {
                             {/* Large Image */}
                             <div className="row-span-2 relative group overflow-hidden rounded-[2rem] shadow-xl">
                                 <img
-                                    src="https://images.unsplash.com/photo-1544197150-b99a580bb7a8?auto=format&fit=crop&q=80&w=800"
+                                    src="https://images.unsplash.com/photo-1544197150-b99a580bb7a8?auto=format&fit=crop&q=80&w=800&fm=webp"
                                     alt="Server Room"
                                     loading="lazy"
                                     className="absolute inset-0 w-full h-full object-cover transition-transform duration-700 group-hover:scale-110"
@@ -151,7 +153,7 @@ const CloudSolutions = () => {
                             {/* Top Small Image */}
                             <div className="relative group overflow-hidden rounded-[2rem] shadow-xl">
                                 <img
-                                    src="https://images.unsplash.com/photo-1667372393119-c85c020799a3?auto=format&fit=crop&q=80&w=800"
+                                    src="https://images.unsplash.com/photo-1667372393119-c85c020799a3?auto=format&fit=crop&q=80&w=800&fm=webp"
                                     alt="Cloud Data"
                                     loading="lazy"
                                     className="absolute inset-0 w-full h-full object-cover transition-transform duration-700 group-hover:scale-110"

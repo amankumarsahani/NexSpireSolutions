@@ -8,7 +8,7 @@ const AiTrends2026 = () => {
         "@context": "https://schema.org",
         "@type": "Article",
         "headline": "Top 10 AI Trends Shaping Business in 2026",
-        "image": "https://images.unsplash.com/photo-1677442136019-21780ecad995?w=1200&q=80",
+        "image": "https://images.unsplash.com/photo-1677442136019-21780ecad995?w=1200&q=80&fm=webp",
         "author": {
             "@type": "Person",
             "name": "Aman Kumar"
@@ -66,7 +66,7 @@ const AiTrends2026 = () => {
 
                 <div className="rounded-[2rem] overflow-hidden shadow-2xl mb-16 h-[500px]">
                     <img
-                        src="https://images.unsplash.com/photo-1677442136019-21780ecad995?w=1200&q=80"
+                        src="https://images.unsplash.com/photo-1677442136019-21780ecad995?w=1200&q=80&fm=webp"
                         alt="AI Trends 2026"
                         loading="lazy"
                         height={500}

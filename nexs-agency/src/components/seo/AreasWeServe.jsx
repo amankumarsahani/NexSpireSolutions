@@ -5,37 +5,37 @@ const cities = [
         name: "London",
         slug: "london",
         country: "United Kingdom",
-        image: "https://images.unsplash.com/photo-1513635269975-59663e0ac1ad?auto=format&fit=crop&q=80&w=800"
+        image: "https://images.unsplash.com/photo-1513635269975-59663e0ac1ad?auto=format&fit=crop&q=80&w=800&fm=webp"
     },
     {
         name: "New York",
         slug: "new-york",
         country: "United States",
-        image: "https://images.unsplash.com/photo-1496442226666-8d4d0e62e6e9?auto=format&fit=crop&q=80&w=800"
+        image: "https://images.unsplash.com/photo-1496442226666-8d4d0e62e6e9?auto=format&fit=crop&q=80&w=800&fm=webp"
     },
     {
         name: "Dubai",
         slug: "dubai",
         country: "UAE",
-        image: "https://images.unsplash.com/photo-1512453979798-5ea936a7d40b?auto=format&fit=crop&q=80&w=800"
+        image: "https://images.unsplash.com/photo-1512453979798-5ea936a7d40b?auto=format&fit=crop&q=80&w=800&fm=webp"
     },
     {
         name: "Sydney",
         slug: "sydney",
         country: "Australia",
-        image: "https://images.unsplash.com/photo-1506973035872-a4ec16b8e8d9?auto=format&fit=crop&q=80&w=800"
+        image: "https://images.unsplash.com/photo-1506973035872-a4ec16b8e8d9?auto=format&fit=crop&q=80&w=800&fm=webp"
     },
     {
         name: "Toronto",
         slug: "toronto",
         country: "Canada",
-        image: "https://images.unsplash.com/photo-1503614472-8c93d56e92ce?auto=format&fit=crop&q=80&w=800"
+        image: "https://images.unsplash.com/photo-1503614472-8c93d56e92ce?auto=format&fit=crop&q=80&w=800&fm=webp"
     },
     {
         name: "Bangalore",
         slug: "bangalore",
         country: "India",
-        image: "https://images.unsplash.com/photo-1596176530529-78163a4f7af2?auto=format&fit=crop&q=80&w=800"
+        image: "https://images.unsplash.com/photo-1596176530529-78163a4f7af2?auto=format&fit=crop&q=80&w=800&fm=webp"
     }
 ];
 

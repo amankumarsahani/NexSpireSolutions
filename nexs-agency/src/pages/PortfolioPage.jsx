@@ -92,7 +92,7 @@ const PortfolioPage = () => {
             id: 1,
             title: "E-commerce Platform (US Retailer)",
             category: "Web Platform",
-            image: "https://images.unsplash.com/photo-1563986768609-322da13575f3?w=1200&q=80",
+            image: "https://images.unsplash.com/photo-1563986768609-322da13575f3?w=1200&q=80&fm=webp",
             size: "large",
             description: "Custom Magento store with UX redesign resulting in a 45% increase in sales.",
             metric: "45% Sales ↑",
@@ -102,7 +102,7 @@ const PortfolioPage = () => {
             id: 2,
             title: "HealthTech Mobile App (UK)",
             category: "Mobile App",
-            image: "https://images.unsplash.com/photo-1576091160399-112ba8d25d1d?w=800&q=80",
+            image: "https://images.unsplash.com/photo-1576091160399-112ba8d25d1d?w=800&q=80&fm=webp",
             size: "small",
             description: "Flutter-based app with real-time analytics achieving 50k downloads in 2 months.",
             metric: "50K Downloads",
@@ -112,7 +112,7 @@ const PortfolioPage = () => {
             id: 3,
             title: "AI-Powered CRM (Australia)",
             category: "Dashboard",
-            image: "https://images.unsplash.com/photo-1551288049-bebda4e38f71?w=800&q=80",
+            image: "https://images.unsplash.com/photo-1551288049-bebda4e38f71?w=800&q=80&fm=webp",
             size: "small",
             description: "Custom CRM with AI predictions increasing sales efficiency by 30%.",
             metric: "30% Efficiency ↑",
@@ -122,7 +122,7 @@ const PortfolioPage = () => {
             id: 4,
             title: "Urban Pulse",
             category: "Mobile App",
-            image: "https://images.unsplash.com/photo-1480714378408-67cf0d13bc1b?w=1200&q=80",
+            image: "https://images.unsplash.com/photo-1480714378408-67cf0d13bc1b?w=1200&q=80&fm=webp",
             size: "wide",
             description: "City guide app with augmented reality navigation and social features.",
             metric: "4.8★ Rating",
@@ -132,7 +132,7 @@ const PortfolioPage = () => {
             id: 5,
             title: "Crypto Exchange",
             category: "Web Platform",
-            image: "https://images.unsplash.com/photo-1621761191319-c6fb62004040?w=800&q=80",
+            image: "https://images.unsplash.com/photo-1621761191319-c6fb62004040?w=800&q=80&fm=webp",
             size: "small",
             description: "Secure and fast cryptocurrency trading platform with advanced charting.",
             metric: "$2M+ Volume",
@@ -142,7 +142,7 @@ const PortfolioPage = () => {
             id: 6,
             title: "EcoEnergy",
             category: "Dashboard",
-            image: "https://images.unsplash.com/photo-1473341304170-971dccb5ac1e?w=800&q=80",
+            image: "https://images.unsplash.com/photo-1473341304170-971dccb5ac1e?w=800&q=80&fm=webp",
             size: "small",
             description: "Smart home energy monitoring dashboard for sustainable living.",
             metric: "20% Energy Saved",
@@ -203,7 +203,7 @@ const PortfolioPage = () => {
             {/* Hero Section */}
             <section className="relative min-h-[85vh] flex items-center pt-20 overflow-hidden bg-gray-950 text-white">
                 <div className="absolute inset-0 bg-[url('https://grainy-gradients.vercel.app/noise.svg')] opacity-20"></div>
-                <div className="absolute inset-0 bg-[url('https://images.unsplash.com/photo-1558655146-d09347e92766?q=80&w=2070&auto=format&fit=crop')] bg-cover bg-center opacity-30 mix-blend-soft-light"></div>
+                <div className="absolute inset-0 bg-[url('https://images.unsplash.com/photo-1558655146-d09347e92766?q=80&w=2070&auto=format&fit=crop&fm=webp')] bg-cover bg-center opacity-30 mix-blend-soft-light"></div>
                 <div className="absolute top-0 right-0 w-2/3 h-full bg-gradient-to-l from-blue-900/30 to-transparent"></div>
 
                 <div className="container-custom relative z-10">

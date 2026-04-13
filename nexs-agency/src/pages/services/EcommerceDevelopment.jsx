@@ -72,7 +72,9 @@ const EcommerceDevelopment = () => {
                 {/* Hero Background Image */}
                 <div className="absolute inset-0 z-0">
                     <img
-                        src="https://images.unsplash.com/photo-1556742049-0cfed4f7a07d?q=80&w=2070&auto=format&fit=crop"
+                        src="https://images.unsplash.com/photo-1556742049-0cfed4f7a07d?q=80&w=2070&auto=format&fit=crop&fm=webp"
+                        srcSet="https://images.unsplash.com/photo-1556742049-0cfed4f7a07d?w=640&fm=webp 640w, https://images.unsplash.com/photo-1556742049-0cfed4f7a07d?w=1024&fm=webp 1024w, https://images.unsplash.com/photo-1556742049-0cfed4f7a07d?w=1920&fm=webp 1920w"
+                        sizes="100vw"
                         alt="Ecommerce Background"
                         loading="lazy"
                         className="w-full h-full object-cover opacity-50 transform scale-105"
@@ -139,7 +141,7 @@ const EcommerceDevelopment = () => {
                             {/* Large Image */}
                             <div className="row-span-2 relative group overflow-hidden rounded-[2rem] shadow-xl">
                                 <img
-                                    src="https://images.unsplash.com/photo-1601933973783-43cf8a7d4c5f?auto=format&fit=crop&q=80&w=800"
+                                    src="https://images.unsplash.com/photo-1601933973783-43cf8a7d4c5f?auto=format&fit=crop&q=80&w=800&fm=webp"
                                     alt="Online Shopping"
                                     loading="lazy"
                                     className="absolute inset-0 w-full h-full object-cover transition-transform duration-700 group-hover:scale-110"
@@ -151,7 +153,7 @@ const EcommerceDevelopment = () => {
                             {/* Top Small Image */}
                             <div className="relative group overflow-hidden rounded-[2rem] shadow-xl">
                                 <img
-                                    src="https://images.unsplash.com/photo-1556742031-c6961e8560b0?auto=format&fit=crop&q=80&w=800"
+                                    src="https://images.unsplash.com/photo-1556742031-c6961e8560b0?auto=format&fit=crop&q=80&w=800&fm=webp"
                                     alt="Payment Terminal"
                                     loading="lazy"
                                     className="absolute inset-0 w-full h-full object-cover transition-transform duration-700 group-hover:scale-110"
