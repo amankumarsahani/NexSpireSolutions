@@ -1,3 +1,4 @@
+// TODO: Replace console.error with Sentry or proper error tracking
 import { Component } from 'react';
 
 class ErrorBoundary extends Component {

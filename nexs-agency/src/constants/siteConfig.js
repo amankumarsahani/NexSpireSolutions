@@ -1,3 +1,5 @@
+export const SITE_URL = 'https://nexspiresolutions.co.in';
+
 export const siteConfig = {
     email: {
         primary: 'nexspiretechsolutions@gmail.com',
@@ -7,7 +9,7 @@ export const siteConfig = {
         primary: '+91 9729916844',
         tel: '+919729916844',
     },
-    domain: 'https://nexspiresolutions.co.in',
+    domain: SITE_URL,
     social: [
         { icon: 'ri-github-line', href: 'https://github.com/orgs/Nexspire-Solutions/repositories', label: 'GitHub' },
         { icon: 'ri-linkedin-line', href: 'https://www.linkedin.com/company/nexspire-solution', label: 'LinkedIn' },

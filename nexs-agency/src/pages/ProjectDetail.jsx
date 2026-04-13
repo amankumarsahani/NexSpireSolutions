@@ -4,6 +4,7 @@ import { motion } from 'framer-motion';
 import Breadcrumbs from '../components/ui/Breadcrumbs';
 import BackToTop from '../components/ui/BackToTop';
 import RelatedServices from '../components/seo/RelatedServices';
+import { SITE_URL } from '../constants/siteConfig';
 
 const ProjectDetail = () => {
     const { slug } = useParams();
@@ -35,12 +36,12 @@ const ProjectDetail = () => {
             <Helmet>
                 <title>{project.title} | Portfolio | Nexspire Solutions</title>
                 <meta name="description" content={`Case study: ${project.title}. See how we delivered exceptional results.`} />
-                <link rel="canonical" href={`https://nexspiresolutions.co.in/portfolio/${slug}`} />
+                <link rel="canonical" href={`${SITE_URL}/portfolio/${slug}`} />
                 <meta property="og:title" content={`${project.title} | Portfolio | Nexspire Solutions`} />
                 <meta property="og:description" content={`Case study: ${project.title}. See how we delivered exceptional results.`} />
                 <meta property="og:type" content="website" />
-                <meta property="og:url" content={`https://nexspiresolutions.co.in/portfolio/${slug}`} />
-                <meta property="og:image" content="https://nexspiresolutions.co.in/og-image.jpg" />
+                <meta property="og:url" content={`${SITE_URL}/portfolio/${slug}`} />
+                <meta property="og:image" content={`${SITE_URL}/og-image.jpg`} />
                 <meta name="twitter:card" content="summary_large_image" />
                 <meta name="twitter:title" content={`${project.title} | Portfolio | Nexspire Solutions`} />
                 <meta name="twitter:description" content={`Case study: ${project.title}. See how we delivered exceptional results.`} />

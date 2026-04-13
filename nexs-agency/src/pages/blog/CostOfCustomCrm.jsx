@@ -1,6 +1,7 @@
 import { Helmet } from 'react-helmet-async';
 import { Link } from 'react-router-dom';
 import RelatedServices from '../../components/seo/RelatedServices';
+import { SITE_URL } from '../../constants/siteConfig';
 
 const CostOfCustomCrm = () => {
 
@@ -18,7 +19,7 @@ const CostOfCustomCrm = () => {
             "name": "Nexspire Solutions",
             "logo": {
                 "@type": "ImageObject",
-                "url": "https://nexspiresolutions.co.in/logo.png"
+                "url": `${SITE_URL}/logo.png`
             }
         },
         "datePublished": "2024-03-20",
@@ -30,12 +31,12 @@ const CostOfCustomCrm = () => {
             <Helmet>
                 <title>Cost of Building a Custom CRM 2026 | Nexspire Blog</title>
                 <meta name="description" content="How much does it cost to build a custom CRM in 2026? We break down the costs for MVPs, mid-sized, and enterprise solutions, plus hidden costs to watch for." />
-                <link rel="canonical" href="https://nexspiresolutions.co.in/blog/cost-of-custom-crm-2026" />
+                <link rel="canonical" href={`${SITE_URL}/blog/cost-of-custom-crm-2026`} />
                 <meta property="og:title" content="Cost of Building a Custom CRM 2026 | Nexspire Blog" />
                 <meta property="og:description" content="How much does it cost to build a custom CRM in 2026? We break down costs for MVPs, mid-sized, and enterprise solutions." />
                 <meta property="og:type" content="article" />
-                <meta property="og:url" content="https://nexspiresolutions.co.in/blog/cost-of-custom-crm-2026" />
-                <meta property="og:image" content="https://nexspiresolutions.co.in/og-image.jpg" />
+                <meta property="og:url" content={`${SITE_URL}/blog/cost-of-custom-crm-2026`} />
+                <meta property="og:image" content={`${SITE_URL}/og-image.jpg`} />
                 <meta name="twitter:card" content="summary_large_image" />
                 <meta name="twitter:title" content="Cost of Building a Custom CRM 2026 | Nexspire Blog" />
                 <meta name="twitter:description" content="How much does it cost to build a custom CRM in 2026? We break down costs for MVPs, mid-sized, and enterprise solutions." />

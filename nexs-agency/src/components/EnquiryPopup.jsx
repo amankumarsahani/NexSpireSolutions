@@ -1,4 +1,5 @@
-import { useState, useEffect, useCallback } from 'react';
+// TODO: Replace console.error with Sentry or proper error tracking
+import { useState, useEffect, useCallback, memo } from 'react';
 import { inquiryAPI } from '../services/api';
 
 const RECAPTCHA_SITE_KEY = import.meta.env.VITE_RECAPTCHA_SITE_KEY;
@@ -7,7 +8,7 @@ const SCROLL_THRESHOLD = 0.5; // 50% scroll
 const STORAGE_KEY = 'nexspire_popup_dismissed';
 const DISMISS_DAYS = 7;
 
-const EnquiryPopup = () => {
+const EnquiryPopup = memo(function EnquiryPopup() {
     const [isVisible, setIsVisible] = useState(false);
     const [isClosing, setIsClosing] = useState(false);
     const [formData, setFormData] = useState({
@@ -324,6 +325,6 @@ const EnquiryPopup = () => {
 
         </div>
     );
-};
+})
 
 export default EnquiryPopup;

@@ -13,6 +13,7 @@ import Breadcrumbs from '../components/ui/Breadcrumbs';
 import BackToTop from '../components/ui/BackToTop';
 import TrustBadges from '../components/ui/TrustBadges';
 import ReadingProgress from '../components/ui/ReadingProgress';
+import { SITE_URL } from '../constants/siteConfig';
 
 const FadeIn = ({ children, className, delay = 0 }) => {
   return (
@@ -71,12 +72,12 @@ const AboutPage = () => {
         <title>About Nexspire Solutions – Global Software Agency</title>
         <meta name="description" content="Discover Nexspire Solutions, a top software development agency delivering web, mobile, AI, cloud, and enterprise solutions to clients globally. Founded in 2020, serving startups, SMEs, and enterprises across North America, Europe, Middle East, and Asia-Pacific." />
         <meta name="keywords" content="global software agency, top software company worldwide, international software solutions, AI software development, about nexspire solutions, software company india, tech experts usa uk, digital transformation partners" />
-        <link rel="canonical" href="https://nexspiresolutions.co.in/about" />
+        <link rel="canonical" href={`${SITE_URL}/about`} />
         <meta property="og:title" content="About Nexspire Solutions – Global Software Agency" />
         <meta property="og:description" content="Top software development agency delivering web, mobile, AI, cloud, and enterprise solutions to clients globally." />
         <meta property="og:type" content="website" />
-        <meta property="og:url" content="https://nexspiresolutions.co.in/about" />
-        <meta property="og:image" content="https://nexspiresolutions.co.in/og-image.jpg" />
+        <meta property="og:url" content={`${SITE_URL}/about`} />
+        <meta property="og:image" content={`${SITE_URL}/og-image.jpg`} />
         <meta name="twitter:card" content="summary_large_image" />
         <meta name="twitter:title" content="About Nexspire Solutions – Global Software Agency" />
         <meta name="twitter:description" content="Top software development agency delivering web, mobile, AI, cloud, and enterprise solutions to clients globally." />
@@ -84,8 +85,8 @@ const AboutPage = () => {
             "@context": "https://schema.org",
             "@type": "Organization",
             "name": "Nexspire Solutions",
-            "url": "https://nexspiresolutions.co.in",
-            "logo": "https://nexspiresolutions.co.in/og-image.jpg",
+            "url": SITE_URL,
+            "logo": `${SITE_URL}/og-image.jpg`,
             "description": "Top software development agency delivering web, mobile, AI, cloud, and enterprise solutions to clients globally.",
             "email": "nexspiretechsolutions@gmail.com",
             "telephone": "+919729916844",

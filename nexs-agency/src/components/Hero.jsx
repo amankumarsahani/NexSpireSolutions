@@ -1,4 +1,4 @@
-import { useState, useEffect } from 'react'
+import { useState, useEffect, memo } from 'react'
 
 const rotatingTexts = [
   "AI-Powered Software Solutions",
@@ -31,7 +31,7 @@ const technologies = [
   { name: 'Firebase', logo: 'https://cdn.jsdelivr.net/gh/devicons/devicon/icons/firebase/firebase-plain.svg' }
 ]
 
-const Hero = () => {
+const Hero = memo(function Hero() {
   const [currentTextIndex, setCurrentTextIndex] = useState(0)
   const [isVisible, setIsVisible] = useState(false)
 
@@ -153,6 +153,6 @@ const Hero = () => {
 
     </section>
   )
-}
+})
 
 export default Hero

@@ -1,8 +1,9 @@
-import { useState, useRef, useEffect } from 'react';
+// TODO: Replace console.error with Sentry or proper error tracking
+import { useState, useRef, useEffect, memo } from 'react';
 import { inquiryAPI } from '../services/api';
 import { siteConfig } from '../constants/siteConfig';
 
-const Contact = () => {
+const Contact = memo(function Contact() {
   const [formData, setFormData] = useState({
     name: '',
     email: '',
@@ -405,6 +406,6 @@ const Contact = () => {
       </div>
     </section>
   );
-};
+})
 
 export default Contact;

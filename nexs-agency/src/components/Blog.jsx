@@ -1,6 +1,8 @@
-import { useState, useEffect } from 'react'
+// TODO: Replace console.error with Sentry or proper error tracking
+import { useState, useEffect, useMemo, memo } from 'react'
 import { Link } from 'react-router-dom'
 import { blogAPI } from '../services/api'
+import SectionBackground from './ui/SectionBackground'
 
 const dummyPosts = [
   {
@@ -43,7 +45,7 @@ const dummyPosts = [
 
 const categories = ["All", "Web Development", "Mobile Development", "Cloud & DevOps", "Design", "Security", "AI & Technology"]
 
-function Blog() {
+const Blog = memo(function Blog() {
   const [activeCategory, setActiveCategory] = useState("All")
   const [isVisible, setIsVisible] = useState(false)
   const [blogPosts, setBlogPosts] = useState([])
@@ -98,21 +100,13 @@ function Blog() {
     }
   }
 
-  const filteredPosts = activeCategory === "All"
+  const filteredPosts = useMemo(() => activeCategory === "All"
     ? blogPosts
-    : blogPosts.filter(post => post.category === activeCategory)
+    : blogPosts.filter(post => post.category === activeCategory), [blogPosts, activeCategory])
 
   return (
     <section id="blog" className="relative py-20 bg-gradient-to-br from-gray-50 via-slate-50 to-indigo-50 overflow-hidden">
-      {/* Background Elements */}
-      <div className="absolute inset-0">
-        <div className="absolute top-0 left-0 w-full h-full bg-gradient-to-br from-blue-500/5 via-transparent to-purple-500/5"></div>
-        <div className="absolute inset-0 bg-gradient-to-tl from-pink-500/3 via-transparent to-cyan-500/3"></div>
-
-        <div className="absolute top-20 left-10 w-80 h-80 bg-gradient-to-br from-blue-200/15 to-cyan-200/10 rounded-full blur-3xl animate-pulse"></div>
-        <div className="absolute bottom-20 right-10 w-96 h-96 bg-gradient-to-bl from-purple-200/12 to-pink-200/8 rounded-full blur-3xl animate-pulse" style={{ animationDelay: '2s' }}></div>
-        <div className="absolute top-1/2 left-1/2 transform -translate-x-1/2 -translate-y-1/2 w-72 h-72 bg-gradient-to-r from-indigo-200/10 to-violet-200/8 rounded-full blur-3xl animate-pulse" style={{ animationDelay: '4s' }}></div>
-      </div>
+      <SectionBackground />
 
       <div className="relative z-10 max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
         {/* Modern Header */}
@@ -296,8 +290,8 @@ function Blog() {
           }`}>
           <div className="relative overflow-hidden">
             {/* Enhanced Background Glow */}
-            <div className="absolute -inset-4 bg-gradient-to-r from-blue-600/30 to-indigo-600/30 rounded-[3rem] blur-3xl animate-pulse" style={{ animationDuration: '4s' }}></div>
-            <div className="absolute -inset-6 bg-gradient-to-r from-purple-600/15 to-cyan-600/15 rounded-[4rem] blur-2xl animate-pulse" style={{ animationDelay: '2s', animationDuration: '6s' }}></div>
+            <div className="absolute -inset-4 bg-gradient-to-r from-blue-600/30 to-indigo-600/30 rounded-[3rem] blur-3xl animate-pulse [animation-duration:4s]"></div>
+            <div className="absolute -inset-6 bg-gradient-to-r from-purple-600/15 to-cyan-600/15 rounded-[4rem] blur-2xl animate-pulse [animation-duration:6s]" style={{ animationDelay: '2s' }}></div>
 
             {/* Ultra Glass Container */}
             <div className="relative bg-gradient-to-br from-blue-600/85 via-indigo-600/80 to-purple-700/90 backdrop-blur-2xl backdrop-saturate-150 backdrop-brightness-110 rounded-3xl p-8 md:p-12 shadow-2xl border border-white/30 overflow-hidden before:absolute before:inset-0 before:bg-gradient-to-br before:from-white/5 before:via-transparent before:to-white/2 before:rounded-3xl">
@@ -349,7 +343,7 @@ function Blog() {
 
                 {/* Animated Wave Overlay */}
                 <div className="absolute inset-0 opacity-[0.06]">
-                  <svg className="w-full h-full animate-pulse" style={{ animationDuration: '8s' }} xmlns="http://www.w3.org/2000/svg" viewBox="0 0 400 200">
+                  <svg className="w-full h-full animate-pulse [animation-duration:8s]" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 400 200">
                     <defs>
                       <linearGradient id="wave-gradient" x1="0%" y1="0%" x2="100%" y2="0%">
                         <stop offset="0%" stopColor="currentColor" stopOpacity="0.1" />
@@ -366,8 +360,8 @@ function Blog() {
               {/* Enhanced Floating Elements */}
               <div className="absolute top-4 right-4 w-2 h-2 bg-white/40 rounded-full animate-pulse shadow-lg"></div>
               <div className="absolute bottom-6 left-6 w-1 h-1 bg-white/30 rounded-full animate-ping shadow-sm"></div>
-              <div className="absolute top-8 left-1/3 w-1.5 h-1.5 bg-white/35 rounded-full animate-bounce shadow-md" style={{ animationDelay: '2s', animationDuration: '4s' }}></div>
-              <div className="absolute bottom-4 right-1/3 w-1 h-1 bg-cyan-300/30 rounded-full animate-pulse" style={{ animationDelay: '1s', animationDuration: '3s' }}></div>
+              <div className="absolute top-8 left-1/3 w-1.5 h-1.5 bg-white/35 rounded-full animate-bounce shadow-md [animation-duration:4s]" style={{ animationDelay: '2s' }}></div>
+              <div className="absolute bottom-4 right-1/3 w-1 h-1 bg-cyan-300/30 rounded-full animate-pulse [animation-duration:3s]" style={{ animationDelay: '1s' }}></div>
               <div className="absolute top-1/2 right-8 w-0.5 h-0.5 bg-purple-300/40 rounded-full animate-ping" style={{ animationDelay: '3s' }}></div>
 
               <div className="relative z-10 max-w-4xl mx-auto">
@@ -441,6 +435,6 @@ function Blog() {
       </div>
     </section>
   )
-}
+})
 
 export default Blog

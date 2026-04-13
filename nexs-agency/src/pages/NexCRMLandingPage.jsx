@@ -1,9 +1,11 @@
+// TODO: Replace console.error with Sentry or proper error tracking
 import { useState, useEffect } from 'react';
 import { Helmet } from 'react-helmet-async';
 import { motion, AnimatePresence } from 'framer-motion';
 import { settingsAPI, billingAPI } from '../services/api';
 import { CheckIcon, XIcon } from '../components/ui/Icons';
 import { crmTiers, crmFeatures } from '../constants/crmPricing';
+import { SITE_URL } from '../constants/siteConfig';
 
 // --- Data ---
 const industries = [
@@ -129,12 +131,12 @@ export default function NexCRMLandingPage() {
             <Helmet>
                 <title>NexCRM - The Operating System for Modern Agencies</title>
                 <meta name="description" content="Streamline your agency with NexCRM. Integrated project management, CRM, invoicing, and client portals." />
-                <link rel="canonical" href="https://nexspiresolutions.co.in/nexcrm" />
+                <link rel="canonical" href={`${SITE_URL}/nexcrm`} />
                 <meta property="og:title" content="NexCRM - The Operating System for Modern Agencies" />
                 <meta property="og:description" content="Streamline your agency with NexCRM. Integrated project management, CRM, invoicing, and client portals." />
                 <meta property="og:type" content="website" />
-                <meta property="og:url" content="https://nexspiresolutions.co.in/nexcrm" />
-                <meta property="og:image" content="https://nexspiresolutions.co.in/og-image.jpg" />
+                <meta property="og:url" content={`${SITE_URL}/nexcrm`} />
+                <meta property="og:image" content={`${SITE_URL}/og-image.jpg`} />
                 <meta name="twitter:card" content="summary_large_image" />
                 <meta name="twitter:title" content="NexCRM - The Operating System for Modern Agencies" />
                 <meta name="twitter:description" content="Streamline your agency with NexCRM. Integrated project management, CRM, invoicing, and client portals." />

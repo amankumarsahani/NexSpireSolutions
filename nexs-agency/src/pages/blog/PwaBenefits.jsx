@@ -1,6 +1,7 @@
 import { Helmet } from 'react-helmet-async';
 import { Link } from 'react-router-dom';
 import RelatedServices from '../../components/seo/RelatedServices';
+import { SITE_URL } from '../../constants/siteConfig';
 
 const PwaBenefits = () => {
 
@@ -18,7 +19,7 @@ const PwaBenefits = () => {
             "name": "Nexspire Solutions",
             "logo": {
                 "@type": "ImageObject",
-                "url": "https://nexspiresolutions.co.in/logo.png"
+                "url": `${SITE_URL}/logo.png`
             }
         },
         "datePublished": "2024-03-30",
@@ -30,12 +31,12 @@ const PwaBenefits = () => {
             <Helmet>
                 <title>Benefits of Progressive Web Apps (PWA) | Nexspire Web Dev</title>
                 <meta name="description" content="Progressive Web Apps (PWAs) offer the best of web and mobile. Learn how they boost conversion rates, improve SEO, and cut development costs." />
-                <link rel="canonical" href="https://nexspiresolutions.co.in/blog/why-business-needs-pwa" />
+                <link rel="canonical" href={`${SITE_URL}/blog/why-business-needs-pwa`} />
                 <meta property="og:title" content="Benefits of Progressive Web Apps (PWA) | Nexspire Web Dev" />
                 <meta property="og:description" content="Progressive Web Apps (PWAs) offer the best of web and mobile. Learn how they boost conversion rates and cut development costs." />
                 <meta property="og:type" content="article" />
-                <meta property="og:url" content="https://nexspiresolutions.co.in/blog/why-business-needs-pwa" />
-                <meta property="og:image" content="https://nexspiresolutions.co.in/og-image.jpg" />
+                <meta property="og:url" content={`${SITE_URL}/blog/why-business-needs-pwa`} />
+                <meta property="og:image" content={`${SITE_URL}/og-image.jpg`} />
                 <meta name="twitter:card" content="summary_large_image" />
                 <meta name="twitter:title" content="Benefits of Progressive Web Apps (PWA) | Nexspire Web Dev" />
                 <meta name="twitter:description" content="Progressive Web Apps (PWAs) offer the best of web and mobile. Learn how they boost conversion rates and cut development costs." />

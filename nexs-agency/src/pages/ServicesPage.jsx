@@ -9,6 +9,7 @@ import ClientLogos from '../components/ClientLogos';
 import Breadcrumbs from '../components/ui/Breadcrumbs';
 import BackToTop from '../components/ui/BackToTop';
 import ReadingProgress from '../components/ui/ReadingProgress';
+import { SITE_URL } from '../constants/siteConfig';
 
 // Refined Premium Styles
 const serviceStyles = {
@@ -191,12 +192,12 @@ const ServicesPage = () => {
             <Helmet>
                 <title>Our Services - Web, Mobile, AI & Cloud | Nexspire Solutions</title>
                 <meta name="description" content="Explore our comprehensive software development services. From custom web and mobile apps to AI integration and cloud solutions." />
-                <link rel="canonical" href="https://nexspiresolutions.co.in/services" />
+                <link rel="canonical" href={`${SITE_URL}/services`} />
                 <meta property="og:title" content="Our Services - Web, Mobile, AI & Cloud | Nexspire Solutions" />
                 <meta property="og:description" content="Explore our comprehensive software development services. From custom web and mobile apps to AI integration and cloud solutions." />
                 <meta property="og:type" content="website" />
-                <meta property="og:url" content="https://nexspiresolutions.co.in/services" />
-                <meta property="og:image" content="https://nexspiresolutions.co.in/og-image.jpg" />
+                <meta property="og:url" content={`${SITE_URL}/services`} />
+                <meta property="og:image" content={`${SITE_URL}/og-image.jpg`} />
                 <meta name="twitter:card" content="summary_large_image" />
                 <meta name="twitter:title" content="Our Services - Web, Mobile, AI & Cloud | Nexspire Solutions" />
                 <meta name="twitter:description" content="Explore our comprehensive software development services. From custom web and mobile apps to AI integration and cloud solutions." />
@@ -204,14 +205,14 @@ const ServicesPage = () => {
                     "@context": "https://schema.org",
                     "@type": "ItemList",
                     "name": "Nexspire Solutions Services",
-                    "url": "https://nexspiresolutions.co.in/services",
+                    "url": `${SITE_URL}/services`,
                     "numberOfItems": 5,
                     "itemListElement": [
-                        { "@type": "ListItem", "position": 1, "name": "Custom Web Development", "url": "https://nexspiresolutions.co.in/services/custom-web-development" },
-                        { "@type": "ListItem", "position": 2, "name": "Mobile App Development", "url": "https://nexspiresolutions.co.in/services/mobile-app-development" },
-                        { "@type": "ListItem", "position": 3, "name": "AI & Machine Learning", "url": "https://nexspiresolutions.co.in/services/ai-machine-learning" },
-                        { "@type": "ListItem", "position": 4, "name": "Cloud Solutions", "url": "https://nexspiresolutions.co.in/services/cloud-solutions" },
-                        { "@type": "ListItem", "position": 5, "name": "E-commerce Development", "url": "https://nexspiresolutions.co.in/services/ecommerce-development" }
+                        { "@type": "ListItem", "position": 1, "name": "Custom Web Development", "url": `${SITE_URL}/services/custom-web-development` },
+                        { "@type": "ListItem", "position": 2, "name": "Mobile App Development", "url": `${SITE_URL}/services/mobile-app-development` },
+                        { "@type": "ListItem", "position": 3, "name": "AI & Machine Learning", "url": `${SITE_URL}/services/ai-machine-learning` },
+                        { "@type": "ListItem", "position": 4, "name": "Cloud Solutions", "url": `${SITE_URL}/services/cloud-solutions` },
+                        { "@type": "ListItem", "position": 5, "name": "E-commerce Development", "url": `${SITE_URL}/services/ecommerce-development` }
                     ]
                 })}</script>
             </Helmet>

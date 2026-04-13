@@ -6,6 +6,7 @@ import Breadcrumbs from '../components/ui/Breadcrumbs';
 import BackToTop from '../components/ui/BackToTop';
 
 import ReadingProgress from '../components/ui/ReadingProgress';
+import { SITE_URL } from '../constants/siteConfig';
 
 const FAQPage = () => {
 
@@ -108,12 +109,12 @@ const FAQPage = () => {
                 <title>FAQ - Frequently Asked Questions | Nexspire Solutions</title>
                 <meta name="description" content="Get answers to common questions about Nexspire Solutions' software development services, technologies, project timelines, support, and more. Learn about our web, mobile, AI, and cloud solutions." />
                 <meta name="keywords" content="software development FAQ, web development questions, mobile app development process, project timeline, post-launch support, data security, SEO websites, custom software solutions" />
-                <link rel="canonical" href="https://nexspiresolutions.co.in/faq" />
+                <link rel="canonical" href={`${SITE_URL}/faq`} />
                 <meta property="og:title" content="Frequently Asked Questions | Nexspire Solutions" />
                 <meta property="og:description" content="Common questions answered about our software development services, process, and technologies." />
                 <meta property="og:type" content="website" />
-                <meta property="og:url" content="https://nexspiresolutions.co.in/faq" />
-                <meta property="og:image" content="https://nexspiresolutions.co.in/og-image.jpg" />
+                <meta property="og:url" content={`${SITE_URL}/faq`} />
+                <meta property="og:image" content={`${SITE_URL}/og-image.jpg`} />
                 <meta name="twitter:card" content="summary_large_image" />
                 <meta name="twitter:title" content="Frequently Asked Questions | Nexspire Solutions" />
                 <meta name="twitter:description" content="Common questions answered about our software development services, process, and technologies." />

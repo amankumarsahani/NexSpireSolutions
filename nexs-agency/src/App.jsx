@@ -1,6 +1,7 @@
 import { lazy, memo } from 'react';
 import { BrowserRouter, Routes, Route } from 'react-router-dom';
 import { Helmet } from 'react-helmet-async';
+import { SITE_URL } from './constants/siteConfig';
 import ScrollReveal from './components/ScrollReveal';
 import ScrollToTop from './components/ScrollToTop';
 import ErrorBoundary from './components/ErrorBoundary';
@@ -64,12 +65,12 @@ const LandingPage = memo(function LandingPage() {
         <title>Nexspire Solutions - AI Software Agency & Freelance Experts in Mohali, Chandigarh</title>
         <meta name="description" content="Nexspire Solutions is a top-rated AI & custom software development agency. We are a team of expert freelancers in Mohali & Chandigarh specializing in React, Next.js, Mobile Apps, and Digital Transformation." />
         <meta name="keywords" content="AI software development, custom software agency, web development company mohali, freelance developers chandigarh, mobile app developers, digital transformation services, React developers, Next.js experts, best software agency in mohali, freelance software engineer" />
-        <link rel="canonical" href="https://nexspiresolutions.co.in/" />
+        <link rel="canonical" href={`${SITE_URL}/`} />
 
         {/* Open Graph */}
         <meta property="og:title" content="Nexspire Solutions - Global Tech Quality, Local Mohali Experts" />
         <meta property="og:description" content="Transform your business with AI-powered software. Top-rated freelance team in Tricity building scalable web & mobile apps." />
-        <meta property="og:url" content="https://nexspiresolutions.co.in/" />
+        <meta property="og:url" content={`${SITE_URL}/`} />
         <meta property="og:type" content="website" />
 
         {/* Twitter */}

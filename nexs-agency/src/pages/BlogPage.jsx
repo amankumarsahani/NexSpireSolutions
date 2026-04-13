@@ -1,3 +1,4 @@
+// TODO: Replace console.error with Sentry or proper error tracking
 import { useEffect, useState, useRef, useCallback } from 'react';
 import { Link } from 'react-router-dom';
 import { Helmet } from 'react-helmet-async';
@@ -7,6 +8,7 @@ import LeadMagnet from '../components/LeadMagnet';
 import { blogAPI } from '../services/api';
 import Breadcrumbs from '../components/ui/Breadcrumbs';
 import BackToTop from '../components/ui/BackToTop';
+import { SITE_URL } from '../constants/siteConfig';
 
 const FadeIn = ({ children, className, delay = 0 }) => {
     return (
@@ -167,12 +169,12 @@ const BlogPage = () => {
                 <title>Blog - Tech Insights & Trends | Nexspire Solutions</title>
                 <meta name="description" content="Stay updated with the latest trends in AI, Web Development, Mobile Apps, and Enterprise Software. Expert insights from Nexspire Solutions." />
                 <meta name="keywords" content="tech blog, AI trends 2026, React vs Angular, mobile app development trends, software development insights, nexspire blog" />
-                <link rel="canonical" href="https://nexspiresolutions.co.in/blog" />
+                <link rel="canonical" href={`${SITE_URL}/blog`} />
                 <meta property="og:title" content="Blog - Tech Insights & Trends | Nexspire Solutions" />
                 <meta property="og:description" content="Read expert articles on AI, Cloud, and Software Development." />
                 <meta property="og:type" content="website" />
-                <meta property="og:url" content="https://nexspiresolutions.co.in/blog" />
-                <meta property="og:image" content="https://nexspiresolutions.co.in/og-image.jpg" />
+                <meta property="og:url" content={`${SITE_URL}/blog`} />
+                <meta property="og:image" content={`${SITE_URL}/og-image.jpg`} />
                 <meta name="twitter:card" content="summary_large_image" />
                 <meta name="twitter:title" content="Blog - Tech Insights & Trends | Nexspire Solutions" />
                 <meta name="twitter:description" content="Read expert articles on AI, Cloud, and Software Development." />
@@ -180,12 +182,12 @@ const BlogPage = () => {
                     "@context": "https://schema.org",
                     "@type": "Blog",
                     "name": "Nexspire Solutions Blog",
-                    "url": "https://nexspiresolutions.co.in/blog",
+                    "url": `${SITE_URL}/blog`,
                     "description": "Stay updated with the latest trends in AI, Web Development, Mobile Apps, and Enterprise Software.",
                     "publisher": {
                         "@type": "Organization",
                         "name": "Nexspire Solutions",
-                        "url": "https://nexspiresolutions.co.in"
+                        "url": SITE_URL
                     }
                 })}</script>
             </Helmet>

@@ -1,8 +1,8 @@
-import { useState, useRef, useEffect } from 'react';
+import { useState, useRef, useEffect, memo } from 'react';
 import { Link } from 'react-router-dom';
 import { siteConfig } from '../constants/siteConfig';
 
-const Footer = () => {
+const Footer = memo(function Footer() {
   const currentYear = new Date().getFullYear();
   const [email, setEmail] = useState('');
   const [subscribed, setSubscribed] = useState(false);
@@ -176,6 +176,6 @@ const Footer = () => {
       </div>
     </footer >
   );
-};
+})
 
 export default Footer;

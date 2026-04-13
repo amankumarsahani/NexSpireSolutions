@@ -1,5 +1,6 @@
 import { Link, useLocation } from 'react-router-dom';
 import { Helmet } from 'react-helmet-async';
+import { SITE_URL } from '../../constants/siteConfig';
 
 const routeNames = {
     'services': 'Services',
@@ -33,7 +34,7 @@ export default function Breadcrumbs({ className = '' }) {
                 "@type": "ListItem",
                 "position": 1,
                 "name": "Home",
-                "item": "https://nexspiresolutions.co.in/"
+                "item": `${SITE_URL}/`
             },
             ...pathnames.map((name, index) => {
                 const routeTo = `/${pathnames.slice(0, index + 1).join('/')}`;
@@ -44,7 +45,7 @@ export default function Breadcrumbs({ className = '' }) {
                     "@type": "ListItem",
                     "position": index + 2,
                     "name": displayName,
-                    "item": `https://nexspiresolutions.co.in${routeTo}`
+                    "item": `${SITE_URL}${routeTo}`
                 };
             })
         ]

@@ -1,3 +1,4 @@
+// TODO: Replace console.error with Sentry or proper error tracking
 import { useState } from 'react';
 
 export default function SocialShare({ url, title, className = '' }) {

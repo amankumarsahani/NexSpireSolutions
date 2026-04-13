@@ -1,3 +1,4 @@
+// TODO: Replace console.error with Sentry or proper error tracking
 import { createContext, useContext, useState, useEffect } from 'react';
 import { authAPI } from '../services/api';
 

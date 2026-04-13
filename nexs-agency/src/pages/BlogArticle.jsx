@@ -1,3 +1,4 @@
+// TODO: Replace console.error with Sentry or proper error tracking
 import { useEffect, useState } from 'react';
 import { useParams, Link } from 'react-router-dom';
 import { Helmet } from 'react-helmet-async';
@@ -11,6 +12,7 @@ import SocialShare from '../components/ui/SocialShare';
 import AuthorBio from '../components/ui/AuthorBio';
 import BackToTop from '../components/ui/BackToTop';
 import TableOfContents, { addIdsToHeadings } from '../components/ui/TableOfContents';
+import { SITE_URL } from '../constants/siteConfig';
 
 const BlogArticle = () => {
     const { slug } = useParams();
@@ -80,7 +82,7 @@ const BlogArticle = () => {
             "name": "Nexspire Solutions",
             "logo": {
                 "@type": "ImageObject",
-                "url": "https://nexspiresolutions.co.in/logo.png"
+                "url": `${SITE_URL}/logo.png`
             }
         },
         "datePublished": blog.created_at,
@@ -114,12 +116,12 @@ const BlogArticle = () => {
             <Helmet>
                 <title>{blog.title} | Nexspire Insights</title>
                 <meta name="description" content={blog.excerpt} />
-                <link rel="canonical" href={`https://nexspiresolutions.co.in/blog/${blog.slug}`} />
+                <link rel="canonical" href={`${SITE_URL}/blog/${blog.slug}`} />
                 <meta property="og:title" content={`${blog.title} | Nexspire Insights`} />
                 <meta property="og:description" content={blog.excerpt} />
                 <meta property="og:type" content="article" />
-                <meta property="og:url" content={`https://nexspiresolutions.co.in/blog/${blog.slug}`} />
-                <meta property="og:image" content="https://nexspiresolutions.co.in/og-image.jpg" />
+                <meta property="og:url" content={`${SITE_URL}/blog/${blog.slug}`} />
+                <meta property="og:image" content={`${SITE_URL}/og-image.jpg`} />
                 <meta name="twitter:card" content="summary_large_image" />
                 <meta name="twitter:title" content={`${blog.title} | Nexspire Insights`} />
                 <meta name="twitter:description" content={blog.excerpt} />
@@ -133,7 +135,7 @@ const BlogArticle = () => {
 
             {/* Floating Social Share */}
             <FloatingSocialShare
-                url={`https://nexspiresolutions.co.in/blog/${blog.slug}`}
+                url={`${SITE_URL}/blog/${blog.slug}`}
                 title={blog.title}
             />
 
@@ -205,7 +207,7 @@ const BlogArticle = () => {
                         {/* Social Share (Inline) */}
                         <div className="border-t border-b border-gray-100 py-6 mb-12">
                             <SocialShare
-                                url={`https://nexspiresolutions.co.in/blog/${blog.slug}`}
+                                url={`${SITE_URL}/blog/${blog.slug}`}
                                 title={blog.title}
                                 className="justify-center"
                             />

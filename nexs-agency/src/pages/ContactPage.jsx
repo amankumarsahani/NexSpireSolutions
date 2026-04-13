@@ -1,3 +1,4 @@
+// TODO: Replace console.error with Sentry or proper error tracking
 import { useEffect, useState } from 'react';
 import { Helmet } from 'react-helmet-async';
 import { motion, AnimatePresence } from 'framer-motion';
@@ -5,6 +6,7 @@ import confetti from 'canvas-confetti';
 import { cn } from '../utils/cn';
 import { inquiryAPI } from '../services/api';
 import ReadingProgress from '../components/ui/ReadingProgress';
+import { SITE_URL } from '../constants/siteConfig';
 
 const FadeIn = ({ children, className, delay = 0 }) => {
     return (
@@ -88,12 +90,12 @@ const ContactPage = () => {
                 <title>Contact Nexspire - Hire Experts in Mohali, London, NYC & Dubai</title>
                 <meta name="description" content="Ready to innovate? Contact Nexspire Solutions. We have a physical presence in Mohali (India) and serve clients globally in London, New York, Dubai, Toronto, and Sydney. Hire top-tier software developers today." />
                 <meta name="keywords" content="contact software company, hire developers mohali, software agency london, tech partners new york, dubai software company, freelance experts india, global software team" />
-                <link rel="canonical" href="https://nexspiresolutions.co.in/contact" />
+                <link rel="canonical" href={`${SITE_URL}/contact`} />
                 <meta property="og:title" content="Contact Nexspire - Global Reach, Local Presence" />
                 <meta property="og:description" content="Connect with our global team. Offices in Mohali, serving the world." />
                 <meta property="og:type" content="website" />
-                <meta property="og:url" content="https://nexspiresolutions.co.in/contact" />
-                <meta property="og:image" content="https://nexspiresolutions.co.in/og-image.jpg" />
+                <meta property="og:url" content={`${SITE_URL}/contact`} />
+                <meta property="og:image" content={`${SITE_URL}/og-image.jpg`} />
                 <meta name="twitter:card" content="summary_large_image" />
                 <meta name="twitter:title" content="Contact Nexspire - Global Reach, Local Presence" />
                 <meta name="twitter:description" content="Connect with our global team. Offices in Mohali, serving the world." />
@@ -101,10 +103,10 @@ const ContactPage = () => {
                     "@context": "https://schema.org",
                     "@type": "LocalBusiness",
                     "name": "Nexspire Solutions",
-                    "url": "https://nexspiresolutions.co.in",
+                    "url": SITE_URL,
                     "email": "nexspiretechsolutions@gmail.com",
                     "telephone": "+919729916844",
-                    "image": "https://nexspiresolutions.co.in/og-image.jpg",
+                    "image": `${SITE_URL}/og-image.jpg`,
                     "address": {
                         "@type": "PostalAddress",
                         "addressLocality": "Mohali",

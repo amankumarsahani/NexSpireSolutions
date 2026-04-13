@@ -2,6 +2,8 @@ import { useEffect, useMemo, useState } from 'react';
 import { Helmet } from 'react-helmet-async';
 import { adminAPI } from '../services/api';
 import { useAuth } from '../context/AuthContext';
+import BackupAccountList from './admin/BackupAccountList';
+import ServerSnapshot from './admin/ServerSnapshot';
 
 const EMPTY_FORM = {
     auth_type: 'oauth_personal',
@@ -652,106 +654,15 @@ export default function AdminBackupsPage() {
                         </form>
 
                         <div className="space-y-8">
-                            <div className="rounded-[2rem] border border-white/70 bg-white/85 p-6 shadow-xl shadow-slate-900/5 backdrop-blur">
-                                <div className="flex items-center justify-between gap-4">
-                                    <div>
-                                        <h2 className="font-display text-2xl font-bold text-slate-900">Configured Accounts</h2>
-                                        <p className="mt-2 text-sm text-slate-600">Create, edit, or delete backup accounts from here.</p>
-                                    </div>
-                                    <button type="button" onClick={loadData} className="rounded-2xl border border-slate-200 px-4 py-2 text-sm font-semibold text-slate-700">
-                                        Refresh
-                                    </button>
-                                </div>
-                                <div className="mt-6 space-y-4">
-                                    {pageLoading ? (
-                                        <div className="rounded-2xl border border-slate-200 bg-slate-50 px-5 py-8 text-center text-sm text-slate-500">
-                                            Loading backup accounts...
-                                        </div>
-                                    ) : accounts.length === 0 ? (
-                                        <div className="rounded-2xl border border-dashed border-slate-300 bg-slate-50 px-5 py-8 text-center text-sm text-slate-500">
-                                            No backup accounts configured yet.
-                                        </div>
-                                    ) : accounts.map((account) => {
-                                        let clientEmail = '';
-                                        const authType = account.auth_type === 'oauth_personal' ? 'oauth_personal' : 'service_account';
-                                        try {
-                                            const credentials = typeof account.credentials_json === 'string' ? JSON.parse(account.credentials_json) : account.credentials_json;
-                                            clientEmail = credentials?.client_email || '';
-                                        } catch {
-                                            clientEmail = '';
-                                        }
+                            <BackupAccountList
+                                accounts={accounts}
+                                pageLoading={pageLoading}
+                                onEdit={handleEdit}
+                                onDelete={handleDelete}
+                                onRefresh={loadData}
+                            />
 
-                                        return (
-                                            <div key={account.id} className="rounded-3xl border border-slate-200 bg-slate-50/80 p-5">
-                                                <div className="flex flex-col gap-4 md:flex-row md:items-start md:justify-between">
-                                                    <div className="space-y-3">
-                                                        <div className="flex flex-wrap items-center gap-3">
-                                                            <h3 className="text-lg font-semibold text-slate-900">{account.account_name}</h3>
-                                                            <span className={`rounded-full px-3 py-1 text-xs font-semibold ${account.is_active ? 'bg-emerald-100 text-emerald-700' : 'bg-slate-200 text-slate-700'}`}>
-                                                                {account.is_active ? 'Active' : 'Inactive'}
-                                                            </span>
-                                                            <span className={`rounded-full px-3 py-1 text-xs font-semibold ${authType === 'oauth_personal' ? 'bg-blue-100 text-blue-700' : 'bg-purple-100 text-purple-700'}`}>
-                                                                {authType === 'oauth_personal' ? 'Personal Drive OAuth' : 'Service Account'}
-                                                            </span>
-                                                        </div>
-                                                        <div className="grid gap-2 text-sm text-slate-600">
-                                                            <p><span className="font-medium text-slate-800">Folder ID:</span> {account.folder_id || '-'}</p>
-                                                            {authType === 'oauth_personal' ? (
-                                                                <>
-                                                                    <p><span className="font-medium text-slate-800">OAuth client ID:</span> {account.oauth_client_id || 'Not set'}</p>
-                                                                    <p><span className="font-medium text-slate-800">Refresh token:</span> {account.oauth_refresh_token ? 'Stored' : 'Missing'}</p>
-                                                                </>
-                                                            ) : (
-                                                                <>
-                                                                    <p><span className="font-medium text-slate-800">Service account:</span> {clientEmail || 'Hidden / unavailable'}</p>
-                                                                    <p><span className="font-medium text-slate-800">Impersonate email:</span> {account.subject_email || 'Not set'}</p>
-                                                                </>
-                                                            )}
-                                                            <p><span className="font-medium text-slate-800">Usage count:</span> {account.usage_count ?? 0}</p>
-                                                        </div>
-                                                    </div>
-                                                    <div className="flex flex-wrap gap-2">
-                                                        <button type="button" onClick={() => handleEdit(account)} className="rounded-2xl border border-slate-200 bg-white px-4 py-2 text-sm font-semibold text-slate-700">
-                                                            Edit
-                                                        </button>
-                                                        <button type="button" onClick={() => handleDelete(account.id, account.account_name)} className="rounded-2xl border border-red-200 bg-white px-4 py-2 text-sm font-semibold text-red-600">
-                                                            Delete
-                                                        </button>
-                                                    </div>
-                                                </div>
-                                            </div>
-                                        );
-                                    })}
-                                </div>
-                            </div>
-
-                            <div className="rounded-[2rem] border border-white/70 bg-white/85 p-6 shadow-xl shadow-slate-900/5 backdrop-blur">
-                                <h2 className="font-display text-2xl font-bold text-slate-900">Server Snapshot</h2>
-                                <p className="mt-2 text-sm text-slate-600">Quick check that the admin API is returning server metadata needed by backups.</p>
-                                <div className="mt-6 grid gap-4">
-                                    {servers.length === 0 ? (
-                                        <div className="rounded-2xl border border-dashed border-slate-300 bg-slate-50 px-5 py-8 text-center text-sm text-slate-500">
-                                            No servers returned by the admin API.
-                                        </div>
-                                    ) : servers.map((server) => (
-                                        <div key={server.id} className="rounded-3xl border border-slate-200 bg-slate-50/80 p-5">
-                                            <div className="flex flex-wrap items-center gap-3">
-                                                <h3 className="text-lg font-semibold text-slate-900">{server.name}</h3>
-                                                {server.is_primary ? <span className="rounded-full bg-blue-100 px-3 py-1 text-xs font-semibold text-blue-700">Primary</span> : null}
-                                                <span className={`rounded-full px-3 py-1 text-xs font-semibold ${server.is_active ? 'bg-emerald-100 text-emerald-700' : 'bg-slate-200 text-slate-700'}`}>
-                                                    {server.is_active ? 'Active' : 'Inactive'}
-                                                </span>
-                                            </div>
-                                            <div className="mt-3 grid gap-2 text-sm text-slate-600 md:grid-cols-2">
-                                                <p><span className="font-medium text-slate-800">Hostname:</span> {server.hostname}</p>
-                                                <p><span className="font-medium text-slate-800">DB host:</span> {server.db_host || 'localhost'}</p>
-                                                <p><span className="font-medium text-slate-800">Tenants:</span> {server.tenant_count ?? 0}</p>
-                                                <p><span className="font-medium text-slate-800">Running processes:</span> {server.running_count ?? 0}</p>
-                                            </div>
-                                        </div>
-                                    ))}
-                                </div>
-                            </div>
+                            <ServerSnapshot servers={servers} />
                         </div>
                     </div>
                 </div>

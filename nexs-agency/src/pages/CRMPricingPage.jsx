@@ -1,8 +1,10 @@
+// TODO: Replace console.error with Sentry or proper error tracking
 import { useState, useEffect } from 'react';
 import { Helmet } from 'react-helmet-async';
 import { settingsAPI, billingAPI } from '../services/api';
 import { CheckIcon, XIcon } from '../components/ui/Icons';
 import { crmTiers, crmFeatures } from '../constants/crmPricing';
+import { SITE_URL } from '../constants/siteConfig';
 
 const tiers = crmTiers;
 const features = crmFeatures;
@@ -117,12 +119,12 @@ export default function CRMPricingPage() {
             <Helmet>
                 <title>NexCRM Pricing - Affordable Plans for Every Business | Nexspire Solutions</title>
                 <meta name="description" content="Choose the perfect NexCRM plan for your business. Starter from ₹999/month. Leads, E-commerce, Team Chat, Mobile App - all included." />
-                <link rel="canonical" href="https://nexspiresolutions.co.in/nexcrm/pricing" />
+                <link rel="canonical" href={`${SITE_URL}/nexcrm/pricing`} />
                 <meta property="og:title" content="NexCRM Pricing - Affordable Plans for Every Business | Nexspire Solutions" />
                 <meta property="og:description" content="Choose the perfect NexCRM plan for your business. Starter from ₹999/month. Leads, E-commerce, Team Chat, Mobile App - all included." />
                 <meta property="og:type" content="website" />
-                <meta property="og:url" content="https://nexspiresolutions.co.in/nexcrm/pricing" />
-                <meta property="og:image" content="https://nexspiresolutions.co.in/og-image.jpg" />
+                <meta property="og:url" content={`${SITE_URL}/nexcrm/pricing`} />
+                <meta property="og:image" content={`${SITE_URL}/og-image.jpg`} />
                 <meta name="twitter:card" content="summary_large_image" />
                 <meta name="twitter:title" content="NexCRM Pricing - Affordable Plans for Every Business | Nexspire Solutions" />
                 <meta name="twitter:description" content="Choose the perfect NexCRM plan for your business. Starter from ₹999/month." />
@@ -527,7 +529,10 @@ export default function CRMPricingPage() {
                                         if (response.ok) {
                                             setSubmitted(true);
                                         } else {
-                                            const err = await response.json().catch(() => ({}));
+                                            const err = await response.json().catch((parseErr) => {
+                                                console.error('Failed to parse error response:', parseErr);
+                                                return {};
+                                            });
                                             showToast(err.error || 'Something went wrong. Please try again.', 'error');
                                         }
                                     } catch (err) {

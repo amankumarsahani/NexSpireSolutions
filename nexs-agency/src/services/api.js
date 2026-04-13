@@ -1,8 +1,8 @@
 import axios from 'axios';
+import { snakeToCamel } from '../utils/mapKeys';
 
 const API_URL = import.meta.env.VITE_API_URL || 'http://localhost:5000/api';
 
-// Create axios instance
 const api = axios.create({
     baseURL: API_URL,
     headers: {
@@ -10,7 +10,6 @@ const api = axios.create({
     }
 });
 
-// Add token and AbortController support to requests
 api.interceptors.request.use((config) => {
     const token = localStorage.getItem('token');
     if (token) {
@@ -25,9 +24,15 @@ api.interceptors.request.use((config) => {
     return config;
 });
 
-// --- In-memory cache with TTL ---
+api.interceptors.response.use((response) => {
+    if (response.data) {
+        response.data = snakeToCamel(response.data);
+    }
+    return response;
+});
+
 const cache = new Map();
-const DEFAULT_TTL = 5 * 60 * 1000; // 5 minutes
+const DEFAULT_TTL = 5 * 60 * 1000;
 
 function getCacheKey(url, params) {
     const paramStr = params ? JSON.stringify(params) : '';

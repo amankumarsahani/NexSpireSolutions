@@ -6,6 +6,7 @@ import { cn } from '../utils/cn';
 import Breadcrumbs from '../components/ui/Breadcrumbs';
 import BackToTop from '../components/ui/BackToTop';
 import ReadingProgress from '../components/ui/ReadingProgress';
+import { SITE_URL } from '../constants/siteConfig';
 
 const FadeIn = ({ children, className, delay = 0 }) => {
     return (
@@ -170,12 +171,12 @@ const PortfolioPage = () => {
                 <title>Portfolio - Custom Software Case Studies | Nexspire Solutions</title>
                 <meta name="description" content="Explore our portfolio of successful projects including E-commerce platforms, HealthTech apps, and AI-Powered CRM systems. See how Nexspire Solutions delivers measurable results for global clients." />
                 <meta name="keywords" content="software portfolio, case studies, web development projects, mobile app examples, AI CRM case study, healthtech app development, e-commerce success stories, nexspire portfolio" />
-                <link rel="canonical" href="https://nexspiresolutions.co.in/portfolio" />
+                <link rel="canonical" href={`${SITE_URL}/portfolio`} />
                 <meta property="og:title" content="Portfolio - Custom Software Case Studies | Nexspire Solutions" />
                 <meta property="og:description" content="See how we've helped businesses worldwide with custom E-commerce, Mobile, and AI solutions." />
                 <meta property="og:type" content="website" />
-                <meta property="og:url" content="https://nexspiresolutions.co.in/portfolio" />
-                <meta property="og:image" content="https://nexspiresolutions.co.in/og-image.jpg" />
+                <meta property="og:url" content={`${SITE_URL}/portfolio`} />
+                <meta property="og:image" content={`${SITE_URL}/og-image.jpg`} />
                 <meta name="twitter:card" content="summary_large_image" />
                 <meta name="twitter:title" content="Portfolio - Custom Software Case Studies | Nexspire Solutions" />
                 <meta name="twitter:description" content="See how we've helped businesses worldwide with custom E-commerce, Mobile, and AI solutions." />
@@ -183,7 +184,7 @@ const PortfolioPage = () => {
                     "@context": "https://schema.org",
                     "@type": "ItemList",
                     "name": "Nexspire Solutions Portfolio",
-                    "url": "https://nexspiresolutions.co.in/portfolio",
+                    "url": `${SITE_URL}/portfolio`,
                     "description": "Explore our portfolio of successful projects including E-commerce platforms, HealthTech apps, and AI-Powered CRM systems.",
                     "numberOfItems": 6,
                     "itemListElement": [

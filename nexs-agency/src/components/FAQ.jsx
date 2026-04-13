@@ -1,6 +1,7 @@
-import { useState, useEffect } from 'react'
+import { useState, useEffect, memo } from 'react'
+import SectionBackground from './ui/SectionBackground'
 
-function FAQ() {
+const FAQ = memo(function FAQ() {
   const [openFAQ, setOpenFAQ] = useState(0)
   const [isVisible, setIsVisible] = useState(false)
 
@@ -77,14 +78,7 @@ function FAQ() {
 
   return (
     <section id="faq" className="relative py-20 bg-gradient-to-br from-gray-50 via-slate-50 to-indigo-50 overflow-hidden">
-      {/* Background Elements */}
-      <div className="absolute inset-0">
-        <div className="absolute top-0 left-0 w-full h-full bg-gradient-to-br from-blue-500/5 via-transparent to-purple-500/5"></div>
-        <div className="absolute inset-0 bg-gradient-to-tl from-pink-500/3 via-transparent to-cyan-500/3"></div>
-        
-        <div className="absolute top-20 left-10 w-80 h-80 bg-gradient-to-br from-blue-200/15 to-cyan-200/10 rounded-full blur-3xl animate-pulse"></div>
-        <div className="absolute bottom-20 right-10 w-96 h-96 bg-gradient-to-bl from-purple-200/12 to-pink-200/8 rounded-full blur-3xl animate-pulse" style={{animationDelay: '2s'}}></div>
-      </div>
+      <SectionBackground />
 
       <div className="relative z-10 max-w-5xl mx-auto px-4 sm:px-6 lg:px-8">
         {/* Modern Header */}
@@ -229,6 +223,6 @@ function FAQ() {
       </div>
     </section>
   )
-}
+})
 
 export default FAQ

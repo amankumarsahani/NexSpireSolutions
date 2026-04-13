@@ -1,3 +1,4 @@
+import { memo } from 'react';
 import { motion } from 'framer-motion';
 
 const milestones = [
@@ -46,7 +47,7 @@ const colorMap = {
     pink: { bg: 'bg-pink-100', text: 'text-pink-600', border: 'border-pink-500' }
 };
 
-export default function Timeline({ className = '' }) {
+const Timeline = memo(function Timeline({ className = '' }) {
     return (
         <section className={`py-24 bg-gradient-to-b from-gray-50 to-white ${className}`}>
             <div className="container-custom">
@@ -116,4 +117,6 @@ export default function Timeline({ className = '' }) {
             </div>
         </section>
     );
-}
+})
+
+export default Timeline;

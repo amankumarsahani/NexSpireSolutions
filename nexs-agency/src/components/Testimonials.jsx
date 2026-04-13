@@ -1,4 +1,4 @@
-import { useState } from 'react'
+import { useState, memo } from 'react'
 
 const testimonials = [
   {
@@ -45,7 +45,7 @@ const testimonials = [
   }
 ]
 
-function Testimonials() {
+const Testimonials = memo(function Testimonials() {
   const [currentTestimonial, setCurrentTestimonial] = useState(0)
 
   const nextTestimonial = () => {
@@ -173,6 +173,6 @@ function Testimonials() {
       </div>
     </section>
   )
-}
+})
 
 export default Testimonials

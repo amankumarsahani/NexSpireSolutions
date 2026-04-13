@@ -1,4 +1,5 @@
 import { Helmet } from 'react-helmet-async';
+import { SITE_URL } from '../constants/siteConfig';
 
 const PrivacyPolicy = () => {
 
@@ -7,13 +8,13 @@ const PrivacyPolicy = () => {
             <Helmet>
                 <title>Privacy Policy | Nexspire Solutions</title>
                 <meta name="description" content="Read the Nexspire Solutions privacy policy. Learn how we collect, use, and protect your personal data." />
-                <link rel="canonical" href="https://nexspiresolutions.co.in/privacy-policy" />
+                <link rel="canonical" href={`${SITE_URL}/privacy-policy`} />
                 <meta name="robots" content="noindex, follow" />
                 <meta property="og:title" content="Privacy Policy | Nexspire Solutions" />
                 <meta property="og:description" content="Read the Nexspire Solutions privacy policy. Learn how we collect, use, and protect your personal data." />
                 <meta property="og:type" content="website" />
-                <meta property="og:url" content="https://nexspiresolutions.co.in/privacy-policy" />
-                <meta property="og:image" content="https://nexspiresolutions.co.in/og-image.jpg" />
+                <meta property="og:url" content={`${SITE_URL}/privacy-policy`} />
+                <meta property="og:image" content={`${SITE_URL}/og-image.jpg`} />
                 <meta name="twitter:card" content="summary_large_image" />
                 <meta name="twitter:title" content="Privacy Policy | Nexspire Solutions" />
                 <meta name="twitter:description" content="Read the Nexspire Solutions privacy policy. Learn how we collect, use, and protect your personal data." />

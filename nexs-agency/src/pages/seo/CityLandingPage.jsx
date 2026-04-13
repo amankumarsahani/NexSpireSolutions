@@ -3,6 +3,7 @@ import { Link, useParams } from 'react-router-dom';
 import { Helmet } from 'react-helmet-async';
 import { motion, useScroll, useTransform } from 'framer-motion';
 import ReadingProgress from '../../components/ui/ReadingProgress';
+import { SITE_URL } from '../../constants/siteConfig';
 
 // City data with SEO content & Timezones
 const cityData = {
@@ -232,7 +233,7 @@ const CityLandingPage = () => {
         "@type": "LocalBusiness",
         "name": `Nexspire Solutions - ${data.city}`,
         "description": data.description,
-        "url": `https://nexspiresolutions.co.in/software-development-company/${city}`,
+        "url": `${SITE_URL}/software-development-company/${city}`,
         "telephone": "+91-7696309551",
         "email": "nexspiretechsolutions@gmail.com",
         "areaServed": data.city,
@@ -257,12 +258,12 @@ const CityLandingPage = () => {
             <Helmet>
                 <title>{data.title}</title>
                 <meta name="description" content={data.description} />
-                <link rel="canonical" href={`https://nexspiresolutions.co.in/software-development-company/${city}`} />
+                <link rel="canonical" href={`${SITE_URL}/software-development-company/${city}`} />
                 <meta property="og:title" content={data.title} />
                 <meta property="og:description" content={data.description} />
                 <meta property="og:type" content="website" />
-                <meta property="og:url" content={`https://nexspiresolutions.co.in/software-development-company/${city}`} />
-                <meta property="og:image" content="https://nexspiresolutions.co.in/og-image.jpg" />
+                <meta property="og:url" content={`${SITE_URL}/software-development-company/${city}`} />
+                <meta property="og:image" content={`${SITE_URL}/og-image.jpg`} />
                 <meta name="twitter:card" content="summary_large_image" />
                 <meta name="twitter:title" content={data.title} />
                 <meta name="twitter:description" content={data.description} />

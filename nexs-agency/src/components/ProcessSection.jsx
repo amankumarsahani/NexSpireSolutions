@@ -1,3 +1,4 @@
+import { memo } from 'react';
 import { motion } from 'framer-motion';
 
 const steps = [
@@ -31,7 +32,7 @@ const steps = [
     }
 ];
 
-export default function ProcessSection({ className = '' }) {
+const ProcessSection = memo(function ProcessSection({ className = '' }) {
     return (
         <section className={`py-24 bg-gradient-to-b from-gray-50 to-white overflow-hidden ${className}`}>
             <div className="container-custom">
@@ -94,4 +95,6 @@ export default function ProcessSection({ className = '' }) {
             </div>
         </section>
     );
-}
+})
+
+export default ProcessSection;

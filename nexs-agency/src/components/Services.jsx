@@ -1,5 +1,54 @@
 import { useState, useEffect, useRef, useCallback, memo } from 'react'
 import { Link } from 'react-router-dom'
+import SectionBackground from './ui/SectionBackground'
+
+const ServiceCard = memo(function ServiceCard({ service }) {
+  const [isHovered, setIsHovered] = useState(false)
+  return (
+    <div
+      className={`group relative bg-white/90 backdrop-blur-md rounded-2xl p-6 sm:p-8 shadow-lg hover:shadow-xl transition-all duration-500 transform hover:-translate-y-2 border border-white/60 overflow-hidden ${isHovered ? 'scale-[1.02] shadow-2xl' : ''}`}
+      onMouseEnter={() => setIsHovered(true)}
+      onMouseLeave={() => setIsHovered(false)}
+    >
+      <div className={`absolute inset-0 ${service.bgPattern} opacity-0 group-hover:opacity-20 transition-opacity duration-700`}></div>
+      <div className={`absolute top-0 left-0 w-full h-1 bg-gradient-to-r ${service.gradient}`}></div>
+      <div className={`absolute bottom-0 right-0 w-1/2 h-0.5 bg-gradient-to-l ${service.gradient} opacity-60`}></div>
+
+      <div className="relative mb-8">
+        <div className={`relative w-16 h-16 sm:w-20 sm:h-20 bg-gradient-to-br ${service.gradient} rounded-3xl flex items-center justify-center group-hover:scale-110 group-hover:rotate-3 transition-all duration-300 shadow-xl group-hover:shadow-2xl`}>
+          <i className={`${service.icon} text-2xl sm:text-3xl text-white group-hover:scale-110 transition-transform duration-300`}></i>
+          <div className={`absolute inset-0 bg-gradient-to-br ${service.gradient} rounded-3xl blur-md opacity-0 group-hover:opacity-30 transition-opacity duration-300`}></div>
+        </div>
+        <div className="absolute -top-1 -right-1 w-4 h-4 bg-gradient-to-r from-yellow-400 to-orange-500 rounded-full opacity-0 group-hover:opacity-100 transition-all duration-300 animate-bounce shadow-lg"></div>
+        <div className="absolute -bottom-1 -left-1 w-3 h-3 bg-gradient-to-r from-emerald-400 to-cyan-500 rounded-full opacity-0 group-hover:opacity-100 transition-all duration-300 animate-bounce shadow-lg" style={{ animationDelay: '0.2s' }}></div>
+      </div>
+
+      <h3 className="relative z-10 text-xl sm:text-2xl font-bold text-gray-900 mb-3 sm:mb-4 group-hover:text-gray-800 transition-colors duration-300">
+        <Link to={service.link} className="hover:text-indigo-600 transition-colors">{service.title}</Link>
+      </h3>
+      <p className="relative z-10 text-gray-600 mb-4 sm:mb-6 leading-relaxed group-hover:text-gray-700 transition-colors duration-300 text-sm sm:text-base">{service.description}</p>
+
+      <ul className="relative z-10 space-y-2 sm:space-y-3 mb-4 sm:mb-6">
+        {service.features.map((feature, featureIndex) => (
+          <li key={featureIndex} className="flex items-center text-sm text-gray-700 group-hover:text-gray-800 transition-colors duration-300">
+            <div className={`w-5 h-5 bg-gradient-to-r ${service.gradient} rounded-full flex items-center justify-center mr-4 group-hover:scale-110 transition-transform duration-300 shadow-md`}>
+              <i className="ri-check-line text-white text-xs"></i>
+            </div>
+            <span className="font-semibold">{feature}</span>
+          </li>
+        ))}
+      </ul>
+
+      <Link to={service.link} className={`relative z-10 inline-flex items-center text-sm font-bold bg-gradient-to-r ${service.gradient} bg-clip-text text-transparent hover:opacity-80 transition-opacity duration-300`}>
+        Learn More
+        <i className="ri-arrow-right-line ml-1 text-indigo-500"></i>
+      </Link>
+
+      <div className={`absolute inset-0 bg-gradient-to-br ${service.gradient} opacity-0 group-hover:opacity-5 transition-opacity duration-500 rounded-2xl`}></div>
+      <div className="absolute inset-0 rounded-2xl opacity-0 group-hover:opacity-100 transition-opacity duration-500" style={{ background: 'linear-gradient(145deg, transparent 0%, rgba(255,255,255,0.1) 50%, transparent 100%)', backdropFilter: 'blur(1px)' }}></div>
+    </div>
+  )
+})
 
 const services = [
   {
@@ -65,7 +114,6 @@ const services = [
 ];
 
 const Services = memo(function Services() {
-  const [hoveredCard, setHoveredCard] = useState(null)
   const [currentSlide, setCurrentSlide] = useState(0)
   const [isPaused, setIsPaused] = useState(false)
   const intervalRef = useRef(null)
@@ -100,30 +148,7 @@ const Services = memo(function Services() {
 
   return (
     <section id="services" className="relative py-12 sm:py-16 lg:py-20 bg-gradient-to-br from-gray-50 via-slate-50 to-indigo-50 overflow-hidden">
-      {/* Enhanced Background Elements */}
-      <div className="absolute inset-0">
-        {/* Gradient overlays */}
-        <div className="absolute top-0 left-0 w-full h-full bg-gradient-to-br from-blue-500/5 via-transparent to-purple-500/5"></div>
-        <div className="absolute inset-0 bg-gradient-to-tl from-pink-500/3 via-transparent to-cyan-500/3"></div>
-
-        {/* Floating elements */}
-        <div className="absolute top-20 left-10 w-80 h-80 bg-gradient-to-br from-blue-200/15 to-cyan-200/10 rounded-full blur-3xl animate-pulse"></div>
-        <div className="absolute bottom-20 right-10 w-96 h-96 bg-gradient-to-bl from-purple-200/12 to-pink-200/8 rounded-full blur-3xl animate-pulse" style={{ animationDelay: '2s' }}></div>
-        <div className="absolute top-1/2 left-1/2 transform -translate-x-1/2 -translate-y-1/2 w-72 h-72 bg-gradient-to-r from-indigo-200/10 to-violet-200/8 rounded-full blur-3xl animate-pulse" style={{ animationDelay: '4s' }}></div>
-
-        {/* Tech pattern overlay */}
-        <div className="absolute inset-0 opacity-5">
-          <svg className="w-full h-full" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 100 100">
-            <defs>
-              <pattern id="services-grid" x="0" y="0" width="20" height="20" patternUnits="userSpaceOnUse">
-                <circle cx="10" cy="10" r="1" fill="currentColor" />
-                <path d="M10 0v20M0 10h20" stroke="currentColor" strokeWidth="0.5" opacity="0.3" />
-              </pattern>
-            </defs>
-            <rect width="100%" height="100%" fill="url(#services-grid)" className="text-indigo-400" />
-          </svg>
-        </div>
-      </div>
+      <SectionBackground gridId="services-grid" />
 
       <div className="relative z-10 max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
         {/* Enhanced Header */}
@@ -166,71 +191,7 @@ const Services = memo(function Services() {
                     {services.slice(slideIndex * servicesPerSlide, (slideIndex + 1) * servicesPerSlide).map((service, index) => {
                       const actualIndex = slideIndex * servicesPerSlide + index;
                       return (
-                        <div
-                          key={actualIndex}
-                          className={`group relative bg-white/90 backdrop-blur-md rounded-2xl p-6 sm:p-8 shadow-lg hover:shadow-xl transition-all duration-500 transform hover:-translate-y-2 border border-white/60 overflow-hidden ${hoveredCard === actualIndex ? 'scale-[1.02] shadow-2xl' : ''
-                            }`}
-                          onMouseEnter={() => setHoveredCard(actualIndex)}
-                          onMouseLeave={() => setHoveredCard(null)}
-                        >
-                          {/* Enhanced Background Pattern */}
-                          <div className={`absolute inset-0 ${service.bgPattern} opacity-0 group-hover:opacity-20 transition-opacity duration-700`}></div>
-
-                          {/* Multiple Gradient Lines */}
-                          <div className={`absolute top-0 left-0 w-full h-1 bg-gradient-to-r ${service.gradient}`}></div>
-                          <div className={`absolute bottom-0 right-0 w-1/2 h-0.5 bg-gradient-to-l ${service.gradient} opacity-60`}></div>
-
-                          {/* Enhanced Floating Icon */}
-                          <div className="relative mb-8">
-                            <div className={`relative w-16 h-16 sm:w-20 sm:h-20 bg-gradient-to-br ${service.gradient} rounded-3xl flex items-center justify-center group-hover:scale-110 group-hover:rotate-3 transition-all duration-300 shadow-xl group-hover:shadow-2xl`}>
-                              <i className={`${service.icon} text-2xl sm:text-3xl text-white group-hover:scale-110 transition-transform duration-300`}></i>
-
-                              {/* Icon glow effect */}
-                              <div className={`absolute inset-0 bg-gradient-to-br ${service.gradient} rounded-3xl blur-md opacity-0 group-hover:opacity-30 transition-opacity duration-300`}></div>
-                            </div>
-
-                            {/* Enhanced floating elements */}
-                            <div className={`absolute -top-1 -right-1 w-4 h-4 bg-gradient-to-r from-yellow-400 to-orange-500 rounded-full opacity-0 group-hover:opacity-100 transition-all duration-300 animate-bounce shadow-lg`}></div>
-                            <div className={`absolute -bottom-1 -left-1 w-3 h-3 bg-gradient-to-r from-emerald-400 to-cyan-500 rounded-full opacity-0 group-hover:opacity-100 transition-all duration-300 animate-bounce shadow-lg`} style={{ animationDelay: '0.2s' }}></div>
-                          </div>
-
-                          {/* Enhanced Content */}
-                          <h3 className="relative z-10 text-xl sm:text-2xl font-bold text-gray-900 mb-3 sm:mb-4 group-hover:text-gray-800 transition-colors duration-300">
-                            <Link to={service.link} className="hover:text-indigo-600 transition-colors">
-                              {service.title}
-                            </Link>
-                          </h3>
-
-                          <p className="relative z-10 text-gray-600 mb-4 sm:mb-6 leading-relaxed group-hover:text-gray-700 transition-colors duration-300 text-sm sm:text-base">
-                            {service.description}
-                          </p>
-
-                          {/* Enhanced Feature List */}
-                          <ul className="relative z-10 space-y-2 sm:space-y-3 mb-4 sm:mb-6">
-                            {service.features.map((feature, featureIndex) => (
-                              <li key={featureIndex} className="flex items-center text-sm text-gray-700 group-hover:text-gray-800 transition-colors duration-300">
-                                <div className={`w-5 h-5 bg-gradient-to-r ${service.gradient} rounded-full flex items-center justify-center mr-4 group-hover:scale-110 transition-transform duration-300 shadow-md`}>
-                                  <i className="ri-check-line text-white text-xs"></i>
-                                </div>
-                                <span className="font-semibold">{feature}</span>
-                              </li>
-                            ))}
-                          </ul>
-
-                          <Link to={service.link} className={`relative z-10 inline-flex items-center text-sm font-bold bg-gradient-to-r ${service.gradient} bg-clip-text text-transparent hover:opacity-80 transition-opacity duration-300`}>
-                            Learn More
-                            <i className="ri-arrow-right-line ml-1 text-indigo-500"></i>
-                          </Link>
-
-                          {/* Enhanced Card glow effect */}
-                          <div className={`absolute inset-0 bg-gradient-to-br ${service.gradient} opacity-0 group-hover:opacity-5 transition-opacity duration-500 rounded-2xl`}></div>
-
-                          {/* Border glow */}
-                          <div className={`absolute inset-0 rounded-2xl opacity-0 group-hover:opacity-100 transition-opacity duration-500`} style={{
-                            background: `linear-gradient(145deg, transparent 0%, rgba(255,255,255,0.1) 50%, transparent 100%)`,
-                            backdropFilter: 'blur(1px)'
-                          }}></div>
-                        </div>
+                        <ServiceCard key={actualIndex} service={service} />
                       );
                     })}
                   </div>

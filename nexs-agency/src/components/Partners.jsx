@@ -1,6 +1,6 @@
-import { useState, useEffect } from 'react'
+import { useState, useEffect, memo } from 'react'
 
-function Partners() {
+const Partners = memo(function Partners() {
   const [isVisible, setIsVisible] = useState(false)
 
   useEffect(() => {
@@ -305,6 +305,6 @@ function Partners() {
       </div>
     </section>
   )
-}
+})
 
 export default Partners

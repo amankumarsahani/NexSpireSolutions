@@ -1,4 +1,5 @@
 import { Helmet } from 'react-helmet-async';
+import { SITE_URL } from '../constants/siteConfig';
 
 const TermsOfService = () => {
 
@@ -7,13 +8,13 @@ const TermsOfService = () => {
             <Helmet>
                 <title>Terms of Service | Nexspire Solutions</title>
                 <meta name="description" content="Read the Nexspire Solutions terms of service. Understand the terms and conditions for using our website and services." />
-                <link rel="canonical" href="https://nexspiresolutions.co.in/terms" />
+                <link rel="canonical" href={`${SITE_URL}/terms`} />
                 <meta name="robots" content="noindex, follow" />
                 <meta property="og:title" content="Terms of Service | Nexspire Solutions" />
                 <meta property="og:description" content="Read the Nexspire Solutions terms of service. Understand the terms and conditions for using our website and services." />
                 <meta property="og:type" content="website" />
-                <meta property="og:url" content="https://nexspiresolutions.co.in/terms" />
-                <meta property="og:image" content="https://nexspiresolutions.co.in/og-image.jpg" />
+                <meta property="og:url" content={`${SITE_URL}/terms`} />
+                <meta property="og:image" content={`${SITE_URL}/og-image.jpg`} />
                 <meta name="twitter:card" content="summary_large_image" />
                 <meta name="twitter:title" content="Terms of Service | Nexspire Solutions" />
                 <meta name="twitter:description" content="Read the Nexspire Solutions terms of service. Understand the terms and conditions for using our website and services." />
