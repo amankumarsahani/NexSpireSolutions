@@ -72,10 +72,10 @@ const FAQ = memo(function FAQ() {
         <div className={`text-center mb-16 transition-all duration-1000 transform ${
           isVisible ? 'translate-y-0 opacity-100' : 'translate-y-8 opacity-0'
         }`}>
-          <span className="text-sm font-semibold text-[#0F766E] uppercase tracking-wider">Frequently Asked Questions</span>
+          <span className="text-sm font-semibold text-[#6D28D9] uppercase tracking-wider">Frequently Asked Questions</span>
           <h2 className="text-3xl md:text-4xl font-bold text-slate-800 mb-6 mt-4 leading-tight tracking-tight">
             Got Questions?
-            <span className="block text-[#0F766E] mt-2">
+            <span className="block text-[#6D28D9] mt-2">
               We've Got Answers
             </span>
           </h2>
@@ -99,18 +99,18 @@ const FAQ = memo(function FAQ() {
                     aria-expanded={openFAQ === index}
                   >
                     <div className="flex items-center space-x-4 flex-1">
-                      <div className="w-8 h-8 bg-[#0F766E] rounded-lg flex items-center justify-center text-white font-bold text-sm shadow-sm">
+                      <div className="w-8 h-8 bg-[#6D28D9] rounded-lg flex items-center justify-center text-white font-bold text-sm shadow-sm">
                         {String(index + 1).padStart(2, '0')}
                       </div>
                       
-                      <h3 className="font-semibold text-slate-800 text-lg group-hover:text-[#0F766E] transition-colors duration-300">
+                      <h3 className="font-semibold text-slate-800 text-lg group-hover:text-[#6D28D9] transition-colors duration-300">
                         {faq.question}
                       </h3>
                     </div>
                     
                     <div className={`transition-all duration-300 ${openFAQ === index ? 'rotate-180' : ''}`}>
-                      <div className="w-8 h-8 bg-slate-100 rounded-lg flex items-center justify-center group-hover:bg-[#0F766E]/10 transition-colors duration-300">
-                        <i className="ri-arrow-down-s-line text-slate-600 group-hover:text-[#0F766E]"></i>
+                      <div className="w-8 h-8 bg-slate-100 rounded-lg flex items-center justify-center group-hover:bg-[#6D28D9]/10 transition-colors duration-300">
+                        <i className="ri-arrow-down-s-line text-slate-600 group-hover:text-[#6D28D9]"></i>
                       </div>
                     </div>
                   </button>
@@ -130,7 +130,7 @@ const FAQ = memo(function FAQ() {
                           </button>
                           <a 
                             href="#contact"
-                            className="bg-[#0F766E] hover:bg-[#0D6B63] text-white px-4 py-2 rounded-lg text-sm font-semibold transition-all duration-300"
+                            className="bg-[#6D28D9] hover:bg-[#5B21B6] text-white px-4 py-2 rounded-lg text-sm font-semibold transition-all duration-300"
                           >
                             Need More Help?
                           </a>
@@ -140,7 +140,7 @@ const FAQ = memo(function FAQ() {
                   )}
                   
                   {openFAQ === index && (
-                    <div className="absolute left-0 top-0 bottom-0 w-1 bg-[#0F766E]"></div>
+                    <div className="absolute left-0 top-0 bottom-0 w-1 bg-[#6D28D9]"></div>
                   )}
                 </div>
               </div>
@@ -151,7 +151,7 @@ const FAQ = memo(function FAQ() {
         <div className={`transition-all duration-1000 delay-700 transform ${
           isVisible ? 'translate-y-0 opacity-100' : 'translate-y-8 opacity-0'
         }`}>
-          <div className="relative bg-[#0F766E] rounded-3xl p-8 md:p-12 text-center text-white overflow-hidden shadow-xl">
+          <div className="relative bg-[#6D28D9] rounded-3xl p-8 md:p-12 text-center text-white overflow-hidden shadow-xl">
             <div className="absolute inset-0 opacity-10">
               <svg className="w-full h-full" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 100 100">
                 <defs>
@@ -186,7 +186,7 @@ const FAQ = memo(function FAQ() {
                 </a>
                 <a
                   href="tel:+919729916844"
-                  className="group relative bg-white text-[#0F766E] px-8 py-4 rounded-2xl font-semibold hover:shadow-xl transition-all duration-300 cursor-pointer whitespace-nowrap"
+                  className="group relative bg-white text-[#6D28D9] px-8 py-4 rounded-2xl font-semibold hover:shadow-xl transition-all duration-300 cursor-pointer whitespace-nowrap"
                 >
                   <span className="flex items-center justify-center">
                     <i className="ri-phone-line mr-2"></i>

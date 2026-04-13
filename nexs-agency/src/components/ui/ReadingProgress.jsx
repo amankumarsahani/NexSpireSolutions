@@ -6,7 +6,7 @@ export default function ReadingProgress() {
 
     return (
         <motion.div
-            className="fixed top-0 left-0 right-0 h-1 bg-[#0F766E] origin-left z-[60]"
+            className="fixed top-0 left-0 right-0 h-1 bg-[#6D28D9] origin-left z-[60]"
             style={{ scaleX: scrollYProgress }}
         />
     );

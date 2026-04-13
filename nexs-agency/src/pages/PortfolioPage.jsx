@@ -73,7 +73,7 @@ const ProjectCard = ({ project }) => {
 
                         {/* View Case Study Button */}
                         <div className="opacity-0 group-hover:opacity-100 transition-opacity duration-300 delay-200">
-                            <span className="inline-flex items-center gap-2 px-5 py-2.5 bg-white text-slate-800 rounded-full text-sm font-bold hover:bg-[#0F766E] hover:text-white transition-colors">
+                            <span className="inline-flex items-center gap-2 px-5 py-2.5 bg-white text-slate-800 rounded-full text-sm font-bold hover:bg-[#6D28D9] hover:text-white transition-colors">
                                 View Case Study
                                 <i className="ri-arrow-right-line"></i>
                             </span>
@@ -286,7 +286,7 @@ const PortfolioPage = () => {
                         <p className="text-xl text-slate-500 mb-12 max-w-2xl mx-auto">
                             Let's collaborate to turn your boldest ideas into reality. We are ready when you are.
                         </p>
-                        <Link to="/contact" className="inline-flex items-center gap-4 px-12 py-6 bg-slate-900 text-white rounded-full text-xl font-bold hover:bg-[#0F766E] transition-all duration-300 group shadow-2xl">
+                        <Link to="/contact" className="inline-flex items-center gap-4 px-12 py-6 bg-slate-900 text-white rounded-full text-xl font-bold hover:bg-[#6D28D9] transition-all duration-300 group shadow-2xl">
                             Start a Project
                             <i className="ri-arrow-right-line group-hover:translate-x-2 transition-transform"></i>
                         </Link>

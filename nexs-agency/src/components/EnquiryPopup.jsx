@@ -217,13 +217,13 @@ const EnquiryPopup = memo(function EnquiryPopup() {
 
                     {/* Header */}
                     <div className="relative px-6 pt-8 pb-4 text-center">
-                        <div className="inline-flex items-center bg-[#0F766E]/20 border border-[#0F766E]/30 text-[#0F766E] text-xs font-semibold px-4 py-1.5 rounded-full mb-4">
+                        <div className="inline-flex items-center bg-[#6D28D9]/20 border border-[#6D28D9]/30 text-[#6D28D9] text-xs font-semibold px-4 py-1.5 rounded-full mb-4">
                             <span className="w-2 h-2 bg-green-400 rounded-full mr-2 animate-pulse"></span>
                             Limited Time Offer
                         </div>
                         <h2 id="modal-title-enquiry" className="text-2xl md:text-3xl font-bold text-white mb-2">
                             Let's Build Something
-                            <span className="block text-[#0F766E] mt-1">
+                            <span className="block text-[#6D28D9] mt-1">
                                 Amazing Together! ✨
                             </span>
                         </h2>
@@ -247,7 +247,7 @@ const EnquiryPopup = memo(function EnquiryPopup() {
                                         maxLength={100}
                                         placeholder="Your Name *"
                                         aria-label="Full name"
-                                        className="w-full px-4 py-3 bg-white/5 border border-white/10 rounded-lg text-white placeholder-gray-500 focus:ring-2 focus:ring-[#0F766E] focus:border-[#0F766E] transition-all text-sm"
+                                        className="w-full px-4 py-3 bg-white/5 border border-white/10 rounded-lg text-white placeholder-gray-500 focus:ring-2 focus:ring-[#6D28D9] focus:border-[#6D28D9] transition-all text-sm"
                                     />
                                 </div>
                                 <div>
@@ -259,7 +259,7 @@ const EnquiryPopup = memo(function EnquiryPopup() {
                                         required
                                         placeholder="Email *"
                                         aria-label="Email address"
-                                        className="w-full px-4 py-3 bg-white/5 border border-white/10 rounded-lg text-white placeholder-gray-500 focus:ring-2 focus:ring-[#0F766E] focus:border-[#0F766E] transition-all text-sm"
+                                        className="w-full px-4 py-3 bg-white/5 border border-white/10 rounded-lg text-white placeholder-gray-500 focus:ring-2 focus:ring-[#6D28D9] focus:border-[#6D28D9] transition-all text-sm"
                                     />
                                 </div>
                             </div>
@@ -272,7 +272,7 @@ const EnquiryPopup = memo(function EnquiryPopup() {
                                     onChange={handleChange}
                                     placeholder="Phone Number (Optional)"
                                     aria-label="Phone number"
-                                    className="w-full px-4 py-3 bg-white/5 border border-white/10 rounded-lg text-white placeholder-gray-500 focus:ring-2 focus:ring-[#0F766E] focus:border-[#0F766E] transition-all text-sm"
+                                    className="w-full px-4 py-3 bg-white/5 border border-white/10 rounded-lg text-white placeholder-gray-500 focus:ring-2 focus:ring-[#6D28D9] focus:border-[#6D28D9] transition-all text-sm"
                                 />
                             </div>
 
@@ -287,7 +287,7 @@ const EnquiryPopup = memo(function EnquiryPopup() {
                                     placeholder="Tell us about your project... *"
                                     rows={3}
                                     aria-label="Your message"
-                                    className="w-full px-4 py-3 bg-white/5 border border-white/10 rounded-lg text-white placeholder-gray-500 focus:ring-2 focus:ring-[#0F766E] focus:border-[#0F766E] transition-all resize-none text-sm"
+                                    className="w-full px-4 py-3 bg-white/5 border border-white/10 rounded-lg text-white placeholder-gray-500 focus:ring-2 focus:ring-[#6D28D9] focus:border-[#6D28D9] transition-all resize-none text-sm"
                                 />
                             </div>
 
@@ -305,7 +305,7 @@ const EnquiryPopup = memo(function EnquiryPopup() {
                             <button
                                 type="submit"
                                 disabled={isSubmitting}
-                                className="w-full relative overflow-hidden bg-[#0F766E] text-white py-3.5 rounded-lg font-semibold transition-all duration-300 transform hover:scale-[1.02] hover:shadow-lg hover:shadow-lg active:scale-[0.98] disabled:opacity-60 disabled:cursor-not-allowed disabled:transform-none group"
+                                className="w-full relative overflow-hidden bg-[#6D28D9] text-white py-3.5 rounded-lg font-semibold transition-all duration-300 transform hover:scale-[1.02] hover:shadow-lg hover:shadow-lg active:scale-[0.98] disabled:opacity-60 disabled:cursor-not-allowed disabled:transform-none group"
                             >
                                 <span className="relative z-10 flex items-center justify-center">
                                     {isSubmitting ? (

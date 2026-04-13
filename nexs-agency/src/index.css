@@ -57,12 +57,12 @@ h6 {
 
 /* Custom Selection */
 ::selection {
-  background: #0F766E;
+  background: #6D28D9;
   color: white;
 }
 
 :focus-visible {
-  outline: 2px solid #0F766E;
+  outline: 2px solid #6D28D9;
   outline-offset: 2px;
 }
 
@@ -162,7 +162,7 @@ h6 {
 
 /* Utilities */
 .text-gradient {
-  color: #0F766E;
+  color: #6D28D9;
 }
 
 .section-padding {
@@ -181,6 +181,6 @@ h6 {
   line-height: 0.8;
   margin-right: 0.12em;
   margin-top: 0.07em;
-  color: #0F766E;
+  color: #6D28D9;
   font-weight: 700;
 }

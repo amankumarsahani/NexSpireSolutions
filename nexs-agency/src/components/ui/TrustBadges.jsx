@@ -29,7 +29,7 @@ export default function TrustBadges({ className = '' }) {
                     key={index}
                     className="flex items-center gap-3 text-slate-500"
                 >
-                    <i className={`${badge.icon} text-2xl text-[#0F766E]`}></i>
+                    <i className={`${badge.icon} text-2xl text-[#6D28D9]`}></i>
                     <div className="text-left">
                         <div className="text-sm font-semibold text-slate-600">{badge.title}</div>
                         <div className="text-xs text-slate-400">{badge.subtitle}</div>

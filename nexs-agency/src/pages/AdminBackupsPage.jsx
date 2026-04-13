@@ -63,7 +63,7 @@ function SignInPanel() {
                                 type="email"
                                 value={email}
                                 onChange={(event) => setEmail(event.target.value)}
-                                className="w-full rounded-2xl border border-slate-200 px-4 py-3 outline-none focus:border-[#0F766E] focus:ring-4 focus:ring-blue-100"
+                                className="w-full rounded-2xl border border-slate-200 px-4 py-3 outline-none focus:border-[#6D28D9] focus:ring-4 focus:ring-blue-100"
                                 required
                             />
                         </div>
@@ -73,7 +73,7 @@ function SignInPanel() {
                                 type="password"
                                 value={password}
                                 onChange={(event) => setPassword(event.target.value)}
-                                className="w-full rounded-2xl border border-slate-200 px-4 py-3 outline-none focus:border-[#0F766E] focus:ring-4 focus:ring-blue-100"
+                                className="w-full rounded-2xl border border-slate-200 px-4 py-3 outline-none focus:border-[#6D28D9] focus:ring-4 focus:ring-blue-100"
                                 required
                             />
                         </div>
@@ -85,7 +85,7 @@ function SignInPanel() {
                         <button
                             type="submit"
                             disabled={loading || submitting}
-                            className="w-full rounded-2xl bg-[#0F766E] px-5 py-3 text-sm font-semibold text-white disabled:opacity-60"
+                            className="w-full rounded-2xl bg-[#6D28D9] px-5 py-3 text-sm font-semibold text-white disabled:opacity-60"
                         >
                             {loading || submitting ? 'Signing in...' : 'Sign In'}
                         </button>
@@ -484,7 +484,7 @@ export default function AdminBackupsPage() {
                 <div className="mx-auto max-w-7xl">
                     <div className="flex flex-col gap-6 lg:flex-row lg:items-end lg:justify-between">
                         <div>
-                            <div className="inline-flex items-center gap-2 rounded-full border border-slate-200 bg-white/80 px-4 py-2 text-sm font-medium text-[#0F766E]">
+                            <div className="inline-flex items-center gap-2 rounded-full border border-slate-200 bg-white/80 px-4 py-2 text-sm font-medium text-[#6D28D9]">
                                 <i className="ri-google-line" />
                                 Google Drive backups
                             </div>
@@ -499,7 +499,7 @@ export default function AdminBackupsPage() {
                                 type="button"
                                 onClick={handleRunNow}
                                 disabled={running}
-                                className="rounded-2xl bg-[#0F766E] px-5 py-3 text-sm font-semibold text-white disabled:opacity-60"
+                                className="rounded-2xl bg-[#6D28D9] px-5 py-3 text-sm font-semibold text-white disabled:opacity-60"
                             >
                                 {running ? 'Starting backup...' : 'Run Backup Now'}
                             </button>
@@ -532,7 +532,7 @@ export default function AdminBackupsPage() {
                         <div className={`mt-8 rounded-2xl border px-5 py-4 text-sm ${notice.type === 'error'
                             ? 'border-red-200 bg-red-50 text-red-700'
                             : notice.type === 'info'
-                                ? 'border-slate-200 bg-[#FAF9F6] text-[#0F766E]'
+                                ? 'border-slate-200 bg-[#FAF9F6] text-[#6D28D9]'
                                 : 'border-emerald-200 bg-emerald-50 text-emerald-700'
                             }`}>
                             {notice.message}
@@ -584,11 +584,11 @@ export default function AdminBackupsPage() {
 
                                 <div>
                                     <label className="mb-2 block text-sm font-medium text-slate-700">Account name</label>
-                                    <input name="account_name" value={form.account_name} onChange={handleChange} className="w-full rounded-2xl border border-slate-200 px-4 py-3 outline-none focus:border-[#0F766E] focus:ring-4 focus:ring-blue-100" required />
+                                    <input name="account_name" value={form.account_name} onChange={handleChange} className="w-full rounded-2xl border border-slate-200 px-4 py-3 outline-none focus:border-[#6D28D9] focus:ring-4 focus:ring-blue-100" required />
                                 </div>
                                 <div>
                                     <label className="mb-2 block text-sm font-medium text-slate-700">Folder ID</label>
-                                    <input name="folder_id" value={form.folder_id} onChange={handleChange} className="w-full rounded-2xl border border-slate-200 px-4 py-3 outline-none focus:border-[#0F766E] focus:ring-4 focus:ring-blue-100" required />
+                                    <input name="folder_id" value={form.folder_id} onChange={handleChange} className="w-full rounded-2xl border border-slate-200 px-4 py-3 outline-none focus:border-[#6D28D9] focus:ring-4 focus:ring-blue-100" required />
                                 </div>
 
                                 {form.auth_type === 'oauth_personal' ? (
@@ -596,11 +596,11 @@ export default function AdminBackupsPage() {
                                         <div className="grid gap-5 md:grid-cols-2">
                                             <div>
                                                 <label className="mb-2 block text-sm font-medium text-slate-700">OAuth client ID</label>
-                                                <input name="oauth_client_id" value={form.oauth_client_id} onChange={handleChange} className="w-full rounded-2xl border border-slate-200 px-4 py-3 outline-none focus:border-[#0F766E] focus:ring-4 focus:ring-blue-100" required />
+                                                <input name="oauth_client_id" value={form.oauth_client_id} onChange={handleChange} className="w-full rounded-2xl border border-slate-200 px-4 py-3 outline-none focus:border-[#6D28D9] focus:ring-4 focus:ring-blue-100" required />
                                             </div>
                                             <div>
                                                 <label className="mb-2 block text-sm font-medium text-slate-700">OAuth client secret</label>
-                                                <input name="oauth_client_secret" value={form.oauth_client_secret} onChange={handleChange} className="w-full rounded-2xl border border-slate-200 px-4 py-3 outline-none focus:border-[#0F766E] focus:ring-4 focus:ring-blue-100" required />
+                                                <input name="oauth_client_secret" value={form.oauth_client_secret} onChange={handleChange} className="w-full rounded-2xl border border-slate-200 px-4 py-3 outline-none focus:border-[#6D28D9] focus:ring-4 focus:ring-blue-100" required />
                                             </div>
                                         </div>
                                         <div>
@@ -617,7 +617,7 @@ export default function AdminBackupsPage() {
                                                 type="button"
                                                 onClick={handleConnectGoogleDrive}
                                                 disabled={oauthConnecting}
-                                                className="rounded-2xl bg-[#0F766E] px-5 py-3 text-sm font-semibold text-white disabled:opacity-60"
+                                                className="rounded-2xl bg-[#6D28D9] px-5 py-3 text-sm font-semibold text-white disabled:opacity-60"
                                             >
                                                 {oauthConnecting ? 'Connecting...' : 'Connect Google Drive'}
                                             </button>
@@ -634,7 +634,7 @@ export default function AdminBackupsPage() {
                                         <div className="grid gap-5 md:grid-cols-2">
                                             <div>
                                                 <label className="mb-2 block text-sm font-medium text-slate-700">Impersonate email</label>
-                                                <input name="subject_email" value={form.subject_email} onChange={handleChange} className="w-full rounded-2xl border border-slate-200 px-4 py-3 outline-none focus:border-[#0F766E] focus:ring-4 focus:ring-blue-100" />
+                                                <input name="subject_email" value={form.subject_email} onChange={handleChange} className="w-full rounded-2xl border border-slate-200 px-4 py-3 outline-none focus:border-[#6D28D9] focus:ring-4 focus:ring-blue-100" />
                                             </div>
                                             <div className="rounded-2xl border border-amber-200 bg-amber-50 px-4 py-3 text-sm text-amber-800">
                                                 Service-account mode is for Shared Drives or Google Workspace setups, not normal personal Gmail Drive folders.

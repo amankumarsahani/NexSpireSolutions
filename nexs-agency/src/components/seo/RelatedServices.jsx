@@ -39,8 +39,8 @@ const services = [
 ];
 
 const colorMap = {
-    blue: "bg-[#FAF9F6] text-[#0F766E] group-hover:bg-[#0F766E] group-hover:text-white",
-    purple: "bg-[#FAF9F6] text-[#0F766E] group-hover:bg-purple-600 group-hover:text-white",
+    blue: "bg-[#FAF9F6] text-[#6D28D9] group-hover:bg-[#6D28D9] group-hover:text-white",
+    purple: "bg-[#FAF9F6] text-[#6D28D9] group-hover:bg-purple-600 group-hover:text-white",
     emerald: "bg-emerald-50 text-emerald-600 group-hover:bg-emerald-600 group-hover:text-white",
     cyan: "bg-cyan-50 text-cyan-600 group-hover:bg-cyan-600 group-hover:text-white",
     orange: "bg-orange-50 text-orange-600 group-hover:bg-orange-600 group-hover:text-white",
@@ -53,7 +53,7 @@ const RelatedServices = ({ currentService }) => {
     return (
         <section className="border-t border-slate-200 pt-10 mt-10">
             <h3 className="text-2xl font-bold mb-8 flex items-center gap-3">
-                <i className="ri-layout-grid-line text-[#0F766E]"></i>
+                <i className="ri-layout-grid-line text-[#6D28D9]"></i>
                 More Services
             </h3>
             <div className="grid md:grid-cols-3 gap-5">
@@ -71,7 +71,7 @@ const RelatedServices = ({ currentService }) => {
                                 <i className={s.icon}></i>
                             </div>
 
-                            <h4 className="font-bold text-slate-800 group-hover:text-[#0F766E] transition-colors mb-2 text-lg">
+                            <h4 className="font-bold text-slate-800 group-hover:text-[#6D28D9] transition-colors mb-2 text-lg">
                                 {s.title}
                             </h4>
 
@@ -79,7 +79,7 @@ const RelatedServices = ({ currentService }) => {
                                 {s.desc}
                             </p>
 
-                            <div className="flex items-center text-sm font-semibold text-slate-400 group-hover:text-[#0F766E] transition-colors mt-auto">
+                            <div className="flex items-center text-sm font-semibold text-slate-400 group-hover:text-[#6D28D9] transition-colors mt-auto">
                                 Explore
                                 <i className="ri-arrow-right-line ml-2 group-hover:translate-x-1 transition-transform"></i>
                             </div>

@@ -59,7 +59,7 @@ export default function Breadcrumbs({ className = '' }) {
             <nav className={`flex items-center gap-2 text-sm ${className}`} aria-label="Breadcrumb">
             <Link
                 to="/"
-                className="text-slate-500 hover:text-[#0F766E] transition-colors flex items-center gap-1"
+                className="text-slate-500 hover:text-[#6D28D9] transition-colors flex items-center gap-1"
             >
                 <i className="ri-home-4-line"></i>
                 <span className="hidden sm:inline">Home</span>
@@ -82,7 +82,7 @@ export default function Breadcrumbs({ className = '' }) {
                         ) : (
                             <Link
                                 to={routeTo}
-                                className="text-slate-500 hover:text-[#0F766E] transition-colors"
+                                className="text-slate-500 hover:text-[#6D28D9] transition-colors"
                             >
                                 {displayName}
                             </Link>

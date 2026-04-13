@@ -31,7 +31,7 @@ export default function ClientLogos({ className = '', title = 'Trusted by Indust
                             className="group cursor-default"
                         >
                             <div className="w-24 h-12 md:w-32 md:h-14 bg-[#FAF9F6] rounded-xl flex items-center justify-center transition-all duration-300 group-hover:bg-[#FAF9F6] group-hover:shadow-lg border border-slate-200 group-hover:border-slate-200">
-                                <span className="text-lg md:text-xl font-bold text-gray-300 group-hover:text-[#0F766E] transition-colors">
+                                <span className="text-lg md:text-xl font-bold text-gray-300 group-hover:text-[#6D28D9] transition-colors">
                                     {client.initial}
                                 </span>
                             </div>

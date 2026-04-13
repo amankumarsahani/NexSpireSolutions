@@ -47,7 +47,7 @@ const AiTrends2026 = () => {
 
             <article className="max-w-4xl mx-auto px-6 py-12">
                 <div className="mb-12 text-center">
-                    <span className="inline-block px-4 py-1.5 bg-[#0F766E]/10 text-[#0F766E] font-bold rounded-full text-sm mb-6">
+                    <span className="inline-block px-4 py-1.5 bg-[#6D28D9]/10 text-[#6D28D9] font-bold rounded-full text-sm mb-6">
                         Artificial Intelligence
                     </span>
                     <h1 className="text-4xl md:text-6xl font-bold leading-tight mb-6 text-slate-800">

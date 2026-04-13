@@ -52,7 +52,7 @@ const AdminBackupsPage = lazy(() => import('./pages/AdminBackupsPage'));
 const LoadingSpinner = () => (
   <div className="min-h-screen flex items-center justify-center bg-[#FAF9F6]">
     <div className="flex flex-col items-center gap-4">
-      <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-[#0F766E]"></div>
+      <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-[#6D28D9]"></div>
       <p className="text-slate-500 text-sm">Loading...</p>
     </div>
   </div>

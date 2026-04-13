@@ -155,7 +155,7 @@ export default function CRMPricingPage() {
             {/* Hero */}
             <section className="pt-32 pb-16 px-4">
                 <div className="max-w-7xl mx-auto text-center">
-                    <span className="inline-block px-4 py-1.5 bg-[#0F766E]/10 text-[#0F766E] text-sm font-medium rounded-full mb-4">
+                    <span className="inline-block px-4 py-1.5 bg-[#6D28D9]/10 text-[#6D28D9] text-sm font-medium rounded-full mb-4">
                         NexCRM Pricing
                     </span>
                     <h1 className="text-4xl md:text-5xl font-bold text-slate-900 mb-4">
@@ -418,7 +418,7 @@ export default function CRMPricingPage() {
             </section>
 
             {/* CTA */}
-            <section className="py-20 px-4 bg-[#0F766E]">
+            <section className="py-20 px-4 bg-[#6D28D9]">
                 <div className="max-w-3xl mx-auto text-center">
                     <h2 className="text-3xl md:text-4xl font-bold text-white mb-4">
                         Ready to Grow Your Business?
@@ -429,7 +429,7 @@ export default function CRMPricingPage() {
                     <div className="flex flex-col sm:flex-row gap-4 justify-center">
                         <button
                             onClick={() => handleAction('')}
-                            className="px-8 py-4 bg-white text-[#0F766E] rounded-lg font-semibold hover:bg-[#FAF9F6] transition-colors"
+                            className="px-8 py-4 bg-white text-[#6D28D9] rounded-lg font-semibold hover:bg-[#FAF9F6] transition-colors"
                         >
                             Contact Sales
                         </button>
@@ -457,8 +457,8 @@ export default function CRMPricingPage() {
                         </button>
 
                         <div className="text-center mb-6">
-                            <div className="w-14 h-14 bg-[#0F766E]/10 rounded-full flex items-center justify-center mx-auto mb-4">
-                                <svg className="w-7 h-7 text-[#0F766E]" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                            <div className="w-14 h-14 bg-[#6D28D9]/10 rounded-full flex items-center justify-center mx-auto mb-4">
+                                <svg className="w-7 h-7 text-[#6D28D9]" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                                     <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M3 8l7.89 5.26a2 2 0 002.22 0L21 8M5 19h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v10a2 2 0 002 2z" />
                                 </svg>
                             </div>
@@ -551,7 +551,7 @@ export default function CRMPricingPage() {
                                             required
                                             minLength={2}
                                             maxLength={100}
-                                            className="w-full px-4 py-2.5 border border-slate-300 rounded-lg focus:ring-2 focus:ring-[#0F766E] focus:border-[#0F766E] outline-none transition-colors"
+                                            className="w-full px-4 py-2.5 border border-slate-300 rounded-lg focus:ring-2 focus:ring-[#6D28D9] focus:border-[#6D28D9] outline-none transition-colors"
                                             placeholder="Your name"
                                         />
                                     </div>
@@ -561,7 +561,7 @@ export default function CRMPricingPage() {
                                             type="email"
                                             name="email"
                                             required
-                                            className="w-full px-4 py-2.5 border border-slate-300 rounded-lg focus:ring-2 focus:ring-[#0F766E] focus:border-[#0F766E] outline-none transition-colors"
+                                            className="w-full px-4 py-2.5 border border-slate-300 rounded-lg focus:ring-2 focus:ring-[#6D28D9] focus:border-[#6D28D9] outline-none transition-colors"
                                             placeholder="you@company.com"
                                         />
                                     </div>
@@ -573,7 +573,7 @@ export default function CRMPricingPage() {
                                         <input
                                             type="tel"
                                             name="phone"
-                                            className="w-full px-4 py-2.5 border border-slate-300 rounded-lg focus:ring-2 focus:ring-[#0F766E] focus:border-[#0F766E] outline-none transition-colors"
+                                            className="w-full px-4 py-2.5 border border-slate-300 rounded-lg focus:ring-2 focus:ring-[#6D28D9] focus:border-[#6D28D9] outline-none transition-colors"
                                             placeholder="+91 98765 43210"
                                         />
                                     </div>
@@ -582,7 +582,7 @@ export default function CRMPricingPage() {
                                         <input
                                             type="text"
                                             name="company"
-                                            className="w-full px-4 py-2.5 border border-slate-300 rounded-lg focus:ring-2 focus:ring-[#0F766E] focus:border-[#0F766E] outline-none transition-colors"
+                                            className="w-full px-4 py-2.5 border border-slate-300 rounded-lg focus:ring-2 focus:ring-[#6D28D9] focus:border-[#6D28D9] outline-none transition-colors"
                                             placeholder="Your company"
                                         />
                                     </div>
@@ -593,7 +593,7 @@ export default function CRMPricingPage() {
                                     <select
                                         name="plan"
                                         defaultValue={selectedPlan}
-                                        className="w-full px-4 py-2.5 border border-slate-300 rounded-lg focus:ring-2 focus:ring-[#0F766E] focus:border-[#0F766E] outline-none transition-colors"
+                                        className="w-full px-4 py-2.5 border border-slate-300 rounded-lg focus:ring-2 focus:ring-[#6D28D9] focus:border-[#6D28D9] outline-none transition-colors"
                                     >
                                         <option value="">Select a plan</option>
                                         <option value="Starter">Starter - ₹999/mo</option>
@@ -609,7 +609,7 @@ export default function CRMPricingPage() {
                                         name="message"
                                         rows={3}
                                         maxLength={2000}
-                                        className="w-full px-4 py-2.5 border border-slate-300 rounded-lg focus:ring-2 focus:ring-[#0F766E] focus:border-[#0F766E] outline-none transition-colors resize-none"
+                                        className="w-full px-4 py-2.5 border border-slate-300 rounded-lg focus:ring-2 focus:ring-[#6D28D9] focus:border-[#6D28D9] outline-none transition-colors resize-none"
                                         placeholder="Tell us about your requirements..."
                                     />
                                 </div>
@@ -631,7 +631,7 @@ export default function CRMPricingPage() {
                                 </button>
 
                                 <p className="text-center text-xs text-slate-500">
-                                    By submitting, you agree to our <a href="/privacy-policy" className="text-[#0F766E] hover:underline">Privacy Policy</a>
+                                    By submitting, you agree to our <a href="/privacy-policy" className="text-[#6D28D9] hover:underline">Privacy Policy</a>
                                 </p>
                             </form>
                         )}

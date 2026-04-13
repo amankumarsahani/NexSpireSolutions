@@ -23,23 +23,23 @@ const ServiceCard = memo(function ServiceCard({ service, index }) {
       viewport={{ once: true }}
       className="group relative bg-white rounded-2xl p-6 sm:p-8 shadow-lg hover:shadow-xl transition-all duration-300 hover:-translate-y-1 border border-slate-200 overflow-hidden"
     >
-      <div className="absolute top-0 left-0 w-full h-[2px] bg-[#0F766E] transition-all duration-300 group-hover:h-[3px] group-hover:shadow-[0_0_8px_rgba(15,118,110,0.4)]"></div>
+      <div className="absolute top-0 left-0 w-full h-[2px] bg-[#6D28D9] transition-all duration-300 group-hover:h-[3px] group-hover:shadow-[0_0_8px_rgba(15,118,110,0.4)]"></div>
 
       <div className="relative mb-8">
-        <div className="relative w-16 h-16 sm:w-20 sm:h-20 bg-[#0F766E] rounded-2xl flex items-center justify-center shadow-lg transition-transform duration-300 group-hover:rotate-[5deg]">
+        <div className="relative w-16 h-16 sm:w-20 sm:h-20 bg-[#6D28D9] rounded-2xl flex items-center justify-center shadow-lg transition-transform duration-300 group-hover:rotate-[5deg]">
           <i className={`${service.icon} text-2xl sm:text-3xl text-white`}></i>
         </div>
       </div>
 
       <h3 className="relative z-10 text-xl sm:text-2xl font-bold text-slate-800 mb-3 sm:mb-4">
-        <Link to={service.link} className="hover:text-[#0F766E] transition-colors">{service.title}</Link>
+        <Link to={service.link} className="hover:text-[#6D28D9] transition-colors">{service.title}</Link>
       </h3>
       <p className="relative z-10 text-slate-600 mb-4 sm:mb-6 leading-relaxed text-sm sm:text-base">{service.description}</p>
 
       <ul className="relative z-10 space-y-2 sm:space-y-3 mb-4 sm:mb-6">
         {service.features.map((feature, featureIndex) => (
           <li key={featureIndex} className="flex items-center text-sm text-slate-700">
-            <div className="w-5 h-5 bg-[#0F766E] rounded-full flex items-center justify-center mr-4 shadow-sm">
+            <div className="w-5 h-5 bg-[#6D28D9] rounded-full flex items-center justify-center mr-4 shadow-sm">
               <i className="ri-check-line text-white text-xs"></i>
             </div>
             <span className="font-semibold">{feature}</span>
@@ -47,9 +47,9 @@ const ServiceCard = memo(function ServiceCard({ service, index }) {
         ))}
       </ul>
 
-      <Link to={service.link} className="relative z-10 inline-flex items-center text-sm font-bold text-[#0F766E] hover:opacity-80 transition-opacity duration-300">
+      <Link to={service.link} className="relative z-10 inline-flex items-center text-sm font-bold text-[#6D28D9] hover:opacity-80 transition-opacity duration-300">
         Learn More
-        <i className="ri-arrow-right-line ml-1 text-[#0F766E]"></i>
+        <i className="ri-arrow-right-line ml-1 text-[#6D28D9]"></i>
       </Link>
     </motion.div>
   )
@@ -137,18 +137,18 @@ const Services = memo(function Services() {
 
       <div className="relative z-10 max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
         <div className="text-center mb-8 sm:mb-12 lg:mb-16">
-          <span className="text-sm font-semibold text-[#0F766E] uppercase tracking-wider">Our Expert Services</span>
+          <span className="text-sm font-semibold text-[#6D28D9] uppercase tracking-wider">Our Expert Services</span>
 
           <h2 className="text-2xl sm:text-3xl md:text-4xl lg:text-5xl font-bold text-slate-800 mb-4 sm:mb-6 mt-4 leading-tight">
             Comprehensive
-            <span className="block text-[#0F766E]">
+            <span className="block text-[#6D28D9]">
               Digital Solutions
             </span>
           </h2>
 
           <p className="text-base sm:text-lg text-slate-600 max-w-3xl mx-auto leading-relaxed px-4 sm:px-0">
             From innovative web development to cutting-edge mobile apps, we deliver
-            <span className="font-semibold text-[#0F766E]"> end-to-end solutions</span> that transform
+            <span className="font-semibold text-[#6D28D9]"> end-to-end solutions</span> that transform
             your business and drive sustainable growth in the digital landscape.
           </p>
         </div>
@@ -182,7 +182,7 @@ const Services = memo(function Services() {
               aria-label="Previous service"
               className="w-10 h-10 bg-white rounded-full shadow-lg hover:shadow-xl transition-all duration-300 flex items-center justify-center group"
             >
-              <i className="ri-arrow-left-line text-lg text-slate-700 group-hover:text-[#0F766E] transition-colors"></i>
+              <i className="ri-arrow-left-line text-lg text-slate-700 group-hover:text-[#6D28D9] transition-colors"></i>
             </button>
 
             <button
@@ -190,7 +190,7 @@ const Services = memo(function Services() {
               aria-label="Next service"
               className="w-10 h-10 bg-white rounded-full shadow-lg hover:shadow-xl transition-all duration-300 flex items-center justify-center group"
             >
-              <i className="ri-arrow-right-line text-lg text-slate-700 group-hover:text-[#0F766E] transition-colors"></i>
+              <i className="ri-arrow-right-line text-lg text-slate-700 group-hover:text-[#6D28D9] transition-colors"></i>
             </button>
           </div>
 
@@ -204,7 +204,7 @@ const Services = memo(function Services() {
                 className="w-8 h-8 flex items-center justify-center"
               >
                 <span className={`w-3 h-3 rounded-full transition-all duration-300 ${currentSlide === index
-                  ? 'bg-[#0F766E] scale-125 shadow-lg'
+                  ? 'bg-[#6D28D9] scale-125 shadow-lg'
                   : 'bg-slate-300 hover:bg-slate-400'
                   }`} />
               </button>
@@ -221,7 +221,7 @@ const Services = memo(function Services() {
           <div className="flex justify-center mt-4">
             <div className="w-48 h-1 bg-slate-200 rounded-full overflow-hidden">
               <div
-                className="h-full bg-[#0F766E] rounded-full transition-all duration-300 ease-out"
+                className="h-full bg-[#6D28D9] rounded-full transition-all duration-300 ease-out"
                 style={{ width: `${((currentSlide + 1) / totalSlides) * 100}%` }}
               />
             </div>
@@ -232,7 +232,7 @@ const Services = memo(function Services() {
             aria-label="Previous service"
             className="absolute -left-16 top-1/2 transform -translate-y-1/2 w-12 h-12 bg-white rounded-full shadow-xl hover:shadow-2xl transition-all duration-300 flex items-center justify-center group lg:block hidden"
           >
-            <i className="ri-arrow-left-line text-xl text-slate-700 group-hover:text-[#0F766E] transition-colors"></i>
+            <i className="ri-arrow-left-line text-xl text-slate-700 group-hover:text-[#6D28D9] transition-colors"></i>
           </button>
 
           <button
@@ -240,12 +240,12 @@ const Services = memo(function Services() {
             aria-label="Next service"
             className="absolute -right-16 top-1/2 transform -translate-y-1/2 w-12 h-12 bg-white rounded-full shadow-xl hover:shadow-2xl transition-all duration-300 flex items-center justify-center group lg:block hidden"
           >
-            <i className="ri-arrow-right-line text-xl text-slate-700 group-hover:text-[#0F766E] transition-colors"></i>
+            <i className="ri-arrow-right-line text-xl text-slate-700 group-hover:text-[#6D28D9] transition-colors"></i>
           </button>
         </div>
 
         <div className="relative">
-          <div className="absolute inset-0 bg-[#0F766E] rounded-3xl"></div>
+          <div className="absolute inset-0 bg-[#6D28D9] rounded-3xl"></div>
 
           <div className="relative z-10 text-center p-12 text-white overflow-hidden rounded-3xl">
             <h3 className="text-3xl md:text-4xl font-bold mb-5 text-white">
@@ -260,7 +260,7 @@ const Services = memo(function Services() {
             <div className="flex flex-col sm:flex-row gap-4 justify-center">
               <MagneticButton
                 href="#contact"
-                className="group bg-white text-[#0F766E] px-8 py-4 rounded-xl font-bold hover:bg-[#FAF9F6] transition-colors duration-300 inline-flex items-center justify-center shadow-xl text-base"
+                className="group bg-white text-[#6D28D9] px-8 py-4 rounded-xl font-bold hover:bg-[#FAF9F6] transition-colors duration-300 inline-flex items-center justify-center shadow-xl text-base"
               >
                 Start Your Project
                 <i className="ri-arrow-right-line ml-2 text-lg group-hover:translate-x-1 transition-transform duration-300"></i>

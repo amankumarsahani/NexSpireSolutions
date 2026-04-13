@@ -172,7 +172,7 @@ const FAQPage = () => {
                                 placeholder="Search for answers..."
                                 value={searchQuery}
                                 onChange={(e) => setSearchQuery(e.target.value)}
-                                className="w-full px-6 py-4 pl-14 rounded-2xl bg-white border border-slate-200 focus:border-[#0F766E] focus:ring-2 focus:ring-[#0F766E]/20 shadow-sm transition-all text-lg outline-none"
+                                className="w-full px-6 py-4 pl-14 rounded-2xl bg-white border border-slate-200 focus:border-[#6D28D9] focus:ring-2 focus:ring-[#6D28D9]/20 shadow-sm transition-all text-lg outline-none"
                             />
                             <i className="ri-search-line absolute left-5 top-1/2 -translate-y-1/2 text-slate-400 text-xl"></i>
                             {searchQuery && (
@@ -233,7 +233,7 @@ const FAQPage = () => {
                                             onClick={() => setExpandedIndex(expandedIndex === index ? null : index)}
                                             className="w-full p-6 text-left flex items-start gap-4 hover:bg-[#FAF9F6] transition-colors"
                                         >
-                                            <span className="flex-shrink-0 w-8 h-8 rounded-lg bg-[#0F766E]/10 text-[#0F766E] flex items-center justify-center font-bold text-sm">
+                                            <span className="flex-shrink-0 w-8 h-8 rounded-lg bg-[#6D28D9]/10 text-[#6D28D9] flex items-center justify-center font-bold text-sm">
                                                 Q
                                             </span>
                                             <div className="flex-1">

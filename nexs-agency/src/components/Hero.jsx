@@ -63,7 +63,7 @@ const Hero = memo(function Hero() {
         <div className="max-w-5xl mx-auto lg:mx-0 lg:ml-[8%] py-20 sm:py-24">
           <div className={`space-y-4 sm:space-y-6 text-center lg:text-left transition-all duration-700 ${isVisible ? 'opacity-100 translate-y-0' : 'opacity-0 translate-y-10'}`}>
 
-            <div className="inline-flex items-center bg-white/90 backdrop-blur-sm border border-white/30 rounded-full px-3 sm:px-4 py-2 text-[#0F766E] font-semibold text-sm sm:text-base">
+            <div className="inline-flex items-center bg-white/90 backdrop-blur-sm border border-white/30 rounded-full px-3 sm:px-4 py-2 text-[#6D28D9] font-semibold text-sm sm:text-base">
               <div className="w-1.5 h-1.5 bg-green-500 rounded-full mr-2"></div>
               <i className="ri-code-s-slash-line mr-1 text-sm"></i>
               Leading Software Development Agency
@@ -92,7 +92,7 @@ const Hero = memo(function Hero() {
             <div className="flex flex-col sm:flex-row gap-3 sm:gap-4 justify-center lg:justify-start mt-6 sm:mt-8">
               <MagneticButton
                 href="#contact"
-                className="bg-[#0F766E] text-white px-8 sm:px-8 lg:px-6 py-4 sm:py-4 lg:py-3 rounded-xl text-base sm:text-lg lg:text-base font-semibold shadow-xl inline-flex items-center justify-center hover:bg-[#0D6B63] active:scale-95 transition-colors duration-300 group"
+                className="bg-[#6D28D9] text-white px-8 sm:px-8 lg:px-6 py-4 sm:py-4 lg:py-3 rounded-xl text-base sm:text-lg lg:text-base font-semibold shadow-xl inline-flex items-center justify-center hover:bg-[#5B21B6] active:scale-95 transition-colors duration-300 group"
               >
                 Start Your Project
                 <i className="ri-arrow-right-line ml-2 text-lg group-hover:translate-x-1 transition-transform duration-300"></i>

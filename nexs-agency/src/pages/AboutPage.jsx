@@ -137,7 +137,7 @@ const AboutPage = () => {
           <div className="grid grid-cols-2 md:grid-cols-4 gap-12 text-center">
             {stats.map((stat, i) => (
               <FadeIn key={i} delay={i * 0.1}>
-                <div className="text-4xl md:text-5xl font-bold text-[#0F766E] mb-2">{stat.value}</div>
+                <div className="text-4xl md:text-5xl font-bold text-[#6D28D9] mb-2">{stat.value}</div>
                 <div className="text-sm text-slate-500 uppercase tracking-widest font-medium">{stat.label}</div>
               </FadeIn>
             ))}
@@ -217,7 +217,7 @@ const AboutPage = () => {
         <div className="container-custom relative z-10">
           <FadeIn>
             <h2 className="text-5xl md:text-7xl font-bold mb-12 tracking-tighter">Ready to innovate?</h2>
-            <Link to="/contact" className="inline-flex items-center gap-4 px-12 py-6 bg-white text-black rounded-full text-xl font-bold hover:bg-[#0F766E] hover:text-white transition-all duration-300 group">
+            <Link to="/contact" className="inline-flex items-center gap-4 px-12 py-6 bg-white text-black rounded-full text-xl font-bold hover:bg-[#6D28D9] hover:text-white transition-all duration-300 group">
               Let's Talk
               <i className="ri-arrow-right-line group-hover:translate-x-2 transition-transform"></i>
             </Link>

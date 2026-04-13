@@ -54,7 +54,7 @@ const ProjectDetail = () => {
             {/* Hero */}
             <section className="py-12">
                 <div className="container-custom">
-                    <span className="inline-block px-4 py-2 bg-[#0F766E]/10 text-[#0F766E] rounded-full text-sm font-bold mb-6">
+                    <span className="inline-block px-4 py-2 bg-[#6D28D9]/10 text-[#6D28D9] rounded-full text-sm font-bold mb-6">
                         {project.category}
                     </span>
                     <h1 className="text-4xl md:text-6xl font-bold mb-8 max-w-4xl">
@@ -92,7 +92,7 @@ const ProjectDetail = () => {
                                 <p className="text-xl font-medium text-blue-900 mb-4 italic">
                                     "{project.testimonial.text}"
                                 </p>
-                                <p className="font-bold text-[#0F766E]">- {project.testimonial.author}</p>
+                                <p className="font-bold text-[#6D28D9]">- {project.testimonial.author}</p>
                             </div>
                         </div>
 
@@ -141,7 +141,7 @@ const ProjectDetail = () => {
                     <h2 className="text-4xl font-bold mb-8">Ready to start your project?</h2>
                     <Link
                         to="/contact"
-                        className="inline-block px-10 py-4 bg-white text-[#0F766E] rounded-full font-bold text-lg hover:shadow-xl transition-all "
+                        className="inline-block px-10 py-4 bg-white text-[#6D28D9] rounded-full font-bold text-lg hover:shadow-xl transition-all "
                     >
                         Get Free Consultation
                     </Link>

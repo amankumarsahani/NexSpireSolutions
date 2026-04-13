@@ -6,7 +6,7 @@ const data = {
     hero: {
         h1Line1: 'Scalable',
         h1Line2: 'Web Applications.',
-        gradient: 'from-[#0F766E] to-[#0D6B63]',
+        gradient: 'from-[#6D28D9] to-[#5B21B6]',
         paragraph: 'We define the digital standard for your business with robust, secure, and high-performance web solutions tailored to your unique goals.',
         ctaText: 'Start Project',
         bgImage: 'https://images.unsplash.com/photo-1451187580459-43490279c0fa',

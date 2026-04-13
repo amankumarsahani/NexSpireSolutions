@@ -38,7 +38,7 @@ export default function BackupAccountList({ accounts, pageLoading, onEdit, onDel
                                         <span className={`rounded-full px-3 py-1 text-xs font-semibold ${account.is_active ? 'bg-emerald-100 text-emerald-700' : 'bg-slate-200 text-slate-700'}`}>
                                             {account.is_active ? 'Active' : 'Inactive'}
                                         </span>
-                                        <span className={`rounded-full px-3 py-1 text-xs font-semibold ${authType === 'oauth_personal' ? 'bg-[#0F766E]/10 text-[#0F766E]' : 'bg-purple-100 text-purple-700'}`}>
+                                        <span className={`rounded-full px-3 py-1 text-xs font-semibold ${authType === 'oauth_personal' ? 'bg-[#6D28D9]/10 text-[#6D28D9]' : 'bg-purple-100 text-purple-700'}`}>
                                             {authType === 'oauth_personal' ? 'Personal Drive OAuth' : 'Service Account'}
                                         </span>
                                     </div>

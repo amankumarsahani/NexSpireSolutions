@@ -377,7 +377,7 @@ const CityLandingPage = () => {
                     <div className="bg-white/90 backdrop-blur-xl rounded-[2rem] shadow-2xl p-8 md:p-10 border border-white/50 grid grid-cols-2 lg:grid-cols-4 gap-8 max-w-6xl mx-auto hover:transform hover:-translate-y-2 transition-transform duration-500 pointer-events-auto">
                         {data.stats && data.stats.map((stat, i) => (
                             <FadeIn key={i} delay={0.3 + (i * 0.1)} className="text-center group cursor-default relative">
-                                <div className="text-4xl md:text-5xl font-bold text-slate-900 group-hover:text-[#0F766E] transition-all duration-300 mb-2 font-display">
+                                <div className="text-4xl md:text-5xl font-bold text-slate-900 group-hover:text-[#6D28D9] transition-all duration-300 mb-2 font-display">
                                     {stat.value}
                                 </div>
                                 <div className="text-slate-500 font-bold text-xs md:text-sm uppercase tracking-widest group-hover:text-slate-800">
@@ -398,12 +398,12 @@ const CityLandingPage = () => {
                     <div className="flex flex-col lg:flex-row gap-16 items-start">
                         {/* Text Content */}
                         <FadeIn className="lg:w-1/2">
-                            <span className="flex items-center gap-2 text-[#0F766E] font-bold tracking-widest uppercase text-sm mb-4">
+                            <span className="flex items-center gap-2 text-[#6D28D9] font-bold tracking-widest uppercase text-sm mb-4">
                                 <span className="w-8 h-px bg-blue-600"></span>
                                 Strategic Hub
                             </span>
                             <h2 className="text-4xl md:text-5xl font-bold text-slate-900 leading-tight mb-6">
-                                Delivering Excellence in <span className="text-[#0F766E]">{data.city}</span>.
+                                Delivering Excellence in <span className="text-[#6D28D9]">{data.city}</span>.
                             </h2>
                             <p className="text-lg text-slate-600 leading-relaxed mb-8">
                                 {data.content} As your local technology partner, we bridge the gap between complex business requirements and cutting-edge digital solutions.
@@ -414,7 +414,7 @@ const CityLandingPage = () => {
                                     <i className="ri-map-pin-line text-9xl"></i>
                                 </div>
                                 <h3 className="text-xl font-bold text-slate-900 mb-6 flex items-center gap-2">
-                                    <i className="ri-briefcase-4-line text-[#0F766E]"></i>
+                                    <i className="ri-briefcase-4-line text-[#6D28D9]"></i>
                                     Key Capabilities
                                 </h3>
                                 <div className="grid sm:grid-cols-2 gap-4 relative z-10">
@@ -479,7 +479,7 @@ const CityLandingPage = () => {
 
                 <div className="container-custom relative z-10">
                     <div className="text-center mb-20">
-                        <span className="text-[#0F766E] font-bold tracking-widest uppercase text-sm">The Nexspire Advantage</span>
+                        <span className="text-[#6D28D9] font-bold tracking-widest uppercase text-sm">The Nexspire Advantage</span>
                         <h2 className="text-4xl font-bold mt-2 text-slate-900">{data.whyUs?.title}</h2>
                     </div>
 
@@ -487,7 +487,7 @@ const CityLandingPage = () => {
                         {data.whyUs?.reasons.map((reason, idx) => (
                             <FadeIn key={idx} delay={idx * 0.1} className="group p-8 rounded-[2rem] bg-white border border-slate-100 hover:shadow-xl hover:shadow-lg hover:-translate-y-1 transition-all duration-300">
                                 <div className="flex gap-6 items-start">
-                                    <div className="w-16 h-16 rounded-2xl bg-slate-50 flex items-center justify-center text-3xl text-[#0F766E] group-hover:bg-[#0F766E] group-hover:text-white transition-all duration-300 shrink-0">
+                                    <div className="w-16 h-16 rounded-2xl bg-slate-50 flex items-center justify-center text-3xl text-[#6D28D9] group-hover:bg-[#6D28D9] group-hover:text-white transition-all duration-300 shrink-0">
                                         <i className={reason.icon}></i>
                                     </div>
                                     <div>
