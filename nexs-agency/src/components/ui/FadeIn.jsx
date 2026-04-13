@@ -1,3 +1,4 @@
+// eslint-disable-next-line no-unused-vars
 import { motion } from 'framer-motion';
 
 const FadeIn = ({ children, className, delay = 0 }) => (

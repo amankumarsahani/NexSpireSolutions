@@ -27,8 +27,8 @@ export default function CRMPricingPage() {
     const [submitting, setSubmitting] = useState(false);
     const [submitted, setSubmitted] = useState(false);
     const [pricingMode, setPricingMode] = useState('contact_us');
-    const [contactEmail, setContactEmail] = useState('sales@nexspire.com');
-    const [loadingSettings, setLoadingSettings] = useState(true);
+    const [, setContactEmail] = useState('sales@nexspire.com');
+    const [, setLoadingSettings] = useState(true);
 
     // reCAPTCHA site key (same as EnquiryPopup)
     const RECAPTCHA_SITE_KEY = import.meta.env.VITE_RECAPTCHA_SITE_KEY;
@@ -428,7 +428,7 @@ export default function CRMPricingPage() {
                     </p>
                     <div className="flex flex-col sm:flex-row gap-4 justify-center">
                         <button
-                            onClick={() => handleContactClick('')}
+                            onClick={() => handleAction('')}
                             className="px-8 py-4 bg-white text-[#0F766E] rounded-lg font-semibold hover:bg-[#FAF9F6] transition-colors"
                         >
                             Contact Sales
@@ -535,7 +535,7 @@ export default function CRMPricingPage() {
                                             });
                                             showToast(err.error || 'Something went wrong. Please try again.', 'error');
                                         }
-                                    } catch (err) {
+                                    } catch {
                                         showToast('Network error. Please try again.', 'error');
                                     } finally {
                                         setSubmitting(false);

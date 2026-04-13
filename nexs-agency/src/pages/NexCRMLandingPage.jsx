@@ -1,6 +1,7 @@
 // TODO: Replace console.error with Sentry or proper error tracking
 import { useState, useEffect } from 'react';
 import { Helmet } from 'react-helmet-async';
+// eslint-disable-next-line no-unused-vars
 import { motion, AnimatePresence } from 'framer-motion';
 import { settingsAPI, billingAPI } from '../services/api';
 import { CheckIcon, XIcon } from '../components/ui/Icons';
@@ -44,8 +45,8 @@ export default function NexCRMLandingPage() {
     const [submitting, setSubmitting] = useState(false);
     const [submitted, setSubmitted] = useState(false);
     const [pricingMode, setPricingMode] = useState('contact_us');
-    const [contactEmail, setContactEmail] = useState('sales@nexspire.com');
-    const [loadingSettings, setLoadingSettings] = useState(true);
+    const [, setContactEmail] = useState('sales@nexspire.com');
+    const [, setLoadingSettings] = useState(true);
 
     const RECAPTCHA_SITE_KEY = import.meta.env.VITE_RECAPTCHA_SITE_KEY;
 
@@ -536,7 +537,7 @@ export default function NexCRMLandingPage() {
                                     });
                                     if (response.ok) setSubmitted(true);
                                     else showToast('Submission failed.', 'error');
-                                } catch (err) { showToast('Network error', 'error'); }
+                                } catch { showToast('Network error', 'error'); }
                                 finally { setSubmitting(false); }
                             }}>
                                 <div className="space-y-4">

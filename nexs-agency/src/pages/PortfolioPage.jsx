@@ -1,7 +1,8 @@
-import { useEffect, useState, useRef } from 'react';
+import { useState } from 'react';
 import { Link } from 'react-router-dom';
 import { Helmet } from 'react-helmet-async';
-import { motion, useInView, AnimatePresence } from 'framer-motion';
+// eslint-disable-next-line no-unused-vars
+import { motion, AnimatePresence } from 'framer-motion';
 import { cn } from '../utils/cn';
 import Breadcrumbs from '../components/ui/Breadcrumbs';
 import BackToTop from '../components/ui/BackToTop';
@@ -22,7 +23,7 @@ const FadeIn = ({ children, className, delay = 0 }) => {
     );
 };
 
-const ProjectCard = ({ project, index }) => {
+const ProjectCard = ({ project }) => {
     return (
         <Link to={`/portfolio/${project.title.toLowerCase().replace(/[^a-z0-9]+/g, '-')}`} className="block h-full">
             <motion.div

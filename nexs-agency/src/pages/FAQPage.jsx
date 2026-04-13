@@ -1,6 +1,7 @@
 import { useState, useMemo } from 'react';
 import { Link } from 'react-router-dom';
 import { Helmet } from 'react-helmet-async';
+// eslint-disable-next-line no-unused-vars
 import { motion, AnimatePresence } from 'framer-motion';
 import Breadcrumbs from '../components/ui/Breadcrumbs';
 import BackToTop from '../components/ui/BackToTop';
@@ -83,6 +84,7 @@ const FAQPage = () => {
                 faq.answer.toLowerCase().includes(searchQuery.toLowerCase());
             return matchesCategory && matchesSearch;
         });
+    // eslint-disable-next-line react-hooks/exhaustive-deps
     }, [activeCategory, searchQuery]);
 
     // FAQ Schema for SEO

@@ -1,5 +1,6 @@
 import { useState, useEffect, useRef, useCallback, memo } from 'react'
 import { Link } from 'react-router-dom'
+// eslint-disable-next-line no-unused-vars
 import { motion } from 'framer-motion'
 import MagneticButton from './ui/MagneticButton'
 
@@ -109,7 +110,7 @@ const Services = memo(function Services() {
     intervalRef.current = setInterval(() => {
       setCurrentSlide((prev) => (prev + 1) % Math.ceil(services.length / 3))
     }, 4000)
-  }, [services.length])
+  }, [])
 
   useEffect(() => {
     if (!isPaused) {

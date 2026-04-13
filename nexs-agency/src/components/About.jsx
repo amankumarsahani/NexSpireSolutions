@@ -1,4 +1,4 @@
-import { useState, useEffect, useRef, useCallback, memo } from 'react'
+import { useState, useEffect, useRef, memo } from 'react'
 
 const useCountUp = (target, duration = 2000, shouldAnimate = false) => {
   const [count, setCount] = useState(0)
@@ -42,6 +42,7 @@ const StatNumber = memo(function StatNumber({ stat, isVisible }) {
   )
 })
 
+// eslint-disable-next-line no-unused-vars
 const teamMembers = [
   {
     name: "Aman Kumar Sahani",

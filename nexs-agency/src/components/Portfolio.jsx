@@ -64,7 +64,9 @@ const Portfolio = memo(function Portfolio() {
 
   const filteredProjects = useMemo(() => activeCategory === "All"
     ? projects
-    : projects.filter(project => project.category === activeCategory), [activeCategory])
+    : projects.filter(project => project.category === activeCategory),
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+    [activeCategory])
 
   return (
     <section id="portfolio" className="relative py-12 sm:py-16 lg:py-20 bg-[#FAF9F6] overflow-hidden">

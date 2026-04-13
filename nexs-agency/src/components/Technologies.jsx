@@ -90,6 +90,7 @@ const Technologies = memo(function Technologies() {
     const selectedTechs = techStacks[activeTab].technologies
     // Duplicate for seamless loop
     setAllTechs([...selectedTechs, ...selectedTechs])
+  // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [activeTab])
 
   return (

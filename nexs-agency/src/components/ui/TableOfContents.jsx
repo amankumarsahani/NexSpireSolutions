@@ -76,6 +76,7 @@ export default function TableOfContents({ content }) {
 }
 
 // Helper to inject IDs into HTML content - export this to use in BlogArticle
+// eslint-disable-next-line react-refresh/only-export-components
 export function addIdsToHeadings(htmlContent) {
     if (!htmlContent) return '';
 

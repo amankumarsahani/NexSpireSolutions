@@ -1,7 +1,7 @@
-import { useState } from 'react';
 import { Link } from 'react-router-dom';
 import { Helmet } from 'react-helmet-async';
-import { motion, AnimatePresence } from 'framer-motion';
+// eslint-disable-next-line no-unused-vars
+import { motion } from 'framer-motion';
 import RelatedServices from '../components/seo/RelatedServices';
 import AreasWeServe from '../components/seo/AreasWeServe';
 import ProcessSection from '../components/ProcessSection';

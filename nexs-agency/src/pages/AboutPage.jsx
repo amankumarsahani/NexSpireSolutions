@@ -1,8 +1,7 @@
-import { useRef } from 'react';
 import { Link } from 'react-router-dom';
 import { Helmet } from 'react-helmet-async';
+// eslint-disable-next-line no-unused-vars
 import { motion } from 'framer-motion';
-import { cn } from '../utils/cn';
 
 // Import Assets
 import officeImg from '../assets/office_collaboration.png';

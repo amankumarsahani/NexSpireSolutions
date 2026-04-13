@@ -1,9 +1,9 @@
 // TODO: Replace console.error with Sentry or proper error tracking
-import { useEffect, useState } from 'react';
+import { useState } from 'react';
 import { Helmet } from 'react-helmet-async';
+// eslint-disable-next-line no-unused-vars
 import { motion, AnimatePresence } from 'framer-motion';
 import confetti from 'canvas-confetti';
-import { cn } from '../utils/cn';
 import { inquiryAPI } from '../services/api';
 import ReadingProgress from '../components/ui/ReadingProgress';
 import { SITE_URL } from '../constants/siteConfig';

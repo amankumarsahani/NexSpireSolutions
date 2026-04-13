@@ -193,6 +193,7 @@ export default function AdminBackupsPage() {
 
     useEffect(() => {
         loadData();
+        // eslint-disable-next-line react-hooks/exhaustive-deps
     }, [isAuthenticated, isAdmin]);
 
     useEffect(() => {
@@ -313,6 +314,7 @@ export default function AdminBackupsPage() {
         };
 
         runExchange();
+        // eslint-disable-next-line react-hooks/exhaustive-deps
     }, [isAuthenticated, isAdmin]);
 
     const handleChange = (event) => {

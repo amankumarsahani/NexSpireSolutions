@@ -1,5 +1,5 @@
 import { useState, useEffect, memo } from 'react';
-import { Link, useLocation, useNavigate } from 'react-router-dom';
+import { Link, useLocation } from 'react-router-dom';
 import { useAuth } from '../context/AuthContext';
 
 const navItems = [
@@ -28,7 +28,6 @@ const Header = memo(function Header() {
   const [scrolled, setScrolled] = useState(false);
   const [isServicesOpen, setIsServicesOpen] = useState(false);
   const location = useLocation();
-  const navigate = useNavigate();
   const { user, isAuthenticated } = useAuth();
   const showAdminBackups = isAuthenticated && user?.role === 'admin';
 

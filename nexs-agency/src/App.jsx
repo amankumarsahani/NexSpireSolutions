@@ -1,6 +1,7 @@
 import { lazy, memo } from 'react';
 import { BrowserRouter, Routes, Route } from 'react-router-dom';
 import { Helmet } from 'react-helmet-async';
+// eslint-disable-next-line no-unused-vars
 import { motion } from 'framer-motion';
 import { SITE_URL } from './constants/siteConfig';
 import ScrollToTop from './components/ScrollToTop';

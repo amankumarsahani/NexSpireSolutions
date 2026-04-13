@@ -49,7 +49,7 @@ const Blog = memo(function Blog() {
   const [activeCategory, setActiveCategory] = useState("All")
   const [isVisible, setIsVisible] = useState(false)
   const [blogPosts, setBlogPosts] = useState([])
-  const [loading, setLoading] = useState(true)
+  const [, setLoading] = useState(true)
 
   useEffect(() => {
     setIsVisible(true)
@@ -129,7 +129,7 @@ const Blog = memo(function Blog() {
         {/* Modern Filter Buttons */}
         <div className={`flex flex-wrap justify-center gap-3 mb-16 transition-all duration-1000 delay-300 transform ${isVisible ? 'translate-y-0 opacity-100' : 'translate-y-8 opacity-0'
           }`}>
-          {categories.map((category, index) => (
+          {categories.map((category) => (
             <button
               key={category}
               onClick={() => setActiveCategory(category)}
