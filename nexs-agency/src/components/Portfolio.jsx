@@ -69,7 +69,7 @@ const Portfolio = memo(function Portfolio() {
     [activeCategory])
 
   return (
-    <section id="portfolio" className="relative py-12 sm:py-16 lg:py-20 bg-[#FAF9F6] overflow-hidden">
+    <section id="portfolio" className="relative py-12 sm:py-16 lg:py-20 bg-[#F0F7FF] overflow-hidden">
 
       <div className="relative z-10 max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
         <div className={`text-left mb-8 sm:mb-12 lg:mb-16 transition-all duration-1000 transform ${isVisible ? 'translate-y-0 opacity-100' : 'translate-y-8 opacity-0'

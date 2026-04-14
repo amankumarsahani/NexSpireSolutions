@@ -133,7 +133,7 @@ const Services = memo(function Services() {
   const totalSlides = Math.ceil(services.length / servicesPerSlide)
 
   return (
-    <section id="services" className="relative py-12 sm:py-16 lg:py-20 bg-[#FAF9F6] overflow-hidden">
+    <section id="services" className="relative py-12 sm:py-16 lg:py-20 bg-[#F5F0FF] overflow-hidden">
 
       <div className="relative z-10 max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
         <div className="text-center mb-8 sm:mb-12 lg:mb-16">

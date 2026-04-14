@@ -94,7 +94,7 @@ const Technologies = memo(function Technologies() {
   }, [activeTab])
 
   return (
-    <section id="technologies" className="relative py-12 sm:py-16 lg:py-20 bg-[#FAF9F6] overflow-hidden">
+    <section id="technologies" className="relative py-12 sm:py-16 lg:py-20 bg-[#F0FFF4] overflow-hidden">
 
       <div className="relative z-10 max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
         {/* Modern Header */}

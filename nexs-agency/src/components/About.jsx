@@ -115,7 +115,7 @@ const About = memo(function About() {
   }, [])
 
   return (
-    <section id="about" className="relative py-20 bg-white overflow-hidden">
+    <section id="about" className="relative py-20 bg-[#FFF8F0] overflow-hidden">
 
       <div className="relative z-10 max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
 

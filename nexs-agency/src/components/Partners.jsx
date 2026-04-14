@@ -8,7 +8,7 @@ const Partners = memo(function Partners() {
   }, [])
 
   return (
-    <section id="partners" className="relative py-20 bg-white overflow-hidden">
+    <section id="partners" className="relative py-20 bg-[#F8F5FF] overflow-hidden">
 
       <div className="relative z-10 max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
         <div className={`text-left mb-16 transition-all duration-1000 transform ${isVisible ? 'translate-y-0 opacity-100' : 'translate-y-8 opacity-0'
