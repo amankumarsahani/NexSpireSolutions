@@ -85,32 +85,6 @@ const Footer = memo(function Footer() {
           </div>
         </div>
 
-        <div className="border-t border-slate-800 py-8">
-          <div className="flex flex-col md:flex-row justify-between items-center gap-6">
-            <div>
-              <h3 className="text-xl font-semibold mb-2">Stay Connected</h3>
-              <p className="text-slate-400">
-                Follow us on social media for the latest updates, insights, and behind-the-scenes content.
-              </p>
-            </div>
-            <div className="flex space-x-4">
-              {socialLinks.map((social, index) => (
-                <a
-                  key={index}
-                  href={social.href}
-                  aria-label={social.label}
-                  target="_blank"
-                  rel="noopener noreferrer"
-                  className="w-12 h-12 bg-slate-800 rounded-full flex items-center justify-center hover:bg-[#2563EB] transition-all duration-300 hover:scale-[1.15] active:scale-100"
-                  style={{ transitionTimingFunction: 'cubic-bezier(0.34, 1.56, 0.64, 1)' }}
-                >
-                  <i className={`${social.icon} text-xl`}></i>
-                </a>
-              ))}
-            </div>
-          </div>
-        </div>
-
         <div className="border-t border-slate-800 py-6">
           <div className="flex flex-col md:flex-row justify-between items-center">
             <p className="text-slate-400 text-sm">
