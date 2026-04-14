@@ -219,7 +219,7 @@ const Partners = memo(function Partners() {
 
         <div className={`transition-all duration-1000 delay-900 transform ${isVisible ? 'translate-y-0 opacity-100' : 'translate-y-8 opacity-0'
           }`}>
-          <div className="bg-[#6D28D9] rounded-2xl p-8 md:p-12 text-center text-white shadow-xl">
+          <div className="bg-[#4F46E5] rounded-2xl p-8 md:p-12 text-center text-white shadow-xl">
             <div className="w-16 h-16 bg-white/20 rounded-2xl flex items-center justify-center mx-auto mb-6">
               <i className="ri-handshake-line text-2xl text-white"></i>
             </div>
@@ -234,7 +234,7 @@ const Partners = memo(function Partners() {
 
             <div className="flex flex-col sm:flex-row gap-4 justify-center max-w-md mx-auto">
               <a
-                className="bg-white text-[#6D28D9] px-8 py-4 rounded-xl font-semibold hover:bg-[#FAF9F6] transition-all duration-300 cursor-pointer"
+                className="bg-white text-[#4F46E5] px-8 py-4 rounded-xl font-semibold hover:bg-[#FAF9F6] transition-all duration-300 cursor-pointer"
                 href="#contact"
               >
                 <span className="flex items-center justify-center">

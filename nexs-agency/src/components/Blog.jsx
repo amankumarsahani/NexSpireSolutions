@@ -111,8 +111,8 @@ const Blog = memo(function Blog() {
         {/* Modern Header */}
         <div className={`text-center mb-16 transition-all duration-1000 transform ${isVisible ? 'translate-y-0 opacity-100' : 'translate-y-8 opacity-0'
           }`}>
-          <div className="inline-flex items-center bg-[#6D28D9]/10 backdrop-blur-xl border border-white/20 text-gray-800 text-sm font-bold px-8 py-4 rounded-full mb-8 shadow-2xl hover:shadow-lg transition-all duration-500">
-            <div className="w-3 h-3 bg-[#6D28D9] rounded-full mr-3 animate-pulse shadow-lg"></div>
+          <div className="inline-flex items-center bg-[#475569]/10 backdrop-blur-xl border border-white/20 text-gray-800 text-sm font-bold px-8 py-4 rounded-full mb-8 shadow-2xl hover:shadow-lg transition-all duration-500">
+            <div className="w-3 h-3 bg-[#475569] rounded-full mr-3 animate-pulse shadow-lg"></div>
             Latest Insights
           </div>
           <h2 className="text-3xl md:text-4xl font-bold text-slate-800 mb-6 leading-tight tracking-tight">

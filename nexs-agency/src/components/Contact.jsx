@@ -276,7 +276,7 @@ const Contact = memo(function Contact() {
           <div className="order-1 lg:order-2">
             <div className="bg-[#FAF9F6] rounded-2xl p-6 border border-slate-200 h-full flex flex-col">
               <div className="flex items-center mb-6">
-                <div className="w-10 h-10 bg-[#6D28D9] rounded-lg flex items-center justify-center mr-3">
+                <div className="w-10 h-10 bg-[#2563EB] rounded-lg flex items-center justify-center mr-3">
                   <i className="ri-information-line text-lg text-white"></i>
                 </div>
                 <h3 className="text-xl font-bold text-slate-800">
@@ -292,14 +292,14 @@ const Contact = memo(function Contact() {
                   <div key={index} className="group">
                     <div className="bg-white rounded-lg p-4 shadow-sm border border-slate-200 hover:shadow-lg transition-all duration-300">
                       <div className="flex items-center space-x-3">
-                        <div className="w-10 h-10 bg-[#6D28D9] rounded-lg flex items-center justify-center flex-shrink-0">
+                        <div className="w-10 h-10 bg-[#059669] rounded-lg flex items-center justify-center flex-shrink-0">
                           <i className={`${info.icon} text-sm text-white`}></i>
                         </div>
                         <div className="flex-1">
                           <h4 className="text-sm font-semibold text-slate-800 mb-1">
                             {info.title}
                           </h4>
-                          <p className="text-[#6D28D9] font-medium mb-1 text-xs">
+                          <p className="text-[#059669] font-medium mb-1 text-xs">
                             {info.details}
                           </p>
                           <p className="text-slate-500 text-xs">

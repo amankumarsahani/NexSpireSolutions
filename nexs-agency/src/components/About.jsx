@@ -149,7 +149,7 @@ const About = memo(function About() {
 
               <div className="absolute -bottom-4 -right-4 bg-white rounded-xl p-4 shadow-xl border border-slate-200">
                 <div className="text-center">
-                  <div className="text-2xl font-bold text-[#6D28D9]">5+</div>
+                  <div className="text-2xl font-bold text-[#D97706]">5+</div>
                   <div className="text-xs text-slate-600 font-medium">Years Experience</div>
                 </div>
               </div>
@@ -184,7 +184,7 @@ const About = memo(function About() {
               <div className="grid md:grid-cols-2 gap-6">
                 <div>
                   <h4 className="text-lg font-semibold text-slate-800 mb-2 flex items-center">
-                    <span className="w-2 h-2 bg-[#6D28D9] rounded-full mr-2"></span>
+                    <span className="w-2 h-2 bg-[#D97706] rounded-full mr-2"></span>
                     Our Mission
                   </h4>
                   <p className="text-sm text-slate-600">
@@ -222,7 +222,7 @@ const About = memo(function About() {
               {features.map((feature, index) => (
                 <div key={index} className="flex items-start gap-6 group">
                   <div className="flex-shrink-0">
-                    <div className="relative w-16 h-16 bg-[#6D28D9] rounded-xl flex items-center justify-center shadow-lg">
+                    <div className="relative w-16 h-16 bg-[#D97706] rounded-xl flex items-center justify-center shadow-lg">
                       <i className={`${feature.icon} text-2xl text-white`}></i>
                     </div>
                   </div>
@@ -261,7 +261,7 @@ const About = memo(function About() {
                 <div className="relative bg-white rounded-2xl p-8 border border-slate-200 shadow-lg hover:shadow-xl hover:-translate-y-1 transition-all duration-300">
                   <div className="text-center mb-6">
                     <div className="relative w-16 h-16 mx-auto mb-4">
-                      <div className="w-full h-full rounded-2xl bg-[#6D28D9] flex items-center justify-center shadow-lg">
+                      <div className="w-full h-full rounded-2xl bg-[#D97706] flex items-center justify-center shadow-lg">
                         <i className={`${stat.icon} text-3xl text-white`}></i>
                       </div>
                     </div>
@@ -269,7 +269,7 @@ const About = memo(function About() {
 
                   <div className="text-center mb-4">
                     <StatNumber stat={stat} isVisible={statsVisible} />
-                    <div className="h-1 w-16 mx-auto rounded-full bg-[#6D28D9]"></div>
+                    <div className="h-1 w-16 mx-auto rounded-full bg-[#D97706]"></div>
                   </div>
 
                   <div className="text-center">

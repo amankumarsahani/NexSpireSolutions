@@ -23,10 +23,10 @@ const ServiceCard = memo(function ServiceCard({ service, index }) {
       viewport={{ once: true }}
       className="group relative bg-white rounded-2xl p-6 sm:p-8 shadow-lg hover:shadow-xl transition-all duration-300 hover:-translate-y-1 border border-slate-200 overflow-hidden"
     >
-      <div className="absolute top-0 left-0 w-full h-[2px] bg-[#6D28D9] transition-all duration-300 group-hover:h-[3px] group-hover:shadow-[0_0_8px_rgba(15,118,110,0.4)]"></div>
+      <div className="absolute top-0 left-0 w-full h-[2px] bg-[#2563EB] transition-all duration-300 group-hover:h-[3px] group-hover:shadow-[0_0_8px_rgba(37,99,235,0.4)]"></div>
 
       <div className="relative mb-8">
-        <div className="relative w-16 h-16 sm:w-20 sm:h-20 bg-[#6D28D9] rounded-2xl flex items-center justify-center shadow-lg transition-transform duration-300 group-hover:rotate-[5deg]">
+        <div className="relative w-16 h-16 sm:w-20 sm:h-20 bg-[#2563EB] rounded-2xl flex items-center justify-center shadow-lg transition-transform duration-300 group-hover:rotate-[5deg]">
           <i className={`${service.icon} text-2xl sm:text-3xl text-white`}></i>
         </div>
       </div>
@@ -39,7 +39,7 @@ const ServiceCard = memo(function ServiceCard({ service, index }) {
       <ul className="relative z-10 space-y-2 sm:space-y-3 mb-4 sm:mb-6">
         {service.features.map((feature, featureIndex) => (
           <li key={featureIndex} className="flex items-center text-sm text-slate-700">
-            <div className="w-5 h-5 bg-[#6D28D9] rounded-full flex items-center justify-center mr-4 shadow-sm">
+            <div className="w-5 h-5 bg-[#2563EB] rounded-full flex items-center justify-center mr-4 shadow-sm">
               <i className="ri-check-line text-white text-xs"></i>
             </div>
             <span className="font-semibold">{feature}</span>
@@ -204,7 +204,7 @@ const Services = memo(function Services() {
                 className="w-8 h-8 flex items-center justify-center"
               >
                 <span className={`w-3 h-3 rounded-full transition-all duration-300 ${currentSlide === index
-                  ? 'bg-[#6D28D9] scale-125 shadow-lg'
+                  ? 'bg-[#2563EB] scale-125 shadow-lg'
                   : 'bg-slate-300 hover:bg-slate-400'
                   }`} />
               </button>
@@ -221,7 +221,7 @@ const Services = memo(function Services() {
           <div className="flex justify-center mt-4">
             <div className="w-48 h-1 bg-slate-200 rounded-full overflow-hidden">
               <div
-                className="h-full bg-[#6D28D9] rounded-full transition-all duration-300 ease-out"
+                className="h-full bg-[#2563EB] rounded-full transition-all duration-300 ease-out"
                 style={{ width: `${((currentSlide + 1) / totalSlides) * 100}%` }}
               />
             </div>
@@ -245,7 +245,7 @@ const Services = memo(function Services() {
         </div>
 
         <div className="relative">
-          <div className="absolute inset-0 bg-[#6D28D9] rounded-3xl"></div>
+          <div className="absolute inset-0 bg-[#2563EB] rounded-3xl"></div>
 
           <div className="relative z-10 text-center p-12 text-white overflow-hidden rounded-3xl">
             <h3 className="text-3xl md:text-4xl font-bold mb-5 text-white">
@@ -260,7 +260,7 @@ const Services = memo(function Services() {
             <div className="flex flex-col sm:flex-row gap-4 justify-center">
               <MagneticButton
                 href="#contact"
-                className="group bg-white text-[#6D28D9] px-8 py-4 rounded-xl font-bold hover:bg-[#FAF9F6] transition-colors duration-300 inline-flex items-center justify-center shadow-xl text-base"
+                className="group bg-white text-[#2563EB] px-8 py-4 rounded-xl font-bold hover:bg-[#FAF9F6] transition-colors duration-300 inline-flex items-center justify-center shadow-xl text-base"
               >
                 Start Your Project
                 <i className="ri-arrow-right-line ml-2 text-lg group-hover:translate-x-1 transition-transform duration-300"></i>

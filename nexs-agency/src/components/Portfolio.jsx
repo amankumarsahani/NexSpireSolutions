@@ -121,14 +121,14 @@ const Portfolio = memo(function Portfolio() {
                   <div className="absolute inset-0 flex items-center justify-center opacity-0 group-hover:opacity-100 transition-all duration-300">
                     <Link
                       to={`/portfolio/${project.slug}`}
-                      className="w-12 h-12 bg-white/90 rounded-full flex items-center justify-center hover:bg-white transition-all duration-300 shadow-lg text-[#6D28D9]"
+                      className="w-12 h-12 bg-white/90 rounded-full flex items-center justify-center hover:bg-white transition-all duration-300 shadow-lg text-[#4F46E5]"
                     >
                       <i className="ri-eye-line text-xl"></i>
                     </Link>
                   </div>
 
                   <div className="absolute top-4 left-4">
-                    <span className="text-xs font-bold text-white px-3 py-1.5 rounded-full bg-[#6D28D9]/80">
+                    <span className="text-xs font-bold text-white px-3 py-1.5 rounded-full bg-[#4F46E5]/80">
                       {project.category}
                     </span>
                   </div>

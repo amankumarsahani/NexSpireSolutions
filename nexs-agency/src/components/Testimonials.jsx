@@ -99,7 +99,7 @@ const Testimonials = memo(function Testimonials() {
                 <div className="font-semibold text-slate-800 text-lg">
                   {testimonials[currentTestimonial].name}
                 </div>
-                <div className="text-[#6D28D9] mb-1">{testimonials[currentTestimonial].position}</div>
+                <div className="text-[#E11D48] mb-1">{testimonials[currentTestimonial].position}</div>
                 <div className="text-slate-500 text-sm">
                   Project: {testimonials[currentTestimonial].project}
                 </div>
@@ -151,7 +151,7 @@ const Testimonials = memo(function Testimonials() {
               aria-current={currentTestimonial === index}
               className="w-8 h-8 flex items-center justify-center cursor-pointer"
             >
-              <span className={`w-3 h-3 rounded-full transition-colors ${currentTestimonial === index ? 'bg-[#6D28D9]' : 'bg-slate-300'}`} />
+              <span className={`w-3 h-3 rounded-full transition-colors ${currentTestimonial === index ? 'bg-[#E11D48]' : 'bg-slate-300'}`} />
             </button>
           ))}
         </div>
