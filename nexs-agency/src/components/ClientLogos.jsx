@@ -30,8 +30,8 @@ export default function ClientLogos({ className = '', title = 'Trusted by Indust
                             transition={{ delay: index * 0.05 }}
                             className="group cursor-default"
                         >
-                            <div className="w-24 h-12 md:w-32 md:h-14 bg-[#FAF9F6] rounded-xl flex items-center justify-center transition-all duration-300 group-hover:bg-[#FAF9F6] group-hover:shadow-lg border border-slate-200 group-hover:border-slate-200">
-                                <span className="text-lg md:text-xl font-bold text-gray-300 group-hover:text-[#6D28D9] transition-colors">
+                            <div className="w-24 h-12 md:w-32 md:h-14 bg-[#F8FAFC] rounded-xl flex items-center justify-center transition-all duration-300 group-hover:bg-[#F8FAFC] group-hover:shadow-lg border border-slate-200 group-hover:border-slate-200">
+                                <span className="text-lg md:text-xl font-bold text-gray-300 group-hover:text-[#2563EB] transition-colors">
                                     {client.initial}
                                 </span>
                             </div>

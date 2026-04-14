@@ -69,15 +69,15 @@ const Portfolio = memo(function Portfolio() {
     [activeCategory])
 
   return (
-    <section id="portfolio" className="relative py-12 sm:py-16 lg:py-20 bg-[#F0F7FF] overflow-hidden">
+    <section id="portfolio" className="relative py-12 sm:py-16 lg:py-20 bg-slate-50 overflow-hidden">
 
       <div className="relative z-10 max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
         <div className={`text-left mb-8 sm:mb-12 lg:mb-16 transition-all duration-1000 transform ${isVisible ? 'translate-y-0 opacity-100' : 'translate-y-8 opacity-0'
           }`}>
-          <span className="text-sm font-semibold text-[#6D28D9] uppercase tracking-wider">Our Portfolio</span>
+          <span className="text-sm font-semibold text-[#2563EB] uppercase tracking-wider">Our Portfolio</span>
           <h2 className="text-2xl sm:text-3xl md:text-4xl font-bold text-slate-800 mb-4 sm:mb-6 mt-4 leading-tight tracking-tight">
             Showcasing Our
-            <span className="block text-[#6D28D9] mt-2">
+            <span className="block text-[#2563EB] mt-2">
               Digital Masterpieces
             </span>
           </h2>
@@ -93,8 +93,8 @@ const Portfolio = memo(function Portfolio() {
               key={index}
               onClick={() => setActiveCategory(category)}
               className={`px-4 sm:px-6 py-2 sm:py-3 rounded-2xl text-sm sm:text-base font-semibold transition-all duration-300 border ${activeCategory === category
-                ? 'bg-[#6D28D9] text-white shadow-lg border-[#6D28D9]'
-                : 'bg-white text-slate-700 hover:bg-[#FAF9F6] border-slate-200 hover:shadow-lg'
+                ? 'bg-[#2563EB] text-white shadow-lg border-[#2563EB]'
+                : 'bg-white text-slate-700 hover:bg-[#F8FAFC] border-slate-200 hover:shadow-lg'
                 }`}
             >
               {category}
@@ -121,20 +121,20 @@ const Portfolio = memo(function Portfolio() {
                   <div className="absolute inset-0 flex items-center justify-center opacity-0 group-hover:opacity-100 transition-all duration-300">
                     <Link
                       to={`/portfolio/${project.slug}`}
-                      className="w-12 h-12 bg-white/90 rounded-full flex items-center justify-center hover:bg-white transition-all duration-300 shadow-lg text-[#4F46E5]"
+                      className="w-12 h-12 bg-white/90 rounded-full flex items-center justify-center hover:bg-white transition-all duration-300 shadow-lg text-[#9333EA]"
                     >
                       <i className="ri-eye-line text-xl"></i>
                     </Link>
                   </div>
 
                   <div className="absolute top-4 left-4">
-                    <span className="text-xs font-bold text-white px-3 py-1.5 rounded-full bg-[#4F46E5]/80">
+                    <span className="text-xs font-bold text-white px-3 py-1.5 rounded-full bg-[#9333EA]/80">
                       {project.category}
                     </span>
                   </div>
                 </div>
 
-                <div className="p-6 border-l-2 border-transparent transition-colors duration-300 group-hover:border-[#6D28D9]">
+                <div className="p-6 border-l-2 border-transparent transition-colors duration-300 group-hover:border-[#2563EB]">
                   <h3 className="text-xl font-bold mb-3 text-slate-800">
                     {project.title}
                   </h3>
@@ -147,13 +147,13 @@ const Portfolio = memo(function Portfolio() {
                     {project.technologies.slice(0, 3).map((tech, techIndex) => (
                       <span
                         key={techIndex}
-                        className="text-xs bg-[#FAF9F6] text-slate-700 px-3 py-1.5 rounded-full border border-slate-200"
+                        className="text-xs bg-[#F8FAFC] text-slate-700 px-3 py-1.5 rounded-full border border-slate-200"
                       >
                         {tech}
                       </span>
                     ))}
                     {project.technologies.length > 3 && (
-                      <span className="text-xs bg-[#FAF9F6] text-slate-500 px-3 py-1.5 rounded-full border border-slate-200">
+                      <span className="text-xs bg-[#F8FAFC] text-slate-500 px-3 py-1.5 rounded-full border border-slate-200">
                         +{project.technologies.length - 3}
                       </span>
                     )}
@@ -166,7 +166,7 @@ const Portfolio = memo(function Portfolio() {
 
         <div className={`text-center transition-all duration-1000 delay-700 transform ${isVisible ? 'translate-y-0 opacity-100' : 'translate-y-8 opacity-0'
           }`}>
-          <Link to="/portfolio" className="group relative inline-block bg-[#6D28D9] hover:bg-[#5B21B6] text-white px-10 py-4 rounded-2xl font-bold shadow-lg transition-all duration-300 overflow-hidden">
+          <Link to="/portfolio" className="group relative inline-block bg-[#2563EB] hover:bg-[#1D4ED8] text-white px-10 py-4 rounded-2xl font-bold shadow-lg transition-all duration-300 overflow-hidden">
             <span className="relative z-10 flex items-center">
               View More Projects
               <i className="ri-arrow-right-line ml-2 group-hover:translate-x-1 transition-transform duration-300"></i>

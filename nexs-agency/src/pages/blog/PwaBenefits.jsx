@@ -47,7 +47,7 @@ const PwaBenefits = () => {
 
             <article className="max-w-4xl mx-auto px-6 py-12">
                 <div className="mb-12 text-center">
-                    <span className="inline-block px-4 py-1.5 bg-[#6D28D9]/10 text-[#6D28D9] font-bold rounded-full text-sm mb-6">
+                    <span className="inline-block px-4 py-1.5 bg-[#2563EB]/10 text-[#2563EB] font-bold rounded-full text-sm mb-6">
                         Web Development
                     </span>
                     <h1 className="text-4xl md:text-6xl font-bold leading-tight mb-6 text-slate-800">
@@ -102,7 +102,7 @@ const PwaBenefits = () => {
                         Thanks to Service Workers, PWAs can cache content. If a user loses internet connection in a tunnel, your app still works. This is crucial for e-commerce and field service apps.
                     </p>
 
-                    <div className="bg-[#FAF9F6] border-l-4 border-blue-600 p-8 my-8 rounded-r-xl">
+                    <div className="bg-[#F8FAFC] border-l-4 border-blue-600 p-8 my-8 rounded-r-xl">
                         <h4 className="text-xl font-bold text-blue-900 mb-2">Go Mobile, Fast</h4>
                         <p className="text-blue-800 mb-0">
                             We can turn your existing website into a PWA in weeks, not months. <Link to="/services/custom-web-development" className="underline font-bold">See our PWA Services</Link>.
@@ -127,7 +127,7 @@ const PwaBenefits = () => {
             </article>
 
             {/* Internal Linking to Services */}
-            <div className="bg-[#FAF9F6] py-16">
+            <div className="bg-[#F8FAFC] py-16">
                 <div className="container-custom">
                     <h2 className="text-3xl font-bold text-center mb-12">Upgrade Your Web Presence</h2>
                     <RelatedServices currentService="Custom Web Development" />

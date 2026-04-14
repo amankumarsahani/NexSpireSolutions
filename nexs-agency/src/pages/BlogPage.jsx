@@ -214,7 +214,7 @@ const BlogPage = () => {
 
                             <div className="flex items-center gap-8 text-sm text-slate-400 font-medium">
                                 <div className="flex items-center gap-3">
-                                    <div className="w-10 h-10 rounded-full bg-[#6D28D9] flex items-center justify-center text-white font-bold text-lg">
+                                    <div className="w-10 h-10 rounded-full bg-[#2563EB] flex items-center justify-center text-white font-bold text-lg">
                                         {featuredPost.author.charAt(0)}
                                     </div>
                                     <span className="text-white">{featuredPost.author}</span>
@@ -265,7 +265,7 @@ const BlogPage = () => {
                                 placeholder="Search articles..."
                                 value={searchQuery}
                                 onChange={(e) => setSearchQuery(e.target.value)}
-                                className="w-full md:w-80 pl-12 pr-6 py-4 rounded-full bg-[#FAF9F6] border border-slate-200 focus:border-blue-600 focus:outline-none shadow-sm transition-all focus:shadow-lg focus:bg-white"
+                                className="w-full md:w-80 pl-12 pr-6 py-4 rounded-full bg-[#F8FAFC] border border-slate-200 focus:border-blue-600 focus:outline-none shadow-sm transition-all focus:shadow-lg focus:bg-white"
                             />
                             <i className="ri-search-line absolute left-5 top-1/2 -translate-y-1/2 text-slate-400 text-lg"></i>
                         </FadeIn>
@@ -307,7 +307,7 @@ const BlogPage = () => {
                                             <span className="w-1 h-1 bg-gray-300 rounded-full"></span>
                                             <span>{post.readTime}</span>
                                         </div>
-                                        <h3 className="text-2xl font-bold font-serif text-slate-800 mb-4 group-hover:text-[#6D28D9] transition-colors leading-tight">
+                                        <h3 className="text-2xl font-bold font-serif text-slate-800 mb-4 group-hover:text-[#2563EB] transition-colors leading-tight">
                                             {post.title}
                                         </h3>
                                         <p className="text-slate-600 mb-6 line-clamp-3 flex-1 leading-loose">
@@ -320,7 +320,7 @@ const BlogPage = () => {
                                                 </div>
                                                 <span className="text-sm font-bold text-slate-800">{post.author}</span>
                                             </div>
-                                            <button className="text-[#6D28D9] font-bold text-sm group-hover:translate-x-1 transition-transform flex items-center gap-1">
+                                            <button className="text-[#2563EB] font-bold text-sm group-hover:translate-x-1 transition-transform flex items-center gap-1">
                                                 Read Article <i className="ri-arrow-right-line"></i>
                                             </button>
                                         </div>
@@ -354,7 +354,7 @@ const BlogPage = () => {
 
                 {/* Follow Us on Social Media */}
                 <div className="mt-16 relative">
-                    <div className="absolute inset-0 bg-[#6D28D9] rounded-[3rem] transform rotate-1 opacity-50 blur-lg"></div>
+                    <div className="absolute inset-0 bg-[#2563EB] rounded-[3rem] transform rotate-1 opacity-50 blur-lg"></div>
                     <div className="bg-slate-900 rounded-[3rem] p-12 md:p-24 text-center text-white relative overflow-hidden shadow-2xl">
                         <div className="absolute inset-0 bg-[url('https://grainy-gradients.vercel.app/noise.svg')] opacity-10"></div>
                         <div className="absolute top-0 left-0 w-full h-full bg-slate-900/70"></div>

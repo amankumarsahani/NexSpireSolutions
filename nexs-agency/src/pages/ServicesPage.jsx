@@ -14,17 +14,17 @@ import { SITE_URL } from '../constants/siteConfig';
 // Refined Premium Styles
 const serviceStyles = {
     blue: {
-        gradient: "from-[#6D28D9] to-[#5B21B6]",
+        gradient: "from-[#2563EB] to-[#1D4ED8]",
         shadow: "shadow-lg",
-        text: "text-[#6D28D9]",
-        bg: "bg-[#FAF9F6]",
-        icon: "text-[#6D28D9]"
+        text: "text-[#2563EB]",
+        bg: "bg-[#F8FAFC]",
+        icon: "text-[#2563EB]"
     },
     purple: {
-        gradient: "from-[#6D28D9] to-[#5B21B6]",
+        gradient: "from-[#2563EB] to-[#1D4ED8]",
         shadow: "shadow-lg",
-        text: "text-[#6D28D9]",
-        bg: "bg-[#FAF9F6]",
+        text: "text-[#2563EB]",
+        bg: "bg-[#F8FAFC]",
         icon: "text-purple-500"
     },
     emerald: {
@@ -42,7 +42,7 @@ const serviceStyles = {
         icon: "text-orange-500"
     },
     cyan: {
-        gradient: "from-[#6D28D9] to-[#5B21B6]",
+        gradient: "from-[#2563EB] to-[#1D4ED8]",
         shadow: "shadow-lg",
         text: "text-cyan-600",
         bg: "bg-cyan-50",
@@ -87,7 +87,7 @@ const ServiceCard = ({ service, index }) => {
 
                 {/* Content */}
                 <div className="relative z-10">
-                    <h3 className="text-2xl font-bold text-slate-800 mb-4 group-hover:text-[#6D28D9] transition-all duration-300">
+                    <h3 className="text-2xl font-bold text-slate-800 mb-4 group-hover:text-[#2563EB] transition-all duration-300">
                         <span>
                             {service.title}
                         </span>
@@ -117,10 +117,10 @@ const ServiceCard = ({ service, index }) => {
 
                     {/* CTA Button */}
                     <div className="flex items-center text-sm font-bold mt-auto group/btn">
-                        <span className={`text-[#6D28D9] mr-2`}>
+                        <span className={`text-[#2563EB] mr-2`}>
                             Explore Service
                         </span>
-                        <div className={`w-8 h-8 rounded-full flex items-center justify-center bg-[#FAF9F6] group-hover/btn:bg-gray-100 transition-colors`}>
+                        <div className={`w-8 h-8 rounded-full flex items-center justify-center bg-[#F8FAFC] group-hover/btn:bg-gray-100 transition-colors`}>
                             <i className={`ri-arrow-right-line ${styles.text} group-hover/btn:translate-x-1 transition-transform`}></i>
                         </div>
                     </div>
@@ -274,7 +274,7 @@ const ServicesPage = () => {
                     <div className="bg-white rounded-2xl shadow-xl shadow-slate-200/50 p-8 md:p-10 border border-slate-100 grid grid-cols-2 md:grid-cols-4 gap-8 backdrop-blur-xl">
                         {stats.map((stat, i) => (
                             <div key={i} className="text-center group cursor-default">
-                                <div className="text-4xl md:text-5xl font-bold text-slate-900 group-hover:text-[#6D28D9] transition-colors duration-300 mb-2 font-display">
+                                <div className="text-4xl md:text-5xl font-bold text-slate-900 group-hover:text-[#2563EB] transition-colors duration-300 mb-2 font-display">
                                     {stat.value}
                                 </div>
                                 <div className="text-slate-500 font-medium text-xs md:text-sm uppercase tracking-widest">
@@ -332,7 +332,7 @@ const ServicesPage = () => {
                     <div className="mb-20">
                         <div className="flex items-center justify-between mb-8">
                             <h2 className="text-2xl font-bold">Related Capabilities</h2>
-                            <Link to="/services" className="text-[#6D28D9] font-medium hover:underline">View All Services</Link>
+                            <Link to="/services" className="text-[#2563EB] font-medium hover:underline">View All Services</Link>
                         </div>
                         <RelatedServices currentService="Services Overview" />
                     </div>

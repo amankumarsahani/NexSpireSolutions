@@ -77,7 +77,7 @@ export default function ServicePageTemplate({ data }) {
 
                         <motion.h1 initial={{ opacity: 0, y: 30 }} animate={{ opacity: 1, y: 0 }} transition={{ delay: 0.1 }} className="text-5xl md:text-7xl font-bold mb-8 tracking-tight leading-tight">
                             {hero.h1Line1} <br />
-                            <span className={`text-[#6D28D9]`}>{hero.h1Line2}</span>
+                            <span className={`text-[#2563EB]`}>{hero.h1Line2}</span>
                         </motion.h1>
 
                         <motion.p initial={{ opacity: 0, y: 30 }} animate={{ opacity: 1, y: 0 }} transition={{ delay: 0.2 }} className="text-xl text-slate-400 max-w-2xl leading-relaxed mb-10">

@@ -94,19 +94,19 @@ const Technologies = memo(function Technologies() {
   }, [activeTab])
 
   return (
-    <section id="technologies" className="relative py-12 sm:py-16 lg:py-20 bg-[#F0FFF4] overflow-hidden">
+    <section id="technologies" className="relative py-12 sm:py-16 lg:py-20 bg-slate-50 overflow-hidden">
 
       <div className="relative z-10 max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
         {/* Modern Header */}
         <div className={`text-center mb-8 sm:mb-12 lg:mb-16 transition-all duration-1000 transform ${isVisible ? 'translate-y-0 opacity-100' : 'translate-y-8 opacity-0'
           }`}>
-          <div className="inline-flex items-center bg-[#059669]/10 border border-slate-200 text-slate-800 text-sm font-bold px-8 py-4 rounded-full mb-8">
-            <div className="w-3 h-3 bg-[#059669] rounded-full mr-3"></div>
+          <div className="inline-flex items-center bg-[#3B82F6]/10 border border-slate-200 text-slate-800 text-sm font-bold px-8 py-4 rounded-full mb-8">
+            <div className="w-3 h-3 bg-[#3B82F6] rounded-full mr-3"></div>
             Our Tech Stack
           </div>
           <h2 className="text-2xl sm:text-3xl md:text-4xl font-bold text-slate-800 mb-4 sm:mb-6 leading-tight tracking-tight">
             <span className="block text-gray-800 font-bold">Technologies We</span>
-            <span className="block text-[#6D28D9] mt-2 font-bold">
+            <span className="block text-[#2563EB] mt-2 font-bold">
               Master & Excel
             </span>
           </h2>
@@ -127,12 +127,12 @@ const Technologies = memo(function Technologies() {
               id={`tab-${tab}`}
               aria-controls={`tabpanel-${tab}`}
               className={`px-4 sm:px-6 py-2 sm:py-3 rounded-2xl text-sm sm:text-base font-semibold transition-all duration-300 whitespace-nowrap border ${activeTab === tab
-                ? 'bg-[#059669] text-white shadow-lg border-[#059669]'
-                : 'bg-white text-slate-600 hover:bg-[#FAF9F6] border-slate-200 hover:shadow-lg'
+                ? 'bg-[#3B82F6] text-white shadow-lg border-[#3B82F6]'
+                : 'bg-white text-slate-600 hover:bg-[#F8FAFC] border-slate-200 hover:shadow-lg'
                 }`}
             >
               <div className="flex items-center space-x-2">
-                <div className={`w-2 h-2 rounded-full transition-all duration-300 ${activeTab === tab ? 'bg-white' : 'bg-[#059669]'
+                <div className={`w-2 h-2 rounded-full transition-all duration-300 ${activeTab === tab ? 'bg-white' : 'bg-[#3B82F6]'
                   }`}></div>
                 <span>{tab}</span>
               </div>
@@ -204,7 +204,7 @@ const Technologies = memo(function Technologies() {
           <div className="mt-16 max-w-4xl mx-auto">
             <div className="grid md:grid-cols-3 gap-8">
               <div className="text-center p-6 bg-white rounded-2xl border border-slate-200 shadow-lg">
-                <div className="w-12 h-12 bg-[#059669] rounded-2xl flex items-center justify-center mx-auto mb-4 shadow-lg">
+                <div className="w-12 h-12 bg-[#3B82F6] rounded-2xl flex items-center justify-center mx-auto mb-4 shadow-lg">
                   <i className="ri-code-line text-2xl text-white"></i>
                 </div>
                 <h4 className="text-lg font-bold text-slate-800 mb-2">Modern Stack</h4>
@@ -212,7 +212,7 @@ const Technologies = memo(function Technologies() {
               </div>
 
               <div className="text-center p-6 bg-white rounded-2xl border border-slate-200 shadow-lg">
-                <div className="w-12 h-12 bg-[#059669] rounded-2xl flex items-center justify-center mx-auto mb-4 shadow-lg">
+                <div className="w-12 h-12 bg-[#3B82F6] rounded-2xl flex items-center justify-center mx-auto mb-4 shadow-lg">
                   <i className="ri-arrow-right-up-line text-2xl text-white"></i>
                 </div>
                 <h4 className="text-lg font-bold text-slate-800 mb-2">High Performance</h4>
@@ -220,7 +220,7 @@ const Technologies = memo(function Technologies() {
               </div>
 
               <div className="text-center p-6 bg-white rounded-2xl border border-slate-200 shadow-lg">
-                <div className="w-12 h-12 bg-[#059669] rounded-2xl flex items-center justify-center mx-auto mb-4 shadow-lg">
+                <div className="w-12 h-12 bg-[#3B82F6] rounded-2xl flex items-center justify-center mx-auto mb-4 shadow-lg">
                   <i className="ri-shield-check-line text-2xl text-white"></i>
                 </div>
                 <h4 className="text-lg font-bold text-slate-800 mb-2">Production Ready</h4>

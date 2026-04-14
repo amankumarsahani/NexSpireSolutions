@@ -38,12 +38,12 @@ body {
 
 body {
   font-family: var(--font-sans);
-  @apply bg-[#FAF9F6] text-slate-800 antialiased;
+  @apply bg-[#F8FAFC] text-slate-800 antialiased;
 }
 
 h1,
 h2 {
-  font-family: var(--font-serif);
+  font-family: var(--font-display);
   letter-spacing: -0.03em;
   text-wrap: balance;
 }
@@ -57,12 +57,12 @@ h6 {
 
 /* Custom Selection */
 ::selection {
-  background: #6D28D9;
+  background: #2563EB;
   color: white;
 }
 
 :focus-visible {
-  outline: 2px solid #6D28D9;
+  outline: 2px solid #2563EB;
   outline-offset: 2px;
 }
 
@@ -70,7 +70,7 @@ h6 {
   width: 8px;
 }
 ::-webkit-scrollbar-track {
-  background: #FAF9F6;
+  background: #F8FAFC;
 }
 ::-webkit-scrollbar-thumb {
   background: #94A3B8;
@@ -162,7 +162,7 @@ h6 {
 
 /* Utilities */
 .text-gradient {
-  color: #6D28D9;
+  color: #2563EB;
 }
 
 .section-padding {
@@ -175,12 +175,12 @@ h6 {
 
 /* Blog article drop cap */
 .prose-dropcap > p:first-of-type::first-letter {
-  font-family: var(--font-serif);
+  font-family: var(--font-display);
   float: left;
   font-size: 3.5em;
   line-height: 0.8;
   margin-right: 0.12em;
   margin-top: 0.07em;
-  color: #6D28D9;
+  color: #2563EB;
   font-weight: 700;
 }

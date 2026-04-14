@@ -62,7 +62,7 @@ const PrivacyPolicy = () => {
                         <p className="mb-4">
                             If you have any questions about this privacy policy or our privacy practices, please contact us at:
                         </p>
-                        <div className="bg-[#FAF9F6] p-6 rounded-xl border border-slate-200">
+                        <div className="bg-[#F8FAFC] p-6 rounded-xl border border-slate-200">
                             <p className="font-semibold text-slate-800">Nexspire Solution</p>
                             <p>Email: nexspiretechsolutions@gmail.com</p>
                             <p>Address: Mohali, SAS Nagar, Punjab, IN</p>

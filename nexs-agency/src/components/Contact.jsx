@@ -86,10 +86,10 @@ const Contact = memo(function Contact() {
 
       <div className="relative z-10 max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
         <div className="text-left mb-16">
-          <span className="text-sm font-semibold text-[#6D28D9] uppercase tracking-wider">Let's Connect</span>
+          <span className="text-sm font-semibold text-[#2563EB] uppercase tracking-wider">Let's Connect</span>
           <h2 className="text-3xl md:text-5xl font-bold mb-6 mt-4 leading-tight">
             Ready to Start
-            <span className="block text-[#6D28D9] mt-1">
+            <span className="block text-[#2563EB] mt-1">
               Your Project?
             </span>
           </h2>
@@ -102,7 +102,7 @@ const Contact = memo(function Contact() {
           <div className="order-2 lg:order-1">
             <div className="bg-white rounded-2xl p-6 shadow-lg border border-slate-200 h-full flex flex-col">
               <div className="flex items-center mb-6">
-                <div className="w-10 h-10 bg-[#6D28D9] rounded-lg flex items-center justify-center mr-3">
+                <div className="w-10 h-10 bg-[#2563EB] rounded-lg flex items-center justify-center mr-3">
                   <i className="ri-mail-line text-lg text-white"></i>
                 </div>
                 <h3 className="text-xl font-bold text-slate-800">
@@ -127,7 +127,7 @@ const Contact = memo(function Contact() {
                           required
                           minLength={2}
                           maxLength={100}
-                          className="w-full px-4 py-3 rounded-lg border border-slate-200 focus:ring-2 focus:ring-[#6D28D9] focus:border-[#6D28D9] transition-all bg-white text-sm"
+                          className="w-full px-4 py-3 rounded-lg border border-slate-200 focus:ring-2 focus:ring-[#2563EB] focus:border-[#2563EB] transition-all bg-white text-sm"
                           placeholder="Name"
                         />
                         <div className="absolute inset-y-0 right-3 flex items-center pointer-events-none">
@@ -148,7 +148,7 @@ const Contact = memo(function Contact() {
                           value={formData.email}
                           onChange={handleChange}
                           required
-                          className="w-full px-4 py-3 rounded-lg border border-slate-200 focus:ring-2 focus:ring-[#6D28D9] focus:border-[#6D28D9] transition-all bg-white text-sm"
+                          className="w-full px-4 py-3 rounded-lg border border-slate-200 focus:ring-2 focus:ring-[#2563EB] focus:border-[#2563EB] transition-all bg-white text-sm"
                           placeholder="xyz@gmail.com"
                         />
                         <div className="absolute inset-y-0 right-3 flex items-center pointer-events-none">
@@ -170,7 +170,7 @@ const Contact = memo(function Contact() {
                         value={formData.company}
                         onChange={handleChange}
                         maxLength={100}
-                        className="w-full px-4 py-3 rounded-lg border border-slate-200 focus:ring-2 focus:ring-[#6D28D9] focus:border-[#6D28D9] transition-all bg-white text-sm"
+                        className="w-full px-4 py-3 rounded-lg border border-slate-200 focus:ring-2 focus:ring-[#2563EB] focus:border-[#2563EB] transition-all bg-white text-sm"
                         placeholder="Your Company"
                       />
                       <div className="absolute inset-y-0 right-3 flex items-center pointer-events-none">
@@ -190,7 +190,7 @@ const Contact = memo(function Contact() {
                         name="phone"
                         value={formData.phone}
                         onChange={handleChange}
-                        className="w-full px-4 py-3 rounded-lg border border-slate-200 focus:ring-2 focus:ring-[#6D28D9] focus:border-[#6D28D9] transition-all bg-white text-sm"
+                        className="w-full px-4 py-3 rounded-lg border border-slate-200 focus:ring-2 focus:ring-[#2563EB] focus:border-[#2563EB] transition-all bg-white text-sm"
                         placeholder="+91 12345 67890"
                       />
                       <div className="absolute inset-y-0 right-3 flex items-center pointer-events-none">
@@ -212,7 +212,7 @@ const Contact = memo(function Contact() {
                         required
                         minLength={10}
                         maxLength={2000}
-                        className="w-full h-32 px-4 py-3 rounded-lg border border-slate-200 focus:ring-2 focus:ring-[#6D28D9] focus:border-[#6D28D9] transition-all resize-none bg-white text-sm"
+                        className="w-full h-32 px-4 py-3 rounded-lg border border-slate-200 focus:ring-2 focus:ring-[#2563EB] focus:border-[#2563EB] transition-all resize-none bg-white text-sm"
                         placeholder="Tell us about your project..."
                       ></textarea>
                       <div className="absolute top-3 right-3 pointer-events-none">
@@ -240,7 +240,7 @@ const Contact = memo(function Contact() {
                     <button
                       type="submit"
                       disabled={isSubmitting}
-                      className="w-full bg-[#6D28D9] hover:bg-[#5B21B6] text-white py-3 rounded-lg font-semibold transition-all duration-300 text-sm disabled:opacity-60 disabled:cursor-not-allowed"
+                      className="w-full bg-[#2563EB] hover:bg-[#1D4ED8] text-white py-3 rounded-lg font-semibold transition-all duration-300 text-sm disabled:opacity-60 disabled:cursor-not-allowed"
                     >
                       <span className="flex items-center justify-center">
                         {isSubmitting ? (
@@ -263,7 +263,7 @@ const Contact = memo(function Contact() {
                         <span>Your information is secure</span>
                       </div>
                       <div className="flex items-center">
-                        <i className="ri-time-line mr-2 text-[#6D28D9]"></i>
+                        <i className="ri-time-line mr-2 text-[#2563EB]"></i>
                         <span>Response in 24 hours</span>
                       </div>
                     </div>
@@ -274,7 +274,7 @@ const Contact = memo(function Contact() {
           </div>
 
           <div className="order-1 lg:order-2">
-            <div className="bg-[#FAF9F6] rounded-2xl p-6 border border-slate-200 h-full flex flex-col">
+            <div className="bg-[#F8FAFC] rounded-2xl p-6 border border-slate-200 h-full flex flex-col">
               <div className="flex items-center mb-6">
                 <div className="w-10 h-10 bg-[#2563EB] rounded-lg flex items-center justify-center mr-3">
                   <i className="ri-information-line text-lg text-white"></i>
@@ -313,7 +313,7 @@ const Contact = memo(function Contact() {
 
                 <div className="bg-white rounded-lg p-4 shadow-sm border border-slate-200">
                   <div className="flex items-center space-x-3 mb-3">
-                    <div className="w-10 h-10 bg-[#6D28D9] rounded-lg flex items-center justify-center flex-shrink-0">
+                    <div className="w-10 h-10 bg-[#2563EB] rounded-lg flex items-center justify-center flex-shrink-0">
                       <i className="ri-share-line text-sm text-white"></i>
                     </div>
                     <div className="flex-1">
@@ -331,9 +331,9 @@ const Contact = memo(function Contact() {
                         key={index}
                         href={social.href}
                         aria-label={social.label}
-                        className="w-8 h-8 bg-[#FAF9F6] rounded-lg flex items-center justify-center border border-slate-200 hover:border-[#6D28D9]/30 hover:bg-[#6D28D9]/5 transition-all duration-300 group"
+                        className="w-8 h-8 bg-[#F8FAFC] rounded-lg flex items-center justify-center border border-slate-200 hover:border-[#2563EB]/30 hover:bg-[#2563EB]/5 transition-all duration-300 group"
                       >
-                        <i className={`${social.icon} text-xs text-slate-600 group-hover:text-[#6D28D9]`}></i>
+                        <i className={`${social.icon} text-xs text-slate-600 group-hover:text-[#2563EB]`}></i>
                       </a>
                     ))}
                   </div>
@@ -344,7 +344,7 @@ const Contact = memo(function Contact() {
         </div>
 
         <div className="grid md:grid-cols-2 gap-8">
-          <div className="bg-[#FAF9F6] rounded-2xl p-6 border border-slate-200">
+          <div className="bg-[#F8FAFC] rounded-2xl p-6 border border-slate-200">
             <div className="flex items-center space-x-4">
               <div className="w-12 h-12 bg-emerald-500 rounded-lg flex items-center justify-center">
                 <i className="ri-time-line text-xl text-white"></i>
@@ -357,7 +357,7 @@ const Contact = memo(function Contact() {
             </div>
           </div>
 
-          <div className="bg-[#FAF9F6] rounded-2xl p-6 border border-slate-200">
+          <div className="bg-[#F8FAFC] rounded-2xl p-6 border border-slate-200">
             <div className="flex items-center space-x-4">
               <div className="w-12 h-12 bg-[#D97706] rounded-lg flex items-center justify-center">
                 <i className="ri-customer-service-line text-xl text-white"></i>

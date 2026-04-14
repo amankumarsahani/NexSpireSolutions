@@ -12,7 +12,7 @@ const NotFound = () => {
             </Helmet>
 
             {/* Background elements */}
-            <div className="absolute top-1/4 left-1/4 w-64 h-64 bg-[#6D28D9]/10 rounded-full mix-blend-multiply filter blur-3xl opacity-30 animate-blob"></div>
+            <div className="absolute top-1/4 left-1/4 w-64 h-64 bg-[#2563EB]/10 rounded-full mix-blend-multiply filter blur-3xl opacity-30 animate-blob"></div>
             <div className="absolute top-1/3 right-1/4 w-64 h-64 bg-purple-100 rounded-full mix-blend-multiply filter blur-3xl opacity-30 animate-blob animation-delay-2000"></div>
 
             <motion.div
@@ -21,7 +21,7 @@ const NotFound = () => {
                 transition={{ duration: 0.5 }}
                 className="relative z-10"
             >
-                <h1 className="text-9xl md:text-[12rem] font-bold text-[#6D28D9] mb-0 leading-none select-none">
+                <h1 className="text-9xl md:text-[12rem] font-bold text-[#2563EB] mb-0 leading-none select-none">
                     404
                 </h1>
             </motion.div>
@@ -59,7 +59,7 @@ const NotFound = () => {
                 </Link>
                 <Link
                     to="/services"
-                    className="inline-flex items-center gap-2 px-8 py-3 bg-white text-slate-600 border border-slate-200 rounded-full font-semibold hover:bg-[#FAF9F6] transition-all duration-300 "
+                    className="inline-flex items-center gap-2 px-8 py-3 bg-white text-slate-600 border border-slate-200 rounded-full font-semibold hover:bg-[#F8FAFC] transition-all duration-300 "
                 >
                     <i className="ri-compass-3-line"></i>
                     Explore Services

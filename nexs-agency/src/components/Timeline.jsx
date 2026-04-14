@@ -41,7 +41,7 @@ const milestones = [
 ];
 
 const colorMap = {
-    blue: { bg: 'bg-[#6D28D9]/10', text: 'text-[#6D28D9]', border: 'border-[#6D28D9]' },
+    blue: { bg: 'bg-[#2563EB]/10', text: 'text-[#2563EB]', border: 'border-[#2563EB]' },
     purple: { bg: 'bg-[#D97706]/10', text: 'text-[#D97706]', border: 'border-[#D97706]' },
     emerald: { bg: 'bg-emerald-100', text: 'text-emerald-600', border: 'border-emerald-500' },
     orange: { bg: 'bg-orange-100', text: 'text-orange-600', border: 'border-orange-500' },
@@ -50,10 +50,10 @@ const colorMap = {
 
 const Timeline = memo(function Timeline({ className = '' }) {
     return (
-        <section className={`py-24 bg-[#FAF9F6] ${className}`}>
+        <section className={`py-24 bg-[#F8FAFC] ${className}`}>
             <div className="container-custom">
                 <div className="text-center mb-16">
-                    <span className="inline-block px-4 py-2 bg-[#6D28D9]/10 text-[#6D28D9] rounded-full text-sm font-bold mb-4">
+                    <span className="inline-block px-4 py-2 bg-[#2563EB]/10 text-[#2563EB] rounded-full text-sm font-bold mb-4">
                         Our Journey
                     </span>
                     <h2 className="text-4xl md:text-5xl font-bold text-slate-800 mb-4">

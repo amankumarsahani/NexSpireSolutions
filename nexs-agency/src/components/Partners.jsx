@@ -8,15 +8,15 @@ const Partners = memo(function Partners() {
   }, [])
 
   return (
-    <section id="partners" className="relative py-20 bg-[#F8F5FF] overflow-hidden">
+    <section id="partners" className="relative py-20 bg-slate-50 overflow-hidden">
 
       <div className="relative z-10 max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
         <div className={`text-left mb-16 transition-all duration-1000 transform ${isVisible ? 'translate-y-0 opacity-100' : 'translate-y-8 opacity-0'
           }`}>
-          <span className="text-sm font-semibold text-[#6D28D9] uppercase tracking-wider">Trusted Partnerships</span>
+          <span className="text-sm font-semibold text-[#2563EB] uppercase tracking-wider">Trusted Partnerships</span>
           <h2 className="text-3xl md:text-5xl font-bold mb-6 mt-4 leading-tight">
             Partners &
-            <span className="block text-[#6D28D9] mt-1">
+            <span className="block text-[#2563EB] mt-1">
               Certifications
             </span>
           </h2>
@@ -28,7 +28,7 @@ const Partners = memo(function Partners() {
         <div className={`grid md:grid-cols-2 lg:grid-cols-4 gap-6 mb-20 transition-all duration-1000 delay-300 transform ${isVisible ? 'translate-y-0 opacity-100' : 'translate-y-8 opacity-0'
           }`}>
           {[
-            { icon: "ri-team-line", number: "50+", label: "Technology Partners", bgColor: "bg-[#6D28D9]/10", textColor: "text-[#6D28D9]" },
+            { icon: "ri-team-line", number: "50+", label: "Technology Partners", bgColor: "bg-[#2563EB]/10", textColor: "text-[#2563EB]" },
             { icon: "ri-award-line", number: "30+", label: "Certifications", bgColor: "bg-[#D97706]/10", textColor: "text-[#D97706]" },
             { icon: "ri-cloud-line", number: "12+", label: "Cloud Platforms", bgColor: "bg-emerald-50", textColor: "text-emerald-600" },
             { icon: "ri-shield-check-line", number: "100%", label: "Success Rate", bgColor: "bg-orange-50", textColor: "text-orange-600" }
@@ -68,7 +68,7 @@ const Partners = memo(function Partners() {
               <div className="flex animate-slide-left space-x-6 w-max">
                 {[
                   { logo: "AWS", name: "Amazon Web Services", type: "Cloud Partner", desc: "Certified AWS solutions architect with expertise in scalable cloud infrastructure", bgColor: "bg-orange-50", iconColor: "text-orange-600", borderColor: "border-orange-200" },
-                  { logo: "Azure", name: "Microsoft Azure", type: "Cloud Partner", desc: "Azure certified professional delivering enterprise cloud transformation", bgColor: "bg-[#FAF9F6]", iconColor: "text-[#6D28D9]", borderColor: "border-slate-200" },
+                  { logo: "Azure", name: "Microsoft Azure", type: "Cloud Partner", desc: "Azure certified professional delivering enterprise cloud transformation", bgColor: "bg-[#F8FAFC]", iconColor: "text-[#2563EB]", borderColor: "border-slate-200" },
                   { logo: "GCP", name: "Google Cloud", type: "Cloud Partner", desc: "Google Cloud certified engineer specializing in AI/ML and data analytics", bgColor: "bg-red-50", iconColor: "text-red-600", borderColor: "border-red-200" },
                   { logo: "React", name: "React Ecosystem", type: "Frontend Framework", desc: "Expert React development with Next.js, TypeScript, and modern tooling", bgColor: "bg-cyan-50", iconColor: "text-cyan-600", borderColor: "border-cyan-200" },
                   { logo: "Node", name: "Node.js", type: "Runtime Platform", desc: "Node.js expertise for scalable backend APIs and full-stack applications", bgColor: "bg-green-50", iconColor: "text-green-600", borderColor: "border-green-200" },
@@ -98,7 +98,7 @@ const Partners = memo(function Partners() {
 
                 {[
                   { logo: "AWS", name: "Amazon Web Services", type: "Cloud Partner", desc: "Certified AWS solutions architect with expertise in scalable cloud infrastructure", bgColor: "bg-orange-50", iconColor: "text-orange-600", borderColor: "border-orange-200" },
-                  { logo: "Azure", name: "Microsoft Azure", type: "Cloud Partner", desc: "Azure certified professional delivering enterprise cloud transformation", bgColor: "bg-[#FAF9F6]", iconColor: "text-[#6D28D9]", borderColor: "border-slate-200" },
+                  { logo: "Azure", name: "Microsoft Azure", type: "Cloud Partner", desc: "Azure certified professional delivering enterprise cloud transformation", bgColor: "bg-[#F8FAFC]", iconColor: "text-[#2563EB]", borderColor: "border-slate-200" },
                   { logo: "GCP", name: "Google Cloud", type: "Cloud Partner", desc: "Google Cloud certified engineer specializing in AI/ML and data analytics", bgColor: "bg-red-50", iconColor: "text-red-600", borderColor: "border-red-200" },
                   { logo: "React", name: "React Ecosystem", type: "Frontend Framework", desc: "Expert React development with Next.js, TypeScript, and modern tooling", bgColor: "bg-cyan-50", iconColor: "text-cyan-600", borderColor: "border-cyan-200" },
                   { logo: "Node", name: "Node.js", type: "Runtime Platform", desc: "Node.js expertise for scalable backend APIs and full-stack applications", bgColor: "bg-green-50", iconColor: "text-green-600", borderColor: "border-green-200" },
@@ -149,9 +149,9 @@ const Partners = memo(function Partners() {
               <div className="flex animate-slide-left space-x-6 w-max">
                 {[
                   { icon: "ri-award-line", title: "AWS Solutions Architect", provider: "Amazon Web Services", year: "2024", bgColor: "bg-orange-50", iconColor: "text-orange-600" },
-                  { icon: "ri-medal-line", title: "Azure Developer Associate", provider: "Microsoft", year: "2024", bgColor: "bg-[#FAF9F6]", iconColor: "text-[#6D28D9]" },
+                  { icon: "ri-medal-line", title: "Azure Developer Associate", provider: "Microsoft", year: "2024", bgColor: "bg-[#F8FAFC]", iconColor: "text-[#2563EB]" },
                   { icon: "ri-trophy-line", title: "Google Cloud Professional", provider: "Google Cloud", year: "2024", bgColor: "bg-red-50", iconColor: "text-red-600" },
-                  { icon: "ri-shield-star-line", title: "Kubernetes Administrator", provider: "CNCF", year: "2024", bgColor: "bg-[#6D28D9]/10", iconColor: "text-[#6D28D9]" },
+                  { icon: "ri-shield-star-line", title: "Kubernetes Administrator", provider: "CNCF", year: "2024", bgColor: "bg-[#2563EB]/10", iconColor: "text-[#2563EB]" },
                   { icon: "ri-star-line", title: "MongoDB Developer", provider: "MongoDB Inc.", year: "2024", bgColor: "bg-green-50", iconColor: "text-green-600" },
                   { icon: "ri-flashlight-line", title: "Certified Scrum Master", provider: "Scrum Alliance", year: "2024", bgColor: "bg-cyan-50", iconColor: "text-cyan-600" }
                 ].map((cert, index) => (
@@ -182,9 +182,9 @@ const Partners = memo(function Partners() {
 
                 {[
                   { icon: "ri-award-line", title: "AWS Solutions Architect", provider: "Amazon Web Services", year: "2024", bgColor: "bg-orange-50", iconColor: "text-orange-600" },
-                  { icon: "ri-medal-line", title: "Azure Developer Associate", provider: "Microsoft", year: "2024", bgColor: "bg-[#FAF9F6]", iconColor: "text-[#6D28D9]" },
+                  { icon: "ri-medal-line", title: "Azure Developer Associate", provider: "Microsoft", year: "2024", bgColor: "bg-[#F8FAFC]", iconColor: "text-[#2563EB]" },
                   { icon: "ri-trophy-line", title: "Google Cloud Professional", provider: "Google Cloud", year: "2024", bgColor: "bg-red-50", iconColor: "text-red-600" },
-                  { icon: "ri-shield-star-line", title: "Kubernetes Administrator", provider: "CNCF", year: "2024", bgColor: "bg-[#6D28D9]/10", iconColor: "text-[#6D28D9]" },
+                  { icon: "ri-shield-star-line", title: "Kubernetes Administrator", provider: "CNCF", year: "2024", bgColor: "bg-[#2563EB]/10", iconColor: "text-[#2563EB]" },
                   { icon: "ri-star-line", title: "MongoDB Developer", provider: "MongoDB Inc.", year: "2024", bgColor: "bg-green-50", iconColor: "text-green-600" },
                   { icon: "ri-flashlight-line", title: "Certified Scrum Master", provider: "Scrum Alliance", year: "2024", bgColor: "bg-cyan-50", iconColor: "text-cyan-600" }
                 ].map((cert, index) => (
@@ -234,7 +234,7 @@ const Partners = memo(function Partners() {
 
             <div className="flex flex-col sm:flex-row gap-4 justify-center max-w-md mx-auto">
               <a
-                className="bg-white text-[#4F46E5] px-8 py-4 rounded-xl font-semibold hover:bg-[#FAF9F6] transition-all duration-300 cursor-pointer"
+                className="bg-white text-[#4F46E5] px-8 py-4 rounded-xl font-semibold hover:bg-[#F8FAFC] transition-all duration-300 cursor-pointer"
                 href="#contact"
               >
                 <span className="flex items-center justify-center">

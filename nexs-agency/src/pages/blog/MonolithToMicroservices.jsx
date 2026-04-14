@@ -126,7 +126,7 @@ const MonolithToMicroservices = () => {
             </article>
 
             {/* Internal Linking to Services */}
-            <div className="bg-[#FAF9F6] py-16">
+            <div className="bg-[#F8FAFC] py-16">
                 <div className="container-custom">
                     <h2 className="text-3xl font-bold text-center mb-12">Modernize Your Infrastructure</h2>
                     <RelatedServices currentService="Cloud Solutions" />

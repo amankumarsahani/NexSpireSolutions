@@ -47,7 +47,7 @@ const AiTrends2026 = () => {
 
             <article className="max-w-4xl mx-auto px-6 py-12">
                 <div className="mb-12 text-center">
-                    <span className="inline-block px-4 py-1.5 bg-[#6D28D9]/10 text-[#6D28D9] font-bold rounded-full text-sm mb-6">
+                    <span className="inline-block px-4 py-1.5 bg-[#2563EB]/10 text-[#2563EB] font-bold rounded-full text-sm mb-6">
                         Artificial Intelligence
                     </span>
                     <h1 className="text-4xl md:text-6xl font-bold leading-tight mb-6 text-slate-800">
@@ -105,7 +105,7 @@ const AiTrends2026 = () => {
                         Processing data on-device (IoT sensors, mobile phones) rather than in the cloud reduces latency and improves privacy. This is critical for autonomous vehicles and smart factories.
                     </p>
 
-                    <div className="bg-[#FAF9F6] border-l-4 border-blue-600 p-8 my-8 rounded-r-xl">
+                    <div className="bg-[#F8FAFC] border-l-4 border-blue-600 p-8 my-8 rounded-r-xl">
                         <h4 className="text-xl font-bold text-blue-900 mb-2">Need an AI Strategy?</h4>
                         <p className="text-blue-800 mb-0">
                             Nexspire specializes in building custom AI solutions for enterprises. <Link to="/services/ai-machine-learning" className="underline font-bold">Explore our AI Services</Link>.
@@ -147,7 +147,7 @@ const AiTrends2026 = () => {
             </article>
 
             {/* Internal Linking to Services */}
-            <div className="bg-[#FAF9F6] py-16">
+            <div className="bg-[#F8FAFC] py-16">
                 <div className="container-custom">
                     <h2 className="text-3xl font-bold text-center mb-12">Ready to Implement AI?</h2>
                     <RelatedServices currentService="none" />

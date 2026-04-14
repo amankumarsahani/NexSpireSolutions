@@ -190,7 +190,7 @@ const ContactPage = () => {
                             <h2 className="text-3xl font-bold mb-8">Contact Information</h2>
                             <div className="space-y-10">
                                 <div className="flex items-start gap-6 group">
-                                    <div className="w-14 h-14 rounded-2xl bg-white/10 backdrop-blur-md flex items-center justify-center text-white group-hover:bg-white group-hover:text-[#6D28D9] transition-all duration-300 shadow-lg">
+                                    <div className="w-14 h-14 rounded-2xl bg-white/10 backdrop-blur-md flex items-center justify-center text-white group-hover:bg-white group-hover:text-[#2563EB] transition-all duration-300 shadow-lg">
                                         <i className="ri-mail-send-line text-2xl"></i>
                                     </div>
                                     <div>
@@ -200,7 +200,7 @@ const ContactPage = () => {
                                 </div>
 
                                 <div className="flex items-start gap-6 group">
-                                    <div className="w-14 h-14 rounded-2xl bg-white/10 backdrop-blur-md flex items-center justify-center text-white group-hover:bg-white group-hover:text-[#6D28D9] transition-all duration-300 shadow-lg">
+                                    <div className="w-14 h-14 rounded-2xl bg-white/10 backdrop-blur-md flex items-center justify-center text-white group-hover:bg-white group-hover:text-[#2563EB] transition-all duration-300 shadow-lg">
                                         <i className="ri-phone-line text-2xl"></i>
                                     </div>
                                     <div>
@@ -211,7 +211,7 @@ const ContactPage = () => {
                                 </div>
 
                                 <div className="flex items-start gap-6 group">
-                                    <div className="w-14 h-14 rounded-2xl bg-white/10 backdrop-blur-md flex items-center justify-center text-white group-hover:bg-white group-hover:text-[#6D28D9] transition-all duration-300 shadow-lg">
+                                    <div className="w-14 h-14 rounded-2xl bg-white/10 backdrop-blur-md flex items-center justify-center text-white group-hover:bg-white group-hover:text-[#2563EB] transition-all duration-300 shadow-lg">
                                         <i className="ri-map-pin-line text-2xl"></i>
                                     </div>
                                     <div>
@@ -258,7 +258,7 @@ const ContactPage = () => {
                                     </p>
                                     <button
                                         onClick={() => setIsSuccess(false)}
-                                        className="px-8 py-4 bg-slate-900 text-white rounded-xl font-bold hover:bg-[#6D28D9] transition-all shadow-lg"
+                                        className="px-8 py-4 bg-slate-900 text-white rounded-xl font-bold hover:bg-[#2563EB] transition-all shadow-lg"
                                     >
                                         Send Another Message
                                     </button>
@@ -274,7 +274,7 @@ const ContactPage = () => {
 
                                     <form onSubmit={handleSubmit} className="space-y-8">
                                         <div className="space-y-2 group">
-                                            <label className="text-xs font-bold text-slate-500 uppercase tracking-widest group-focus-within:text-[#6D28D9] transition-colors">Full Name</label>
+                                            <label className="text-xs font-bold text-slate-500 uppercase tracking-widest group-focus-within:text-[#2563EB] transition-colors">Full Name</label>
                                             <input
                                                 type="text"
                                                 name="name"
@@ -289,7 +289,7 @@ const ContactPage = () => {
                                         </div>
 
                                         <div className="space-y-2 group">
-                                            <label className="text-xs font-bold text-slate-500 uppercase tracking-widest group-focus-within:text-[#6D28D9] transition-colors">Email Address</label>
+                                            <label className="text-xs font-bold text-slate-500 uppercase tracking-widest group-focus-within:text-[#2563EB] transition-colors">Email Address</label>
                                             <input
                                                 type="email"
                                                 name="email"
@@ -303,7 +303,7 @@ const ContactPage = () => {
 
                                         <div className="grid md:grid-cols-2 gap-8">
                                             <div className="space-y-2 group">
-                                                <label className="text-xs font-bold text-slate-500 uppercase tracking-widest group-focus-within:text-[#6D28D9] transition-colors">Phone (Optional)</label>
+                                                <label className="text-xs font-bold text-slate-500 uppercase tracking-widest group-focus-within:text-[#2563EB] transition-colors">Phone (Optional)</label>
                                                 <input
                                                     type="tel"
                                                     name="phone"
@@ -314,7 +314,7 @@ const ContactPage = () => {
                                                 />
                                             </div>
                                             <div className="space-y-2 group">
-                                                <label className="text-xs font-bold text-slate-500 uppercase tracking-widest group-focus-within:text-[#6D28D9] transition-colors">Company (Optional)</label>
+                                                <label className="text-xs font-bold text-slate-500 uppercase tracking-widest group-focus-within:text-[#2563EB] transition-colors">Company (Optional)</label>
                                                 <input
                                                     type="text"
                                                     name="company"
@@ -328,7 +328,7 @@ const ContactPage = () => {
                                         </div>
 
                                         <div className="space-y-2 group">
-                                            <label className="text-xs font-bold text-slate-500 uppercase tracking-widest group-focus-within:text-[#6D28D9] transition-colors">Message</label>
+                                            <label className="text-xs font-bold text-slate-500 uppercase tracking-widest group-focus-within:text-[#2563EB] transition-colors">Message</label>
                                             <textarea
                                                 name="message"
                                                 value={formState.message}
@@ -354,7 +354,7 @@ const ContactPage = () => {
 
                                         <button
                                             disabled={isSubmitting}
-                                            className="w-full bg-slate-900 text-white py-5 rounded-xl font-bold hover:bg-[#6D28D9] transition-all duration-300 flex items-center justify-center gap-2 shadow-xl transform hover:-translate-y-1 disabled:opacity-70 disabled:cursor-not-allowed"
+                                            className="w-full bg-slate-900 text-white py-5 rounded-xl font-bold hover:bg-[#2563EB] transition-all duration-300 flex items-center justify-center gap-2 shadow-xl transform hover:-translate-y-1 disabled:opacity-70 disabled:cursor-not-allowed"
                                         >
                                             {isSubmitting ? (
                                                 <span className="flex items-center gap-2">

@@ -23,7 +23,7 @@ export default function AuthorBio({
                             className="w-20 h-20 rounded-2xl object-cover shadow-lg"
                         />
                     ) : (
-                        <div className="w-20 h-20 rounded-2xl bg-[#6D28D9] flex items-center justify-center text-white text-2xl font-bold shadow-lg">
+                        <div className="w-20 h-20 rounded-2xl bg-[#2563EB] flex items-center justify-center text-white text-2xl font-bold shadow-lg">
                             {initials}
                         </div>
                     )}
@@ -32,7 +32,7 @@ export default function AuthorBio({
                 {/* Info */}
                 <div className="flex-1">
                     <div className="flex items-center gap-2 mb-1">
-                        <span className="text-xs font-medium text-[#6D28D9] uppercase tracking-wider">Written by</span>
+                        <span className="text-xs font-medium text-[#2563EB] uppercase tracking-wider">Written by</span>
                     </div>
                     <h3 className="text-xl font-bold text-slate-800 mb-1">{name}</h3>
                     <p className="text-sm text-slate-500 font-medium mb-3">{role}</p>
@@ -64,7 +64,7 @@ export default function AuthorBio({
                         )}
                         <a
                             href={`mailto:hello@nexspiresolutions.co.in`}
-                            className="w-9 h-9 rounded-full bg-white border border-slate-200 flex items-center justify-center text-slate-400 hover:text-[#6D28D9] hover:border-blue-600 transition-all"
+                            className="w-9 h-9 rounded-full bg-white border border-slate-200 flex items-center justify-center text-slate-400 hover:text-[#2563EB] hover:border-blue-600 transition-all"
                         >
                             <i className="ri-mail-line text-lg"></i>
                         </a>

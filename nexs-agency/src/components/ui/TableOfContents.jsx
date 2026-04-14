@@ -63,7 +63,7 @@ export default function TableOfContents({ content }) {
                             });
                         }}
                         className={`block pl-4 py-1 text-sm border-l-2 transition-all duration-300 ${activeId === heading.id
-                                ? 'border-blue-600 text-[#6D28D9] font-medium'
+                                ? 'border-blue-600 text-[#2563EB] font-medium'
                                 : 'border-transparent text-slate-500 hover:text-slate-800 hover:border-slate-200'
                             } ${heading.level === 3 ? 'ml-4' : ''}`}
                     >

@@ -6,7 +6,7 @@ const data = {
     hero: {
         h1Line1: 'Sell Smarter.',
         h1Line2: 'Grow Faster.',
-        gradient: 'from-[#6D28D9] to-[#5B21B6]',
+        gradient: 'from-[#2563EB] to-[#1D4ED8]',
         paragraph: 'We build data-driven e-commerce experiences that turn visitors into loyal customers. From headless storefronts to complex marketplaces.',
         ctaText: 'Start Selling',
         bgImage: 'https://images.unsplash.com/photo-1556742049-0cfed4f7a07d',

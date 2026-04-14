@@ -39,8 +39,8 @@ const services = [
 ];
 
 const colorMap = {
-    blue: "bg-[#FAF9F6] text-[#6D28D9] group-hover:bg-[#6D28D9] group-hover:text-white",
-    purple: "bg-[#FAF9F6] text-[#6D28D9] group-hover:bg-purple-600 group-hover:text-white",
+    blue: "bg-[#F8FAFC] text-[#2563EB] group-hover:bg-[#2563EB] group-hover:text-white",
+    purple: "bg-[#F8FAFC] text-[#2563EB] group-hover:bg-purple-600 group-hover:text-white",
     emerald: "bg-emerald-50 text-emerald-600 group-hover:bg-emerald-600 group-hover:text-white",
     cyan: "bg-cyan-50 text-cyan-600 group-hover:bg-cyan-600 group-hover:text-white",
     orange: "bg-orange-50 text-orange-600 group-hover:bg-orange-600 group-hover:text-white",
@@ -53,7 +53,7 @@ const RelatedServices = ({ currentService }) => {
     return (
         <section className="border-t border-slate-200 pt-10 mt-10">
             <h3 className="text-2xl font-bold mb-8 flex items-center gap-3">
-                <i className="ri-layout-grid-line text-[#6D28D9]"></i>
+                <i className="ri-layout-grid-line text-[#2563EB]"></i>
                 More Services
             </h3>
             <div className="grid md:grid-cols-3 gap-5">
@@ -64,14 +64,14 @@ const RelatedServices = ({ currentService }) => {
                         className="group relative flex flex-col p-6 rounded-2xl bg-white border border-slate-100 hover:border-slate-200 hover:shadow-xl hover:shadow-lg transition-all duration-300 overflow-hidden"
                     >
                         {/* Hover Gradient Background */}
-                        <div className="absolute inset-0 bg-[#FAF9F6] opacity-0 group-hover:opacity-100 transition-opacity duration-300"></div>
+                        <div className="absolute inset-0 bg-[#F8FAFC] opacity-0 group-hover:opacity-100 transition-opacity duration-300"></div>
 
                         <div className="relative z-10">
                             <div className={`w-12 h-12 rounded-xl flex items-center justify-center text-xl mb-4 transition-all duration-300 ${colorMap[s.color]}`}>
                                 <i className={s.icon}></i>
                             </div>
 
-                            <h4 className="font-bold text-slate-800 group-hover:text-[#6D28D9] transition-colors mb-2 text-lg">
+                            <h4 className="font-bold text-slate-800 group-hover:text-[#2563EB] transition-colors mb-2 text-lg">
                                 {s.title}
                             </h4>
 
@@ -79,7 +79,7 @@ const RelatedServices = ({ currentService }) => {
                                 {s.desc}
                             </p>
 
-                            <div className="flex items-center text-sm font-semibold text-slate-400 group-hover:text-[#6D28D9] transition-colors mt-auto">
+                            <div className="flex items-center text-sm font-semibold text-slate-400 group-hover:text-[#2563EB] transition-colors mt-auto">
                                 Explore
                                 <i className="ri-arrow-right-line ml-2 group-hover:translate-x-1 transition-transform"></i>
                             </div>

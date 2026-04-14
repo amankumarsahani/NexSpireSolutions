@@ -61,7 +61,7 @@ const BlogArticle = () => {
                 <div className="text-center">
                     <h1 className="text-4xl font-bold text-slate-800 mb-4">Blog Not Found</h1>
                     <p className="text-slate-600 mb-8">The article you're looking for doesn't exist.</p>
-                    <Link to="/blog" className="text-[#6D28D9] hover:underline font-medium">
+                    <Link to="/blog" className="text-[#2563EB] hover:underline font-medium">
                         ← Back to Blog
                     </Link>
                 </div>
@@ -149,7 +149,7 @@ const BlogArticle = () => {
                 {/* Article Header */}
                 <div className="mb-12 text-center">
                     {blog.category && (
-                        <span className="inline-block px-4 py-1.5 bg-[#6D28D9]/10 text-[#6D28D9] font-bold rounded-full text-sm mb-6">
+                        <span className="inline-block px-4 py-1.5 bg-[#2563EB]/10 text-[#2563EB] font-bold rounded-full text-sm mb-6">
                             {blog.category}
                         </span>
                     )}
@@ -230,7 +230,7 @@ const BlogArticle = () => {
 
             {/* Related Posts */}
             {relatedPosts.length > 0 && (
-                <div className="bg-[#FAF9F6] py-16">
+                <div className="bg-[#F8FAFC] py-16">
                     <div className="container-custom">
                         <h2 className="text-3xl font-bold text-center mb-12">Related Articles</h2>
                         <div className="grid md:grid-cols-3 gap-8">
@@ -252,10 +252,10 @@ const BlogArticle = () => {
                                         </div>
                                     )}
                                     <div className="p-6">
-                                        <span className="text-xs font-bold text-[#6D28D9] uppercase tracking-wider">
+                                        <span className="text-xs font-bold text-[#2563EB] uppercase tracking-wider">
                                             {post.category}
                                         </span>
-                                        <h3 className="text-lg font-bold font-serif mt-2 group-hover:text-[#6D28D9] transition-colors line-clamp-2">
+                                        <h3 className="text-lg font-bold font-serif mt-2 group-hover:text-[#2563EB] transition-colors line-clamp-2">
                                             {post.title}
                                         </h3>
                                         <p className="text-slate-500 text-sm mt-2 line-clamp-2 leading-relaxed">

@@ -6,7 +6,7 @@ const data = {
     hero: {
         h1Line1: 'Scale Without',
         h1Line2: 'Limits.',
-        gradient: 'from-[#6D28D9] to-[#5B21B6]',
+        gradient: 'from-[#2563EB] to-[#1D4ED8]',
         paragraph: 'Build, deploy, and manage your applications with the speed and reliability of modern cloud infrastructure.',
         ctaText: 'Plan Your Migration',
         bgImage: 'https://images.unsplash.com/photo-1451187580459-43490279c0fa',

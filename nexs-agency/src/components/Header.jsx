@@ -110,7 +110,7 @@ const Header = memo(function Header() {
               className="group flex items-center space-x-3"
             >
               <div className="relative">
-                <div className="w-9 h-9 bg-[#6D28D9] rounded-xl flex items-center justify-center shadow-lg transition-all duration-300">
+                <div className="w-9 h-9 bg-[#2563EB] rounded-xl flex items-center justify-center shadow-lg transition-all duration-300">
                   <span className="text-white font-bold text-base">N</span>
                 </div>
               </div>
@@ -134,8 +134,8 @@ const Header = memo(function Header() {
                       onBlur: () => { setTimeout(() => setIsServicesOpen(false), 150); }
                     } : {})}
                     className={`relative z-10 px-4 py-2 text-sm font-semibold rounded-full transition-all duration-300 inline-flex items-center gap-1 ${isActive(item.path)
-                      ? 'bg-[#6D28D9] text-white shadow-lg'
-                      : 'text-slate-700 hover:text-[#6D28D9]'
+                      ? 'bg-[#2563EB] text-white shadow-lg'
+                      : 'text-slate-700 hover:text-[#2563EB]'
                       }`}
                   >
                     {item.label}
@@ -152,7 +152,7 @@ const Header = memo(function Header() {
                               to={child.path}
                               onFocus={() => setIsServicesOpen(true)}
                               onBlur={() => { setTimeout(() => setIsServicesOpen(false), 150); }}
-                              className="px-4 py-3 text-sm font-medium text-slate-700 hover:bg-[#FAF9F6] hover:text-[#6D28D9] rounded-xl transition-colors text-left flex items-center justify-between group/item"
+                              className="px-4 py-3 text-sm font-medium text-slate-700 hover:bg-[#F8FAFC] hover:text-[#2563EB] rounded-xl transition-colors text-left flex items-center justify-between group/item"
                             >
                               {child.label}
                               <i className="ri-arrow-right-line opacity-0 group-hover/item:opacity-100 -translate-x-2 group-hover/item:translate-x-0 transition-all text-xs"></i>
@@ -169,8 +169,8 @@ const Header = memo(function Header() {
                   <Link
                     to="/admin/backups"
                     className={`relative z-10 px-4 py-2 text-sm font-semibold rounded-full transition-all duration-300 inline-flex items-center gap-1 ${isActive('/admin/backups')
-                      ? 'bg-[#6D28D9] text-white shadow-lg'
-                      : 'text-slate-700 hover:text-[#6D28D9]'
+                      ? 'bg-[#2563EB] text-white shadow-lg'
+                      : 'text-slate-700 hover:text-[#2563EB]'
                       }`}
                   >
                     Backups
@@ -183,7 +183,7 @@ const Header = memo(function Header() {
           <div className="hidden lg:flex items-center space-x-4">
             <Link
               to="/contact"
-              className="group bg-[#6D28D9] hover:bg-[#5B21B6] text-white px-6 py-2.5 rounded-xl text-sm font-bold transition-all duration-300 shadow-lg"
+              className="group bg-[#2563EB] hover:bg-[#1D4ED8] text-white px-6 py-2.5 rounded-xl text-sm font-bold transition-all duration-300 shadow-lg"
             >
               <span className="relative z-10 flex items-center">
                 Get Started
@@ -223,8 +223,8 @@ const Header = memo(function Header() {
                         }}
                         aria-expanded={activeDropdown === item.label}
                         className={`relative z-10 w-full text-left px-4 py-2 text-base font-semibold rounded-xl transition-all duration-300 cursor-pointer ${isActive(item.path)
-                          ? 'text-white bg-[#6D28D9] shadow-lg'
-                          : 'text-slate-700 hover:text-[#6D28D9] hover:bg-[#FAF9F6]'
+                          ? 'text-white bg-[#2563EB] shadow-lg'
+                          : 'text-slate-700 hover:text-[#2563EB] hover:bg-[#F8FAFC]'
                           }`}
                       >
                         <div className="flex items-center justify-between">
@@ -238,8 +238,8 @@ const Header = memo(function Header() {
                         handleNavClick(e, item.path);
                       }}
                       className={`relative z-10 block px-4 py-2 text-base font-semibold rounded-xl transition-all duration-300 cursor-pointer ${isActive(item.path)
-                        ? 'text-white bg-[#6D28D9] shadow-lg'
-                        : 'text-slate-700 hover:text-[#6D28D9] hover:bg-[#FAF9F6]'
+                        ? 'text-white bg-[#2563EB] shadow-lg'
+                        : 'text-slate-700 hover:text-[#2563EB] hover:bg-[#F8FAFC]'
                         }`}
                     >
                       <div className="flex items-center justify-between">
@@ -256,7 +256,7 @@ const Header = memo(function Header() {
                               key={child.label}
                               to={child.path}
                               onClick={() => setIsMenuOpen(false)}
-                              className="block px-4 py-2 text-sm font-medium text-slate-600 hover:text-[#6D28D9]"
+                              className="block px-4 py-2 text-sm font-medium text-slate-600 hover:text-[#2563EB]"
                             >
                               {child.label}
                             </Link>
@@ -271,8 +271,8 @@ const Header = memo(function Header() {
                     to="/admin/backups"
                     onClick={() => setIsMenuOpen(false)}
                     className={`relative z-10 block px-4 py-2 text-base font-semibold rounded-xl transition-all duration-300 ${isActive('/admin/backups')
-                      ? 'text-white bg-[#6D28D9] shadow-lg'
-                      : 'text-slate-700 hover:text-[#6D28D9] hover:bg-[#FAF9F6]'
+                      ? 'text-white bg-[#2563EB] shadow-lg'
+                      : 'text-slate-700 hover:text-[#2563EB] hover:bg-[#F8FAFC]'
                       }`}
                   >
                     Backups
@@ -285,7 +285,7 @@ const Header = memo(function Header() {
                 <Link
                   to="/contact"
                   onClick={() => setIsMenuOpen(false)}
-                  className="relative block w-full px-4 py-3 bg-[#6D28D9] hover:bg-[#5B21B6] text-white text-center text-base font-bold rounded-xl transition-all duration-300 shadow-lg"
+                  className="relative block w-full px-4 py-3 bg-[#2563EB] hover:bg-[#1D4ED8] text-white text-center text-base font-bold rounded-xl transition-all duration-300 shadow-lg"
                 >
                   Get Started
                 </Link>

@@ -14,7 +14,7 @@ const dummyPosts = [
     author: "Anu Kumar",
     date: "March 12, 2025",
     readTime: "7 min read",
-    color: "from-[#6D28D9] to-[#5B21B6]",
+    color: "from-[#2563EB] to-[#1D4ED8]",
     slug: "mobile-app-development-native-vs-cross-platform"
   },
   {
@@ -66,11 +66,11 @@ const Blog = memo(function Blog() {
         // Transform API data to match component format
         const transformedPosts = blogs.map((blog, index) => {
           const colors = [
-            "from-[#6D28D9] to-[#5B21B6]",
-            "from-[#6D28D9] to-[#5B21B6]",
+            "from-[#2563EB] to-[#1D4ED8]",
+            "from-[#2563EB] to-[#1D4ED8]",
             "from-emerald-500 to-emerald-600",
             "from-orange-500 to-orange-600",
-            "from-[#6D28D9] to-[#5B21B6]",
+            "from-[#2563EB] to-[#1D4ED8]",
             "from-red-500 to-red-600"
           ]
           return {
@@ -105,19 +105,19 @@ const Blog = memo(function Blog() {
     : blogPosts.filter(post => post.category === activeCategory), [blogPosts, activeCategory])
 
   return (
-    <section id="blog" className="relative py-20 bg-[#FAF9F6] overflow-hidden">
+    <section id="blog" className="relative py-20 bg-slate-50 overflow-hidden">
 
       <div className="relative z-10 max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
         {/* Modern Header */}
         <div className={`text-center mb-16 transition-all duration-1000 transform ${isVisible ? 'translate-y-0 opacity-100' : 'translate-y-8 opacity-0'
           }`}>
-          <div className="inline-flex items-center bg-[#475569]/10 backdrop-blur-xl border border-white/20 text-gray-800 text-sm font-bold px-8 py-4 rounded-full mb-8 shadow-2xl hover:shadow-lg transition-all duration-500">
-            <div className="w-3 h-3 bg-[#475569] rounded-full mr-3 animate-pulse shadow-lg"></div>
+          <div className="inline-flex items-center bg-[#6366F1]/10 backdrop-blur-xl border border-white/20 text-gray-800 text-sm font-bold px-8 py-4 rounded-full mb-8 shadow-2xl hover:shadow-lg transition-all duration-500">
+            <div className="w-3 h-3 bg-[#6366F1] rounded-full mr-3 animate-pulse shadow-lg"></div>
             Latest Insights
           </div>
           <h2 className="text-3xl md:text-4xl font-bold text-slate-800 mb-6 leading-tight tracking-tight">
             <span className="block text-gray-800 font-bold">Insights &</span>
-            <span className="block text-[#6D28D9] mt-2 font-bold">
+            <span className="block text-[#2563EB] mt-2 font-bold">
               Tech Articles
             </span>
           </h2>
@@ -134,7 +134,7 @@ const Blog = memo(function Blog() {
               key={category}
               onClick={() => setActiveCategory(category)}
               className={`px-6 py-3 rounded-2xl font-semibold transition-all duration-300 whitespace-nowrap backdrop-blur-sm border ${activeCategory === category
-                ? 'bg-[#6D28D9] text-white shadow-lg shadow-lg border-emerald-400/50'
+                ? 'bg-[#2563EB] text-white shadow-lg shadow-lg border-emerald-400/50'
                 : 'bg-white/60 text-slate-600 hover:bg-white/80 border-white/30 hover:shadow-lg'
                 }`}
             >
@@ -215,13 +215,13 @@ const Blog = memo(function Blog() {
                       {post.tags.slice(0, 3).map((tag, tagIndex) => (
                         <span
                           key={tagIndex}
-                          className="text-xs bg-[#FAF9F6] text-slate-600 px-3 py-2 rounded-xl border border-slate-200/60 hover:bg-gray-100 transition-colors duration-200 font-medium"
+                          className="text-xs bg-[#F8FAFC] text-slate-600 px-3 py-2 rounded-xl border border-slate-200/60 hover:bg-gray-100 transition-colors duration-200 font-medium"
                         >
                           #{tag}
                         </span>
                       ))}
                       {post.tags.length > 3 && (
-                        <span className="text-xs bg-[#FAF9F6] text-slate-500 px-3 py-2 rounded-xl border border-slate-200/60">
+                        <span className="text-xs bg-[#F8FAFC] text-slate-500 px-3 py-2 rounded-xl border border-slate-200/60">
                           +{post.tags.length - 3} more
                         </span>
                       )}
@@ -244,11 +244,11 @@ const Blog = memo(function Blog() {
 
                       {/* Interactive Read More */}
                       <div className="flex items-center space-x-2">
-                        <button className="group/like w-9 h-9 rounded-xl bg-[#FAF9F6] hover:bg-red-50 flex items-center justify-center transition-all duration-300 ">
+                        <button className="group/like w-9 h-9 rounded-xl bg-[#F8FAFC] hover:bg-red-50 flex items-center justify-center transition-all duration-300 ">
                           <i className="ri-heart-line text-slate-400 group-hover/like:text-red-500 transition-colors"></i>
                         </button>
-                        <button className="group/share w-9 h-9 rounded-xl bg-[#FAF9F6] hover:bg-[#FAF9F6] flex items-center justify-center transition-all duration-300 ">
-                          <i className="ri-share-line text-slate-400 group-hover/share:text-[#6D28D9] transition-colors"></i>
+                        <button className="group/share w-9 h-9 rounded-xl bg-[#F8FAFC] hover:bg-[#F8FAFC] flex items-center justify-center transition-all duration-300 ">
+                          <i className="ri-share-line text-slate-400 group-hover/share:text-[#2563EB] transition-colors"></i>
                         </button>
                       </div>
                     </div>
@@ -275,12 +275,12 @@ const Blog = memo(function Blog() {
         {/* View All Button */}
         <div className={`text-center mb-16 transition-all duration-1000 delay-700 transform ${isVisible ? 'translate-y-0 opacity-100' : 'translate-y-8 opacity-0'
           }`}>
-          <Link to="/blog" className="group relative bg-[#6D28D9] text-white px-10 py-4 rounded-2xl font-bold shadow-2xl shadow-lg hover:shadow-lg transition-all duration-300 transform  overflow-hidden inline-block">
+          <Link to="/blog" className="group relative bg-[#2563EB] text-white px-10 py-4 rounded-2xl font-bold shadow-2xl shadow-lg hover:shadow-lg transition-all duration-300 transform  overflow-hidden inline-block">
             <span className="relative z-10 flex items-center">
               View All Articles
               <i className="ri-arrow-right-line ml-2 group-hover:translate-x-1 transition-transform duration-300"></i>
             </span>
-            <div className="absolute inset-0 bg-[#6D28D9] opacity-0 group-hover:opacity-100 transition-opacity duration-300"></div>
+            <div className="absolute inset-0 bg-[#2563EB] opacity-0 group-hover:opacity-100 transition-opacity duration-300"></div>
           </Link>
         </div>
 
@@ -290,7 +290,7 @@ const Blog = memo(function Blog() {
           <div className="relative overflow-hidden">
             <div className="absolute -inset-4 bg-gradient-to-r from-blue-600/30 to-indigo-600/30 rounded-[3rem] blur-3xl animate-pulse [animation-duration:4s]"></div>
 
-            <div className="relative bg-[#6D28D9] backdrop-blur-2xl backdrop-saturate-150 backdrop-brightness-110 rounded-3xl p-8 md:p-12 shadow-2xl border border-white/30 overflow-hidden before:absolute before:inset-0 before:bg-gradient-to-br before:from-white/5 before:via-transparent before:to-white/2 before:rounded-3xl">
+            <div className="relative bg-[#2563EB] backdrop-blur-2xl backdrop-saturate-150 backdrop-brightness-110 rounded-3xl p-8 md:p-12 shadow-2xl border border-white/30 overflow-hidden before:absolute before:inset-0 before:bg-gradient-to-br before:from-white/5 before:via-transparent before:to-white/2 before:rounded-3xl">
 
               <div className="absolute inset-0">
                 <div className="absolute inset-0 bg-gradient-to-br from-blue-500/30 via-transparent to-purple-600/30"></div>

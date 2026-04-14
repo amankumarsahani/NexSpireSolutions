@@ -6,7 +6,7 @@ const data = {
     hero: {
         h1Line1: 'Apps That Users',
         h1Line2: 'Actually Love.',
-        gradient: 'from-[#6D28D9] to-[#5B21B6]',
+        gradient: 'from-[#2563EB] to-[#1D4ED8]',
         paragraph: 'From native iOS/Android to high-performance cross-platform solutions, we build mobile experiences that drive engagement and retention.',
         ctaText: 'Discuss Your App',
         bgImage: 'https://images.unsplash.com/photo-1551650975-87deedd944c3',

@@ -32,7 +32,7 @@ const ServiceCard = memo(function ServiceCard({ service, index }) {
       </div>
 
       <h3 className="relative z-10 text-xl sm:text-2xl font-bold text-slate-800 mb-3 sm:mb-4">
-        <Link to={service.link} className="hover:text-[#6D28D9] transition-colors">{service.title}</Link>
+        <Link to={service.link} className="hover:text-[#2563EB] transition-colors">{service.title}</Link>
       </h3>
       <p className="relative z-10 text-slate-600 mb-4 sm:mb-6 leading-relaxed text-sm sm:text-base">{service.description}</p>
 
@@ -47,9 +47,9 @@ const ServiceCard = memo(function ServiceCard({ service, index }) {
         ))}
       </ul>
 
-      <Link to={service.link} className="relative z-10 inline-flex items-center text-sm font-bold text-[#6D28D9] hover:opacity-80 transition-opacity duration-300">
+      <Link to={service.link} className="relative z-10 inline-flex items-center text-sm font-bold text-[#2563EB] hover:opacity-80 transition-opacity duration-300">
         Learn More
-        <i className="ri-arrow-right-line ml-1 text-[#6D28D9]"></i>
+        <i className="ri-arrow-right-line ml-1 text-[#2563EB]"></i>
       </Link>
     </motion.div>
   )
@@ -133,22 +133,22 @@ const Services = memo(function Services() {
   const totalSlides = Math.ceil(services.length / servicesPerSlide)
 
   return (
-    <section id="services" className="relative py-12 sm:py-16 lg:py-20 bg-[#F5F0FF] overflow-hidden">
+    <section id="services" className="relative py-12 sm:py-16 lg:py-20 bg-slate-50 overflow-hidden">
 
       <div className="relative z-10 max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
         <div className="text-center mb-8 sm:mb-12 lg:mb-16">
-          <span className="text-sm font-semibold text-[#6D28D9] uppercase tracking-wider">Our Expert Services</span>
+          <span className="text-sm font-semibold text-[#2563EB] uppercase tracking-wider">Our Expert Services</span>
 
           <h2 className="text-2xl sm:text-3xl md:text-4xl lg:text-5xl font-bold text-slate-800 mb-4 sm:mb-6 mt-4 leading-tight">
             Comprehensive
-            <span className="block text-[#6D28D9]">
+            <span className="block text-[#2563EB]">
               Digital Solutions
             </span>
           </h2>
 
           <p className="text-base sm:text-lg text-slate-600 max-w-3xl mx-auto leading-relaxed px-4 sm:px-0">
             From innovative web development to cutting-edge mobile apps, we deliver
-            <span className="font-semibold text-[#6D28D9]"> end-to-end solutions</span> that transform
+            <span className="font-semibold text-[#2563EB]"> end-to-end solutions</span> that transform
             your business and drive sustainable growth in the digital landscape.
           </p>
         </div>
@@ -182,7 +182,7 @@ const Services = memo(function Services() {
               aria-label="Previous service"
               className="w-10 h-10 bg-white rounded-full shadow-lg hover:shadow-xl transition-all duration-300 flex items-center justify-center group"
             >
-              <i className="ri-arrow-left-line text-lg text-slate-700 group-hover:text-[#6D28D9] transition-colors"></i>
+              <i className="ri-arrow-left-line text-lg text-slate-700 group-hover:text-[#2563EB] transition-colors"></i>
             </button>
 
             <button
@@ -190,7 +190,7 @@ const Services = memo(function Services() {
               aria-label="Next service"
               className="w-10 h-10 bg-white rounded-full shadow-lg hover:shadow-xl transition-all duration-300 flex items-center justify-center group"
             >
-              <i className="ri-arrow-right-line text-lg text-slate-700 group-hover:text-[#6D28D9] transition-colors"></i>
+              <i className="ri-arrow-right-line text-lg text-slate-700 group-hover:text-[#2563EB] transition-colors"></i>
             </button>
           </div>
 
@@ -232,7 +232,7 @@ const Services = memo(function Services() {
             aria-label="Previous service"
             className="absolute -left-16 top-1/2 transform -translate-y-1/2 w-12 h-12 bg-white rounded-full shadow-xl hover:shadow-2xl transition-all duration-300 flex items-center justify-center group lg:block hidden"
           >
-            <i className="ri-arrow-left-line text-xl text-slate-700 group-hover:text-[#6D28D9] transition-colors"></i>
+            <i className="ri-arrow-left-line text-xl text-slate-700 group-hover:text-[#2563EB] transition-colors"></i>
           </button>
 
           <button
@@ -240,7 +240,7 @@ const Services = memo(function Services() {
             aria-label="Next service"
             className="absolute -right-16 top-1/2 transform -translate-y-1/2 w-12 h-12 bg-white rounded-full shadow-xl hover:shadow-2xl transition-all duration-300 flex items-center justify-center group lg:block hidden"
           >
-            <i className="ri-arrow-right-line text-xl text-slate-700 group-hover:text-[#6D28D9] transition-colors"></i>
+            <i className="ri-arrow-right-line text-xl text-slate-700 group-hover:text-[#2563EB] transition-colors"></i>
           </button>
         </div>
 
@@ -260,7 +260,7 @@ const Services = memo(function Services() {
             <div className="flex flex-col sm:flex-row gap-4 justify-center">
               <MagneticButton
                 href="#contact"
-                className="group bg-white text-[#2563EB] px-8 py-4 rounded-xl font-bold hover:bg-[#FAF9F6] transition-colors duration-300 inline-flex items-center justify-center shadow-xl text-base"
+                className="group bg-white text-[#2563EB] px-8 py-4 rounded-xl font-bold hover:bg-[#F8FAFC] transition-colors duration-300 inline-flex items-center justify-center shadow-xl text-base"
               >
                 Start Your Project
                 <i className="ri-arrow-right-line ml-2 text-lg group-hover:translate-x-1 transition-transform duration-300"></i>

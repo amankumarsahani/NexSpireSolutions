@@ -44,7 +44,7 @@ const AreasWeServe = () => {
         <section className="py-20 bg-white">
             <div className="container-custom">
                 <div className="text-center mb-16">
-                    <span className="text-[#6D28D9] font-bold tracking-wider uppercase text-sm">Global Footprint</span>
+                    <span className="text-[#2563EB] font-bold tracking-wider uppercase text-sm">Global Footprint</span>
                     <h2 className="text-4xl font-bold text-slate-800 mt-2 mb-4">We Serve Global Markets</h2>
                     <p className="text-slate-500 max-w-2xl mx-auto">
                         Delivering world-class software solutions to clients across major tech hubs.

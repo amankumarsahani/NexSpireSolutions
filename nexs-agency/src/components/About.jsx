@@ -36,7 +36,7 @@ const StatNumber = memo(function StatNumber({ stat, isVisible }) {
   const count = useCountUp(isSpecial ? 0 : numericValue, 2000, isVisible)
 
   return (
-    <div className="text-5xl font-bold text-[#D97706] mb-2">
+    <div className="text-5xl font-bold text-[#4F46E5] mb-2">
       {isSpecial ? '24/7' : `${count}${suffix}`}
     </div>
   )
@@ -115,17 +115,17 @@ const About = memo(function About() {
   }, [])
 
   return (
-    <section id="about" className="relative py-20 bg-[#FFF8F0] overflow-hidden">
+    <section id="about" className="relative py-20 bg-slate-50 overflow-hidden">
 
       <div className="relative z-10 max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
 
         <div className={`text-left mb-16 transition-all duration-1000 transform ${isVisible ? 'translate-y-0 opacity-100' : 'translate-y-8 opacity-0'
           }`}>
-          <span className="text-sm font-semibold text-[#6D28D9] uppercase tracking-wider">More Than An Agency</span>
+          <span className="text-sm font-semibold text-[#2563EB] uppercase tracking-wider">More Than An Agency</span>
 
           <h2 className="text-4xl md:text-5xl lg:text-6xl font-bold text-slate-800 mb-6 mt-4 leading-tight">
             We Are Your Technical
-            <span className="block text-[#6D28D9] mt-2">
+            <span className="block text-[#2563EB] mt-2">
               Co-Founders & Partners
             </span>
           </h2>
@@ -149,14 +149,14 @@ const About = memo(function About() {
 
               <div className="absolute -bottom-4 -right-4 bg-white rounded-xl p-4 shadow-xl border border-slate-200">
                 <div className="text-center">
-                  <div className="text-2xl font-bold text-[#D97706]">5+</div>
+                  <div className="text-2xl font-bold text-[#4F46E5]">5+</div>
                   <div className="text-xs text-slate-600 font-medium">Years Experience</div>
                 </div>
               </div>
 
               <div className="absolute -top-4 -left-4 bg-white rounded-xl p-4 shadow-xl border border-slate-200">
                 <div className="text-center">
-                  <div className="text-2xl font-bold text-[#D97706]">150+</div>
+                  <div className="text-2xl font-bold text-[#4F46E5]">150+</div>
                   <div className="text-xs text-slate-600 font-medium">Projects Done</div>
                 </div>
               </div>
@@ -180,11 +180,11 @@ const About = memo(function About() {
               </div>
             </div>
 
-            <div className="bg-[#FAF9F6] rounded-xl p-6 border border-slate-200">
+            <div className="bg-[#F8FAFC] rounded-xl p-6 border border-slate-200">
               <div className="grid md:grid-cols-2 gap-6">
                 <div>
                   <h4 className="text-lg font-semibold text-slate-800 mb-2 flex items-center">
-                    <span className="w-2 h-2 bg-[#D97706] rounded-full mr-2"></span>
+                    <span className="w-2 h-2 bg-[#4F46E5] rounded-full mr-2"></span>
                     Our Mission
                   </h4>
                   <p className="text-sm text-slate-600">
@@ -193,7 +193,7 @@ const About = memo(function About() {
                 </div>
                 <div>
                   <h4 className="text-lg font-semibold text-slate-800 mb-2 flex items-center">
-                    <span className="w-2 h-2 bg-[#D97706] rounded-full mr-2"></span>
+                    <span className="w-2 h-2 bg-[#4F46E5] rounded-full mr-2"></span>
                     Our Vision
                   </h4>
                   <p className="text-sm text-slate-600">
@@ -208,9 +208,9 @@ const About = memo(function About() {
         <div className={`mb-24 transition-all duration-1000 delay-500 transform ${isVisible ? 'translate-y-0 opacity-100' : 'translate-y-8 opacity-0'
           }`}>
           <div className="text-left mb-16">
-            <span className="text-sm font-semibold text-[#6D28D9] uppercase tracking-wider">Why Choose Nexspire Solution</span>
+            <span className="text-sm font-semibold text-[#2563EB] uppercase tracking-wider">Why Choose Nexspire Solution</span>
             <h3 className="text-3xl md:text-4xl font-bold text-slate-800 mb-6 mt-4">
-              What Makes Us <span className="text-[#D97706]">Different</span>
+              What Makes Us <span className="text-[#4F46E5]">Different</span>
             </h3>
             <p className="text-lg text-slate-600 max-w-2xl">
               Four core principles that drive our success and your satisfaction
@@ -222,7 +222,7 @@ const About = memo(function About() {
               {features.map((feature, index) => (
                 <div key={index} className="flex items-start gap-6 group">
                   <div className="flex-shrink-0">
-                    <div className="relative w-16 h-16 bg-[#D97706] rounded-xl flex items-center justify-center shadow-lg">
+                    <div className="relative w-16 h-16 bg-[#4F46E5] rounded-xl flex items-center justify-center shadow-lg">
                       <i className={`${feature.icon} text-2xl text-white`}></i>
                     </div>
                   </div>
@@ -246,9 +246,9 @@ const About = memo(function About() {
         <div className={`mb-24 transition-all duration-1000 delay-700 transform ${isVisible ? 'translate-y-0 opacity-100' : 'translate-y-8 opacity-0'
           }`}>
           <div className="text-center mb-16">
-            <span className="text-sm font-semibold text-[#6D28D9] uppercase tracking-wider">Performance Metrics</span>
+            <span className="text-sm font-semibold text-[#2563EB] uppercase tracking-wider">Performance Metrics</span>
             <h3 className="text-3xl md:text-4xl font-bold text-slate-800 mb-6 mt-4 leading-tight tracking-tight">
-              Numbers That Define <span className="text-[#6D28D9]">Excellence</span>
+              Numbers That Define <span className="text-[#2563EB]">Excellence</span>
             </h3>
             <p className="text-xl text-slate-600 max-w-3xl mx-auto leading-relaxed">
               Our achievements speak volumes about our dedication to delivering exceptional results
@@ -261,7 +261,7 @@ const About = memo(function About() {
                 <div className="relative bg-white rounded-2xl p-8 border border-slate-200 shadow-lg hover:shadow-xl hover:-translate-y-1 transition-all duration-300">
                   <div className="text-center mb-6">
                     <div className="relative w-16 h-16 mx-auto mb-4">
-                      <div className="w-full h-full rounded-2xl bg-[#D97706] flex items-center justify-center shadow-lg">
+                      <div className="w-full h-full rounded-2xl bg-[#4F46E5] flex items-center justify-center shadow-lg">
                         <i className={`${stat.icon} text-3xl text-white`}></i>
                       </div>
                     </div>
@@ -269,7 +269,7 @@ const About = memo(function About() {
 
                   <div className="text-center mb-4">
                     <StatNumber stat={stat} isVisible={statsVisible} />
-                    <div className="h-1 w-16 mx-auto rounded-full bg-[#D97706]"></div>
+                    <div className="h-1 w-16 mx-auto rounded-full bg-[#4F46E5]"></div>
                   </div>
 
                   <div className="text-center">

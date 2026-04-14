@@ -61,7 +61,7 @@ const Testimonials = memo(function Testimonials() {
   }
 
   return (
-    <section id="testimonials" className="py-20 bg-[#FFF5F5]">
+    <section id="testimonials" className="py-20 bg-blue-50">
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
         <div className="text-center mb-16">
           <h2 className="text-4xl font-bold text-slate-800 mb-4">
@@ -99,7 +99,7 @@ const Testimonials = memo(function Testimonials() {
                 <div className="font-semibold text-slate-800 text-lg">
                   {testimonials[currentTestimonial].name}
                 </div>
-                <div className="text-[#E11D48] mb-1">{testimonials[currentTestimonial].position}</div>
+                <div className="text-[#7C3AED] mb-1">{testimonials[currentTestimonial].position}</div>
                 <div className="text-slate-500 text-sm">
                   Project: {testimonials[currentTestimonial].project}
                 </div>
@@ -111,14 +111,14 @@ const Testimonials = memo(function Testimonials() {
           <button
             onClick={prevTestimonial}
             aria-label="Previous testimonial"
-            className="hidden md:flex absolute -left-6 top-1/2 transform -translate-y-1/2 w-12 h-12 items-center justify-center bg-white rounded-full shadow-lg hover:bg-[#FAF9F6] transition-colors cursor-pointer"
+            className="hidden md:flex absolute -left-6 top-1/2 transform -translate-y-1/2 w-12 h-12 items-center justify-center bg-white rounded-full shadow-lg hover:bg-[#F8FAFC] transition-colors cursor-pointer"
           >
             <i className="ri-arrow-left-s-line text-slate-600 text-xl"></i>
           </button>
           <button
             onClick={nextTestimonial}
             aria-label="Next testimonial"
-            className="hidden md:flex absolute -right-6 top-1/2 transform -translate-y-1/2 w-12 h-12 items-center justify-center bg-white rounded-full shadow-lg hover:bg-[#FAF9F6] transition-colors cursor-pointer"
+            className="hidden md:flex absolute -right-6 top-1/2 transform -translate-y-1/2 w-12 h-12 items-center justify-center bg-white rounded-full shadow-lg hover:bg-[#F8FAFC] transition-colors cursor-pointer"
           >
             <i className="ri-arrow-right-s-line text-slate-600 text-xl"></i>
           </button>
@@ -129,14 +129,14 @@ const Testimonials = memo(function Testimonials() {
           <button
             onClick={prevTestimonial}
             aria-label="Previous testimonial"
-            className="w-10 h-10 flex items-center justify-center bg-white rounded-full shadow-lg hover:bg-[#FAF9F6] transition-colors cursor-pointer"
+            className="w-10 h-10 flex items-center justify-center bg-white rounded-full shadow-lg hover:bg-[#F8FAFC] transition-colors cursor-pointer"
           >
             <i className="ri-arrow-left-s-line text-slate-600 text-lg"></i>
           </button>
           <button
             onClick={nextTestimonial}
             aria-label="Next testimonial"
-            className="w-10 h-10 flex items-center justify-center bg-white rounded-full shadow-lg hover:bg-[#FAF9F6] transition-colors cursor-pointer"
+            className="w-10 h-10 flex items-center justify-center bg-white rounded-full shadow-lg hover:bg-[#F8FAFC] transition-colors cursor-pointer"
           >
             <i className="ri-arrow-right-s-line text-slate-600 text-lg"></i>
           </button>
@@ -151,7 +151,7 @@ const Testimonials = memo(function Testimonials() {
               aria-current={currentTestimonial === index}
               className="w-8 h-8 flex items-center justify-center cursor-pointer"
             >
-              <span className={`w-3 h-3 rounded-full transition-colors ${currentTestimonial === index ? 'bg-[#E11D48]' : 'bg-slate-300'}`} />
+              <span className={`w-3 h-3 rounded-full transition-colors ${currentTestimonial === index ? 'bg-[#7C3AED]' : 'bg-slate-300'}`} />
             </button>
           ))}
         </div>

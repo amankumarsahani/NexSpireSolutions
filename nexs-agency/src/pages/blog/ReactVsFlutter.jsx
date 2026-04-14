@@ -103,7 +103,7 @@ const ReactVsFlutter = () => {
                         <li><strong>Flutter:</strong> Uses bespoke widgets. You can make pixel-perfect designs that look exactly the same on both platforms. Great for strong brand identity.</li>
                     </ul>
 
-                    <div className="bg-[#FAF9F6] border-l-4 border-purple-600 p-8 my-8 rounded-r-xl">
+                    <div className="bg-[#F8FAFC] border-l-4 border-purple-600 p-8 my-8 rounded-r-xl">
                         <h4 className="text-xl font-bold text-purple-900 mb-2">Unsure which to pick?</h4>
                         <p className="text-purple-800 mb-0">
                             Our mobile architects can assess your specific needs. <Link to="/services/mobile-app-development" className="underline font-bold">Book a technical consultation</Link>.
@@ -118,7 +118,7 @@ const ReactVsFlutter = () => {
                     <h2>Verdict: Which one for 2026?</h2>
 
                     <div className="grid md:grid-cols-2 gap-6 my-8">
-                        <div className="p-6 bg-[#FAF9F6] rounded-xl">
+                        <div className="p-6 bg-[#F8FAFC] rounded-xl">
                             <h4 className="font-bold text-blue-800 mb-2">Choose React Native if:</h4>
                             <ul className="text-sm list-disc pl-4 text-blue-900">
                                 <li>You already have a web team (React).</li>
@@ -143,7 +143,7 @@ const ReactVsFlutter = () => {
             </article>
 
             {/* Internal Linking to Services */}
-            <div className="bg-[#FAF9F6] py-16">
+            <div className="bg-[#F8FAFC] py-16">
                 <div className="container-custom">
                     <h2 className="text-3xl font-bold text-center mb-12">Build Your Next App</h2>
                     <RelatedServices currentService="Mobile App Development" />

@@ -6,7 +6,7 @@ const data = {
     hero: {
         h1Line1: 'Intelligence,',
         h1Line2: 'Integrated.',
-        gradient: 'from-[#6D28D9] to-[#5B21B6]',
+        gradient: 'from-[#2563EB] to-[#1D4ED8]',
         paragraph: 'Transform your business with next-gen AI. From automating workflows to predicting market trends, we build intelligent systems that drive value.',
         ctaText: 'Consult AI Expert',
         bgImage: 'https://images.unsplash.com/photo-1620712943543-bcc4688e7485',
