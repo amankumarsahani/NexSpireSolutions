@@ -1,7 +1,7 @@
 import { Suspense } from 'react';
 import { Outlet, useLocation } from 'react-router-dom';
 // eslint-disable-next-line no-unused-vars
-import { motion, AnimatePresence } from 'framer-motion';
+import { motion } from 'framer-motion';
 import Header from './Header';
 import Footer from './Footer';
 import EnquiryPopup from './EnquiryPopup';
@@ -16,17 +16,14 @@ const PublicLayout = () => {
             <Header />
             <main id="main-content">
                 <Suspense fallback={<PageLoader />}>
-                    <AnimatePresence mode="wait">
-                        <motion.div
-                            key={location.pathname}
-                            initial={{ opacity: 0, y: 10 }}
-                            animate={{ opacity: 1, y: 0 }}
-                            exit={{ opacity: 0, y: -10 }}
-                            transition={{ duration: 0.3, ease: [0.25, 0.46, 0.45, 0.94] }}
-                        >
-                            <Outlet />
-                        </motion.div>
-                    </AnimatePresence>
+                    <motion.div
+                        key={location.pathname}
+                        initial={{ opacity: 0 }}
+                        animate={{ opacity: 1 }}
+                        transition={{ duration: 0.2, ease: 'easeOut' }}
+                    >
+                        <Outlet />
+                    </motion.div>
                 </Suspense>
             </main>
             <Footer />
