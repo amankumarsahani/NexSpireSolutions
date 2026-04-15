@@ -1,300 +1,225 @@
-import { useState } from 'react';
+import { useState, useMemo } from 'react';
 import { Link } from 'react-router-dom';
 import { Helmet } from 'react-helmet-async';
 // eslint-disable-next-line no-unused-vars
-import { motion, AnimatePresence } from 'framer-motion';
-import { cn } from '../utils/cn';
+import { motion } from 'framer-motion';
 import Breadcrumbs from '../components/ui/Breadcrumbs';
 import BackToTop from '../components/ui/BackToTop';
 import ReadingProgress from '../components/ui/ReadingProgress';
 import { SITE_URL } from '../constants/siteConfig';
 
-const FadeIn = ({ children, className, delay = 0 }) => {
-    return (
-        <motion.div
-            initial={{ opacity: 0, y: 20 }}
-            whileInView={{ opacity: 1, y: 0 }}
-            viewport={{ once: true, margin: "-50px" }}
-            transition={{ duration: 0.7, delay, ease: [0.21, 0.47, 0.32, 0.98] }}
-            className={className}
-        >
-            {children}
-        </motion.div>
-    );
-};
+const FadeIn = ({ children, className, delay = 0 }) => (
+    <motion.div
+        initial={{ opacity: 0, y: 16 }}
+        whileInView={{ opacity: 1, y: 0 }}
+        viewport={{ once: true, margin: "-50px" }}
+        transition={{ duration: 0.5, delay, ease: "easeOut" }}
+        className={className}
+    >
+        {children}
+    </motion.div>
+);
 
-const ProjectCard = ({ project }) => {
-    return (
-        <Link to={`/portfolio/${project.title.toLowerCase().replace(/[^a-z0-9]+/g, '-')}`} className="block h-full">
-            <motion.div
-                layout
-                initial={{ opacity: 0, scale: 0.9 }}
-                animate={{ opacity: 1, scale: 1 }}
-                exit={{ opacity: 0, scale: 0.9 }}
-                transition={{ duration: 0.5 }}
-                className={cn(
-                    "group relative rounded-[2rem] overflow-hidden cursor-pointer h-full",
-                    project.size === 'large' ? 'md:col-span-2 md:row-span-2' :
-                        project.size === 'wide' ? 'md:col-span-2' :
-                            'md:col-span-1'
-                )}
-            >
-                <div className="absolute inset-0 bg-slate-900/30 group-hover:bg-slate-900/60 transition-colors duration-500 z-10" />
-                <img
-                    src={project.image}
-                    alt={project.title}
-                    loading="lazy"
-                    className="w-full h-full object-cover transform group- transition-transform duration-700 ease-out"
-                />
+const projects = [
+    {
+        id: 1,
+        title: "E-commerce Platform",
+        slug: "e-commerce-platform-us-retailer",
+        category: "Web",
+        image: "https://images.unsplash.com/photo-1563986768609-322da13575f3?w=1200&q=80&fm=webp",
+        description: "Custom Magento store with UX redesign for a US-based retailer.",
+        tags: ["Magento", "UX/UI", "E-commerce"]
+    },
+    {
+        id: 2,
+        title: "HealthTech Mobile App",
+        slug: "healthtech-mobile-app-uk",
+        category: "Mobile",
+        image: "https://images.unsplash.com/photo-1576091160399-112ba8d25d1d?w=800&q=80&fm=webp",
+        description: "Flutter-based patient engagement app with real-time analytics.",
+        tags: ["Flutter", "Healthcare", "Analytics"]
+    },
+    {
+        id: 3,
+        title: "AI-Powered CRM",
+        slug: "ai-powered-crm-australia",
+        category: "Dashboard",
+        image: "https://images.unsplash.com/photo-1551288049-bebda4e38f71?w=800&q=80&fm=webp",
+        description: "Custom CRM with predictive lead scoring and automated workflows.",
+        tags: ["AI/ML", "Python", "React"]
+    },
+    {
+        id: 4,
+        title: "Urban Pulse",
+        slug: "urban-pulse",
+        category: "Mobile",
+        image: "https://images.unsplash.com/photo-1480714378408-67cf0d13bc1b?w=1200&q=80&fm=webp",
+        description: "City guide app with augmented reality navigation and social features.",
+        tags: ["Flutter", "ARKit", "Firebase"]
+    },
+    {
+        id: 5,
+        title: "Crypto Exchange",
+        slug: "crypto-exchange",
+        category: "Web",
+        image: "https://images.unsplash.com/photo-1621761191319-c6fb62004040?w=800&q=80&fm=webp",
+        description: "Secure cryptocurrency trading platform with advanced charting.",
+        tags: ["Vue.js", "WebSockets", "Go"]
+    },
+    {
+        id: 6,
+        title: "EcoEnergy Dashboard",
+        slug: "ecoenergy",
+        category: "Dashboard",
+        image: "https://images.unsplash.com/photo-1473341304170-971dccb5ac1e?w=800&q=80&fm=webp",
+        description: "Smart home energy monitoring dashboard for sustainable living.",
+        tags: ["React", "IoT", "AWS"]
+    }
+];
 
-                {/* Metrics Badge */}
-                {project.metric && (
-                    <div className="absolute top-4 right-4 z-30">
-                        <div className="px-4 py-2 bg-green-500 text-white rounded-full text-sm font-bold shadow-lg flex items-center gap-2">
-                            <i className="ri-arrow-up-line"></i>
-                            {project.metric}
-                        </div>
-                    </div>
-                )}
-
-                <div className="absolute inset-0 bg-gradient-to-t from-black/90 via-black/40 to-transparent z-20 flex flex-col justify-end p-8">
-                    <div className="transform translate-y-2 group-hover:translate-y-0 transition-transform duration-500">
-                        <div className="flex flex-wrap gap-2 mb-3">
-                            {project.tags.map((tag, i) => (
-                                <span key={i} className="px-3 py-1 bg-white/10 backdrop-blur-md border border-white/20 rounded-full text-xs font-medium text-white">
-                                    {tag}
-                                </span>
-                            ))}
-                        </div>
-                        <h3 className="text-2xl md:text-3xl font-bold text-white mb-2">{project.title}</h3>
-                        <p className="text-gray-300 line-clamp-2 mb-4 opacity-0 group-hover:opacity-100 transition-opacity duration-500 delay-100">
-                            {project.description}
-                        </p>
-
-                        {/* View Case Study Button */}
-                        <div className="opacity-0 group-hover:opacity-100 transition-opacity duration-300 delay-200">
-                            <span className="inline-flex items-center gap-2 px-5 py-2.5 bg-white text-slate-800 rounded-full text-sm font-bold hover:bg-[#2563EB] hover:text-white transition-colors">
-                                View Case Study
-                                <i className="ri-arrow-right-line"></i>
-                            </span>
-                        </div>
-                    </div>
-                </div>
-            </motion.div>
-        </Link>
-    );
-};
+const filters = ["All", "Web", "Mobile", "Dashboard"];
 
 const PortfolioPage = () => {
-
     const [activeFilter, setActiveFilter] = useState('All');
 
-    const projects = [
-        {
-            id: 1,
-            title: "E-commerce Platform (US Retailer)",
-            category: "Web Platform",
-            image: "https://images.unsplash.com/photo-1563986768609-322da13575f3?w=1200&q=80&fm=webp",
-            size: "large",
-            description: "Custom Magento store with UX redesign resulting in a 45% increase in sales.",
-            metric: "45% Sales ↑",
-            tags: ["Magento", "UX/UI Design", "E-commerce"]
-        },
-        {
-            id: 2,
-            title: "HealthTech Mobile App (UK)",
-            category: "Mobile App",
-            image: "https://images.unsplash.com/photo-1576091160399-112ba8d25d1d?w=800&q=80&fm=webp",
-            size: "small",
-            description: "Flutter-based app with real-time analytics achieving 50k downloads in 2 months.",
-            metric: "50K Downloads",
-            tags: ["Flutter", "Healthcare", "Analytics"]
-        },
-        {
-            id: 3,
-            title: "AI-Powered CRM (Australia)",
-            category: "Dashboard",
-            image: "https://images.unsplash.com/photo-1551288049-bebda4e38f71?w=800&q=80&fm=webp",
-            size: "small",
-            description: "Custom CRM with AI predictions increasing sales efficiency by 30%.",
-            metric: "30% Efficiency ↑",
-            tags: ["AI/ML", "Python", "React"]
-        },
-        {
-            id: 4,
-            title: "Urban Pulse",
-            category: "Mobile App",
-            image: "https://images.unsplash.com/photo-1480714378408-67cf0d13bc1b?w=1200&q=80&fm=webp",
-            size: "wide",
-            description: "City guide app with augmented reality navigation and social features.",
-            metric: "4.8★ Rating",
-            tags: ["Flutter", "ARKit", "Firebase"]
-        },
-        {
-            id: 5,
-            title: "Crypto Exchange",
-            category: "Web Platform",
-            image: "https://images.unsplash.com/photo-1621761191319-c6fb62004040?w=800&q=80&fm=webp",
-            size: "small",
-            description: "Secure and fast cryptocurrency trading platform with advanced charting.",
-            metric: "$2M+ Volume",
-            tags: ["Vue.js", "WebSockets", "Go"]
-        },
-        {
-            id: 6,
-            title: "EcoEnergy",
-            category: "Dashboard",
-            image: "https://images.unsplash.com/photo-1473341304170-971dccb5ac1e?w=800&q=80&fm=webp",
-            size: "small",
-            description: "Smart home energy monitoring dashboard for sustainable living.",
-            metric: "20% Energy Saved",
-            tags: ["React", "IoT", "AWS"]
-        }
-    ];
-
-    const filters = ["All", "Web Platform", "Mobile App", "Dashboard"];
-
-    const filteredProjects = activeFilter === 'All'
-        ? projects
-        : projects.filter(p => p.category === activeFilter);
-
-    // Stats
-    const stats = [
-        { value: '150+', label: 'Projects Completed' },
-        { value: '95%', label: 'Client Satisfaction' },
-        { value: '12+', label: 'Countries Served' },
-        { value: '5+', label: 'Years Experience' }
-    ];
+    const filteredProjects = useMemo(
+        () => activeFilter === 'All' ? projects : projects.filter(p => p.category === activeFilter),
+        [activeFilter]
+    );
 
     return (
-        <div className="min-h-screen bg-white font-sans text-slate-800 selection:bg-blue-600 selection:text-white">
+        <div className="min-h-screen bg-[#F8FAFC] font-sans text-slate-800 selection:bg-blue-600 selection:text-white">
             <Helmet>
                 <title>Portfolio - Custom Software Case Studies | Nexspire Solutions</title>
-                <meta name="description" content="Explore our portfolio of successful projects including E-commerce platforms, HealthTech apps, and AI-Powered CRM systems. See how Nexspire Solutions delivers measurable results for global clients." />
-                <meta name="keywords" content="software portfolio, case studies, web development projects, mobile app examples, AI CRM case study, healthtech app development, e-commerce success stories, nexspire portfolio" />
+                <meta name="description" content="Explore our portfolio of successful projects including E-commerce platforms, HealthTech apps, and AI-Powered CRM systems." />
                 <link rel="canonical" href={`${SITE_URL}/portfolio`} />
                 <meta property="og:title" content="Portfolio - Custom Software Case Studies | Nexspire Solutions" />
-                <meta property="og:description" content="See how we've helped businesses worldwide with custom E-commerce, Mobile, and AI solutions." />
+                <meta property="og:description" content="See how we've helped businesses worldwide with custom software solutions." />
                 <meta property="og:type" content="website" />
                 <meta property="og:url" content={`${SITE_URL}/portfolio`} />
                 <meta property="og:image" content={`${SITE_URL}/og-image.jpg`} />
                 <meta name="twitter:card" content="summary_large_image" />
                 <meta name="twitter:title" content="Portfolio - Custom Software Case Studies | Nexspire Solutions" />
-                <meta name="twitter:description" content="See how we've helped businesses worldwide with custom E-commerce, Mobile, and AI solutions." />
+                <meta name="twitter:description" content="See how we've helped businesses worldwide with custom software solutions." />
                 <script type="application/ld+json">{JSON.stringify({
                     "@context": "https://schema.org",
                     "@type": "ItemList",
                     "name": "Nexspire Solutions Portfolio",
                     "url": `${SITE_URL}/portfolio`,
-                    "description": "Explore our portfolio of successful projects including E-commerce platforms, HealthTech apps, and AI-Powered CRM systems.",
-                    "numberOfItems": 6,
-                    "itemListElement": [
-                        { "@type": "ListItem", "position": 1, "name": "E-commerce Platform (US Retailer)" },
-                        { "@type": "ListItem", "position": 2, "name": "HealthTech Mobile App (UK)" },
-                        { "@type": "ListItem", "position": 3, "name": "AI-Powered CRM (Australia)" },
-                        { "@type": "ListItem", "position": 4, "name": "Urban Pulse" },
-                        { "@type": "ListItem", "position": 5, "name": "Crypto Exchange" },
-                        { "@type": "ListItem", "position": 6, "name": "EcoEnergy" }
-                    ]
+                    "numberOfItems": projects.length,
+                    "itemListElement": projects.map((p, i) => ({
+                        "@type": "ListItem",
+                        "position": i + 1,
+                        "name": p.title
+                    }))
                 })}</script>
             </Helmet>
 
-            {/* Scroll Progress Bar */}
             <ReadingProgress />
 
-            {/* Hero Section */}
-            <section className="relative min-h-[85vh] flex items-center pt-20 overflow-hidden bg-gray-950 text-white">
-                <div className="absolute inset-0 bg-[url('https://grainy-gradients.vercel.app/noise.svg')] opacity-20"></div>
-                <div className="absolute inset-0 bg-[url('https://images.unsplash.com/photo-1558655146-d09347e92766?q=80&w=2070&auto=format&fit=crop&fm=webp')] bg-cover bg-center opacity-30 mix-blend-soft-light"></div>
-                <div className="absolute top-0 right-0 w-2/3 h-full bg-gradient-to-l from-slate-900/30 to-transparent"></div>
-
-                <div className="container-custom relative z-10">
+            {/* Hero */}
+            <section className="pt-32 pb-16 lg:pt-40 lg:pb-20 bg-white">
+                <div className="container-custom">
+                    <Breadcrumbs />
                     <FadeIn>
-                        <span className="inline-block py-2 px-4 rounded-full bg-white/10 border border-white/10 backdrop-blur-md text-sm font-medium mb-6">
-                            Selected Works 2023-2024
-                        </span>
-                        <h1 className="text-6xl md:text-8xl font-bold tracking-tighter leading-tight mb-8">
-                            We Create <br />
-                            <span className="text-[#D97706]">Digital Legacies.</span>
+                        <h1 className="font-serif text-5xl lg:text-6xl text-slate-900 tracking-tight mt-8 mb-6">
+                            Our Work
                         </h1>
-                        <p className="text-xl text-slate-400 max-w-2xl mb-8">
-                            Real results for real businesses. Explore our portfolio of successful projects across web, mobile, and AI.
+                    </FadeIn>
+                    <FadeIn delay={0.1}>
+                        <p className="text-lg lg:text-xl text-slate-500 max-w-2xl leading-relaxed">
+                            A selection of projects we&apos;ve shipped. Each one started with a conversation
+                            and ended with measurable results.
                         </p>
                     </FadeIn>
                 </div>
             </section>
 
-            {/* Stats Bar */}
-            <section className="relative -mt-16 z-30 px-6 mb-12">
+            {/* Filter + Grid */}
+            <section className="py-24 lg:py-32">
                 <div className="container-custom">
-                    <div className="bg-white rounded-2xl shadow-xl p-8 border border-slate-200 grid grid-cols-2 md:grid-cols-4 gap-8">
-                        {stats.map((stat, i) => (
-                            <div key={i} className="text-center">
-                                <div className="text-3xl md:text-4xl font-bold text-slate-800 mb-1">{stat.value}</div>
-                                <div className="text-sm text-slate-500 font-medium">{stat.label}</div>
-                            </div>
-                        ))}
-                    </div>
-                </div>
-            </section>
-
-            {/* Filter & Grid */}
-            <section className="py-10 bg-[#F8FAFC] min-h-screen">
-                <div className="container-custom">
-                    {/* Breadcrumbs */}
-                    <div className="mb-8">
-                        <Breadcrumbs />
-                    </div>
-
                     {/* Filters */}
-                    <div className="flex flex-wrap gap-4 mb-16 justify-center md:justify-start">
-                        {filters.map(filter => (
-                            <button
-                                key={filter}
-                                onClick={() => setActiveFilter(filter)}
-                                className={cn(
-                                    "px-6 py-3 rounded-full text-sm font-bold transition-all duration-300",
-                                    activeFilter === filter
-                                        ? "bg-slate-900 text-white shadow-lg scale-105"
-                                        : "bg-white text-slate-600 hover:bg-gray-100 border border-slate-200"
-                                )}
-                            >
-                                {filter}
-                            </button>
-                        ))}
-                    </div>
-
-                    {/* Masonry Grid */}
-                    <motion.div
-                        layout
-                        className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8 auto-rows-[400px]"
-                    >
-                        <AnimatePresence mode="popLayout">
-                            {filteredProjects.map((project, index) => (
-                                <ProjectCard key={project.id} project={project} index={index} />
+                    <FadeIn>
+                        <div className="flex flex-wrap gap-3 mb-16">
+                            {filters.map(filter => (
+                                <button
+                                    key={filter}
+                                    onClick={() => setActiveFilter(filter)}
+                                    className={`px-5 py-2 rounded-full text-sm font-medium transition-colors duration-200 ${
+                                        activeFilter === filter
+                                            ? 'bg-[#2563EB] text-white'
+                                            : 'bg-slate-100 text-slate-600 hover:bg-slate-200'
+                                    }`}
+                                >
+                                    {filter}
+                                </button>
                             ))}
-                        </AnimatePresence>
-                    </motion.div>
+                        </div>
+                    </FadeIn>
+
+                    {/* Asymmetric Grid */}
+                    <div className="grid grid-cols-1 md:grid-cols-12 gap-6 lg:gap-8">
+                        {filteredProjects.map((project, index) => {
+                            // Alternating layout: large-small / small-large
+                            const isEvenPair = Math.floor(index / 2) % 2 === 0;
+                            const isFirst = index % 2 === 0;
+                            const span = (isEvenPair && isFirst) || (!isEvenPair && !isFirst)
+                                ? 'md:col-span-7' : 'md:col-span-5';
+
+                            return (
+                                <FadeIn key={project.id} className={span} delay={index * 0.05}>
+                                    <Link to={`/portfolio/${project.slug}`} className="block group">
+                                        <div className="overflow-hidden rounded-xl">
+                                            <img
+                                                src={project.image}
+                                                alt={project.title}
+                                                loading="lazy"
+                                                className="w-full aspect-[4/3] object-cover transition-transform duration-500 group-hover:scale-[1.03]"
+                                            />
+                                        </div>
+                                        <div className="mt-4">
+                                            <h3 className="font-serif text-xl text-slate-900 group-hover:text-[#2563EB] transition-colors duration-200">
+                                                {project.title}
+                                            </h3>
+                                            <p className="text-slate-500 text-sm mt-1 leading-relaxed">
+                                                {project.description}
+                                            </p>
+                                            <div className="flex flex-wrap gap-2 mt-3">
+                                                {project.tags.map(tag => (
+                                                    <span key={tag} className="px-2.5 py-1 bg-slate-100 text-slate-500 rounded text-xs">
+                                                        {tag}
+                                                    </span>
+                                                ))}
+                                            </div>
+                                        </div>
+                                    </Link>
+                                </FadeIn>
+                            );
+                        })}
+                    </div>
                 </div>
             </section>
 
-            {/* CTA Section */}
-            <section className="py-32 bg-white text-center relative overflow-hidden">
-                <div className="container-custom relative z-10">
+            {/* CTA */}
+            <section className="py-24 lg:py-32 border-t border-slate-200">
+                <div className="container-custom text-center">
                     <FadeIn>
-                        <h2 className="text-5xl md:text-7xl font-bold mb-8 tracking-tighter">Have a vision?</h2>
-                        <p className="text-xl text-slate-500 mb-12 max-w-2xl mx-auto">
-                            Let's collaborate to turn your boldest ideas into reality. We are ready when you are.
+                        <p className="font-serif text-3xl lg:text-4xl text-slate-900 mb-8">
+                            Have a project in mind?
                         </p>
-                        <Link to="/contact" className="inline-flex items-center gap-4 px-12 py-6 bg-slate-900 text-white rounded-full text-xl font-bold hover:bg-[#2563EB] transition-all duration-300 group shadow-2xl">
-                            Start a Project
-                            <i className="ri-arrow-right-line group-hover:translate-x-2 transition-transform"></i>
+                        <Link
+                            to="/contact"
+                            className="inline-flex items-center gap-2 text-[#2563EB] font-medium text-lg hover:text-[#1D4ED8] transition-colors duration-200"
+                        >
+                            Let&apos;s talk
+                            <svg className="w-5 h-5" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2}>
+                                <path strokeLinecap="round" strokeLinejoin="round" d="M17 8l4 4m0 0l-4 4m4-4H3" />
+                            </svg>
                         </Link>
                     </FadeIn>
                 </div>
             </section>
 
-            {/* Back to Top */}
             <BackToTop />
         </div>
     );
