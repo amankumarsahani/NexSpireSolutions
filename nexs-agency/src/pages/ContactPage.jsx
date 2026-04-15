@@ -1,48 +1,38 @@
-// TODO: Replace console.error with Sentry or proper error tracking
 import { useState } from 'react';
 import { Helmet } from 'react-helmet-async';
 // eslint-disable-next-line no-unused-vars
 import { motion, AnimatePresence } from 'framer-motion';
-import confetti from 'canvas-confetti';
 import { inquiryAPI } from '../services/api';
+import Breadcrumbs from '../components/ui/Breadcrumbs';
+import BackToTop from '../components/ui/BackToTop';
 import ReadingProgress from '../components/ui/ReadingProgress';
-import { SITE_URL } from '../constants/siteConfig';
+import { SITE_URL, siteConfig } from '../constants/siteConfig';
 
-const FadeIn = ({ children, className, delay = 0 }) => {
-    return (
-        <motion.div
-            initial={{ opacity: 0, y: 20 }}
-            whileInView={{ opacity: 1, y: 0 }}
-            viewport={{ once: true, margin: "-50px" }}
-            transition={{ duration: 0.7, delay, ease: [0.21, 0.47, 0.32, 0.98] }}
-            className={className}
-        >
-            {children}
-        </motion.div>
-    );
-};
+const FadeIn = ({ children, className, delay = 0 }) => (
+    <motion.div
+        initial={{ opacity: 0, y: 16 }}
+        whileInView={{ opacity: 1, y: 0 }}
+        viewport={{ once: true, margin: "-50px" }}
+        transition={{ duration: 0.5, delay, ease: "easeOut" }}
+        className={className}
+    >
+        {children}
+    </motion.div>
+);
 
 const ContactPage = () => {
-
-
     const [formState, setFormState] = useState({
         name: '',
         email: '',
-        phone: '',
-        company: '',
         message: ''
     });
-
     const [isSubmitting, setIsSubmitting] = useState(false);
     const [isSuccess, setIsSuccess] = useState(false);
     const [error, setError] = useState('');
 
     const handleChange = (e) => {
-        setFormState({
-            ...formState,
-            [e.target.name]: e.target.value
-        });
-        setError(''); // Clear error on input change
+        setFormState({ ...formState, [e.target.name]: e.target.value });
+        setError('');
     };
 
     const handleSubmit = async (e) => {
@@ -51,54 +41,31 @@ const ContactPage = () => {
         setError('');
 
         try {
-            // Submit form data directly (fields now match backend API)
             await inquiryAPI.submit(formState);
-
             setIsSubmitting(false);
             setIsSuccess(true);
-            confetti({
-                particleCount: 150,
-                spread: 70,
-                origin: { y: 0.6 },
-                colors: ['#3B82F6', '#8B5CF6', '#10B981']
-            });
         } catch (err) {
+            // TODO: Replace with Sentry or proper error tracking
             console.error('Form submission error:', err);
             setIsSubmitting(false);
             setError(err.response?.data?.error || 'Failed to send message. Please try again.');
         }
     };
 
-    const faqs = [
-        {
-            question: "Are you accepting new projects?",
-            answer: "Yes, we are currently accepting new projects for Q2 and Q3. Reach out to secure your spot."
-        },
-        {
-            question: "Do you work with startups?",
-            answer: "Absolutely. We love helping startups build their MVPs and scale their products."
-        },
-        {
-            question: "What is your hourly rate?",
-            answer: "We typically work on a project-based pricing model to ensure transparency and predictable costs."
-        }
-    ];
-
     return (
-        <div className="min-h-screen bg-white font-sans text-slate-800 selection:bg-blue-600 selection:text-white overflow-hidden">
+        <div className="min-h-screen bg-[#F8FAFC] font-sans text-slate-800 selection:bg-blue-600 selection:text-white">
             <Helmet>
-                <title>Contact Nexspire - Hire Experts in Mohali, London, NYC & Dubai</title>
-                <meta name="description" content="Ready to innovate? Contact Nexspire Solutions. We have a physical presence in Mohali (India) and serve clients globally in London, New York, Dubai, Toronto, and Sydney. Hire top-tier software developers today." />
-                <meta name="keywords" content="contact software company, hire developers mohali, software agency london, tech partners new york, dubai software company, freelance experts india, global software team" />
+                <title>Contact Us | Nexspire Solutions</title>
+                <meta name="description" content="Get in touch with Nexspire Solutions. We're based in Mohali, India and work with clients globally." />
                 <link rel="canonical" href={`${SITE_URL}/contact`} />
-                <meta property="og:title" content="Contact Nexspire - Global Reach, Local Presence" />
-                <meta property="og:description" content="Connect with our global team. Offices in Mohali, serving the world." />
+                <meta property="og:title" content="Contact Us | Nexspire Solutions" />
+                <meta property="og:description" content="Get in touch with Nexspire Solutions. We're based in Mohali, India and work with clients globally." />
                 <meta property="og:type" content="website" />
                 <meta property="og:url" content={`${SITE_URL}/contact`} />
                 <meta property="og:image" content={`${SITE_URL}/og-image.jpg`} />
                 <meta name="twitter:card" content="summary_large_image" />
-                <meta name="twitter:title" content="Contact Nexspire - Global Reach, Local Presence" />
-                <meta name="twitter:description" content="Connect with our global team. Offices in Mohali, serving the world." />
+                <meta name="twitter:title" content="Contact Us | Nexspire Solutions" />
+                <meta name="twitter:description" content="Get in touch. We're based in Mohali, India and work with clients globally." />
                 <script type="application/ld+json">{JSON.stringify({
                     "@context": "https://schema.org",
                     "@type": "LocalBusiness",
@@ -106,7 +73,6 @@ const ContactPage = () => {
                     "url": SITE_URL,
                     "email": "nexspiretechsolutions@gmail.com",
                     "telephone": "+919729916844",
-                    "image": `${SITE_URL}/og-image.jpg`,
                     "address": {
                         "@type": "PostalAddress",
                         "addressLocality": "Mohali",
@@ -116,166 +82,63 @@ const ContactPage = () => {
                 })}</script>
             </Helmet>
 
-            {/* Scroll Progress Bar */}
             <ReadingProgress />
 
-            {/* Hero Section - 3D Gradient Mesh Style */}
-            <section className="relative min-h-[85vh] flex items-center pt-20 pb-32 overflow-hidden bg-gray-950 text-white">
-                {/* CSS-based Animated Background */}
-                <div className="absolute inset-0 z-0">
-                    <div className="absolute inset-0 bg-slate-900"></div>
-                    <motion.div
-                        animate={{
-                            scale: [1, 1.2, 1],
-                            rotate: [0, 180, 360],
-                            opacity: [0.3, 0.5, 0.3]
-                        }}
-                        transition={{ duration: 20, repeat: Infinity, ease: "linear" }}
-                        className="absolute top-[-20%] right-[-10%] w-[800px] h-[800px] bg-blue-600/20 rounded-full blur-[120px]"
-                    />
-                    <motion.div
-                        animate={{
-                            scale: [1, 1.3, 1],
-                            rotate: [360, 180, 0],
-                            opacity: [0.3, 0.5, 0.3]
-                        }}
-                        transition={{ duration: 25, repeat: Infinity, ease: "linear" }}
-                        className="absolute bottom-[-20%] left-[-10%] w-[600px] h-[600px] bg-purple-600/20 rounded-full blur-[100px]"
-                    />
-                    <div className="absolute inset-0 bg-[url('https://grainy-gradients.vercel.app/noise.svg')] opacity-20 mix-blend-overlay"></div>
-                    <div className="absolute inset-0 bg-[url('https://images.unsplash.com/photo-1423666639041-f142fcb93461?q=80&w=2070&auto=format&fit=crop&fm=webp')] bg-cover bg-center opacity-30 mix-blend-soft-light"></div>
-                </div>
-
-                <div className="container-custom relative z-10 text-center">
-                    <motion.div
-                        initial={{ opacity: 0, y: 30 }}
-                        animate={{ opacity: 1, y: 0 }}
-                        transition={{ duration: 0.8 }}
-                    >
-                        <span className="inline-block py-2 px-6 rounded-full bg-white/5 border border-white/10 backdrop-blur-md text-blue-300 font-medium mb-8">
-                            Global Reach, Local Presence
-                        </span>
-                        <h1 className="text-5xl md:text-7xl font-bold mb-6 tracking-tight">
-                            Let's Build <br />
-                            <span className="text-[#D97706]">Something Great.</span>
+            <section className="pt-32 pb-16 lg:pt-40 lg:pb-20 bg-white">
+                <div className="container-custom">
+                    <Breadcrumbs />
+                    <FadeIn>
+                        <h1 className="font-serif text-5xl lg:text-6xl text-slate-900 tracking-tight mt-8 mb-6">
+                            Get in Touch
                         </h1>
-                        <p className="text-xl text-blue-100/80 max-w-2xl mx-auto">
-                            From Mohali to the World. We build software that empowers businesses everywhere.
+                    </FadeIn>
+                    <FadeIn delay={0.1}>
+                        <p className="text-lg lg:text-xl text-slate-500 max-w-2xl leading-relaxed">
+                            Have a project in mind or just want to say hello? We&apos;d love to hear from you.
                         </p>
-                    </motion.div>
+                    </FadeIn>
                 </div>
             </section>
 
-            <div className="container-custom -mt-20 relative z-20 pb-24">
-                <div className="bg-white rounded-[2.5rem] shadow-2xl overflow-hidden grid lg:grid-cols-2 min-h-[800px] border border-slate-200">
-
-                    {/* Left: Contact Info & Map */}
-                    <div className="relative bg-blue-600 text-white p-12 lg:p-16 flex flex-col justify-between overflow-hidden">
-                        {/* Map Background */}
-                        <div className="absolute inset-0 opacity-30 mix-blend-overlay grayscale contrast-125">
-                            <iframe
-                                src="https://www.google.com/maps/embed?pb=!1m18!1m12!1m3!1d3430.566817389476!2d76.7033!3d30.7046!2m3!1f0!2f0!3f0!3m2!1i1024!2i768!4f13.1!3m3!1m2!1s0x390fee906da6f81f%3A0x512998f16ce508d8!2sSahibzada%20Ajit%20Singh%20Nagar%2C%20Punjab!5e0!3m2!1sen!2sin!4v1625641234567!5m2!1sen!2sin"
-                                width="100%"
-                                height="100%"
-                                style={{ border: 0 }}
-                                allowFullScreen=""
-                                loading="lazy"
-                                title="Office Location"
-                                className="w-full h-full object-cover"
-                            ></iframe>
-                        </div>
-                        <div className="absolute inset-0 bg-slate-900/90 pointer-events-none"></div>
-
-                        <div className="relative z-10">
-                            <h2 className="text-3xl font-bold mb-8">Contact Information</h2>
-                            <div className="space-y-10">
-                                <div className="flex items-start gap-6 group">
-                                    <div className="w-14 h-14 rounded-2xl bg-white/10 backdrop-blur-md flex items-center justify-center text-white group-hover:bg-white group-hover:text-[#2563EB] transition-all duration-300 shadow-lg">
-                                        <i className="ri-mail-send-line text-2xl"></i>
-                                    </div>
-                                    <div>
-                                        <h3 className="font-bold text-xl mb-1">Email Us</h3>
-                                        <p className="text-blue-100 opacity-80">nexspiretechsolutions@gmail.com</p>
-                                    </div>
-                                </div>
-
-                                <div className="flex items-start gap-6 group">
-                                    <div className="w-14 h-14 rounded-2xl bg-white/10 backdrop-blur-md flex items-center justify-center text-white group-hover:bg-white group-hover:text-[#2563EB] transition-all duration-300 shadow-lg">
-                                        <i className="ri-phone-line text-2xl"></i>
-                                    </div>
-                                    <div>
-                                        <h3 className="font-bold text-xl mb-1">Call Us</h3>
-                                        <p className="text-blue-100 opacity-80">+91 9729916844</p>
-                                        <p className="text-blue-100 opacity-80">Mon-Fri, 9am - 6pm IST</p>
-                                    </div>
-                                </div>
-
-                                <div className="flex items-start gap-6 group">
-                                    <div className="w-14 h-14 rounded-2xl bg-white/10 backdrop-blur-md flex items-center justify-center text-white group-hover:bg-white group-hover:text-[#2563EB] transition-all duration-300 shadow-lg">
-                                        <i className="ri-map-pin-line text-2xl"></i>
-                                    </div>
-                                    <div>
-                                        <h3 className="font-bold text-xl mb-1">Visit Us</h3>
-                                        <p className="text-blue-100 opacity-80">Mohali, SAS Nagar</p>
-                                        <p className="text-blue-100 opacity-80">Punjab, India</p>
-                                    </div>
-                                </div>
-                            </div>
-                        </div>
-
-                        <div className="relative z-10 mt-12">
-                            <p className="text-blue-200 mb-6 font-medium">Connect with us</p>
-                            <div className="flex gap-4">
-                                {[
-                                    { icon: 'ri-github-fill', href: 'https://github.com/orgs/Nexspire-Solutions/repositories', label: 'GitHub' },
-                                    { icon: 'ri-linkedin-fill', href: 'https://www.linkedin.com/company/nexspire-solution', label: 'LinkedIn' },
-                                    { icon: 'ri-instagram-fill', href: 'https://www.instagram.com/nexspire_solutions/', label: 'Instagram' }
-                                ].map((social, i) => (
-                                    <a key={i} href={social.href} target="_blank" rel="noopener noreferrer" aria-label={social.label} className="w-12 h-12 rounded-full border border-white/20 flex items-center justify-center hover:bg-white hover:text-blue-900 transition-all transform  hover:shadow-lg backdrop-blur-sm">
-                                        <i className={`${social.icon} text-xl`}></i>
-                                    </a>
-                                ))}
-                            </div>
-                        </div>
-                    </div>
-
-                    {/* Right: Form */}
-                    <div className="p-12 lg:p-16 bg-white flex flex-col justify-center relative">
-                        <AnimatePresence mode="wait">
-                            {isSuccess ? (
-                                <motion.div
-                                    initial={{ opacity: 0, scale: 0.9 }}
-                                    animate={{ opacity: 1, scale: 1 }}
-                                    exit={{ opacity: 0, scale: 0.9 }}
-                                    className="text-center py-20"
-                                >
-                                    <div className="w-24 h-24 bg-green-100 text-green-600 rounded-full flex items-center justify-center mx-auto mb-8 animate-bounce">
-                                        <i className="ri-check-line text-5xl"></i>
-                                    </div>
-                                    <h2 className="text-4xl font-bold text-slate-800 mb-4">Message Sent!</h2>
-                                    <p className="text-xl text-slate-500 mb-12">
-                                        Thanks for reaching out. We'll get back to you within 24 hours.
-                                    </p>
-                                    <button
-                                        onClick={() => setIsSuccess(false)}
-                                        className="px-8 py-4 bg-slate-900 text-white rounded-xl font-bold hover:bg-[#2563EB] transition-all shadow-lg"
+            <section className="py-24 lg:py-32">
+                <div className="container-custom">
+                    <div className="grid lg:grid-cols-2 gap-16 lg:gap-24">
+                        <FadeIn>
+                            <AnimatePresence mode="wait">
+                                {isSuccess ? (
+                                    <motion.div
+                                        key="success"
+                                        initial={{ opacity: 0 }}
+                                        animate={{ opacity: 1 }}
+                                        exit={{ opacity: 0 }}
+                                        className="py-16"
                                     >
-                                        Send Another Message
-                                    </button>
-                                </motion.div>
-                            ) : (
-                                <motion.div
-                                    initial={{ opacity: 0 }}
-                                    animate={{ opacity: 1 }}
-                                    exit={{ opacity: 0 }}
-                                >
-                                    <h2 className="text-3xl font-bold text-slate-800 mb-2">Send us a Message</h2>
-                                    <p className="text-slate-500 mb-10">We'd love to hear about your project.</p>
-
-                                    <form onSubmit={handleSubmit} className="space-y-8">
-                                        <div className="space-y-2 group">
-                                            <label className="text-xs font-bold text-slate-500 uppercase tracking-widest group-focus-within:text-[#2563EB] transition-colors">Full Name</label>
+                                        <h2 className="font-serif text-3xl text-slate-900 mb-4">Message sent.</h2>
+                                        <p className="text-slate-500 leading-relaxed mb-8">
+                                            Thanks for reaching out. We&apos;ll get back to you within 24 hours.
+                                        </p>
+                                        <button
+                                            onClick={() => { setIsSuccess(false); setFormState({ name: '', email: '', message: '' }); }}
+                                            className="text-[#2563EB] font-medium hover:text-[#1D4ED8] transition-colors"
+                                        >
+                                            Send another message →
+                                        </button>
+                                    </motion.div>
+                                ) : (
+                                    <motion.form
+                                        key="form"
+                                        initial={{ opacity: 0 }}
+                                        animate={{ opacity: 1 }}
+                                        exit={{ opacity: 0 }}
+                                        onSubmit={handleSubmit}
+                                        className="space-y-8"
+                                    >
+                                        <div>
+                                            <label htmlFor="contact-name" className="block text-sm font-medium text-slate-700 mb-2">
+                                                Name
+                                            </label>
                                             <input
+                                                id="contact-name"
                                                 type="text"
                                                 name="name"
                                                 value={formState.name}
@@ -283,120 +146,108 @@ const ContactPage = () => {
                                                 required
                                                 minLength={2}
                                                 maxLength={100}
-                                                className="w-full px-0 py-3 border-b-2 border-slate-200 focus:border-blue-600 focus:outline-none transition-colors bg-transparent placeholder-gray-300 font-medium text-lg"
-                                                placeholder="John Doe"
+                                                className="w-full px-0 py-3 border-b-2 border-slate-200 focus:border-[#2563EB] focus:outline-none transition-colors bg-transparent text-lg"
+                                                placeholder="Your name"
                                             />
                                         </div>
 
-                                        <div className="space-y-2 group">
-                                            <label className="text-xs font-bold text-slate-500 uppercase tracking-widest group-focus-within:text-[#2563EB] transition-colors">Email Address</label>
+                                        <div>
+                                            <label htmlFor="contact-email" className="block text-sm font-medium text-slate-700 mb-2">
+                                                Email
+                                            </label>
                                             <input
+                                                id="contact-email"
                                                 type="email"
                                                 name="email"
                                                 value={formState.email}
                                                 onChange={handleChange}
                                                 required
-                                                className="w-full px-0 py-3 border-b-2 border-slate-200 focus:border-blue-600 focus:outline-none transition-colors bg-transparent placeholder-gray-300 font-medium text-lg"
-                                                placeholder="john@example.com"
+                                                className="w-full px-0 py-3 border-b-2 border-slate-200 focus:border-[#2563EB] focus:outline-none transition-colors bg-transparent text-lg"
+                                                placeholder="you@company.com"
                                             />
                                         </div>
 
-                                        <div className="grid md:grid-cols-2 gap-8">
-                                            <div className="space-y-2 group">
-                                                <label className="text-xs font-bold text-slate-500 uppercase tracking-widest group-focus-within:text-[#2563EB] transition-colors">Phone (Optional)</label>
-                                                <input
-                                                    type="tel"
-                                                    name="phone"
-                                                    value={formState.phone}
-                                                    onChange={handleChange}
-                                                    className="w-full px-0 py-3 border-b-2 border-slate-200 focus:border-blue-600 focus:outline-none transition-colors bg-transparent placeholder-gray-300 font-medium text-lg"
-                                                    placeholder="+91 12345 67890"
-                                                />
-                                            </div>
-                                            <div className="space-y-2 group">
-                                                <label className="text-xs font-bold text-slate-500 uppercase tracking-widest group-focus-within:text-[#2563EB] transition-colors">Company (Optional)</label>
-                                                <input
-                                                    type="text"
-                                                    name="company"
-                                                    value={formState.company}
-                                                    onChange={handleChange}
-                                                    maxLength={100}
-                                                    className="w-full px-0 py-3 border-b-2 border-slate-200 focus:border-blue-600 focus:outline-none transition-colors bg-transparent placeholder-gray-300 font-medium text-lg"
-                                                    placeholder="Your Company"
-                                                />
-                                            </div>
-                                        </div>
-
-                                        <div className="space-y-2 group">
-                                            <label className="text-xs font-bold text-slate-500 uppercase tracking-widest group-focus-within:text-[#2563EB] transition-colors">Message</label>
+                                        <div>
+                                            <label htmlFor="contact-message" className="block text-sm font-medium text-slate-700 mb-2">
+                                                Tell us about your project
+                                            </label>
                                             <textarea
+                                                id="contact-message"
                                                 name="message"
                                                 value={formState.message}
                                                 onChange={handleChange}
                                                 required
                                                 minLength={10}
                                                 maxLength={2000}
-                                                rows="4"
-                                                className="w-full px-0 py-3 border-b-2 border-slate-200 focus:border-blue-600 focus:outline-none transition-colors bg-transparent placeholder-gray-300 font-medium text-lg resize-none"
-                                                placeholder="Tell us about your project..."
-                                            ></textarea>
+                                                rows="5"
+                                                className="w-full px-0 py-3 border-b-2 border-slate-200 focus:border-[#2563EB] focus:outline-none transition-colors bg-transparent text-lg resize-none"
+                                                placeholder="What are you building?"
+                                            />
                                         </div>
 
-                                        {/* Error Message */}
                                         {error && (
-                                            <div className="bg-red-50 border border-red-200 text-red-700 px-4 py-3 rounded-lg text-sm">
-                                                <div className="flex items-center">
-                                                    <i className="ri-error-warning-line mr-2"></i>
-                                                    <span>{error}</span>
-                                                </div>
-                                            </div>
+                                            <p className="text-red-600 text-sm" role="alert">{error}</p>
                                         )}
 
                                         <button
+                                            type="submit"
                                             disabled={isSubmitting}
-                                            className="w-full bg-slate-900 text-white py-5 rounded-xl font-bold hover:bg-[#2563EB] transition-all duration-300 flex items-center justify-center gap-2 shadow-xl transform hover:-translate-y-1 disabled:opacity-70 disabled:cursor-not-allowed"
+                                            className="px-8 py-4 bg-[#2563EB] text-white rounded-lg font-medium hover:bg-[#1D4ED8] transition-colors disabled:opacity-60 disabled:cursor-not-allowed"
                                         >
-                                            {isSubmitting ? (
-                                                <span className="flex items-center gap-2">
-                                                    <i className="ri-loader-4-line animate-spin text-xl"></i>
-                                                    Sending...
-                                                </span>
-                                            ) : (
-                                                <span className="flex items-center gap-2">
-                                                    Send Message
-                                                    <i className="ri-send-plane-fill"></i>
-                                                </span>
-                                            )}
+                                            {isSubmitting ? 'Sending...' : 'Send Message'}
                                         </button>
-                                    </form>
-                                </motion.div>
-                            )}
-                        </AnimatePresence>
+                                    </motion.form>
+                                )}
+                            </AnimatePresence>
+                        </FadeIn>
+
+                        <FadeIn delay={0.1}>
+                            <div className="space-y-10 lg:pt-4">
+                                <div>
+                                    <h3 className="text-xs tracking-widest uppercase text-slate-400 font-medium mb-3">Email</h3>
+                                    <a href="mailto:nexspiretechsolutions@gmail.com" className="text-slate-800 hover:text-[#2563EB] transition-colors">
+                                        nexspiretechsolutions@gmail.com
+                                    </a>
+                                </div>
+
+                                <div>
+                                    <h3 className="text-xs tracking-widest uppercase text-slate-400 font-medium mb-3">Phone</h3>
+                                    <a href="tel:+919729916844" className="text-slate-800 hover:text-[#2563EB] transition-colors">
+                                        +91 9729916844
+                                    </a>
+                                    <p className="text-slate-500 text-sm mt-1">Mon–Fri, 9am – 6pm IST</p>
+                                </div>
+
+                                <div>
+                                    <h3 className="text-xs tracking-widest uppercase text-slate-400 font-medium mb-3">Location</h3>
+                                    <p className="text-slate-800">Mohali, SAS Nagar</p>
+                                    <p className="text-slate-500 text-sm mt-1">Punjab, India</p>
+                                </div>
+
+                                <div>
+                                    <h3 className="text-xs tracking-widest uppercase text-slate-400 font-medium mb-3">Social</h3>
+                                    <div className="flex gap-4">
+                                        {siteConfig.social.map(s => (
+                                            <a
+                                                key={s.label}
+                                                href={s.href}
+                                                target="_blank"
+                                                rel="noopener noreferrer"
+                                                aria-label={s.label}
+                                                className="text-slate-500 hover:text-[#2563EB] transition-colors"
+                                            >
+                                                <i className={`${s.icon} text-xl`}></i>
+                                            </a>
+                                        ))}
+                                    </div>
+                                </div>
+                            </div>
+                        </FadeIn>
                     </div>
                 </div>
-            </div>
-
-            {/* FAQ Section */}
-            <section className="py-24 max-w-4xl mx-auto px-4 sm:px-6 lg:px-8">
-                <FadeIn>
-                    <h2 className="text-3xl font-bold text-center mb-12">Before you ask...</h2>
-                    <div className="grid gap-6">
-                        {faqs.map((faq, index) => (
-                            <motion.div
-                                initial={{ opacity: 0, y: 20 }}
-                                whileInView={{ opacity: 1, y: 0 }}
-                                viewport={{ once: true }}
-                                transition={{ delay: index * 0.1 }}
-                                key={index}
-                                className="bg-white p-8 rounded-2xl shadow-sm border border-slate-200 hover:shadow-lg hover:border-slate-200 transition-all duration-300"
-                            >
-                                <h3 className="text-lg font-bold text-slate-800 mb-2">{faq.question}</h3>
-                                <p className="text-slate-600 leading-relaxed">{faq.answer}</p>
-                            </motion.div>
-                        ))}
-                    </div>
-                </FadeIn>
             </section>
+
+            <BackToTop />
         </div>
     );
 };
