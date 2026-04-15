@@ -32,7 +32,6 @@ const BlogArticle = () => {
             const response = await blogAPI.getBySlug(slug);
             setBlog(response.data.blog);
 
-            // Load related posts
             const allResponse = await blogAPI.getAll();
             const allBlogs = allResponse.data.blogs || [];
             const related = allBlogs
@@ -50,7 +49,7 @@ const BlogArticle = () => {
     if (loading) {
         return (
             <div className="min-h-screen flex items-center justify-center bg-white pt-20">
-                <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-blue-600"></div>
+                <div className="animate-spin rounded-full h-10 w-10 border-2 border-slate-200 border-t-[#2563EB]"></div>
             </div>
         );
     }
@@ -60,9 +59,9 @@ const BlogArticle = () => {
             <div className="min-h-screen flex items-center justify-center bg-white pt-20">
                 <div className="text-center">
                     <h1 className="text-4xl font-bold text-slate-800 mb-4">Blog Not Found</h1>
-                    <p className="text-slate-600 mb-8">The article you're looking for doesn't exist.</p>
+                    <p className="text-slate-600 mb-8">The article you&apos;re looking for doesn&apos;t exist.</p>
                     <Link to="/blog" className="text-[#2563EB] hover:underline font-medium">
-                        ← Back to Blog
+                        &larr; Back to Blog
                     </Link>
                 </div>
             </div>
@@ -131,25 +130,21 @@ const BlogArticle = () => {
                 </script>
             </Helmet>
 
-            {/* Reading Progress */}
             <ReadingProgress />
 
-            {/* Floating Social Share */}
             <FloatingSocialShare
                 url={`${SITE_URL}/blog/${blog.slug}`}
                 title={blog.title}
             />
 
-            {/* Breadcrumbs */}
             <div className="container-custom py-4">
                 <Breadcrumbs />
             </div>
 
             <article className="max-w-4xl mx-auto px-6 py-8">
-                {/* Article Header */}
                 <div className="mb-12 text-center">
                     {blog.category && (
-                        <span className="inline-block px-4 py-1.5 bg-[#2563EB]/10 text-[#2563EB] font-bold rounded-full text-sm mb-6">
+                        <span className="text-sm font-medium uppercase tracking-wider text-[#2563EB] mb-4 block">
                             {blog.category}
                         </span>
                     )}
@@ -158,12 +153,12 @@ const BlogArticle = () => {
                     </h1>
                     <div className="flex items-center justify-center gap-6 text-slate-500 font-medium flex-wrap">
                         <div className="flex items-center gap-2">
-                            <div className="w-8 h-8 rounded-full bg-blue-600 text-white flex items-center justify-center font-bold">
+                            <div className="w-8 h-8 rounded-full bg-slate-100 text-slate-600 flex items-center justify-center font-semibold text-xs">
                                 {blog.author?.charAt(0) || 'A'}
                             </div>
                             <span>{blog.author}</span>
                         </div>
-                        <span>•</span>
+                        <span className="text-slate-300">&middot;</span>
                         <span>{new Date(blog.created_at).toLocaleDateString('en-US', {
                             year: 'numeric',
                             month: 'short',
@@ -171,7 +166,7 @@ const BlogArticle = () => {
                         })}</span>
                         {blog.read_time && (
                             <>
-                                <span>•</span>
+                                <span className="text-slate-300">&middot;</span>
                                 <span className="flex items-center gap-1">
                                     <i className="ri-time-line"></i>
                                     {blog.read_time}
@@ -181,9 +176,8 @@ const BlogArticle = () => {
                     </div>
                 </div>
 
-                {/* Featured Image */}
                 {blog.image && (
-                    <div className="rounded-[2rem] overflow-hidden shadow-2xl mb-16 h-[500px]">
+                    <div className="rounded-xl overflow-hidden mb-16 aspect-[16/9]">
                         <img
                             src={blog.image}
                             alt={blog.title}
@@ -195,17 +189,14 @@ const BlogArticle = () => {
                 )}
 
                 <div className="flex flex-col lg:flex-row gap-12">
-                    {/* Table of Contents - Desktop */}
                     <TableOfContents content={addIdsToHeadings(blog.content)} />
 
-                    {/* Article Content */}
                     <div className="flex-1 min-w-0">
                         <div
                             className="prose prose-lg prose-blue max-w-none mb-16 prose-dropcap"
                             dangerouslySetInnerHTML={{ __html: DOMPurify.sanitize(addIdsToHeadings(blog.content), { ADD_ATTR: ['id', 'target'] }) }}
                         />
 
-                        {/* Social Share (Inline) */}
                         <div className="border-t border-b border-slate-200 py-6 mb-12">
                             <SocialShare
                                 url={`${SITE_URL}/blog/${blog.slug}`}
@@ -214,7 +205,6 @@ const BlogArticle = () => {
                             />
                         </div>
 
-                        {/* Author Bio */}
                         <div className="mb-16">
                             <AuthorBio
                                 name={blog.author}
@@ -228,17 +218,16 @@ const BlogArticle = () => {
                 </div>
             </article>
 
-            {/* Related Posts */}
             {relatedPosts.length > 0 && (
-                <div className="bg-[#F8FAFC] py-16">
+                <div className="bg-[#F8FAFC] py-24 lg:py-32">
                     <div className="container-custom">
-                        <h2 className="text-3xl font-bold text-center mb-12">Related Articles</h2>
+                        <h2 className="text-3xl font-bold font-serif text-center mb-12 text-slate-800">Related Articles</h2>
                         <div className="grid md:grid-cols-3 gap-8">
                             {relatedPosts.map(post => (
                                 <Link
                                     key={post.id}
                                     to={`/blog/${post.slug}`}
-                                    className="bg-white rounded-2xl overflow-hidden shadow-sm hover:shadow-xl transition-all group"
+                                    className="bg-white rounded-xl overflow-hidden border border-slate-200 hover:shadow-md transition-shadow duration-300 group"
                                 >
                                     {post.image && (
                                         <div className="h-48 overflow-hidden">
@@ -247,12 +236,12 @@ const BlogArticle = () => {
                                                 alt={post.title}
                                                 loading="lazy"
                                                 height={192}
-                                                className="w-full h-full object-cover group- transition-transform duration-500"
+                                                className="w-full h-full object-cover"
                                             />
                                         </div>
                                     )}
                                     <div className="p-6">
-                                        <span className="text-xs font-bold text-[#2563EB] uppercase tracking-wider">
+                                        <span className="text-xs font-medium text-[#2563EB] uppercase tracking-wider">
                                             {post.category}
                                         </span>
                                         <h3 className="text-lg font-bold font-serif mt-2 group-hover:text-[#2563EB] transition-colors line-clamp-2">
@@ -269,15 +258,13 @@ const BlogArticle = () => {
                 </div>
             )}
 
-            {/* Related Services */}
-            <div className="bg-white py-16">
+            <div className="bg-white py-24 lg:py-32">
                 <div className="container-custom">
-                    <h2 className="text-3xl font-bold text-center mb-12">Explore Our Services</h2>
+                    <h2 className="text-3xl font-bold font-serif text-center mb-12 text-slate-800">Explore Our Services</h2>
                     <RelatedServices currentService="none" />
                 </div>
             </div>
 
-            {/* Back to Top */}
             <BackToTop />
         </div>
     );

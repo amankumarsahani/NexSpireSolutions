@@ -2,7 +2,8 @@ import { useEffect, useState } from 'react';
 import { Link, useParams } from 'react-router-dom';
 import { Helmet } from 'react-helmet-async';
 // eslint-disable-next-line no-unused-vars
-import { motion, useScroll, useTransform } from 'framer-motion';
+import { motion } from 'framer-motion';
+import FadeIn from '../../components/ui/FadeIn';
 import ReadingProgress from '../../components/ui/ReadingProgress';
 import { SITE_URL } from '../../constants/siteConfig';
 
@@ -178,18 +179,6 @@ const cityData = {
     }
 };
 
-const FadeIn = ({ children, delay = 0, className = "" }) => (
-    <motion.div
-        initial={{ opacity: 0, y: 20 }}
-        whileInView={{ opacity: 1, y: 0 }}
-        viewport={{ once: true }}
-        transition={{ duration: 0.6, delay }}
-        className={className}
-    >
-        {children}
-    </motion.div>
-);
-
 const CityLandingPage = () => {
     const { city } = useParams();
     const data = cityData[city] || cityData['london'];
@@ -224,10 +213,6 @@ const CityLandingPage = () => {
         return () => clearInterval(interval);
     }, [data.timezone]);
 
-    const { scrollYProgress } = useScroll();
-
-    const y = useTransform(scrollYProgress, [0, 1], [0, 200]);
-
     // LocalBusiness Schema for the city
     const localBusinessSchema = {
         "@context": "https://schema.org",
@@ -255,7 +240,7 @@ const CityLandingPage = () => {
     };
 
     return (
-        <div className="min-h-screen bg-slate-50 font-sans text-slate-900 selection:bg-blue-600 selection:text-white overflow-hidden">
+        <div className="min-h-screen bg-[#F8FAFC] font-sans text-slate-800 selection:bg-blue-600 selection:text-white">
             <Helmet>
                 <title>{data.title}</title>
                 <meta name="description" content={data.description} />
@@ -275,226 +260,125 @@ const CityLandingPage = () => {
 
             <ReadingProgress />
 
-            {/* Premium Live Hero Section - Removing overflow-hidden from parent to avoid clipping floating stats */}
-            <div className='relative'>
-                <section className="relative min-h-[90vh] flex items-center pt-20 pb-20 overflow-hidden text-white rounded-b-[4rem] z-20 bg-slate-900">
-                    {/* Parallax Background */}
-                    <div className="absolute inset-0 z-0 pointer-events-none">
-                        <motion.div
-                            style={{ y }}
-                            className="w-full h-[120%]"
-                        >
-                            <img
-                                src={data.image}
-                                alt={`${data.city} Skyline`}
-                                loading="lazy"
-                                className="w-full h-full object-cover opacity-50"
-                            />
-                        </motion.div>
-
-                        <div className="absolute inset-0 bg-gradient-to-b from-slate-900/60 via-slate-900/80 to-slate-900/95"></div>
-                        <div className="absolute inset-0 bg-[url('https://grainy-gradients.vercel.app/noise.svg')] opacity-20 mix-blend-soft-light"></div>
-
-                        {/* Tech Pulse Effect Overlay */}
-                        <div className="absolute inset-0 bg-[url('https://www.transparenttextures.com/patterns/circuit-board.png')] opacity-10 animate-pulse"></div>
-                    </div>
-
-                    <div className="container-custom relative z-30 pt-10">
-                        {/* Live Dashboard Header */}
-                        <div className="flex justify-between items-start mb-12">
-                            <motion.div
-                                initial={{ opacity: 0, x: -20 }}
-                                animate={{ opacity: 1, x: 0 }}
-                                className="inline-flex items-center gap-2 px-4 py-2 rounded-full bg-white/10 border border-white/20 backdrop-blur-md"
+            {/* Hero */}
+            <section className="pt-32 pb-16 lg:pt-40 lg:pb-20 bg-white">
+                <div className="container-custom">
+                    <FadeIn>
+                        <p className="text-slate-500 text-lg mb-2">
+                            {greeting}, {data.city} &middot; <span className="tabular-nums">{time}</span>
+                        </p>
+                        <h1 className="font-serif text-5xl lg:text-6xl text-slate-900 tracking-tight mb-6">
+                            Software Development <br className="hidden lg:block" />in {data.city}
+                        </h1>
+                    </FadeIn>
+                    <FadeIn delay={0.1}>
+                        <p className="text-lg lg:text-xl text-slate-500 max-w-2xl leading-relaxed mb-10">
+                            {data.heroText} World-class engineering tailored to your time zone and business culture.
+                        </p>
+                    </FadeIn>
+                    <FadeIn delay={0.15}>
+                        <div className="flex flex-wrap gap-4">
+                            <Link
+                                to="/contact"
+                                className="inline-flex items-center gap-2 px-7 py-3.5 bg-[#2563EB] text-white font-medium rounded-xl hover:bg-[#1D4ED8] transition-colors duration-200"
                             >
-                                <span className="relative flex h-3 w-3">
-                                    <span className="animate-ping absolute inline-flex h-full w-full rounded-full bg-green-400 opacity-75"></span>
-                                    <span className="relative inline-flex rounded-full h-3 w-3 bg-green-500"></span>
-                                </span>
-                                <span className="text-sm font-medium tracking-wide text-green-300">Live in {data.city}</span>
-                            </motion.div>
-
-                            <motion.div
-                                initial={{ opacity: 0, y: -20 }}
-                                animate={{ opacity: 1, y: 0 }}
-                                className="bg-white/10 backdrop-blur-md border border-white/20 rounded-2xl p-4 flex items-center gap-4 shadow-lg hidden md:flex"
+                                Start a project in {data.city}
+                                <svg className="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2}>
+                                    <path strokeLinecap="round" strokeLinejoin="round" d="M17 8l4 4m0 0l-4 4m4-4H3" />
+                                </svg>
+                            </Link>
+                            <Link
+                                to="/services"
+                                className="inline-flex items-center gap-2 px-7 py-3.5 border border-slate-200 text-slate-700 font-medium rounded-xl hover:border-slate-300 hover:bg-slate-50 transition-colors duration-200"
                             >
-                                <div className="text-right">
-                                    <div className="text-xs text-blue-200 uppercase tracking-wider font-bold">Local Time</div>
-                                    <div className="text-2xl font-mono font-bold text-white tabular-nums tracking-widest leading-none">{time}</div>
-                                </div>
-                                <div className="w-10 h-10 rounded-xl bg-blue-600/50 flex items-center justify-center animate-pulse">
-                                    <i className="ri-time-line text-xl"></i>
-                                </div>
-                            </motion.div>
+                                View capabilities
+                            </Link>
                         </div>
+                    </FadeIn>
+                </div>
+            </section>
 
-                        <div className="max-w-4xl">
-                            <motion.h1
-                                initial={{ opacity: 0, y: 30 }}
-                                animate={{ opacity: 1, y: 0 }}
-                                transition={{ delay: 0.1 }}
-                                className="text-5xl md:text-8xl font-bold tracking-tight leading-none mb-6 relative z-30"
-                            >
-                                <span className="block text-3xl md:text-4xl font-light text-slate-300 mb-2">{greeting}, {data.city}.</span>
-                                <span className="text-[#D97706]">
-                                    We Build the Future Here.
-                                </span>
-                            </motion.h1>
-
-                            <motion.p
-                                initial={{ opacity: 0, y: 30 }}
-                                animate={{ opacity: 1, y: 0 }}
-                                transition={{ delay: 0.2 }}
-                                className="text-xl md:text-2xl text-slate-300 max-w-2xl leading-relaxed mb-12"
-                            >
-                                {data.heroText} Experience world-class software engineering tailored to your time zone and business culture.
-                            </motion.p>
-
-                            <motion.div
-                                initial={{ opacity: 0, y: 30 }}
-                                animate={{ opacity: 1, y: 0 }}
-                                transition={{ delay: 0.3 }}
-                                className="flex flex-wrap gap-4 relative z-40"
-                            >
-                                <Link
-                                    to="/contact"
-                                    className="px-8 py-4 bg-blue-600 rounded-full font-bold text-white hover:bg-[#F8FAFC]0 transition-all shadow-lg hover:shadow-lg flex items-center gap-2 group"
-                                >
-                                    Start Project in {data.city} <i className="ri-arrow-right-line group-hover:translate-x-1 transition-transform"></i>
-                                </Link>
-                                <div className="px-6 py-4 rounded-full bg-white/5 backdrop-blur-sm border border-white/10 text-slate-300 flex items-center gap-3">
-                                    <i className="ri-shield-check-line text-green-400"></i>
-                                    Available Now
-                                </div>
-                            </motion.div>
-                        </div>
-                    </div>
-                </section>
-
-                {/* Floating Stats Bar - Moved OUTSIDE hero section to prevent clipping */}
-                <div className="container-custom relative z-40 -mt-20 sm:-mt-24 pointer-events-none">
-                    <div className="bg-white/90 backdrop-blur-xl rounded-[2rem] shadow-2xl p-8 md:p-10 border border-white/50 grid grid-cols-2 lg:grid-cols-4 gap-8 max-w-6xl mx-auto hover:transform hover:-translate-y-2 transition-transform duration-500 pointer-events-auto">
+            {/* Stats Row */}
+            <section className="border-t border-b border-slate-200 py-12 bg-white">
+                <div className="container-custom">
+                    <div className="grid grid-cols-2 lg:grid-cols-4 gap-8">
                         {data.stats && data.stats.map((stat, i) => (
-                            <FadeIn key={i} delay={0.3 + (i * 0.1)} className="text-center group cursor-default relative">
-                                <div className="text-4xl md:text-5xl font-bold text-slate-900 group-hover:text-[#2563EB] transition-all duration-300 mb-2 font-display">
-                                    {stat.value}
+                            <FadeIn key={i} delay={i * 0.05}>
+                                <div className="text-center">
+                                    <div className="text-3xl font-semibold text-slate-900">{stat.value}</div>
+                                    <div className="text-sm text-slate-500 mt-1">{stat.label}</div>
                                 </div>
-                                <div className="text-slate-500 font-bold text-xs md:text-sm uppercase tracking-widest group-hover:text-slate-800">
-                                    {stat.label}
-                                </div>
-                                {i !== data.stats.length - 1 && (
-                                    <div className="hidden lg:block absolute right-0 top-1/2 -translate-y-1/2 w-px h-12 bg-slate-200"></div>
-                                )}
                             </FadeIn>
                         ))}
                     </div>
                 </div>
-            </div>
+            </section>
 
-            {/* Redesigned "Our Presence" - "Strategic Hub" Section */}
-            <section className="pt-32 pb-24 bg-slate-50">
+            {/* Our Presence */}
+            <section className="py-24 lg:py-32">
                 <div className="container-custom">
-                    <div className="flex flex-col lg:flex-row gap-16 items-start">
-                        {/* Text Content */}
-                        <FadeIn className="lg:w-1/2">
-                            <span className="flex items-center gap-2 text-[#2563EB] font-bold tracking-widest uppercase text-sm mb-4">
-                                <span className="w-8 h-px bg-blue-600"></span>
-                                Strategic Hub
-                            </span>
-                            <h2 className="text-4xl md:text-5xl font-bold text-slate-900 leading-tight mb-6">
-                                Delivering Excellence in <span className="text-[#2563EB]">{data.city}</span>.
+                    <div className="grid lg:grid-cols-2 gap-16 items-start">
+                        <FadeIn>
+                            <h2 className="font-serif text-3xl lg:text-4xl text-slate-900 mb-6">
+                                Delivering excellence in {data.city}
                             </h2>
-                            <p className="text-lg text-slate-600 leading-relaxed mb-8">
+                            <p className="text-slate-600 leading-relaxed mb-8">
                                 {data.content} As your local technology partner, we bridge the gap between complex business requirements and cutting-edge digital solutions.
                             </p>
 
-                            <div className="bg-white p-8 rounded-3xl shadow-lg border border-slate-100 relative overflow-hidden">
-                                <div className="absolute top-0 right-0 p-4 opacity-5">
-                                    <i className="ri-map-pin-line text-9xl"></i>
-                                </div>
-                                <h3 className="text-xl font-bold text-slate-900 mb-6 flex items-center gap-2">
-                                    <i className="ri-briefcase-4-line text-[#2563EB]"></i>
+                            <div className="rounded-xl border border-slate-200 p-6">
+                                <h3 className="text-sm font-semibold text-slate-900 uppercase tracking-wide mb-5">
                                     Key Capabilities
                                 </h3>
-                                <div className="grid sm:grid-cols-2 gap-4 relative z-10">
+                                <ul className="space-y-3">
                                     {data.services.map((service, index) => (
-                                        <div key={index} className="flex items-start gap-3">
-                                            <i className="ri-check-line text-green-500 font-bold mt-1"></i>
-                                            <span className="text-slate-700 font-medium text-sm">{service}</span>
-                                        </div>
+                                        <li key={index} className="flex items-center gap-3">
+                                            <span className="w-1.5 h-1.5 rounded-full bg-[#2563EB] shrink-0" />
+                                            <span className="text-slate-600 text-sm">{service}</span>
+                                        </li>
                                     ))}
-                                </div>
+                                </ul>
                             </div>
                         </FadeIn>
 
-                        {/* Visual Content - Professional "Tech Specs" Look */}
-                        <FadeIn delay={0.2} className="lg:w-1/2 w-full">
-                            <div className="relative rounded-[2.5rem] overflow-hidden shadow-2xl bg-slate-900 min-h-[500px] border-4 border-white">
+                        <FadeIn delay={0.15}>
+                            <div className="overflow-hidden rounded-xl">
                                 <img
-                                    src="https://images.unsplash.com/photo-1486406146926-c627a92ad1ab?auto=format&fit=crop&q=80&w=1200&fm=webp"
-                                    alt="Corporate Architecture"
+                                    src={data.image}
+                                    alt={`${data.city} skyline`}
                                     loading="lazy"
-                                    className="absolute inset-0 w-full h-full object-cover opacity-40  transition-transform duration-700"
+                                    className="w-full h-auto object-cover aspect-[4/3]"
                                 />
-                                <div className="absolute inset-0 bg-gradient-to-t from-slate-900 via-slate-900/50 to-transparent"></div>
-
-                                <div className="absolute bottom-0 left-0 p-8 w-full">
-                                    <div className="bg-white border border-slate-200 bg-white/10 backdrop-blur-md rounded-2xl p-6 border border-white/10">
-                                        <div className="flex items-center gap-4 mb-4">
-                                            <div className="w-12 h-12 rounded-full bg-blue-600 flex items-center justify-center text-white shadow-lg shadow-lg">
-                                                <i className="ri-global-line text-2xl"></i>
-                                            </div>
-                                            <div>
-                                                <p className="font-bold text-white text-lg">Global Standards</p>
-                                                <p className="text-sm text-blue-200">ISO 27001 Certified Processes</p>
-                                            </div>
-                                        </div>
-                                        <div className="h-px bg-white/10 my-4"></div>
-                                        <div className="flex justify-between items-center">
-                                            <div className="text-center">
-                                                <p className="text-2xl font-bold text-white">100%</p>
-                                                <p className="text-[10px] uppercase tracking-wider text-slate-300">On-Time</p>
-                                            </div>
-                                            <div className="text-center">
-                                                <p className="text-2xl font-bold text-white">4.9</p>
-                                                <p className="text-[10px] uppercase tracking-wider text-slate-300">Client Rating</p>
-                                            </div>
-                                            <div className="text-center">
-                                                <p className="text-2xl font-bold text-white">24h</p>
-                                                <p className="text-[10px] uppercase tracking-wider text-slate-300">Turnaround</p>
-                                            </div>
-                                        </div>
-                                    </div>
-                                </div>
                             </div>
                         </FadeIn>
                     </div>
                 </div>
             </section>
 
-            {/* Why Us Grid */}
-            <section className="py-24 bg-white relative overflow-hidden">
-                <div className="absolute inset-0 bg-slate-50/50 -skew-y-3 transform origin-top-left scale-110"></div>
+            {/* Why Us */}
+            <section className="py-24 lg:py-32 bg-slate-50">
+                <div className="container-custom">
+                    <FadeIn>
+                        <h2 className="font-serif text-3xl lg:text-4xl text-slate-900 mb-4">
+                            {data.whyUs?.title}
+                        </h2>
+                        <p className="text-slate-500 max-w-xl mb-16">
+                            The Nexspire advantage for businesses operating in {data.city}.
+                        </p>
+                    </FadeIn>
 
-                <div className="container-custom relative z-10">
-                    <div className="text-center mb-20">
-                        <span className="text-[#2563EB] font-bold tracking-widest uppercase text-sm">The Nexspire Advantage</span>
-                        <h2 className="text-4xl font-bold mt-2 text-slate-900">{data.whyUs?.title}</h2>
-                    </div>
-
-                    <div className="grid md:grid-cols-2 gap-8">
+                    <div className="grid md:grid-cols-2 gap-6">
                         {data.whyUs?.reasons.map((reason, idx) => (
-                            <FadeIn key={idx} delay={idx * 0.1} className="group p-8 rounded-[2rem] bg-white border border-slate-100 hover:shadow-xl hover:shadow-lg hover:-translate-y-1 transition-all duration-300">
-                                <div className="flex gap-6 items-start">
-                                    <div className="w-16 h-16 rounded-2xl bg-slate-50 flex items-center justify-center text-3xl text-[#2563EB] group-hover:bg-[#2563EB] group-hover:text-white transition-all duration-300 shrink-0">
-                                        <i className={reason.icon}></i>
-                                    </div>
-                                    <div>
-                                        <h4 className="text-xl font-bold text-slate-900 mb-3">{reason.title}</h4>
-                                        <p className="text-slate-600 leading-relaxed group-hover:text-slate-700 transition-colors">
-                                            {reason.desc}
-                                        </p>
+                            <FadeIn key={idx} delay={idx * 0.05}>
+                                <div className="p-6 rounded-xl border border-slate-200 bg-white">
+                                    <div className="flex gap-4 items-start">
+                                        <div className="w-10 h-10 rounded-lg bg-slate-100 flex items-center justify-center text-lg text-[#2563EB] shrink-0">
+                                            <i className={reason.icon}></i>
+                                        </div>
+                                        <div>
+                                            <h4 className="font-semibold text-slate-900 mb-1">{reason.title}</h4>
+                                            <p className="text-slate-500 text-sm leading-relaxed">{reason.desc}</p>
+                                        </div>
                                     </div>
                                 </div>
                             </FadeIn>
@@ -503,33 +387,23 @@ const CityLandingPage = () => {
                 </div>
             </section>
 
-            {/* CTA Section */}
-            <section className="py-24 bg-slate-900 text-white text-center relative overflow-hidden">
-                <div className="absolute inset-0 bg-[url('https://grainy-gradients.vercel.app/noise.svg')] opacity-10 mix-blend-soft-light"></div>
-                <div className="absolute top-0 right-0 w-[600px] h-[600px] bg-blue-600/20 rounded-full blur-[120px] -translate-y-1/2 translate-x-1/2"></div>
-
-                <div className="container-custom relative z-10">
-                    <h2 className="text-5xl md:text-6xl font-bold mb-8 tracking-tight">
-                        Ready to Build in {data.city}?
-                    </h2>
-                    <p className="text-xl text-slate-400 mb-12 max-w-2xl mx-auto leading-relaxed">
-                        Join the hundreds of successful businesses that trust Nexspire for their mission-critical software.
-                    </p>
-                    <div className="flex flex-col sm:flex-row gap-6 justify-center">
+            {/* CTA */}
+            <section className="py-24 lg:py-32 border-t border-slate-200">
+                <div className="container-custom text-center">
+                    <FadeIn>
+                        <p className="font-serif text-3xl lg:text-4xl text-slate-900 mb-8">
+                            Ready to build in {data.city}?
+                        </p>
                         <Link
                             to="/contact"
-                            className="inline-flex items-center justify-center gap-4 px-10 py-5 bg-blue-600 text-white rounded-full text-lg font-bold hover:bg-[#F8FAFC]0 shadow-lg hover:shadow-lg transition-all duration-300 "
+                            className="inline-flex items-center gap-2 text-[#2563EB] font-medium text-lg hover:text-[#1D4ED8] transition-colors duration-200"
                         >
-                            Start Your Project
-                            <i className="ri-arrow-right-line"></i>
+                            Start your project
+                            <svg className="w-5 h-5" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2}>
+                                <path strokeLinecap="round" strokeLinejoin="round" d="M17 8l4 4m0 0l-4 4m4-4H3" />
+                            </svg>
                         </Link>
-                        <Link
-                            to="/services"
-                            className="inline-flex items-center justify-center gap-4 px-10 py-5 bg-white/10 text-white border border-white/10 backdrop-blur-sm rounded-full text-lg font-bold hover:bg-white/20 transition-all duration-300"
-                        >
-                            View Capabilities
-                        </Link>
-                    </div>
+                    </FadeIn>
                 </div>
             </section>
         </div>
