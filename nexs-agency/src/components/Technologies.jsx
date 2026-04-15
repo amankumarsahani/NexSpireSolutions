@@ -136,11 +136,13 @@ const Technologies = memo(function Technologies() {
 
         {/* Static Category Tabs */}
         <div className={`flex flex-wrap justify-center gap-2 sm:gap-3 mb-8 sm:mb-12 lg:mb-16 transition-all duration-1000 delay-300 transform ${isVisible ? 'translate-y-0 opacity-100' : 'translate-y-8 opacity-0'
-          }`}>
+          }`} role="tablist">
           {Object.keys(techStacks).map((tab) => (
             <button
               key={tab}
               onClick={() => setActiveTab(tab)}
+              role="tab"
+              aria-selected={activeTab === tab}
               className={`px-4 sm:px-6 py-2 sm:py-3 rounded-2xl text-sm sm:text-base font-semibold transition-all duration-500 whitespace-nowrap backdrop-blur-sm border ${activeTab === tab
                 ? 'bg-gradient-to-r from-cyan-500 to-indigo-600 text-white shadow-lg shadow-cyan-500/30 border-cyan-400/50 scale-105'
                 : 'bg-white/60 text-gray-700 hover:bg-white/80 border-white/30 hover:shadow-lg'
@@ -157,7 +159,7 @@ const Technologies = memo(function Technologies() {
 
         {/* Creative Tech Stack Layout */}
         <div className={`mb-16 transition-all duration-1000 delay-500 transform ${isVisible ? 'translate-y-0 opacity-100' : 'translate-y-8 opacity-0'
-          }`}>
+          }`} role="tabpanel">
           {/* Category Title */}
           <div className="text-center mb-12">
             <div className="inline-flex items-center bg-white/70 backdrop-blur-lg border border-gray-200/50 text-gray-700 text-lg font-bold px-8 py-4 rounded-2xl mb-6 shadow-lg">

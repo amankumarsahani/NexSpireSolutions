@@ -1,23 +1,32 @@
-import { useState } from 'react';
+import { useState, useRef, useEffect, memo } from 'react';
 import { Link } from 'react-router-dom';
+import { siteConfig } from '../constants/siteConfig';
 
 const Footer = () => {
   const currentYear = new Date().getFullYear();
   const [email, setEmail] = useState('');
   const [subscribed, setSubscribed] = useState(false);
   const [isSubmitting, setIsSubmitting] = useState(false);
+  const submitTimeoutRef = useRef(null);
+  const subscribedTimeoutRef = useRef(null);
+
+  useEffect(() => {
+    return () => {
+      if (submitTimeoutRef.current) clearTimeout(submitTimeoutRef.current);
+      if (subscribedTimeoutRef.current) clearTimeout(subscribedTimeoutRef.current);
+    };
+  }, []);
 
   const handleSubscribe = (e) => {
     e.preventDefault();
     if (!email) return;
 
     setIsSubmitting(true);
-    // Simulate API call
-    setTimeout(() => {
+    submitTimeoutRef.current = setTimeout(() => {
       setIsSubmitting(false);
       setSubscribed(true);
       setEmail('');
-      setTimeout(() => setSubscribed(false), 5000);
+      subscribedTimeoutRef.current = setTimeout(() => setSubscribed(false), 5000);
     }, 1000);
   };
 
@@ -46,11 +55,7 @@ const Footer = () => {
     ]
   };
 
-  const socialLinks = [
-    { icon: "ri-github-line", href: "https://github.com/orgs/Nexspire-Solutions/repositories", label: "GitHub" },
-    { icon: "ri-linkedin-line", href: "https://www.linkedin.com/company/nexspire-solution", label: "LinkedIn" },
-    { icon: "ri-instagram-line", href: "https://www.instagram.com/nexspire_solutions/", label: "Instagram" }
-  ];
+  const socialLinks = siteConfig.social;
 
   return (
     <footer className="bg-gray-900 text-white" >
@@ -130,6 +135,7 @@ const Footer = () => {
                     value={email}
                     onChange={(e) => setEmail(e.target.value)}
                     required
+                    aria-label="Email for newsletter"
                     className="flex-1 px-4 py-3 rounded-lg bg-gray-800 border border-gray-700 focus:ring-2 focus:ring-blue-500 focus:border-transparent text-white placeholder-gray-400 transition-all outline-none"
                   />
                   <button
@@ -184,4 +190,4 @@ const Footer = () => {
   );
 };
 
-export default Footer;
+export default memo(Footer);

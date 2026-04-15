@@ -14,7 +14,7 @@ const Portfolio = memo(function Portfolio() {
       title: "E-commerce Platform",
       slug: "ecommerce-platform",
       category: "Web Development",
-      image: "https://images.unsplash.com/photo-1556742049-0cfed4f6a45d?w=400&h=300&fit=crop",
+      image: "https://images.unsplash.com/photo-1556742049-0cfed4f6a45d?w=400&h=300&fit=crop&fm=webp",
       description: "Modern e-commerce platform with advanced product filtering and secure payment integration.",
       technologies: ["React", "Node.js", "MongoDB", "Stripe"]
     },
@@ -22,7 +22,7 @@ const Portfolio = memo(function Portfolio() {
       title: "Food Delivery App",
       slug: "food-delivery-app",
       category: "Mobile Development",
-      image: "https://plus.unsplash.com/premium_photo-1682130100826-913b21060e4e?q=80&w=1170&auto=format&fit=crop&ixlib=rb-4.1.0&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D?w=400&h=300&fit=crop",
+      image: "https://plus.unsplash.com/premium_photo-1682130100826-913b21060e4e?q=80&w=1170&auto=format&fit=crop&ixlib=rb-4.1.0&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D?w=400&h=300&fit=crop&fm=webp",
       description: "Mobile app for food delivery with real-time tracking and multiple payment options.",
       technologies: ["React Native", "Firebase", "Maps API", "PayPal"]
     },
@@ -30,7 +30,7 @@ const Portfolio = memo(function Portfolio() {
       title: "Healthcare Dashboard",
       slug: "healthcare-dashboard",
       category: "Web Development",
-      image: "https://images.unsplash.com/photo-1526628953301-3e589a6a8b74?q=80&w=1106&auto=format&fit=crop&ixlib=rb-4.1.0&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D?w=400&h=300&fit=crop",
+      image: "https://images.unsplash.com/photo-1526628953301-3e589a6a8b74?q=80&w=1106&auto=format&fit=crop&ixlib=rb-4.1.0&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D?w=400&h=300&fit=crop&fm=webp",
       description: "Comprehensive healthcare management system with patient records and appointment scheduling.",
       technologies: ["Vue.js", "Python", "PostgreSQL", "Docker"]
     },
@@ -38,7 +38,7 @@ const Portfolio = memo(function Portfolio() {
       title: "Real Estate Portal",
       slug: "real-estate-portal",
       category: "Full Stack",
-      image: "https://images.unsplash.com/photo-1560518883-ce09059eeffa?w=400&h=300&fit=crop",
+      image: "https://images.unsplash.com/photo-1560518883-ce09059eeffa?w=400&h=300&fit=crop&fm=webp",
       description: "Property listing platform with advanced search filters and virtual tours.",
       technologies: ["Next.js", "Prisma", "MySQL", "AWS"]
     },
@@ -46,7 +46,7 @@ const Portfolio = memo(function Portfolio() {
       title: "Fitness Tracker",
       slug: "fitness-tracker",
       category: "Mobile Development",
-      image: "https://images.unsplash.com/photo-1571019613454-1cb2f99b2d8b?w=400&h=300&fit=crop",
+      image: "https://images.unsplash.com/photo-1571019613454-1cb2f99b2d8b?w=400&h=300&fit=crop&fm=webp",
       description: "Mobile fitness app with workout tracking, nutrition planning, and progress analytics.",
       technologies: ["Flutter", "Dart", "Firebase", "Charts"]
     },
@@ -54,7 +54,7 @@ const Portfolio = memo(function Portfolio() {
       title: "Inventory Management",
       slug: "inventory-management",
       category: "Enterprise",
-      image: "https://images.unsplash.com/photo-1553413077-190dd305871c?w=400&h=300&fit=crop",
+      image: "https://images.unsplash.com/photo-1553413077-190dd305871c?w=400&h=300&fit=crop&fm=webp",
       description: "Enterprise inventory management system with analytics and automated reporting.",
       technologies: ["Angular", "Java", "Spring", "Oracle"]
     }
@@ -150,9 +150,10 @@ const Portfolio = memo(function Portfolio() {
 
                   {/* Image Section */}
                   <div className="relative overflow-hidden">
-                    <img
+                      <img
                       src={project.image}
                       alt={project.title}
+                      loading="lazy"
                       className="w-full h-40 sm:h-48 object-cover group-hover:scale-105 transition-transform duration-700"
                     />
                     {/* Gradient Overlay */}

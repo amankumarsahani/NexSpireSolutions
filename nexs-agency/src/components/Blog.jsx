@@ -1,4 +1,4 @@
-import { useState, useEffect } from 'react'
+import { useState, useEffect, memo } from 'react'
 import { Link } from 'react-router-dom'
 import { blogAPI } from '../services/api'
 
@@ -13,7 +13,7 @@ function Blog() {
     {
       title: "Mobile App Development: Native vs Cross-Platform in 2024",
       category: "Mobile Development",
-      image: "https://images.unsplash.com/photo-1512941937669-90a1b58e7e9c?w=400&h=250&fit=crop",
+      image: "https://images.unsplash.com/photo-1512941937669-90a1b58e7e9c?w=400&h=250&fit=crop&fm=webp",
       description: "A comprehensive comparison of native and cross-platform development approaches to help you make the right choice.",
       tags: ["React Native", "Flutter", "iOS", "Android"],
       author: "Anu Kumar",
@@ -25,7 +25,7 @@ function Blog() {
     {
       title: "UI/UX Design Principles for Modern Web Applications",
       category: "Design",
-      image: "https://images.unsplash.com/photo-1586717791821-3f44a563fa4c?w=400&h=250&fit=crop",
+      image: "https://images.unsplash.com/photo-1586717791821-3f44a563fa4c?w=400&h=250&fit=crop&fm=webp",
       description: "Discover essential design principles that create intuitive and engaging user experiences in modern web applications.",
       tags: ["UX Design", "UI Design", "Figma", "Prototyping"],
       author: "Anu Kumar",
@@ -37,7 +37,7 @@ function Blog() {
     {
       title: "Cybersecurity Best Practices for Web Applications",
       category: "Security",
-      image: "https://images.unsplash.com/photo-1555949963-aa79dcee981c?w=400&h=250&fit=crop",
+      image: "https://images.unsplash.com/photo-1555949963-aa79dcee981c?w=400&h=250&fit=crop&fm=webp",
       description: "Essential security measures every developer should implement to protect web applications from common vulnerabilities.",
       tags: ["Security", "OWASP", "Authentication", "Encryption"],
       author: "Anu Kumar",
@@ -73,7 +73,7 @@ function Blog() {
           return {
             title: blog.title,
             category: blog.category || "Technology",
-            image: blog.image_url || blog.image || `https://images.unsplash.com/photo-1517180102446-f3ece451e9d8?w=400&h=250&fit=crop`,
+            image: blog.image_url || blog.image || `https://images.unsplash.com/photo-1517180102446-f3ece451e9d8?w=400&h=250&fit=crop&fm=webp`,
             description: blog.excerpt || blog.title,
             tags: blog.category ? [blog.category] : ["Technology"],
             author: blog.author || "Nexspire Team",
@@ -283,13 +283,13 @@ function Blog() {
         {/* View All Button */}
         <div className={`text-center mb-16 transition-all duration-1000 delay-700 transform ${isVisible ? 'translate-y-0 opacity-100' : 'translate-y-8 opacity-0'
           }`}>
-          <button className="group relative bg-gradient-to-r from-emerald-600 via-teal-600 to-cyan-600 text-white px-10 py-4 rounded-2xl font-bold shadow-2xl shadow-emerald-500/30 hover:shadow-emerald-500/50 transition-all duration-300 transform hover:scale-105 overflow-hidden">
+          <Link to="/blog" className="group relative inline-block bg-gradient-to-r from-emerald-600 via-teal-600 to-cyan-600 text-white px-10 py-4 rounded-2xl font-bold shadow-2xl shadow-emerald-500/30 hover:shadow-emerald-500/50 transition-all duration-300 transform hover:scale-105 overflow-hidden">
             <span className="relative z-10 flex items-center">
               View All Articles
               <i className="ri-arrow-right-line ml-2 group-hover:translate-x-1 transition-transform duration-300"></i>
             </span>
             <div className="absolute inset-0 bg-gradient-to-r from-cyan-600 via-teal-600 to-emerald-600 opacity-0 group-hover:opacity-100 transition-opacity duration-300"></div>
-          </button>
+          </Link>
         </div>
 
         {/* Glass Newsletter Banner */}
@@ -401,6 +401,7 @@ function Blog() {
                         <input
                           type="email"
                           placeholder="Enter your email address"
+                          aria-label="Email for newsletter"
                           className="w-full px-4 py-3 rounded-2xl text-gray-900 placeholder-gray-400 bg-white/80 backdrop-blur-3xl backdrop-saturate-150 border border-white/50 shadow-lg shadow-black/5 focus:outline-none focus:ring-2 focus:ring-white/70 focus:bg-white/90 focus:border-white/70 focus:shadow-xl transition-all duration-500 group-hover:bg-white/85"
                         />
                         <div className="absolute inset-0 bg-gradient-to-r from-white/5 via-white/10 to-white/5 rounded-2xl opacity-0 group-hover:opacity-100 transition-opacity duration-500 pointer-events-none"></div>
@@ -443,4 +444,4 @@ function Blog() {
   )
 }
 
-export default Blog
+export default memo(Blog)

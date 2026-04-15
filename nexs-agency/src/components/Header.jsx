@@ -1,53 +1,75 @@
-import { useState, useEffect } from 'react';
+import { useState, useEffect, memo } from 'react';
 import { Link, useLocation } from 'react-router-dom';
 import { useAuth } from '../context/AuthContext';
+
+const navItems = [
+  { label: 'Home', path: '/' },
+  {
+    label: 'Services',
+    path: '/services',
+    children: [
+      { label: 'Web Development', path: '/services/custom-web-development' },
+      { label: 'Mobile Apps', path: '/services/mobile-app-development' },
+      { label: 'AI & Machine Learning', path: '/services/ai-machine-learning' },
+      { label: 'Cloud Solutions', path: '/services/cloud-solutions' },
+      { label: 'E-commerce', path: '/services/ecommerce-development' },
+    ]
+  },
+  { label: 'NexCRM', path: '/nexcrm' },
+  { label: 'About', path: '/about' },
+  { label: 'Portfolio', path: '/portfolio' },
+  { label: 'Blog', path: '/blog' },
+  { label: 'Contact', path: '/contact' },
+];
 
 const Header = () => {
   const [isMenuOpen, setIsMenuOpen] = useState(false);
   const [activeDropdown, setActiveDropdown] = useState(null);
+  const [focusedDropdown, setFocusedDropdown] = useState(null);
   const [scrolled, setScrolled] = useState(false);
   const location = useLocation();
   const { user, isAuthenticated } = useAuth();
   const showAdminBackups = isAuthenticated && user?.role === 'admin';
 
-  const navItems = [
-    { label: 'Home', path: '/' },
-    {
-      label: 'Services',
-      path: '/services',
-      children: [
-        { label: 'Web Development', path: '/services/custom-web-development' },
-        { label: 'Mobile Apps', path: '/services/mobile-app-development' },
-        { label: 'AI & Machine Learning', path: '/services/ai-machine-learning' },
-        { label: 'Cloud Solutions', path: '/services/cloud-solutions' },
-        { label: 'E-commerce', path: '/services/ecommerce-development' },
-      ]
-    },
-    { label: 'NexCRM', path: '/nexcrm' },
-    { label: 'About', path: '/about' },
-    { label: 'Portfolio', path: '/portfolio' },
-    { label: 'Blog', path: '/blog' },
-    { label: 'Contact', path: '/contact' },
-  ];
-
   useEffect(() => {
+    let ticking = false;
     const handleScroll = () => {
-      setScrolled(window.scrollY > 10);
+      if (!ticking) {
+        requestAnimationFrame(() => {
+          setScrolled(window.scrollY > 10);
+          ticking = false;
+        });
+        ticking = true;
+      }
     };
 
-    window.addEventListener('scroll', handleScroll);
+    window.addEventListener('scroll', handleScroll, { passive: true });
     return () => window.removeEventListener('scroll', handleScroll);
   }, []);
 
-  // Lock body scroll when mobile menu is open
+  // Lock body scroll when mobile menu is open (iOS-safe)
   useEffect(() => {
     if (isMenuOpen) {
-      document.body.style.overflow = 'hidden';
+      const scrollY = window.scrollY;
+      document.body.style.position = 'fixed';
+      document.body.style.top = `-${scrollY}px`;
+      document.body.style.left = '0';
+      document.body.style.right = '0';
     } else {
-      document.body.style.overflow = 'unset';
+      const scrollY = parseInt(document.body.style.top || '0', 10) * -1;
+      document.body.style.position = '';
+      document.body.style.top = '';
+      document.body.style.left = '';
+      document.body.style.right = '';
+      window.scrollTo(0, scrollY);
     }
     return () => {
-      document.body.style.overflow = 'unset';
+      const scrollY = parseInt(document.body.style.top || '0', 10) * -1;
+      document.body.style.position = '';
+      document.body.style.top = '';
+      document.body.style.left = '';
+      document.body.style.right = '';
+      window.scrollTo(0, scrollY);
     };
   }, [isMenuOpen]);
 
@@ -109,7 +131,14 @@ const Header = () => {
             <div className="relative flex items-center space-x-1 bg-gradient-to-r from-white/80 via-blue-50/70 to-purple-50/80 backdrop-blur-md rounded-full px-3 py-2 shadow-lg">
               <div className="absolute inset-0 bg-gradient-to-r from-blue-100/20 via-purple-100/20 to-pink-100/20 rounded-full"></div>
               {navItems.map((item) => (
-                <div key={item.label} className="relative group">
+                <div key={item.label} className="relative group"
+                  onFocus={() => item.children && setFocusedDropdown(item.label)}
+                  onBlur={(e) => {
+                    if (item.children && !e.currentTarget.contains(e.relatedTarget)) {
+                      setFocusedDropdown(null);
+                    }
+                  }}
+                >
                   <Link
                     to={item.path}
                     onClick={(e) => handleNavClick(e, item.path)}
@@ -117,6 +146,7 @@ const Header = () => {
                       ? 'bg-gradient-to-r from-blue-500 to-purple-500 text-white shadow-lg shadow-blue-500/25'
                       : 'text-slate-700 hover:text-white hover:bg-gradient-to-r hover:from-blue-400 hover:to-purple-400 hover:shadow-md hover:shadow-blue-400/20'
                       }`}
+                    {...(item.children ? { 'aria-haspopup': 'true', 'aria-expanded': focusedDropdown === item.label } : {})}
                   >
                     {item.label}
                     {item.children && <i className="ri-arrow-down-s-line text-xs font-bold mt-0.5"></i>}
@@ -124,7 +154,7 @@ const Header = () => {
 
                   {/* Dropdown Menu */}
                   {item.children && (
-                    <div className="absolute top-full left-1/2 -translate-x-1/2 pt-4 opacity-0 invisible group-hover:opacity-100 group-hover:visible transition-all duration-300 w-64 transform translate-y-2 group-hover:translate-y-0">
+                    <div className={`absolute top-full left-1/2 -translate-x-1/2 pt-4 transition-all duration-300 w-64 transform ${focusedDropdown === item.label ? 'opacity-100 visible translate-y-0' : 'opacity-0 invisible translate-y-2 group-hover:opacity-100 group-hover:visible group-hover:translate-y-0'}`}>
                       <div className="bg-white/90 backdrop-blur-xl rounded-2xl shadow-xl border border-white/20 overflow-hidden p-2">
                         <div className="flex flex-col gap-1">
                           {item.children.map((child) => (
@@ -176,6 +206,8 @@ const Header = () => {
           <button
             onClick={() => setIsMenuOpen(!isMenuOpen)}
             className="lg:hidden relative w-10 h-10 rounded-xl bg-gradient-to-br from-blue-100/60 via-purple-100/50 to-pink-100/60 backdrop-blur-sm flex items-center justify-center hover:from-blue-200/70 hover:via-purple-200/60 hover:to-pink-200/70 transition-all duration-300 shadow-md hover:shadow-lg"
+            aria-label="Toggle navigation menu"
+            aria-expanded={isMenuOpen}
           >
             <div className="w-4 h-3 relative flex flex-col justify-between">
               <span className={`w-full h-0.5 bg-gradient-to-r from-blue-600 to-purple-600 transition-all duration-300 ${isMenuOpen ? 'rotate-45 translate-y-1.25' : ''
@@ -197,7 +229,8 @@ const Header = () => {
               <div className="px-4 space-y-1">
                 {navItems.map((item) => (
                   <div key={item.label}>
-                    <div
+                    <button
+                      type="button"
                       onClick={(e) => {
                         if (item.children) {
                           setActiveDropdown(activeDropdown === item.label ? null : item.label);
@@ -205,10 +238,11 @@ const Header = () => {
                           handleNavClick(e, item.path);
                         }
                       }}
-                      className={`relative z-10 block px-4 py-2 text-base font-semibold rounded-xl transition-all duration-300 cursor-pointer ${isActive(item.path)
+                      className={`relative z-10 w-full text-left px-4 py-2 text-base font-semibold rounded-xl transition-all duration-300 ${isActive(item.path)
                         ? 'text-white bg-gradient-to-r from-blue-500 to-purple-500 shadow-lg shadow-blue-500/25'
                         : 'text-slate-700 hover:text-white hover:bg-gradient-to-r hover:from-blue-400 hover:to-purple-400 hover:shadow-md hover:shadow-blue-400/20'
                         }`}
+                      {...(item.children ? { 'aria-expanded': activeDropdown === item.label } : {})}
                     >
                       <div className="flex items-center justify-between">
                         <span>{item.label}</span>
@@ -218,7 +252,7 @@ const Header = () => {
                           <div className="w-2 h-2 bg-gradient-to-r from-purple-400 to-pink-400 rounded-full animate-pulse shadow-sm"></div>
                         )}
                       </div>
-                    </div>
+                    </button>
 
                     {item.children && (
                       <div className={`overflow-hidden transition-all duration-300 ${activeDropdown === item.label ? 'max-h-96 opacity-100 mt-1' : 'max-h-0 opacity-0'}`}>
@@ -270,4 +304,4 @@ const Header = () => {
   );
 };
 
-export default Header;
+export default memo(Header);

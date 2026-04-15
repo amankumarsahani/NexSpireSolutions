@@ -1,3 +1,4 @@
+import { memo } from 'react';
 // eslint-disable-next-line no-unused-vars
 import { motion } from 'framer-motion';
 
@@ -47,7 +48,7 @@ const colorMap = {
     pink: { bg: 'bg-pink-100', text: 'text-pink-600', border: 'border-pink-500' }
 };
 
-export default function Timeline({ className = '' }) {
+function Timeline({ className = '' }) {
     return (
         <section className={`py-24 bg-gradient-to-b from-gray-50 to-white ${className}`}>
             <div className="container-custom">
@@ -118,3 +119,5 @@ export default function Timeline({ className = '' }) {
         </section>
     );
 }
+
+export default memo(Timeline);

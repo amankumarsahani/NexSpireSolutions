@@ -1,52 +1,52 @@
-import { useState } from 'react'
+import { useState, memo } from 'react'
+
+const testimonials = [
+  {
+    text: "Working with this team has been exceptional. They delivered our e-commerce platform ahead of schedule and exceeded all our expectations. The attention to detail and technical expertise is outstanding.",
+    name: "Sarah Johnson",
+    position: "CEO, TechStart Inc.",
+    project: "E-commerce Platform",
+    image: "https://images.unsplash.com/photo-1573496359142-b8d87734a5a2?w=100&h=100&fit=crop&q=80&fm=webp"
+  },
+  {
+    text: "The mobile app they developed for us has been a game-changer. User engagement increased by 300% after launch. Their understanding of user experience and technical implementation is remarkable.",
+    name: "Michael Rodriguez",
+    position: "CTO, FitTech Solutions",
+    project: "Mobile Fitness App",
+    image: "https://images.unsplash.com/photo-1560250097-0b93528c311a?w=100&h=100&fit=crop&q=80&fm=webp"
+  },
+  {
+    text: "Our cloud migration project was seamless thanks to their expertise. They reduced our infrastructure costs by 40% while improving performance significantly. Highly recommended for enterprise solutions.",
+    name: "Emily Chen",
+    position: "Director of IT, GlobalCorp",
+    project: "Cloud Migration",
+    image: "https://images.unsplash.com/photo-1580489944761-15a19d654956?w=100&h=100&fit=crop&q=80&fm=webp"
+  },
+  {
+    text: "The custom CRM system they built has transformed our sales process. Our team productivity increased by 50% and customer satisfaction scores are at an all-time high.",
+    name: "David Thompson",
+    position: "Sales Director, InnovateSales",
+    project: "Custom CRM System",
+    image: "https://images.unsplash.com/photo-1519085360753-af0119f7cbe7?w=100&h=100&fit=crop&q=80&fm=webp"
+  },
+  {
+    text: "Their AI integration project exceeded our expectations. The machine learning models they implemented have improved our operational efficiency by 60%. True technical innovators.",
+    name: "Lisa Park",
+    position: "Head of Operations, DataFlow Inc.",
+    project: "AI Integration",
+    image: "https://images.unsplash.com/photo-1594744803329-e58b31de8bf5?w=100&h=100&fit=crop&q=80&fm=webp"
+  },
+  {
+    text: "The web application they developed has revolutionized our customer service. Response times are down 70% and customer satisfaction is up 85%. Outstanding work from start to finish.",
+    name: "Robert Wilson",
+    position: "Customer Success Manager, ServicePro",
+    project: "Customer Service Platform",
+    image: "https://images.unsplash.com/photo-1500648767791-00dcc994a43e?w=100&h=100&fit=crop&q=80&fm=webp"
+  }
+]
 
 function Testimonials() {
   const [currentTestimonial, setCurrentTestimonial] = useState(0)
-
-  const testimonials = [
-    {
-      text: "Working with this team has been exceptional. They delivered our e-commerce platform ahead of schedule and exceeded all our expectations. The attention to detail and technical expertise is outstanding.",
-      name: "Sarah Johnson",
-      position: "CEO, TechStart Inc.",
-      project: "E-commerce Platform",
-      image: "https://images.unsplash.com/photo-1573496359142-b8d87734a5a2?w=100&h=100&fit=crop&q=80"
-    },
-    {
-      text: "The mobile app they developed for us has been a game-changer. User engagement increased by 300% after launch. Their understanding of user experience and technical implementation is remarkable.",
-      name: "Michael Rodriguez",
-      position: "CTO, FitTech Solutions",
-      project: "Mobile Fitness App",
-      image: "https://images.unsplash.com/photo-1560250097-0b93528c311a?w=100&h=100&fit=crop&q=80"
-    },
-    {
-      text: "Our cloud migration project was seamless thanks to their expertise. They reduced our infrastructure costs by 40% while improving performance significantly. Highly recommended for enterprise solutions.",
-      name: "Emily Chen",
-      position: "Director of IT, GlobalCorp",
-      project: "Cloud Migration",
-      image: "https://images.unsplash.com/photo-1580489944761-15a19d654956?w=100&h=100&fit=crop&q=80"
-    },
-    {
-      text: "The custom CRM system they built has transformed our sales process. Our team productivity increased by 50% and customer satisfaction scores are at an all-time high.",
-      name: "David Thompson",
-      position: "Sales Director, InnovateSales",
-      project: "Custom CRM System",
-      image: "https://images.unsplash.com/photo-1519085360753-af0119f7cbe7?w=100&h=100&fit=crop&q=80"
-    },
-    {
-      text: "Their AI integration project exceeded our expectations. The machine learning models they implemented have improved our operational efficiency by 60%. True technical innovators.",
-      name: "Lisa Park",
-      position: "Head of Operations, DataFlow Inc.",
-      project: "AI Integration",
-      image: "https://images.unsplash.com/photo-1594744803329-e58b31de8bf5?w=100&h=100&fit=crop&q=80"
-    },
-    {
-      text: "The web application they developed has revolutionized our customer service. Response times are down 70% and customer satisfaction is up 85%. Outstanding work from start to finish.",
-      name: "Robert Wilson",
-      position: "Customer Success Manager, ServicePro",
-      project: "Customer Service Platform",
-      image: "https://images.unsplash.com/photo-1500648767791-00dcc994a43e?w=100&h=100&fit=crop&q=80"
-    }
-  ]
 
   const nextTestimonial = () => {
     setCurrentTestimonial((prev) => (prev + 1) % testimonials.length)
@@ -72,7 +72,7 @@ function Testimonials() {
           </p>
         </div>
 
-        <div className="relative">
+        <div className="relative" role="region" aria-roledescription="carousel" aria-label="Client testimonials">
           <div className="bg-white rounded-2xl p-8 md:p-12 shadow-xl max-w-4xl mx-auto">
             <div className="flex items-center justify-center mb-6">
               <div className="flex space-x-1">
@@ -90,6 +90,7 @@ function Testimonials() {
               <img
                 src={testimonials[currentTestimonial].image}
                 alt={testimonials[currentTestimonial].name}
+                loading="lazy"
                 className="w-16 h-16 rounded-full object-cover object-top mr-4"
               />
               <div className="text-center">
@@ -108,12 +109,14 @@ function Testimonials() {
           <button
             onClick={prevTestimonial}
             className="hidden md:flex absolute -left-6 top-1/2 transform -translate-y-1/2 w-12 h-12 items-center justify-center bg-white rounded-full shadow-lg hover:bg-gray-50 transition-colors cursor-pointer"
+            aria-label="Previous"
           >
             <i className="ri-arrow-left-s-line text-gray-600 text-xl"></i>
           </button>
           <button
             onClick={nextTestimonial}
             className="hidden md:flex absolute -right-6 top-1/2 transform -translate-y-1/2 w-12 h-12 items-center justify-center bg-white rounded-full shadow-lg hover:bg-gray-50 transition-colors cursor-pointer"
+            aria-label="Next"
           >
             <i className="ri-arrow-right-s-line text-gray-600 text-xl"></i>
           </button>
@@ -124,25 +127,32 @@ function Testimonials() {
           <button
             onClick={prevTestimonial}
             className="w-10 h-10 flex items-center justify-center bg-white rounded-full shadow-lg hover:bg-gray-50 transition-colors cursor-pointer"
+            aria-label="Previous"
           >
             <i className="ri-arrow-left-s-line text-gray-600 text-lg"></i>
           </button>
           <button
             onClick={nextTestimonial}
             className="w-10 h-10 flex items-center justify-center bg-white rounded-full shadow-lg hover:bg-gray-50 transition-colors cursor-pointer"
+            aria-label="Next"
           >
             <i className="ri-arrow-right-s-line text-gray-600 text-lg"></i>
           </button>
         </div>
 
-        <div className="flex justify-center mt-6 md:mt-8 space-x-2">
+        <div className="flex justify-center mt-6 md:mt-8 space-x-0">
           {testimonials.map((_, index) => (
             <button
               key={index}
               onClick={() => goToTestimonial(index)}
-              className={`w-3 h-3 rounded-full cursor-pointer transition-colors ${currentTestimonial === index ? 'bg-blue-600' : 'bg-gray-300'
-                }`}
-            />
+              className="w-8 h-8 flex items-center justify-center"
+              aria-label={`Go to slide ${index + 1}`}
+            >
+              <span
+                className={`block w-3 h-3 rounded-full transition-colors ${currentTestimonial === index ? 'bg-blue-600' : 'bg-gray-300'
+                  }`}
+              />
+            </button>
           ))}
         </div>
 
@@ -165,4 +175,4 @@ function Testimonials() {
   )
 }
 
-export default Testimonials
+export default memo(Testimonials)

@@ -1,7 +1,7 @@
 import { useState, useEffect, useCallback } from 'react';
 import { inquiryAPI } from '../services/api';
 
-const RECAPTCHA_SITE_KEY = '6LcrNTYsAAAAAAiRJyNE6h2kWSsof7HrIHRx4Z8z';
+const RECAPTCHA_SITE_KEY = import.meta.env.VITE_RECAPTCHA_SITE_KEY;
 const POPUP_DELAY_MS = 15000; // 15 seconds
 const SCROLL_THRESHOLD = 0.5; // 50% scroll
 const STORAGE_KEY = 'nexspire_popup_dismissed';
@@ -77,15 +77,29 @@ const EnquiryPopup = () => {
         return () => document.removeEventListener('keydown', handleEsc);
     }, [isVisible, closePopup]);
 
-    // Prevent body scroll when popup is open
+    // Prevent body scroll when popup is open (iOS-safe)
     useEffect(() => {
         if (isVisible) {
-            document.body.style.overflow = 'hidden';
+            const scrollY = window.scrollY;
+            document.body.style.position = 'fixed';
+            document.body.style.top = `-${scrollY}px`;
+            document.body.style.left = '0';
+            document.body.style.right = '0';
         } else {
-            document.body.style.overflow = 'unset';
+            const scrollY = parseInt(document.body.style.top || '0', 10) * -1;
+            document.body.style.position = '';
+            document.body.style.top = '';
+            document.body.style.left = '';
+            document.body.style.right = '';
+            window.scrollTo(0, scrollY);
         }
         return () => {
-            document.body.style.overflow = 'unset';
+            const scrollY = parseInt(document.body.style.top || '0', 10) * -1;
+            document.body.style.position = '';
+            document.body.style.top = '';
+            document.body.style.left = '';
+            document.body.style.right = '';
+            window.scrollTo(0, scrollY);
         };
     }, [isVisible]);
 
@@ -102,10 +116,16 @@ const EnquiryPopup = () => {
         setSubmitStatus({ type: '', message: '' });
 
         try {
-            // Get reCAPTCHA token
             let captchaToken = null;
-            if (window.grecaptcha) {
+            try {
+                if (!window.grecaptcha) {
+                    throw new Error('reCAPTCHA is not available. Please refresh and try again.');
+                }
                 captchaToken = await window.grecaptcha.execute(RECAPTCHA_SITE_KEY, { action: 'submit_inquiry' });
+            } catch (captchaError) {
+                setSubmitStatus({ type: 'error', message: captchaError.message || 'Captcha verification failed. Please try again.' });
+                setIsSubmitting(false);
+                return;
             }
 
             await inquiryAPI.submit({
@@ -140,6 +160,9 @@ const EnquiryPopup = () => {
             className={`fixed inset-0 z-[9999] flex items-center justify-center p-4 transition-all duration-300 ${isClosing ? 'opacity-0' : 'opacity-100'}`}
             style={{ background: 'rgba(0, 0, 0, 0.7)', backdropFilter: 'blur(8px)' }}
             onClick={closePopup}
+            role="dialog"
+            aria-modal="true"
+            aria-labelledby="enquiry-popup-title"
         >
             {/* Animated particles/sparkles */}
             <div className="absolute inset-0 overflow-hidden pointer-events-none">
@@ -175,6 +198,7 @@ const EnquiryPopup = () => {
                     <button
                         onClick={closePopup}
                         className="absolute top-4 right-4 z-10 w-8 h-8 flex items-center justify-center rounded-full bg-white/10 hover:bg-white/20 transition-colors group"
+                        aria-label="Close"
                     >
                         <i className="ri-close-line text-white text-xl group-hover:scale-110 transition-transform"></i>
                     </button>
@@ -185,7 +209,7 @@ const EnquiryPopup = () => {
                             <span className="w-2 h-2 bg-green-400 rounded-full mr-2 animate-pulse"></span>
                             Limited Time Offer
                         </div>
-                        <h2 className="text-2xl md:text-3xl font-bold text-white mb-2">
+                        <h2 id="enquiry-popup-title" className="text-2xl md:text-3xl font-bold text-white mb-2">
                             Let's Build Something
                             <span className="block bg-gradient-to-r from-blue-400 via-purple-400 to-pink-400 bg-clip-text text-transparent mt-1">
                                 Amazing Together! ✨
@@ -207,7 +231,10 @@ const EnquiryPopup = () => {
                                         value={formData.name}
                                         onChange={handleChange}
                                         required
+                                        minLength={2}
+                                        maxLength={100}
                                         placeholder="Your Name *"
+                                        aria-label="Your Name"
                                         className="w-full px-4 py-3 bg-white/5 border border-white/10 rounded-lg text-white placeholder-gray-500 focus:ring-2 focus:ring-blue-500 focus:border-blue-500 transition-all text-sm"
                                     />
                                 </div>
@@ -218,7 +245,9 @@ const EnquiryPopup = () => {
                                         value={formData.email}
                                         onChange={handleChange}
                                         required
+                                        maxLength={254}
                                         placeholder="Email *"
+                                        aria-label="Email"
                                         className="w-full px-4 py-3 bg-white/5 border border-white/10 rounded-lg text-white placeholder-gray-500 focus:ring-2 focus:ring-blue-500 focus:border-blue-500 transition-all text-sm"
                                     />
                                 </div>
@@ -230,7 +259,10 @@ const EnquiryPopup = () => {
                                     name="phone"
                                     value={formData.phone}
                                     onChange={handleChange}
+                                    minLength={10}
+                                    maxLength={15}
                                     placeholder="Phone Number (Optional)"
+                                    aria-label="Phone Number"
                                     className="w-full px-4 py-3 bg-white/5 border border-white/10 rounded-lg text-white placeholder-gray-500 focus:ring-2 focus:ring-blue-500 focus:border-blue-500 transition-all text-sm"
                                 />
                             </div>
@@ -241,7 +273,10 @@ const EnquiryPopup = () => {
                                     value={formData.message}
                                     onChange={handleChange}
                                     required
+                                    minLength={10}
+                                    maxLength={2000}
                                     placeholder="Tell us about your project... *"
+                                    aria-label="Message"
                                     rows={3}
                                     className="w-full px-4 py-3 bg-white/5 border border-white/10 rounded-lg text-white placeholder-gray-500 focus:ring-2 focus:ring-blue-500 focus:border-blue-500 transition-all resize-none text-sm"
                                 />

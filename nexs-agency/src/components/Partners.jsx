@@ -1,4 +1,4 @@
-import { useState, useEffect } from 'react'
+import { useState, useEffect, memo } from 'react'
 
 function Partners() {
   const [isVisible, setIsVisible] = useState(false)
@@ -307,4 +307,4 @@ function Partners() {
   )
 }
 
-export default Partners
+export default memo(Partners)

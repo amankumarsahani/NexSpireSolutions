@@ -1,74 +1,82 @@
 import { useState, useEffect, memo } from 'react'
+import { Link } from 'react-router-dom'
+
+const services = [
+  {
+    icon: "ri-code-line",
+    title: "Web Development",
+    slug: "custom-web-development",
+    description: "Modern, responsive websites built with cutting-edge technologies and industry best practices for optimal performance.",
+    features: ["React & Next.js", "Node.js & Python", "Mobile-First Design", "Performance Optimization"],
+    gradient: "from-blue-500 to-cyan-500",
+    bgPattern: "bg-blue-50",
+    accentColor: "blue"
+  },
+  {
+    icon: "ri-smartphone-line",
+    title: "Mobile Apps",
+    slug: "mobile-app-development",
+    description: "Native and cross-platform mobile applications that deliver exceptional user experiences across all devices.",
+    features: ["iOS & Android", "React Native", "Flutter Development", "App Store Deployment"],
+    gradient: "from-purple-500 to-pink-500",
+    bgPattern: "bg-purple-50",
+    accentColor: "purple"
+  },
+  {
+    icon: "ri-cloud-line",
+    title: "Cloud Solutions",
+    slug: "cloud-solutions",
+    description: "Scalable cloud infrastructure and DevOps solutions that grow with your business needs and requirements.",
+    features: ["AWS & Azure", "Docker & Kubernetes", "CI/CD Pipelines", "Auto-scaling Systems"],
+    gradient: "from-green-500 to-teal-500",
+    bgPattern: "bg-green-50",
+    accentColor: "green"
+  },
+  {
+    icon: "ri-palette-line",
+    title: "UI/UX Design",
+    slug: "ui-ux-design",
+    description: "Beautiful, intuitive designs that enhance user experience and drive engagement through thoughtful interface design.",
+    features: ["User Research", "Interactive Prototypes", "Design Systems", "Accessibility Focus"],
+    gradient: "from-orange-500 to-red-500",
+    bgPattern: "bg-orange-50",
+    accentColor: "orange"
+  },
+  {
+    icon: "ri-shopping-cart-line",
+    title: "E-commerce Solutions",
+    slug: "ecommerce-development",
+    description: "Complete e-commerce platforms with advanced payment integration and comprehensive inventory management systems.",
+    features: ["Custom E-commerce", "Payment Integration", "Inventory Management", "Analytics Dashboard"],
+    gradient: "from-indigo-500 to-blue-500",
+    bgPattern: "bg-indigo-50",
+    accentColor: "indigo"
+  },
+  {
+    icon: "ri-shield-check-line",
+    title: "Security & Testing",
+    slug: "security-testing",
+    description: "Comprehensive security audits and rigorous testing protocols to ensure your applications are secure and reliable.",
+    features: ["Security Audits", "Penetration Testing", "Code Quality Reviews", "Compliance Standards"],
+    gradient: "from-emerald-500 to-green-500",
+    bgPattern: "bg-emerald-50",
+    accentColor: "emerald"
+  }
+];
 
 const Services = memo(function Services() {
   const [hoveredCard, setHoveredCard] = useState(null)
   const [currentSlide, setCurrentSlide] = useState(0)
+  const [isAutoPlaying, setIsAutoPlaying] = useState(true)
 
-  const services = [
-    {
-      icon: "ri-code-line",
-      title: "Web Development",
-      description: "Modern, responsive websites built with cutting-edge technologies and industry best practices for optimal performance.",
-      features: ["React & Next.js", "Node.js & Python", "Mobile-First Design", "Performance Optimization"],
-      gradient: "from-blue-500 to-cyan-500",
-      bgPattern: "bg-blue-50",
-      accentColor: "blue"
-    },
-    {
-      icon: "ri-smartphone-line",
-      title: "Mobile Apps",
-      description: "Native and cross-platform mobile applications that deliver exceptional user experiences across all devices.",
-      features: ["iOS & Android", "React Native", "Flutter Development", "App Store Deployment"],
-      gradient: "from-purple-500 to-pink-500",
-      bgPattern: "bg-purple-50",
-      accentColor: "purple"
-    },
-    {
-      icon: "ri-cloud-line",
-      title: "Cloud Solutions",
-      description: "Scalable cloud infrastructure and DevOps solutions that grow with your business needs and requirements.",
-      features: ["AWS & Azure", "Docker & Kubernetes", "CI/CD Pipelines", "Auto-scaling Systems"],
-      gradient: "from-green-500 to-teal-500",
-      bgPattern: "bg-green-50",
-      accentColor: "green"
-    },
-    {
-      icon: "ri-palette-line",
-      title: "UI/UX Design",
-      description: "Beautiful, intuitive designs that enhance user experience and drive engagement through thoughtful interface design.",
-      features: ["User Research", "Interactive Prototypes", "Design Systems", "Accessibility Focus"],
-      gradient: "from-orange-500 to-red-500",
-      bgPattern: "bg-orange-50",
-      accentColor: "orange"
-    },
-    {
-      icon: "ri-shopping-cart-line",
-      title: "E-commerce Solutions",
-      description: "Complete e-commerce platforms with advanced payment integration and comprehensive inventory management systems.",
-      features: ["Custom E-commerce", "Payment Integration", "Inventory Management", "Analytics Dashboard"],
-      gradient: "from-indigo-500 to-blue-500",
-      bgPattern: "bg-indigo-50",
-      accentColor: "indigo"
-    },
-    {
-      icon: "ri-shield-check-line",
-      title: "Security & Testing",
-      description: "Comprehensive security audits and rigorous testing protocols to ensure your applications are secure and reliable.",
-      features: ["Security Audits", "Penetration Testing", "Code Quality Reviews", "Compliance Standards"],
-      gradient: "from-emerald-500 to-green-500",
-      bgPattern: "bg-emerald-50",
-      accentColor: "emerald"
-    }
-  ];
-
-  // Auto slider functionality
   useEffect(() => {
+    if (!isAutoPlaying) return
     const timer = setInterval(() => {
       setCurrentSlide((prev) => (prev + 1) % Math.ceil(services.length / 3))
     }, 4000)
 
     return () => clearInterval(timer)
-  }, [services.length])
+  }, [isAutoPlaying])
 
   const goToSlide = (index) => {
     setCurrentSlide(index)
@@ -130,7 +138,7 @@ const Services = memo(function Services() {
         </div>
 
         {/* Enhanced Services Carousel */}
-        <div className="relative mb-16">
+        <div className="relative mb-16" role="region" aria-roledescription="carousel" aria-label="Our services">
           {/* Carousel Container */}
           <div className="overflow-hidden">
             <div
@@ -174,9 +182,11 @@ const Services = memo(function Services() {
                           </div>
 
                           {/* Enhanced Content */}
-                          <h3 className="relative z-10 text-xl sm:text-2xl font-bold text-gray-900 mb-3 sm:mb-4 group-hover:text-gray-800 transition-colors duration-300">
-                            {service.title}
-                          </h3>
+                          <Link to={`/services/${service.slug}`} className="relative z-10">
+                            <h3 className="text-xl sm:text-2xl font-bold text-gray-900 mb-3 sm:mb-4 group-hover:text-gray-800 transition-colors duration-300">
+                              {service.title}
+                            </h3>
+                          </Link>
 
                           <p className="relative z-10 text-gray-600 mb-4 sm:mb-6 leading-relaxed group-hover:text-gray-700 transition-colors duration-300 text-sm sm:text-base">
                             {service.description}
@@ -216,6 +226,7 @@ const Services = memo(function Services() {
             <button
               onClick={() => goToSlide(currentSlide === 0 ? totalSlides - 1 : currentSlide - 1)}
               className="w-10 h-10 bg-white/90 backdrop-blur-sm rounded-full shadow-lg hover:shadow-xl transition-all duration-300 flex items-center justify-center group hover:scale-110"
+              aria-label="Previous"
             >
               <i className="ri-arrow-left-line text-lg text-gray-700 group-hover:text-indigo-600 transition-colors"></i>
             </button>
@@ -223,39 +234,53 @@ const Services = memo(function Services() {
             <button
               onClick={() => goToSlide(currentSlide === totalSlides - 1 ? 0 : currentSlide + 1)}
               className="w-10 h-10 bg-white/90 backdrop-blur-sm rounded-full shadow-lg hover:shadow-xl transition-all duration-300 flex items-center justify-center group hover:scale-110"
+              aria-label="Next"
             >
               <i className="ri-arrow-right-line text-lg text-gray-700 group-hover:text-indigo-600 transition-colors"></i>
             </button>
           </div>
 
           {/* Carousel Navigation Dots */}
-          <div className="flex justify-center mt-6 space-x-3">
+          <div className="flex justify-center mt-6 space-x-1">
             {Array.from({ length: totalSlides }).map((_, index) => (
               <button
                 key={index}
                 onClick={() => goToSlide(index)}
-                className={`w-3 h-3 rounded-full transition-all duration-300 ${currentSlide === index
-                  ? 'bg-gradient-to-r from-indigo-500 to-purple-500 scale-125 shadow-lg'
-                  : 'bg-gray-300 hover:bg-gray-400 hover:scale-110'
-                  }`}
-              />
+                className="w-8 h-8 flex items-center justify-center"
+                aria-label={`Go to slide ${index + 1}`}
+              >
+                <span
+                  className={`block w-3 h-3 rounded-full transition-all duration-300 ${currentSlide === index
+                    ? 'bg-gradient-to-r from-indigo-500 to-purple-500 scale-125 shadow-lg'
+                    : 'bg-gray-300 hover:bg-gray-400 hover:scale-110'
+                    }`}
+                />
+              </button>
             ))}
           </div>
 
-          {/* Carousel Progress Bar */}
-          <div className="flex justify-center mt-4">
+          {/* Carousel Progress Bar & Pause/Play */}
+          <div className="flex justify-center items-center mt-4 gap-3">
             <div className="w-48 h-1 bg-gray-200 rounded-full overflow-hidden">
               <div
                 className="h-full bg-gradient-to-r from-indigo-500 to-purple-500 rounded-full transition-all duration-300 ease-out"
                 style={{ width: `${((currentSlide + 1) / totalSlides) * 100}%` }}
               />
             </div>
+            <button
+              onClick={() => setIsAutoPlaying(!isAutoPlaying)}
+              className="w-7 h-7 flex items-center justify-center rounded-full bg-gray-200/80 hover:bg-gray-300/80 transition-colors"
+              aria-label={isAutoPlaying ? 'Pause carousel' : 'Play carousel'}
+            >
+              <i className={`${isAutoPlaying ? 'ri-pause-line' : 'ri-play-line'} text-xs text-gray-600`}></i>
+            </button>
           </div>
 
           {/* Navigation Arrows - Positioned outside of cards */}
           <button
             onClick={() => goToSlide(currentSlide === 0 ? totalSlides - 1 : currentSlide - 1)}
             className="absolute -left-16 top-1/2 transform -translate-y-1/2 w-12 h-12 bg-white/90 backdrop-blur-sm rounded-full shadow-xl hover:shadow-2xl transition-all duration-300 flex items-center justify-center group hover:scale-110 lg:block hidden"
+            aria-label="Previous"
           >
             <i className="ri-arrow-left-line text-xl text-gray-700 group-hover:text-indigo-600 transition-colors"></i>
           </button>
@@ -263,6 +288,7 @@ const Services = memo(function Services() {
           <button
             onClick={() => goToSlide(currentSlide === totalSlides - 1 ? 0 : currentSlide + 1)}
             className="absolute -right-16 top-1/2 transform -translate-y-1/2 w-12 h-12 bg-white/90 backdrop-blur-sm rounded-full shadow-xl hover:shadow-2xl transition-all duration-300 flex items-center justify-center group hover:scale-110 lg:block hidden"
+            aria-label="Next"
           >
             <i className="ri-arrow-right-line text-xl text-gray-700 group-hover:text-indigo-600 transition-colors"></i>
           </button>

@@ -1,3 +1,4 @@
+import { memo } from 'react';
 // eslint-disable-next-line no-unused-vars
 import { motion } from 'framer-motion';
 
@@ -10,7 +11,7 @@ const clients = [
     { name: 'LogiFlow', initial: 'LF' }
 ];
 
-export default function ClientLogos({ className = '', title = 'Trusted by Industry Leaders' }) {
+function ClientLogos({ className = '', title = 'Trusted by Industry Leaders' }) {
     return (
         <section className={`py-16 bg-white ${className}`}>
             <div className="container-custom">
@@ -48,3 +49,5 @@ export default function ClientLogos({ className = '', title = 'Trusted by Indust
         </section>
     );
 }
+
+export default memo(ClientLogos);

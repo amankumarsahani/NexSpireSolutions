@@ -1,4 +1,5 @@
-import { useState, useEffect } from 'react'
+import { useState, useEffect, memo } from 'react'
+import { siteConfig } from '../constants/siteConfig'
 
 function FAQ() {
   const [openFAQ, setOpenFAQ] = useState(0)
@@ -120,6 +121,7 @@ function FAQ() {
                   <button 
                     className="w-full px-6 py-5 text-left flex items-center justify-between group-hover:px-8 transition-all duration-300"
                     onClick={() => toggleFAQ(index)}
+                    aria-expanded={openFAQ === index}
                   >
                     <div className="flex items-center space-x-4 flex-1">
                       {/* Number Badge */}
@@ -213,7 +215,7 @@ function FAQ() {
                   </span>
                 </a>
                 <a
-                  href="tel:+15551234567"
+                  href={`tel:${siteConfig.phone.tel}`}
                   className="group relative bg-white text-indigo-600 px-8 py-4 rounded-2xl font-semibold hover:shadow-xl hover:scale-105 transition-all duration-300 cursor-pointer whitespace-nowrap"
                 >
                   <span className="flex items-center justify-center">
@@ -230,4 +232,4 @@ function FAQ() {
   )
 }
 
-export default FAQ
+export default memo(FAQ)

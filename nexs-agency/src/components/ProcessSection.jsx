@@ -1,3 +1,4 @@
+import { memo } from 'react';
 // eslint-disable-next-line no-unused-vars
 import { motion } from 'framer-motion';
 
@@ -32,7 +33,7 @@ const steps = [
     }
 ];
 
-export default function ProcessSection({ className = '' }) {
+function ProcessSection({ className = '' }) {
     return (
         <section className={`py-24 bg-gradient-to-b from-gray-50 to-white overflow-hidden ${className}`}>
             <div className="container-custom">
@@ -96,3 +97,5 @@ export default function ProcessSection({ className = '' }) {
         </section>
     );
 }
+
+export default memo(ProcessSection);

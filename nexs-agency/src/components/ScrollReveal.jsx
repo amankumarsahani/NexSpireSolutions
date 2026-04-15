@@ -81,8 +81,7 @@ export default function ScrollReveal({
             style={{
                 ...currentStyle,
                 transition: `opacity ${duration}ms ease-out, transform ${duration}ms ease-out`,
-                transitionDelay: `${delay}ms`,
-                willChange: 'opacity, transform'
+                transitionDelay: `${delay}ms`
             }}
         >
             {children}
@@ -142,8 +141,7 @@ export function StaggerReveal({
                     style={{
                         ...currentStyle,
                         transition: `opacity ${duration}ms ease-out, transform ${duration}ms ease-out`,
-                        transitionDelay: `${baseDelay + (index * staggerDelay)}ms`,
-                        willChange: 'opacity, transform'
+                        transitionDelay: `${baseDelay + (index * staggerDelay)}ms`
                     }}
                 >
                     {child}
@@ -153,8 +151,7 @@ export function StaggerReveal({
                     style={{
                         ...currentStyle,
                         transition: `opacity ${duration}ms ease-out, transform ${duration}ms ease-out`,
-                        transitionDelay: `${baseDelay}ms`,
-                        willChange: 'opacity, transform'
+                        transitionDelay: `${baseDelay}ms`
                     }}
                 >
                     {children}
