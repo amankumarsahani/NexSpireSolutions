@@ -1,87 +1,8 @@
-import { useState, useEffect, useRef, memo } from 'react'
+import { useState, useEffect } from 'react'
 
-const useCountUp = (target, duration = 2000, shouldAnimate = false) => {
-  const [count, setCount] = useState(0)
-  const rafRef = useRef(null)
-
-  useEffect(() => {
-    if (!shouldAnimate) return
-
-    const startTime = performance.now()
-    const easeOutQuart = (t) => 1 - Math.pow(1 - t, 4)
-
-    const animate = (now) => {
-      const elapsed = now - startTime
-      const progress = Math.min(elapsed / duration, 1)
-      const easedProgress = easeOutQuart(progress)
-      setCount(Math.round(target * easedProgress))
-
-      if (progress < 1) {
-        rafRef.current = requestAnimationFrame(animate)
-      }
-    }
-
-    rafRef.current = requestAnimationFrame(animate)
-    return () => { if (rafRef.current) cancelAnimationFrame(rafRef.current) }
-  }, [target, duration, shouldAnimate])
-
-  return count
-}
-
-const StatNumber = memo(function StatNumber({ stat, isVisible }) {
-  // Parse the number from strings like "150+", "80+", "98%", "24/7"
-  const isSpecial = stat.number === '24/7'
-  const numericValue = parseInt(stat.number.replace(/[^0-9]/g, ''), 10)
-  const suffix = stat.number.replace(/[0-9]/g, '')
-  const count = useCountUp(isSpecial ? 0 : numericValue, 2000, isVisible)
-
-  return (
-    <div className="text-5xl font-bold text-[#4F46E5] mb-2">
-      {isSpecial ? '24/7' : `${count}${suffix}`}
-    </div>
-  )
-})
-
-// eslint-disable-next-line no-unused-vars
-const teamMembers = [
-  {
-    name: "Aman Kumar Sahani",
-    role: "Founder & Lead Developer",
-    image: "https://images.unsplash.com/photo-1507003211169-0a1dd7228f2d?w=200&h=200&fit=crop&fm=webp",
-    skills: ["React", "Node.js", "Python", "AWS"],
-  },
-  {
-    name: "Anu Kumar",
-    role: "Senior UI/UX Designer",
-    image: "https://images.unsplash.com/photo-1506794778202-cad84cf45f1d?w=200&h=200&fit=crop&fm=webp",
-    skills: ["Figma", "React", "Design Systems"],
-  },
-  {
-    name: "Kshitij Bhardwaj",
-    role: "Backend Architect",
-    image: "https://images.unsplash.com/photo-1472099645785-5658abf4ff4e?w=200&h=200&fit=crop&fm=webp",
-    skills: ["Vue.js", "Django", "PostgreSQL", "Docker"],
-  }
-];
-
-const stats = [
-  { number: "150+", label: "Projects Completed", icon: "ri-bar-chart-box-line" },
-  { number: "80+", label: "Happy Clients", icon: "ri-heart-line" },
-  { number: "98%", label: "Success Rate", icon: "ri-flashlight-line" },
-  { number: "24/7", label: "Support Available", icon: "ri-customer-service-line" }
-];
-
-const features = [
-  { icon: "ri-flashlight-line", title: "Agile Development", description: "Fast, iterative development approach for rapid delivery" },
-  { icon: "ri-shield-check-line", title: "Quality Assurance", description: "Rigorous testing and quality control processes" },
-  { icon: "ri-arrow-right-up-line", title: "Scalable Solutions", description: "Future-proof architecture that grows with your business" },
-  { icon: "ri-lightbulb-line", title: "Innovation Focus", description: "Cutting-edge technologies and creative problem solving" }
-];
-
-const About = memo(function About() {
+const About = () => {
   const [isVisible, setIsVisible] = useState(false)
-  const [statsVisible, setStatsVisible] = useState(false)
-  const statsRef = useRef(null)
+  const [hoveredMember, setHoveredMember] = useState(null) // eslint-disable-line no-unused-vars
 
   useEffect(() => {
     const observer = new IntersectionObserver(
@@ -99,74 +20,159 @@ const About = memo(function About() {
     return () => observer.disconnect()
   }, [])
 
-  useEffect(() => {
-    const observer = new IntersectionObserver(
-      ([entry]) => {
-        if (entry.isIntersecting) {
-          setStatsVisible(true)
-          observer.disconnect()
-        }
-      },
-      { threshold: 0.3 }
-    )
+  const teamMembers = [ // eslint-disable-line no-unused-vars
+    {
+      name: "Aman Kumar Sahani",
+      role: "Founder & Lead Developer",
+      image: "https://media.licdn.com/dms/image/v2/D5635AQH5ci5Ugk1vTw/profile-framedphoto-shrink_400_400/B56ZfvUFh9GUAc-/0/1752066710244?e=1764432000&v=beta&t=tKuFhdqPPrrcdpFEn9N8hDVCx1MTK5HeqUAbZ_ise8I",
+      skills: ["React", "Node.js", "Python", "AWS"],
+      gradient: "from-blue-500 to-blue-600"
+    },
+    {
+      name: "Anu Kumar",
+      role: "Senior UI/UX Designer",
+      image: "https://media.licdn.com/dms/image/v2/D5635AQHiirkL_Zj4Kg/profile-framedphoto-shrink_400_400/profile-framedphoto-shrink_400_400/0/1712624046763?e=1764432000&v=beta&t=8cpHTXKwpXe6DU-Gvd8Vf9kdWqGg2TJofno2wUZAVLs",
+      skills: ["Figma", "React", "Design Systems"],
+      gradient: "from-purple-500 to-purple-600"
+    },
+    {
+      name: "Kshitij Bhardwaj",
+      role: "Backend Architect",
+      image: "https://media.licdn.com/dms/image/v2/D5635AQFLeeMkFr5TQw/profile-framedphoto-shrink_400_400/B56Zitq2hlH0Ak-/0/1755260348813?e=1764432000&v=beta&t=r4fL3zagpQbN7L5-ubGA70k3szERV5yeJM0cLZTno-E",
+      skills: ["Vue.js", "Django", "PostgreSQL", "Docker"],
+      gradient: "from-green-500 to-green-600"
+    }
+  ];
 
-    if (statsRef.current) observer.observe(statsRef.current)
-    return () => observer.disconnect()
-  }, [])
+  const stats = [
+    {
+      number: "150+",
+      label: "Projects Completed",
+      description: "Successfully delivered across various industries"
+    },
+    {
+      number: "80+",
+      label: "Happy Clients",
+      description: "Long-term partnerships built on trust"
+    },
+    {
+      number: "98%",
+      label: "Success Rate",
+      description: "On-time delivery and quality assurance"
+    },
+    {
+      number: "24/7",
+      label: "Support Available",
+      description: "Round-the-clock technical assistance"
+    }
+  ];
+
+  const features = [
+    {
+      icon: "⚡",
+      title: "Agile Development",
+      description: "Fast, iterative development approach for rapid delivery"
+    },
+    {
+      icon: "🛡️",
+      title: "Quality Assurance",
+      description: "Rigorous testing and quality control processes"
+    },
+    {
+      icon: "🚀",
+      title: "Scalable Solutions",
+      description: "Future-proof architecture that grows with your business"
+    },
+    {
+      icon: "💡",
+      title: "Innovation Focus",
+      description: "Cutting-edge technologies and creative problem solving"
+    }
+  ];
 
   return (
-    <section id="about" className="relative py-20 bg-slate-50 overflow-hidden">
+    <section id="about" className="relative py-20 bg-gradient-to-br from-gray-50 via-slate-50 to-indigo-50 overflow-hidden">
+      {/* Background Elements - Same as Services */}
+      <div className="absolute inset-0">
+        <div className="absolute top-0 left-0 w-full h-full bg-gradient-to-br from-blue-500/5 via-transparent to-purple-500/5"></div>
+        <div className="absolute inset-0 bg-gradient-to-tl from-pink-500/3 via-transparent to-cyan-500/3"></div>
+
+        <div className="absolute top-20 left-10 w-80 h-80 bg-gradient-to-br from-blue-200/15 to-cyan-200/10 rounded-full blur-3xl animate-pulse"></div>
+        <div className="absolute bottom-20 right-10 w-96 h-96 bg-gradient-to-bl from-purple-200/12 to-pink-200/8 rounded-full blur-3xl animate-pulse" style={{ animationDelay: '2s' }}></div>
+        <div className="absolute top-1/2 left-1/2 transform -translate-x-1/2 -translate-y-1/2 w-72 h-72 bg-gradient-to-r from-indigo-200/10 to-violet-200/8 rounded-full blur-3xl animate-pulse" style={{ animationDelay: '4s' }}></div>
+
+        <div className="absolute inset-0 opacity-5">
+          <svg className="w-full h-full" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 100 100">
+            <defs>
+              <pattern id="about-grid" x="0" y="0" width="20" height="20" patternUnits="userSpaceOnUse">
+                <circle cx="10" cy="10" r="1" fill="currentColor" />
+                <path d="M10 0v20M0 10h20" stroke="currentColor" strokeWidth="0.5" opacity="0.3" />
+              </pattern>
+            </defs>
+            <rect width="100%" height="100%" fill="url(#about-grid)" className="text-indigo-400" />
+          </svg>
+        </div>
+      </div>
 
       <div className="relative z-10 max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
 
-        <div className={`text-left mb-16 transition-all duration-1000 transform ${isVisible ? 'translate-y-0 opacity-100' : 'translate-y-8 opacity-0'
+        {/* Professional Header */}
+        <div className={`text-center mb-16 transition-all duration-1000 transform ${isVisible ? 'translate-y-0 opacity-100' : 'translate-y-8 opacity-0'
           }`}>
-          <span className="text-sm font-semibold text-[#2563EB] uppercase tracking-wider">More Than An Agency</span>
+          <div className="inline-flex items-center bg-blue-100/80 backdrop-blur-sm border border-blue-200/60 text-blue-700 text-sm font-semibold px-6 py-3 rounded-full mb-6 shadow-lg">
+            <div className="w-2 h-2 bg-blue-600 rounded-full mr-2 animate-pulse"></div>
+            More Than An Agency
+          </div>
 
-          <h2 className="text-4xl md:text-5xl lg:text-6xl font-bold text-slate-800 mb-6 mt-4 leading-tight">
+          <h2 className="text-4xl md:text-5xl lg:text-6xl font-bold text-gray-900 mb-6 leading-tight">
             We Are Your Technical
-            <span className="block text-[#2563EB] mt-2">
+            <span className="block bg-gradient-to-r from-blue-600 to-purple-600 bg-clip-text text-transparent mt-2">
               Co-Founders & Partners
             </span>
           </h2>
 
-          <p className="text-xl text-slate-600 max-w-3xl leading-relaxed">
+          <p className="text-xl text-gray-600 max-w-3xl mx-auto leading-relaxed">
             Most agencies just take tickets. We take ownership. We build the infrastructure that allows visionary companies to scale without limits.
           </p>
         </div>
 
-        <div className={`grid lg:grid-cols-12 gap-16 items-center mb-20 transition-all duration-1000 delay-300 transform ${isVisible ? 'translate-y-0 opacity-100' : 'translate-y-8 opacity-0'
+        {/* Main Content Grid */}
+        <div className={`grid lg:grid-cols-2 gap-16 items-center mb-20 transition-all duration-1000 delay-300 transform ${isVisible ? 'translate-y-0 opacity-100' : 'translate-y-8 opacity-0'
           }`}>
 
-          <div className="lg:col-span-5 relative group">
-            <div className="relative bg-white rounded-2xl p-6 shadow-xl border border-slate-200">
+          {/* Left: Company Image */}
+          <div className="relative group">
+            <div className="absolute -inset-4 bg-gradient-to-r from-blue-400/20 to-purple-400/20 rounded-2xl blur-2xl opacity-0 group-hover:opacity-100 transition-opacity duration-700"></div>
+            <div className="relative bg-white/80 backdrop-blur-sm rounded-2xl p-6 shadow-xl border border-white/50">
               <img
-                src="https://images.unsplash.com/photo-1522071820081-009f0129c71c?w=600&h=400&fit=crop&q=80&fm=webp"
+                src="https://images.unsplash.com/photo-1522071820081-009f0129c71c?w=600&h=400&fit=crop&q=80"
                 alt="Our professional team at work"
                 loading="lazy"
-                className="rounded-xl shadow-lg object-cover w-full h-80"
+                className="rounded-xl shadow-lg object-cover w-full h-80 transition-transform duration-700 group-hover:scale-[1.02]"
               />
 
-              <div className="absolute -bottom-4 -right-4 bg-white rounded-xl p-4 shadow-xl border border-slate-200">
+              {/* Floating Stats Cards */}
+              <div className="absolute -bottom-4 -right-4 bg-white/95 backdrop-blur-sm rounded-xl p-4 shadow-xl border border-white/30 transform group-hover:scale-105 transition-all duration-500">
                 <div className="text-center">
-                  <div className="text-2xl font-bold text-[#4F46E5]">5+</div>
-                  <div className="text-xs text-slate-600 font-medium">Years Experience</div>
+                  <div className="text-2xl font-bold text-blue-600">5+</div>
+                  <div className="text-xs text-gray-600 font-medium">Years Experience</div>
                 </div>
               </div>
 
-              <div className="absolute -top-4 -left-4 bg-white rounded-xl p-4 shadow-xl border border-slate-200">
+              <div className="absolute -top-4 -left-4 bg-white/95 backdrop-blur-sm rounded-xl p-4 shadow-xl border border-white/30 transform group-hover:scale-105 transition-all duration-500">
                 <div className="text-center">
-                  <div className="text-2xl font-bold text-[#4F46E5]">150+</div>
-                  <div className="text-xs text-slate-600 font-medium">Projects Done</div>
+                  <div className="text-2xl font-bold text-purple-600">150+</div>
+                  <div className="text-xs text-gray-600 font-medium">Projects Done</div>
                 </div>
               </div>
             </div>
           </div>
 
-          <div className="lg:col-span-7 space-y-8">
+          {/* Right: Company Information */}
+          <div className="space-y-8">
             <div>
-              <h3 className="text-3xl font-bold text-slate-800 mb-6">Who We Are</h3>
-              <div className="space-y-4 text-lg text-slate-600 leading-relaxed">
+              <h3 className="text-3xl font-bold text-gray-900 mb-6">Who We Are</h3>
+              <div className="space-y-4 text-lg text-gray-700 leading-relaxed">
                 <p>
                   With over 5 years of experience in the software development industry, Nexspire Solution has
                   established itself as a <strong>leading AI-powered development agency</strong>, trusted by Fortune 500 companies
@@ -180,23 +186,24 @@ const About = memo(function About() {
               </div>
             </div>
 
-            <div className="bg-[#F8FAFC] rounded-xl p-6 border border-slate-200">
+            {/* Mission & Vision */}
+            <div className="bg-white/70 backdrop-blur-sm rounded-xl p-6 border border-white/50 shadow-lg">
               <div className="grid md:grid-cols-2 gap-6">
                 <div>
-                  <h4 className="text-lg font-semibold text-slate-800 mb-2 flex items-center">
-                    <span className="w-2 h-2 bg-[#4F46E5] rounded-full mr-2"></span>
+                  <h4 className="text-lg font-semibold text-gray-900 mb-2 flex items-center">
+                    <span className="w-2 h-2 bg-blue-600 rounded-full mr-2"></span>
                     Our Mission
                   </h4>
-                  <p className="text-sm text-slate-600">
+                  <p className="text-sm text-gray-600">
                     To eliminate technical debt and accelerate go-to-market speed for ambitious global brands.
                   </p>
                 </div>
                 <div>
-                  <h4 className="text-lg font-semibold text-slate-800 mb-2 flex items-center">
-                    <span className="w-2 h-2 bg-[#4F46E5] rounded-full mr-2"></span>
+                  <h4 className="text-lg font-semibold text-gray-900 mb-2 flex items-center">
+                    <span className="w-2 h-2 bg-purple-600 rounded-full mr-2"></span>
                     Our Vision
                   </h4>
-                  <p className="text-sm text-slate-600">
+                  <p className="text-sm text-gray-600">
                     To be the infrastructure partner behind the next generation of Fortune 500 digital products.
                   </p>
                 </div>
@@ -205,81 +212,187 @@ const About = memo(function About() {
           </div>
         </div>
 
+        {/* Creative Why Choose Nexspire Solution */}
         <div className={`mb-24 transition-all duration-1000 delay-500 transform ${isVisible ? 'translate-y-0 opacity-100' : 'translate-y-8 opacity-0'
           }`}>
-          <div className="text-left mb-16">
-            <span className="text-sm font-semibold text-[#2563EB] uppercase tracking-wider">Why Choose Nexspire Solution</span>
-            <h3 className="text-3xl md:text-4xl font-bold text-slate-800 mb-6 mt-4">
-              What Makes Us <span className="text-[#4F46E5]">Different</span>
+          <div className="text-center mb-16">
+            <div className="inline-flex items-center bg-white/60 backdrop-blur-lg border border-gray-200/50 text-gray-700 text-sm font-semibold px-6 py-3 rounded-2xl mb-8 shadow-lg">
+              <div className="w-2 h-2 bg-blue-500 rounded-full mr-2"></div>
+              Why Choose Nexspire Solution
+            </div>
+            <h3 className="text-3xl md:text-4xl font-bold text-gray-900 mb-6">
+              What Makes Us <span className="text-blue-600">Different</span>
             </h3>
-            <p className="text-lg text-slate-600 max-w-2xl">
+            <p className="text-lg text-gray-600 max-w-2xl mx-auto">
               Four core principles that drive our success and your satisfaction
             </p>
           </div>
 
-          <div className="max-w-6xl">
+          {/* Horizontal Layout */}
+          <div className="max-w-6xl mx-auto">
             <div className="grid md:grid-cols-2 gap-8">
-              {features.map((feature, index) => (
-                <div key={index} className="flex items-start gap-6 group">
-                  <div className="flex-shrink-0">
-                    <div className="relative w-16 h-16 bg-[#4F46E5] rounded-xl flex items-center justify-center shadow-lg">
-                      <i className={`${feature.icon} text-2xl text-white`}></i>
-                    </div>
-                  </div>
+              {features.map((feature, index) => {
+                const isLeft = index % 2 === 0;
+                const featureIcons = ['ri-flashlight-line', 'ri-shield-check-line', 'ri-rocket-2-line', 'ri-lightbulb-line'];
+                const colors = ['blue', 'purple', 'green', 'orange'];
 
-                  <div className="flex-1">
-                    <div className="bg-white rounded-xl p-6 shadow-lg border border-slate-200 hover:shadow-xl hover:-translate-y-0.5 transition-all duration-300">
-                      <h4 className="text-xl font-bold text-slate-800 mb-3">
-                        {feature.title}
-                      </h4>
-                      <p className="text-slate-600 leading-relaxed">
-                        {feature.description}
-                      </p>
+                return (
+                  <div key={index} className={`flex ${isLeft ? 'flex-row' : 'flex-row-reverse'} items-center gap-6 group`}>
+                    {/* Icon Section */}
+                    <div className="flex-shrink-0">
+                      <div className={`relative w-16 h-16 bg-gradient-to-br from-${colors[index]}-400 to-${colors[index]}-600 rounded-xl flex items-center justify-center shadow-lg transform rotate-3 group-hover:rotate-6 transition-transform duration-300`}>
+                        <i className={`${featureIcons[index]} text-2xl text-white`}></i>
+                        {/* Floating decoration */}
+                        <div className={`absolute -top-1 -right-1 w-4 h-4 bg-${colors[index]}-300 rounded-full opacity-80 animate-bounce`}></div>
+                      </div>
+                    </div>
+
+                    {/* Content Section */}
+                    <div className={`flex-1 ${isLeft ? 'text-left' : 'text-right'}`}>
+                      <div className={`bg-white/70 backdrop-blur-sm rounded-xl p-6 shadow-lg border border-white/50 ${isLeft ? 'ml-4' : 'mr-4'}`}>
+                        <h4 className={`text-xl font-bold text-gray-900 mb-3 ${isLeft ? 'text-left' : 'text-right'}`}>
+                          {feature.title}
+                        </h4>
+                        <p className={`text-gray-600 leading-relaxed ${isLeft ? 'text-left' : 'text-right'}`}>
+                          {feature.description}
+                        </p>
+
+                        {/* Progress bar */}
+                        <div className={`mt-4 ${isLeft ? 'text-left' : 'text-right'}`}>
+                          <div className={`h-1 bg-gray-200 rounded-full ${isLeft ? '' : 'ml-auto'} w-24`}>
+                            <div className={`h-full bg-gradient-to-r from-${colors[index]}-400 to-${colors[index]}-600 rounded-full animate-pulse`} style={{ width: `${85 + index * 5}%` }}></div>
+                          </div>
+                        </div>
+                      </div>
+
+                      {/* Connection Line */}
+                      <div className={`hidden md:block absolute top-1/2 ${isLeft ? 'right-0 translate-x-3' : 'left-0 -translate-x-3'} w-6 h-0.5 bg-gradient-to-r from-${colors[index]}-300 to-${colors[index]}-500`}></div>
                     </div>
                   </div>
-                </div>
-              ))}
+                )
+              })}
+            </div>
+
+            {/* Central Design Element */}
+            <div className="absolute left-1/2 top-1/2 transform -translate-x-1/2 -translate-y-1/2 hidden lg:block">
+              <div className="w-32 h-32 bg-gradient-to-br from-blue-100 to-purple-100 rounded-full opacity-20 animate-pulse"></div>
+              <div className="absolute inset-0 w-24 h-24 bg-white/50 rounded-full top-4 left-4 backdrop-blur-sm border border-white/30"></div>
+              <div className="absolute inset-0 w-16 h-16 bg-gradient-to-br from-blue-400 to-purple-500 rounded-full top-8 left-8 flex items-center justify-center">
+                <i className="ri-award-line text-2xl text-white"></i>
+              </div>
             </div>
           </div>
         </div>
 
+        {/* Ultra Modern Track Record Section */}
         <div className={`mb-24 transition-all duration-1000 delay-700 transform ${isVisible ? 'translate-y-0 opacity-100' : 'translate-y-8 opacity-0'
           }`}>
           <div className="text-center mb-16">
-            <span className="text-sm font-semibold text-[#2563EB] uppercase tracking-wider">Performance Metrics</span>
-            <h3 className="text-3xl md:text-4xl font-bold text-slate-800 mb-6 mt-4 leading-tight tracking-tight">
-              Numbers That Define <span className="text-[#2563EB]">Excellence</span>
+            <div className="inline-flex items-center bg-gradient-to-r from-indigo-500/10 via-purple-500/10 to-pink-500/10 backdrop-blur-xl border border-white/20 text-gray-800 text-sm font-bold px-8 py-4 rounded-full mb-8 shadow-2xl hover:shadow-indigo-500/20 transition-all duration-500">
+              <div className="w-3 h-3 bg-gradient-to-r from-indigo-500 to-purple-500 rounded-full mr-3 animate-pulse shadow-lg"></div>
+              Performance Metrics
+            </div>
+            <h3 className="text-3xl md:text-4xl font-bold text-gray-900 mb-6 leading-tight tracking-tight">
+              <span className="block text-gray-800 font-bold">Numbers That</span>
+              <span className="block bg-gradient-to-r from-indigo-600 via-purple-600 to-pink-600 bg-clip-text text-transparent mt-2 font-bold">
+                Define Excellence
+              </span>
             </h3>
-            <p className="text-xl text-slate-600 max-w-3xl mx-auto leading-relaxed">
+            <p className="text-xl text-gray-600 max-w-3xl mx-auto leading-relaxed">
               Our achievements speak volumes about our dedication to delivering exceptional results
             </p>
           </div>
 
-          <div ref={statsRef} className="grid sm:grid-cols-2 lg:grid-cols-4 gap-6 sm:gap-8 lg:gap-12">
-            {stats.map((stat, index) => (
-              <div key={index} className="group relative">
-                <div className="relative bg-white rounded-2xl p-8 border border-slate-200 shadow-lg hover:shadow-xl hover:-translate-y-1 transition-all duration-300">
-                  <div className="text-center mb-6">
-                    <div className="relative w-16 h-16 mx-auto mb-4">
-                      <div className="w-full h-full rounded-2xl bg-[#4F46E5] flex items-center justify-center shadow-lg">
-                        <i className={`${stat.icon} text-3xl text-white`}></i>
+          <div className="grid sm:grid-cols-2 lg:grid-cols-4 gap-6 sm:gap-8 lg:gap-12">
+            {stats.map((stat, index) => {
+              const colors = [
+                { primary: '#6366f1', secondary: '#8b5cf6', bg: 'from-indigo-500/20 to-purple-500/20' },
+                { primary: '#8b5cf6', secondary: '#ec4899', bg: 'from-purple-500/20 to-pink-500/20' },
+                { primary: '#10b981', secondary: '#06b6d4', bg: 'from-emerald-500/20 to-cyan-500/20' },
+                { primary: '#f59e0b', secondary: '#ef4444', bg: 'from-amber-500/20 to-red-500/20' }
+              ];
+              const icons = [
+                'ri-bar-chart-box-line',
+                'ri-rocket-line',
+                'ri-flashlight-line',
+                'ri-rocket-2-line'
+              ];
+
+              return (
+                <div key={index} className="group relative">
+                  {/* Main Container */}
+                  <div className="relative">
+                    {/* Background Glow */}
+                    <div className={`absolute -inset-4 bg-gradient-to-r ${colors[index].bg} rounded-3xl blur-2xl opacity-60 transition-all duration-700`}></div>
+
+                    {/* Glass Card */}
+                    <div className="relative bg-white/10 backdrop-blur-2xl rounded-3xl p-8 border border-white/40 transition-all duration-500 transform -translate-y-2">
+
+                      {/* Icon */}
+                      <div className="text-center mb-6">
+                        <div className="relative w-16 h-16 mx-auto mb-4">
+                          <div
+                            className="w-full h-full rounded-2xl flex items-center justify-center shadow-xl scale-110 transition-transform duration-300"
+                            style={{
+                              background: `linear-gradient(135deg, ${colors[index].primary}, ${colors[index].secondary})`
+                            }}
+                          >
+                            <i className={`${icons[index]} text-3xl text-white`}></i>
+                          </div>
+                          {/* Icon Glow */}
+                          <div
+                            className="absolute inset-0 rounded-2xl blur-lg opacity-40"
+                            style={{
+                              background: `linear-gradient(135deg, ${colors[index].primary}, ${colors[index].secondary})`
+                            }}
+                          ></div>
+                        </div>
                       </div>
+
+                      {/* Animated Counter */}
+                      <div className="text-center mb-6">
+                        <div className="relative">
+                          <div
+                            className="text-5xl font-black mb-2 scale-105 transition-all duration-300"
+                            style={{
+                              background: `linear-gradient(135deg, ${colors[index].primary}, ${colors[index].secondary})`,
+                              WebkitBackgroundClip: 'text',
+                              WebkitTextFillColor: 'transparent',
+                              backgroundClip: 'text'
+                            }}
+                          >
+                            {stat.number}
+                          </div>
+
+                          {/* Animated Underline */}
+                          <div
+                            className="h-1 w-16 mx-auto rounded-full transition-all duration-500"
+                            style={{ backgroundColor: colors[index].primary }}
+                          ></div>
+                        </div>
+                      </div>
+
+                      {/* Label */}
+                      <div className="text-center">
+                        <h4 className="text-lg font-bold text-gray-900 transition-colors duration-300">
+                          {stat.label}
+                        </h4>
+                      </div>
+
+                      {/* Floating Elements */}
+                      <div
+                        className="absolute top-4 right-4 w-4 h-4 rounded-full opacity-70 transition-all duration-500 animate-pulse"
+                        style={{ backgroundColor: colors[index].primary }}
+                      ></div>
+                      <div
+                        className="absolute bottom-4 left-4 w-3 h-3 rounded-full opacity-50 transition-all duration-700"
+                        style={{ backgroundColor: colors[index].secondary }}
+                      ></div>
                     </div>
                   </div>
-
-                  <div className="text-center mb-4">
-                    <StatNumber stat={stat} isVisible={statsVisible} />
-                    <div className="h-1 w-16 mx-auto rounded-full bg-[#4F46E5]"></div>
-                  </div>
-
-                  <div className="text-center">
-                    <h4 className="text-lg font-bold text-slate-800">
-                      {stat.label}
-                    </h4>
-                  </div>
                 </div>
-              </div>
-            ))}
+              )
+            })}
           </div>
         </div>
 
@@ -287,6 +400,6 @@ const About = memo(function About() {
       </div>
     </section>
   );
-})
+};
 
 export default About;

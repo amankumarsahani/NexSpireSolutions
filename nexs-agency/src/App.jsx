@@ -1,9 +1,8 @@
 import { lazy, memo } from 'react';
 import { BrowserRouter, Routes, Route } from 'react-router-dom';
 import { Helmet } from 'react-helmet-async';
-// eslint-disable-next-line no-unused-vars
-import { motion } from 'framer-motion';
 import { SITE_URL } from './constants/siteConfig';
+import ScrollReveal from './components/ScrollReveal';
 import ScrollToTop from './components/ScrollToTop';
 import ErrorBoundary from './components/ErrorBoundary';
 
@@ -11,8 +10,13 @@ import ErrorBoundary from './components/ErrorBoundary';
 import Header from './components/Header';
 import Hero from './components/Hero';
 import Services from './components/Services';
+import About from './components/About';
 import Portfolio from './components/Portfolio';
+import Technologies from './components/Technologies';
 import Testimonials from './components/Testimonials';
+import Blog from './components/Blog';
+import FAQ from './components/FAQ';
+import Partners from './components/Partners';
 import Contact from './components/Contact';
 import Footer from './components/Footer';
 import PublicLayout from './components/PublicLayout';
@@ -45,10 +49,10 @@ const AdminBackupsPage = lazy(() => import('./pages/AdminBackupsPage'));
 
 // Loading spinner component
 const LoadingSpinner = () => (
-  <div className="min-h-screen flex items-center justify-center bg-[#F8FAFC]">
+  <div className="min-h-screen flex items-center justify-center bg-gradient-to-br from-slate-900 to-indigo-900">
     <div className="flex flex-col items-center gap-4">
-      <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-[#2563EB]"></div>
-      <p className="text-slate-500 text-sm">Loading...</p>
+      <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-blue-400"></div>
+      <p className="text-white/60 text-sm">Loading...</p>
     </div>
   </div>
 );
@@ -78,21 +82,42 @@ const LandingPage = memo(function LandingPage() {
       {/* Hero loads immediately for faster FCP */}
       <Hero />
 
-      <motion.div className="py-24 lg:py-32" initial={{ opacity: 0, y: 24 }} whileInView={{ opacity: 1, y: 0 }} viewport={{ once: true, margin: "-100px" }} transition={{ duration: 0.5 }}>
+      {/* Sections with scroll-reveal animations */}
+      <ScrollReveal animation="fade-up" delay={0}>
         <Services />
-      </motion.div>
+      </ScrollReveal>
 
-      <motion.div className="py-24 lg:py-32" initial={{ opacity: 0, y: 24 }} whileInView={{ opacity: 1, y: 0 }} viewport={{ once: true, margin: "-100px" }} transition={{ duration: 0.5 }}>
+      <ScrollReveal animation="fade-up" delay={100}>
+        <About />
+      </ScrollReveal>
+
+      <ScrollReveal animation="zoom" delay={0}>
         <Portfolio />
-      </motion.div>
+      </ScrollReveal>
 
-      <motion.div className="py-24 lg:py-32" initial={{ opacity: 0, y: 24 }} whileInView={{ opacity: 1, y: 0 }} viewport={{ once: true, margin: "-100px" }} transition={{ duration: 0.5 }}>
+      <ScrollReveal animation="fade-up" delay={0}>
+        <Technologies />
+      </ScrollReveal>
+
+      <ScrollReveal animation="fade-left" delay={0}>
         <Testimonials />
-      </motion.div>
+      </ScrollReveal>
 
-      <motion.div className="py-24 lg:py-32" initial={{ opacity: 0, y: 24 }} whileInView={{ opacity: 1, y: 0 }} viewport={{ once: true, margin: "-100px" }} transition={{ duration: 0.5 }}>
+      <ScrollReveal animation="fade-up" delay={0}>
+        <Blog />
+      </ScrollReveal>
+
+      <ScrollReveal animation="fade-right" delay={0}>
+        <FAQ />
+      </ScrollReveal>
+
+      <ScrollReveal animation="zoom" delay={0}>
+        <Partners />
+      </ScrollReveal>
+
+      <ScrollReveal animation="fade-up" delay={0}>
         <Contact />
-      </motion.div>
+      </ScrollReveal>
     </div>
   );
 });
