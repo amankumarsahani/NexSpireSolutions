@@ -85,7 +85,7 @@ const BlogController = {
                 content,
                 category,
                 author,
-                image,
+                image_url: image,
                 featured,
                 status,
                 read_time
