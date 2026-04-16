@@ -1,118 +1,25 @@
-// TODO: Replace console.error with Sentry or proper error tracking
-import { useState, useEffect } from 'react';
 import { Helmet } from 'react-helmet-async';
-import { settingsAPI, billingAPI } from '../services/api';
-import { CheckIcon, XIcon } from '../components/ui/Icons';
+import { CheckIcon } from '../components/ui/Icons';
 import { crmTiers, crmFeatures } from '../constants/crmPricing';
 import { SITE_URL } from '../constants/siteConfig';
+import FeatureValue from '../components/crm/FeatureValue';
+import useCRMPricing from '../hooks/useCRMPricing';
 
 const tiers = crmTiers;
 const features = crmFeatures;
 
-const FeatureValue = ({ value, soon }) => {
-    if (value === true) return <CheckIcon />;
-    if (value === false) return <XIcon />;
-    return (
-        <span className="text-sm font-medium text-slate-700">
-            {value}
-            {soon && <span className="ml-1 text-xs text-amber-600">(Soon)</span>}
-        </span>
-    );
-};
-
 export default function CRMPricingPage() {
-    const [isYearly, setIsYearly] = useState(false);
-    const [showContactModal, setShowContactModal] = useState(false);
-    const [selectedPlan, setSelectedPlan] = useState('');
-    const [submitting, setSubmitting] = useState(false);
-    const [submitted, setSubmitted] = useState(false);
-    const [pricingMode, setPricingMode] = useState('contact_us');
-    const [, setContactEmail] = useState('sales@nexspire.com');
-    const [, setLoadingSettings] = useState(true);
-
-    // reCAPTCHA site key (same as EnquiryPopup)
-    const RECAPTCHA_SITE_KEY = import.meta.env.VITE_RECAPTCHA_SITE_KEY;
-
-    // Load reCAPTCHA v3 script and settings
-    useEffect(() => {
-        const fetchSettings = async () => {
-            try {
-                const response = await settingsAPI.getPublicSettings();
-                if (response.data.success || response.data) {
-                    const settings = response.data.data || response.data;
-                    if (settings.pricing_page_mode) setPricingMode(settings.pricing_page_mode);
-                    if (settings.contact_sales_email) setContactEmail(settings.contact_sales_email);
-                }
-            } catch (err) {
-                console.error('Failed to fetch pricing settings:', err);
-            } finally {
-                setLoadingSettings(false);
-            }
-        };
-
-        fetchSettings();
-    }, []);
-
-    const getCaptchaToken = async () => {
-        if (!window.grecaptcha) {
-            throw new Error('reCAPTCHA failed to load. Please refresh the page and try again.');
-        }
-
-        try {
-            await new Promise(resolve => window.grecaptcha.ready(resolve));
-            return await window.grecaptcha.execute(RECAPTCHA_SITE_KEY, { action: 'pricing_inquiry' });
-        } catch {
-            throw new Error('reCAPTCHA verification failed. Please refresh the page and try again.');
-        }
-    };
-
-    // Toast notification state
-    const [toast, setToast] = useState({ show: false, message: '', type: 'error' });
-
-    const showToast = (message, type = 'error') => {
-        setToast({ show: true, message, type });
-        setTimeout(() => setToast({ show: false, message: '', type: 'error' }), 4000);
-    };
-
-    const handleAction = async (planName) => {
-        if (pricingMode === 'contact_us' || planName === 'Enterprise') {
-            setSelectedPlan(planName);
-            setShowContactModal(true);
-            setSubmitted(false);
-            return;
-        }
-
-        const planId = planName.toLowerCase();
-        showToast('Initiating secure Razorpay checkout...', 'info');
-        try {
-            const finalPlanId = isYearly ? `${planId}_yearly` : planId;
-            const response = await billingAPI.createPaymentLink({
-                planId: finalPlanId,
-                billingCycle: isYearly ? 'yearly' : 'monthly',
-                successUrl: window.location.origin + '/nexcrm?payment=success',
-                cancelUrl: window.location.origin + '/nexcrm/pricing?payment=cancelled',
-                metadata: {
-                    source: 'agency_pricing_page',
-                    billing_cycle: isYearly ? 'yearly' : 'monthly'
-                }
-            });
-
-            if (response.data.success && response.data.url) {
-                const paymentUrl = new URL(response.data.url, window.location.origin);
-                const allowedHosts = [window.location.hostname, 'razorpay.com', 'api.razorpay.com', 'checkout.razorpay.com'];
-                if (allowedHosts.some(h => paymentUrl.hostname === h || paymentUrl.hostname.endsWith('.' + h))) {
-                    window.location.href = response.data.url;
-                } else {
-                    showToast('Invalid checkout URL. Please contact support.');
-                }
-            } else {
-                showToast(response.data.error || 'Failed to generate checkout link');
-            }
-        } catch (err) {
-            showToast('Failed to initiate Razorpay checkout. Please contact support.');
-            console.error('Razorpay checkout error:', err);
-        }
-    };
+    const {
+        isYearly, setIsYearly,
+        showContactModal, setShowContactModal,
+        selectedPlan,
+        submitting, submitted,
+        pricingMode,
+        toast,
+        dismissToast,
+        handleAction,
+        submitContactForm,
+    } = useCRMPricing();
 
     return (
         <div className="min-h-screen bg-gradient-to-b from-slate-50 to-white">
@@ -130,7 +37,6 @@ export default function CRMPricingPage() {
                 <meta name="twitter:description" content="Choose the perfect NexCRM plan for your business. Starter from ₹999/month." />
             </Helmet>
 
-            {/* Toast Notification */}
             {toast.show && (
                 <div className={`fixed top-4 right-4 z-[100] px-4 py-3 rounded-lg shadow-lg flex items-center gap-3 animate-fade-in ${toast.type === 'error' ? 'bg-red-500 text-white' : (toast.type === 'info' ? 'bg-[#F8FAFC]0 text-white' : 'bg-emerald-500 text-white')
                     }`}>
@@ -144,7 +50,7 @@ export default function CRMPricingPage() {
                         ))}
                     </svg>
                     <span className="font-medium">{toast.message}</span>
-                    <button onClick={() => setToast({ show: false, message: '', type: 'error' })} className="ml-2 hover:opacity-70">
+                    <button onClick={dismissToast} className="ml-2 hover:opacity-70">
                         <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                             <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M6 18L18 6M6 6l12 12" />
                         </svg>
@@ -152,7 +58,6 @@ export default function CRMPricingPage() {
                 </div>
             )}
 
-            {/* Hero */}
             <section className="pt-32 pb-16 px-4">
                 <div className="max-w-7xl mx-auto text-center">
                     <span className="inline-block px-4 py-1.5 bg-[#2563EB]/10 text-[#2563EB] text-sm font-medium rounded-full mb-4">
@@ -165,7 +70,6 @@ export default function CRMPricingPage() {
                         Choose a plan that scales with your business. Contact our sales team to get started.
                     </p>
 
-                    {/* Billing Toggle */}
                     <div className="flex items-center justify-center gap-4 mb-12">
                         <span className={`text-sm font-medium ${!isYearly ? 'text-slate-900' : 'text-slate-500'}`}>Monthly</span>
                         <button
@@ -179,7 +83,6 @@ export default function CRMPricingPage() {
                         </span>
                     </div>
 
-                    {/* Pricing Cards */}
                     <div className="grid md:grid-cols-2 lg:grid-cols-4 gap-6 max-w-7xl mx-auto">
                         {tiers.map((tier) => (
                             <div
@@ -253,7 +156,6 @@ export default function CRMPricingPage() {
                 </div>
             </section>
 
-            {/* Feature Comparison */}
             <section className="py-20 px-4 bg-white">
                 <div className="max-w-6xl mx-auto">
                     <h2 className="text-3xl font-bold text-slate-900 text-center mb-4">
@@ -276,90 +178,12 @@ export default function CRMPricingPage() {
                                 </tr>
                             </thead>
                             <tbody>
-                                {/* Core Features */}
-                                <tr className="bg-slate-50">
-                                    <td colSpan={5} className="py-3 px-4 text-sm font-bold text-slate-900 uppercase tracking-wider">
-                                        Core Features
-                                    </td>
-                                </tr>
-                                {features.core.map((feature) => (
-                                    <tr key={feature.name} className="border-b border-slate-100">
-                                        <td className="py-3 px-4 text-sm text-slate-700">{feature.name}</td>
-                                        <td className="py-3 px-4 text-center"><FeatureValue value={feature.starter} /></td>
-                                        <td className="py-3 px-4 text-center"><FeatureValue value={feature.growth} /></td>
-                                        <td className="py-3 px-4 text-center"><FeatureValue value={feature.business} /></td>
-                                        <td className="py-3 px-4 text-center"><FeatureValue value={feature.enterprise} /></td>
-                                    </tr>
-                                ))}
-
-                                {/* E-commerce */}
-                                <tr className="bg-slate-50">
-                                    <td colSpan={5} className="py-3 px-4 text-sm font-bold text-slate-900 uppercase tracking-wider">
-                                        E-commerce
-                                    </td>
-                                </tr>
-                                {features.ecommerce.map((feature) => (
-                                    <tr key={feature.name} className="border-b border-slate-100">
-                                        <td className="py-3 px-4 text-sm text-slate-700">{feature.name}</td>
-                                        <td className="py-3 px-4 text-center"><FeatureValue value={feature.starter} /></td>
-                                        <td className="py-3 px-4 text-center"><FeatureValue value={feature.growth} /></td>
-                                        <td className="py-3 px-4 text-center"><FeatureValue value={feature.business} /></td>
-                                        <td className="py-3 px-4 text-center"><FeatureValue value={feature.enterprise} /></td>
-                                    </tr>
-                                ))}
-
-                                {/* Communication */}
-                                <tr className="bg-slate-50">
-                                    <td colSpan={5} className="py-3 px-4 text-sm font-bold text-slate-900 uppercase tracking-wider">
-                                        Communication
-                                    </td>
-                                </tr>
-                                {features.communication.map((feature) => (
-                                    <tr key={feature.name} className="border-b border-slate-100">
-                                        <td className="py-3 px-4 text-sm text-slate-700">
-                                            {feature.name}
-                                            {feature.soon && <span className="ml-2 text-xs bg-amber-100 text-amber-700 px-2 py-0.5 rounded">Soon</span>}
-                                        </td>
-                                        <td className="py-3 px-4 text-center"><FeatureValue value={feature.starter} soon={feature.soon} /></td>
-                                        <td className="py-3 px-4 text-center"><FeatureValue value={feature.growth} soon={feature.soon} /></td>
-                                        <td className="py-3 px-4 text-center"><FeatureValue value={feature.business} soon={feature.soon} /></td>
-                                        <td className="py-3 px-4 text-center"><FeatureValue value={feature.enterprise} soon={feature.soon} /></td>
-                                    </tr>
-                                ))}
-
-                                {/* Automation */}
-                                <tr className="bg-slate-50">
-                                    <td colSpan={5} className="py-3 px-4 text-sm font-bold text-slate-900 uppercase tracking-wider">
-                                        Automation
-                                    </td>
-                                </tr>
-                                {features.automation.map((feature) => (
-                                    <tr key={feature.name} className="border-b border-slate-100">
-                                        <td className="py-3 px-4 text-sm text-slate-700">
-                                            {feature.name}
-                                            {feature.soon && <span className="ml-2 text-xs bg-amber-100 text-amber-700 px-2 py-0.5 rounded">Soon</span>}
-                                        </td>
-                                        <td className="py-3 px-4 text-center"><FeatureValue value={feature.starter} soon={feature.soon} /></td>
-                                        <td className="py-3 px-4 text-center"><FeatureValue value={feature.growth} soon={feature.soon} /></td>
-                                        <td className="py-3 px-4 text-center"><FeatureValue value={feature.business} soon={feature.soon} /></td>
-                                        <td className="py-3 px-4 text-center"><FeatureValue value={feature.enterprise} soon={feature.soon} /></td>
-                                    </tr>
-                                ))}
-
-                                {/* Support */}
-                                <tr className="bg-slate-50">
-                                    <td colSpan={5} className="py-3 px-4 text-sm font-bold text-slate-900 uppercase tracking-wider">
-                                        Support & Extras
-                                    </td>
-                                </tr>
-                                {features.support.map((feature) => (
-                                    <tr key={feature.name} className="border-b border-slate-100">
-                                        <td className="py-3 px-4 text-sm text-slate-700">{feature.name}</td>
-                                        <td className="py-3 px-4 text-center"><FeatureValue value={feature.starter} /></td>
-                                        <td className="py-3 px-4 text-center"><FeatureValue value={feature.growth} /></td>
-                                        <td className="py-3 px-4 text-center"><FeatureValue value={feature.business} /></td>
-                                        <td className="py-3 px-4 text-center"><FeatureValue value={feature.enterprise} /></td>
-                                    </tr>
+                                {Object.entries(features).map(([category, categoryFeatures]) => (
+                                    <FeatureCategory
+                                        key={category}
+                                        title={category === 'support' ? 'Support & Extras' : category.charAt(0).toUpperCase() + category.slice(1)}
+                                        features={categoryFeatures}
+                                    />
                                 ))}
                             </tbody>
                         </table>
@@ -367,7 +191,6 @@ export default function CRMPricingPage() {
                 </div>
             </section>
 
-            {/* FAQ */}
             <section className="py-20 px-4 bg-slate-50">
                 <div className="max-w-3xl mx-auto">
                     <h2 className="text-3xl font-bold text-slate-900 text-center mb-12">
@@ -400,8 +223,8 @@ export default function CRMPricingPage() {
                                 q: 'Do you offer custom enterprise plans?',
                                 a: 'Yes, for large organizations with specific needs, we offer custom plans with tailored features and pricing. Contact our sales team.'
                             }
-                        ].map((faq, i) => (
-                            <details key={i} className="group bg-white rounded-xl border border-slate-200 overflow-hidden">
+                        ].map((faq) => (
+                            <details key={faq.q} className="group bg-white rounded-xl border border-slate-200 overflow-hidden">
                                 <summary className="flex items-center justify-between p-5 cursor-pointer list-none">
                                     <span className="font-medium text-slate-900">{faq.q}</span>
                                     <svg className="w-5 h-5 text-slate-500 transition-transform group-open:rotate-180" fill="none" stroke="currentColor" viewBox="0 0 24 24">
@@ -417,7 +240,6 @@ export default function CRMPricingPage() {
                 </div>
             </section>
 
-            {/* CTA */}
             <section className="py-20 px-4 bg-[#2563EB]">
                 <div className="max-w-3xl mx-auto text-center">
                     <h2 className="text-3xl md:text-4xl font-bold text-white mb-4">
@@ -443,13 +265,13 @@ export default function CRMPricingPage() {
                 </div>
             </section>
 
-            {/* Contact Modal */}
             {showContactModal && (
                 <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-black/50 backdrop-blur-sm">
                     <div className="bg-white rounded-2xl shadow-2xl max-w-lg w-full p-6 relative max-h-[90vh] overflow-y-auto">
                         <button
                             onClick={() => setShowContactModal(false)}
                             className="absolute top-4 right-4 text-slate-400 hover:text-slate-600"
+                            aria-label="Close contact form"
                         >
                             <svg className="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                                 <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M6 18L18 6M6 6l12 12" />
@@ -471,7 +293,6 @@ export default function CRMPricingPage() {
                         </div>
 
                         {submitted ? (
-                            /* Success Message */
                             <div className="text-center py-8">
                                 <div className="w-16 h-16 bg-emerald-100 rounded-full flex items-center justify-center mx-auto mb-4">
                                     <svg className="w-8 h-8 text-emerald-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
@@ -490,62 +311,19 @@ export default function CRMPricingPage() {
                                 </button>
                             </div>
                         ) : (
-                            /* Contact Form */
                             <form
                                 className="space-y-4"
                                 onSubmit={async (e) => {
                                     e.preventDefault();
-                                    setSubmitting(true);
-
-                                    // Get CAPTCHA token
-                                    let captchaToken;
-                                    try {
-                                        captchaToken = await getCaptchaToken();
-                                    } catch (captchaErr) {
-                                        showToast(captchaErr.message, 'error');
-                                        setSubmitting(false);
-                                        return;
-                                    }
-
                                     const formData = new FormData(e.target);
-                                    const selectedPlanValue = formData.get('plan') || selectedPlan || 'General';
-                                    const userMessage = formData.get('message') || '';
-                                    const data = {
-                                        name: formData.get('name'),
-                                        email: formData.get('email'),
-                                        phone: formData.get('phone'),
-                                        company: formData.get('company'),
-                                        message: `📋 Plan: NexCRM ${selectedPlanValue}\n\n${userMessage || 'Interested in learning more about NexCRM.'}`,
-                                        captchaToken
-                                    };
-
-                                    try {
-                                        const response = await fetch(`${import.meta.env.VITE_API_URL || ''}/inquiries`, {
-                                            method: 'POST',
-                                            headers: { 'Content-Type': 'application/json' },
-                                            body: JSON.stringify(data)
-                                        });
-
-                                        if (response.ok) {
-                                            setSubmitted(true);
-                                        } else {
-                                            const err = await response.json().catch((parseErr) => {
-                                                console.error('Failed to parse error response:', parseErr);
-                                                return {};
-                                            });
-                                            showToast(err.error || 'Something went wrong. Please try again.', 'error');
-                                        }
-                                    } catch {
-                                        showToast('Network error. Please try again.', 'error');
-                                    } finally {
-                                        setSubmitting(false);
-                                    }
+                                    await submitContactForm(formData, formData.get('plan') || selectedPlan);
                                 }}
                             >
                                 <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
                                     <div>
-                                        <label className="block text-sm font-medium text-slate-700 mb-1">Name *</label>
+                                        <label htmlFor="crm-name" className="block text-sm font-medium text-slate-700 mb-1">Name *</label>
                                         <input
+                                            id="crm-name"
                                             type="text"
                                             name="name"
                                             required
@@ -556,8 +334,9 @@ export default function CRMPricingPage() {
                                         />
                                     </div>
                                     <div>
-                                        <label className="block text-sm font-medium text-slate-700 mb-1">Email *</label>
+                                        <label htmlFor="crm-email" className="block text-sm font-medium text-slate-700 mb-1">Email *</label>
                                         <input
+                                            id="crm-email"
                                             type="email"
                                             name="email"
                                             required
@@ -569,8 +348,9 @@ export default function CRMPricingPage() {
 
                                 <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
                                     <div>
-                                        <label className="block text-sm font-medium text-slate-700 mb-1">Phone</label>
+                                        <label htmlFor="crm-phone" className="block text-sm font-medium text-slate-700 mb-1">Phone</label>
                                         <input
+                                            id="crm-phone"
                                             type="tel"
                                             name="phone"
                                             className="w-full px-4 py-2.5 border border-slate-300 rounded-lg focus:ring-2 focus:ring-[#2563EB] focus:border-[#2563EB] outline-none transition-colors"
@@ -578,8 +358,9 @@ export default function CRMPricingPage() {
                                         />
                                     </div>
                                     <div>
-                                        <label className="block text-sm font-medium text-slate-700 mb-1">Company</label>
+                                        <label htmlFor="crm-company" className="block text-sm font-medium text-slate-700 mb-1">Company</label>
                                         <input
+                                            id="crm-company"
                                             type="text"
                                             name="company"
                                             className="w-full px-4 py-2.5 border border-slate-300 rounded-lg focus:ring-2 focus:ring-[#2563EB] focus:border-[#2563EB] outline-none transition-colors"
@@ -589,8 +370,9 @@ export default function CRMPricingPage() {
                                 </div>
 
                                 <div>
-                                    <label className="block text-sm font-medium text-slate-700 mb-1">Interested Plan</label>
+                                    <label htmlFor="crm-plan" className="block text-sm font-medium text-slate-700 mb-1">Interested Plan</label>
                                     <select
+                                        id="crm-plan"
                                         name="plan"
                                         defaultValue={selectedPlan}
                                         className="w-full px-4 py-2.5 border border-slate-300 rounded-lg focus:ring-2 focus:ring-[#2563EB] focus:border-[#2563EB] outline-none transition-colors"
@@ -604,8 +386,9 @@ export default function CRMPricingPage() {
                                 </div>
 
                                 <div>
-                                    <label className="block text-sm font-medium text-slate-700 mb-1">Message</label>
+                                    <label htmlFor="crm-message" className="block text-sm font-medium text-slate-700 mb-1">Message</label>
                                     <textarea
+                                        id="crm-message"
                                         name="message"
                                         rows={3}
                                         maxLength={2000}
@@ -639,5 +422,29 @@ export default function CRMPricingPage() {
                 </div>
             )}
         </div>
+    );
+}
+
+function FeatureCategory({ title, features: categoryFeatures }) {
+    return (
+        <>
+            <tr className="bg-slate-50">
+                <td colSpan={5} className="py-3 px-4 text-sm font-bold text-slate-900 uppercase tracking-wider">
+                    {title}
+                </td>
+            </tr>
+            {categoryFeatures.map((feature) => (
+                <tr key={feature.name} className="border-b border-slate-100">
+                    <td className="py-3 px-4 text-sm text-slate-700">
+                        {feature.name}
+                        {feature.soon && <span className="ml-2 text-xs bg-amber-100 text-amber-700 px-2 py-0.5 rounded">Soon</span>}
+                    </td>
+                    <td className="py-3 px-4 text-center"><FeatureValue value={feature.starter} soon={feature.soon} /></td>
+                    <td className="py-3 px-4 text-center"><FeatureValue value={feature.growth} soon={feature.soon} /></td>
+                    <td className="py-3 px-4 text-center"><FeatureValue value={feature.business} soon={feature.soon} /></td>
+                    <td className="py-3 px-4 text-center"><FeatureValue value={feature.enterprise} soon={feature.soon} /></td>
+                </tr>
+            ))}
+        </>
     );
 }

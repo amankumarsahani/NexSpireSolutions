@@ -1,14 +1,24 @@
 // TODO: Replace console.error with Sentry or proper error tracking
-import { useState, useEffect } from 'react';
+import React from 'react';
 import { Helmet } from 'react-helmet-async';
-// eslint-disable-next-line no-unused-vars
 import { motion, AnimatePresence } from 'framer-motion';
-import { settingsAPI, billingAPI } from '../services/api';
-import { CheckIcon, XIcon } from '../components/ui/Icons';
 import { crmTiers, crmFeatures } from '../constants/crmPricing';
 import { SITE_URL } from '../constants/siteConfig';
+import { CheckIcon, XIcon } from '../components/ui/Icons';
+import FeatureValue from '../components/crm/FeatureValue';
+import useCRMPricing from '../hooks/useCRMPricing';
+import Icon from '../components/ui/Icon';
+import FadeIn from '../components/ui/FadeIn';
+import {
+    RiBankCardLine, RiCheckLine, RiDashboard3Line, RiLoader4Line,
+    RiMailSendLine, RiRobot2Line, RiRobotLine, RiSmartphoneLine,
+    RiUserFollowLine, RiGoogleLine, RiMailLine, RiCalendarLine,
+    RiWhatsappLine, RiNotionLine, RiSlackLine, RiDriveLine,
+    RiGroupLine, RiTimeLine, RiStarFill, RiLinksLine,
+    RiSettings3Line, RiUploadCloud2Line, RiLineChartLine,
+    RiArrowDownSLine
+} from 'react-icons/ri';
 
-// --- Data ---
 const industries = [
     { name: "Digital Agencies", icon: "ri-briefcase-4-line", color: "text-[#2563EB]", bg: "bg-[#F8FAFC]" },
     { name: "Freelancers", icon: "ri-macbook-line", color: "text-[#2563EB]", bg: "bg-[#F8FAFC]" },
@@ -21,111 +31,96 @@ const industries = [
 ];
 
 const tiers = crmTiers.map((tier, i) => {
-    const ctaOverrides = ['Start Free Trial', 'Get Started', 'Contact Sales', 'Contact Sales'];
+    const ctaOverrides = ['Get Started', 'Get Started', 'Contact Sales', 'Contact Sales'];
     return { ...tier, cta: ctaOverrides[i] };
 });
 
 const features = crmFeatures;
 
-const FeatureValue = ({ value, soon }) => {
-    if (value === true) return <CheckIcon />;
-    if (value === false) return <XIcon />;
-    return (
-        <span className="text-sm font-medium text-slate-700">
-            {value}
-            {soon && <span className="ml-1 text-xs text-amber-600">(Soon)</span>}
-        </span>
-    );
+const trustStats = [
+    { value: '500+', label: 'Active Users', icon: RiGroupLine },
+    { value: '99.9%', label: 'Uptime', icon: RiTimeLine },
+    { value: '4.8', label: 'Rating', icon: RiStarFill, isStar: true },
+    { value: '50+', label: 'Integrations', icon: RiLinksLine },
+];
+
+const howItWorks = [
+    {
+        step: '01',
+        title: 'Sign Up & Configure',
+        description: 'Set up your workspace, invite team members, configure your pipeline stages and workflows.',
+        icon: RiSettings3Line,
+    },
+    {
+        step: '02',
+        title: 'Import & Connect',
+        description: 'Import existing data, connect your payment gateway, and set up your storefront in minutes.',
+        icon: RiUploadCloud2Line,
+    },
+    {
+        step: '03',
+        title: 'Grow & Scale',
+        description: 'Start managing leads, sending invoices, and scaling your operations with data-driven insights.',
+        icon: RiLineChartLine,
+    },
+];
+
+const integrations = [
+    { name: 'Razorpay', icon: RiBankCardLine },
+    { name: 'Google', icon: RiGoogleLine },
+    { name: 'Slack', icon: RiSlackLine },
+    { name: 'WhatsApp', icon: RiWhatsappLine },
+    { name: 'Notion', icon: RiNotionLine },
+    { name: 'Gmail', icon: RiMailLine },
+    { name: 'Calendar', icon: RiCalendarLine },
+    { name: 'Drive', icon: RiDriveLine },
+];
+
+const faqs = [
+    {
+        q: 'How do I get started?',
+        a: "Contact our sales team and we'll set up your account within 24 hours. We'll guide you through the onboarding process."
+    },
+    {
+        q: 'Can I upgrade or downgrade anytime?',
+        a: 'Absolutely. You can upgrade or downgrade your plan at any time. Changes take effect on your next billing cycle.'
+    },
+    {
+        q: 'Is the mobile app included?',
+        a: 'Yes, mobile app access is included in all plans at no extra cost. Available for both iOS and Android.'
+    },
+    {
+        q: 'What payment methods do you accept?',
+        a: 'We accept UPI, cards, net banking, and other methods supported by Razorpay.'
+    },
+    {
+        q: 'What happens if I exceed my limits?',
+        a: "We'll notify you when you're approaching limits. You can upgrade your plan or purchase add-ons to increase limits."
+    },
+    {
+        q: 'Do you offer custom enterprise plans?',
+        a: 'Yes, for large organizations with specific needs, we offer custom plans with tailored features and pricing. Contact our sales team.'
+    }
+];
+
+const featureCategoryLabels = {
+    core: 'Core Features',
+    ecommerce: 'E-commerce',
+    communication: 'Communication',
+    automation: 'Automation',
+    support: 'Support & Extras',
 };
 
 export default function NexCRMLandingPage() {
-    const [isYearly, setIsYearly] = useState(false);
-    const [showContactModal, setShowContactModal] = useState(false);
-    const [selectedPlan, setSelectedPlan] = useState('');
-    const [submitting, setSubmitting] = useState(false);
-    const [submitted, setSubmitted] = useState(false);
-    const [pricingMode, setPricingMode] = useState('contact_us');
-    const [, setContactEmail] = useState('sales@nexspire.com');
-    const [, setLoadingSettings] = useState(true);
-
-    const RECAPTCHA_SITE_KEY = import.meta.env.VITE_RECAPTCHA_SITE_KEY;
-
-    useEffect(() => {
-        const fetchSettings = async () => {
-            try {
-                const response = await settingsAPI.getPublicSettings();
-                if (response.data.success || response.data) {
-                    const settings = response.data.data || response.data;
-                    if (settings.pricing_page_mode) setPricingMode(settings.pricing_page_mode);
-                    if (settings.contact_sales_email) setContactEmail(settings.contact_sales_email);
-                }
-            } catch (err) {
-                console.error('Failed to fetch pricing settings:', err);
-            } finally {
-                setLoadingSettings(false);
-            }
-        };
-
-        fetchSettings();
-    }, []);
-
-    const getCaptchaToken = async () => {
-        if (!window.grecaptcha) {
-            throw new Error('reCAPTCHA failed to load. Please refresh the page and try again.');
-        }
-        try {
-            await new Promise(resolve => window.grecaptcha.ready(resolve));
-            return await window.grecaptcha.execute(RECAPTCHA_SITE_KEY, { action: 'pricing_inquiry' });
-        } catch {
-            throw new Error('reCAPTCHA verification failed. Please refresh the page and try again.');
-        }
-    };
-
-    const [toast, setToast] = useState({ show: false, message: '', type: 'error' });
-    const showToast = (message, type = 'error') => {
-        setToast({ show: true, message, type });
-        setTimeout(() => setToast({ show: false, message: '', type: 'error' }), 4000);
-    };
-
-    const handleAction = async (planName) => {
-        if (pricingMode === 'contact_us' || planName === 'Enterprise') {
-            setSelectedPlan(planName);
-            setShowContactModal(true);
-            setSubmitted(false);
-            return;
-        }
-
-        const planId = planName.toLowerCase();
-        showToast('Initiating secure Razorpay checkout...', 'info');
-        try {
-            const finalPlanId = isYearly ? `${planId}_yearly` : planId;
-            const response = await billingAPI.createPaymentLink({
-                planId: finalPlanId,
-                billingCycle: isYearly ? 'yearly' : 'monthly',
-                successUrl: window.location.origin + '/nexcrm?payment=success',
-                cancelUrl: window.location.origin + '/nexcrm/pricing?payment=cancelled',
-                metadata: {
-                    source: 'agency_pricing_page',
-                    billing_cycle: isYearly ? 'yearly' : 'monthly'
-                }
-            });
-
-            if (response.data.success && response.data.url) {
-                const paymentUrl = new URL(response.data.url, window.location.origin);
-                const allowedHosts = [window.location.hostname, 'razorpay.com', 'api.razorpay.com', 'checkout.razorpay.com'];
-                if (allowedHosts.some(h => paymentUrl.hostname === h || paymentUrl.hostname.endsWith('.' + h))) {
-                    window.location.href = response.data.url;
-                } else {
-                    showToast('Invalid checkout URL. Please contact support.');
-                }
-            } else {
-                showToast(response.data.error || 'Failed to generate checkout link');
-            }
-        } catch (err) {
-            showToast('Failed to initiate Razorpay checkout. Please contact support.');
-            console.error('Razorpay checkout error:', err);
-        }
-    };
+    const {
+        isYearly, setIsYearly,
+        showContactModal, setShowContactModal,
+        selectedPlan,
+        submitting, submitted,
+        toast,
+        handleAction,
+        submitContactForm,
+    } = useCRMPricing();
 
     return (
         <div className="min-h-screen bg-white font-sans text-slate-900 overflow-x-hidden selection:bg-[#2563EB]/10">
@@ -143,7 +138,6 @@ export default function NexCRMLandingPage() {
                 <meta name="twitter:description" content="Streamline your agency with NexCRM. Integrated project management, CRM, invoicing, and client portals." />
             </Helmet>
 
-            {/* Toast */}
             <AnimatePresence>
                 {toast.show && (
                     <motion.div
@@ -159,10 +153,7 @@ export default function NexCRMLandingPage() {
 
             {/* Hero Section */}
             <section className="relative pt-32 pb-20 lg:pt-48 lg:pb-32 overflow-hidden bg-[url('https://images.unsplash.com/photo-1557804506-669a67965ba0?ixlib=rb-4.0.3&auto=format&fit=crop&w=2600&q=80&fm=webp')] bg-cover bg-center">
-                {/* Hero Overlay */}
                 <div className="absolute inset-0 bg-white/90 backdrop-blur-sm z-0"></div>
-
-                {/* Background Elements */}
                 <div className="absolute top-0 left-1/2 -translate-x-1/2 w-[1000px] h-[600px] bg-gradient-to-b from-[#2563EB]/10 to-transparent rounded-full blur-3xl opacity-60 pointer-events-none z-0" />
 
                 <div className="container-custom px-6 max-w-7xl mx-auto relative z-10 text-center">
@@ -187,44 +178,46 @@ export default function NexCRMLandingPage() {
                         </p>
 
                         <div className="flex flex-col sm:flex-row gap-4 justify-center items-center">
-                            <button onClick={() => document.getElementById('pricing').scrollIntoView({ behavior: 'smooth' })} className="px-8 py-4 bg-slate-900 text-white rounded-xl font-semibold shadow-xl shadow-slate-900/20 hover:bg-slate-800  transition-all duration-300 ring-4 ring-slate-900/10">
-                                Start Free Trial
+                            <button onClick={() => document.getElementById('pricing').scrollIntoView({ behavior: 'smooth' })} className="px-8 py-4 bg-slate-900 text-white rounded-xl font-semibold shadow-xl shadow-slate-900/20 hover:bg-slate-800 transition-all duration-300 ring-4 ring-slate-900/10">
+                                View Plans
                             </button>
                             <a href="/contact" className="px-8 py-4 bg-white text-slate-700 border border-slate-200 rounded-xl font-semibold hover:bg-slate-50 hover:border-slate-300 transition-all duration-300 shadow-sm">
                                 Book a Demo
                             </a>
                         </div>
                     </motion.div>
+                </div>
+            </section>
 
-                    {/* Dashboard Mockup (3D Tilt) */}
-                    <motion.div
-                        initial={{ opacity: 0, y: 60, rotateX: 10 }}
-                        animate={{ opacity: 1, y: 0, rotateX: 0 }}
-                        transition={{ duration: 0.8, delay: 0.2 }}
-                        className="mt-20 relative mx-auto max-w-5xl"
-                        style={{ perspective: '1000px' }}
-                    >
-                        <div className="relative rounded-2xl border-[6px] border-slate-900 bg-slate-900 shadow-2xl overflow-hidden aspect-[16/9] group ring-1 ring-slate-900/50">
-                            <img
-                                src="https://images.unsplash.com/photo-1460925895917-afdab827c52f?ixlib=rb-4.0.3&auto=format&fit=crop&w=2426&q=80&fm=webp"
-                                srcSet="https://images.unsplash.com/photo-1460925895917-afdab827c52f?w=640&fm=webp 640w, https://images.unsplash.com/photo-1460925895917-afdab827c52f?w=1024&fm=webp 1024w, https://images.unsplash.com/photo-1460925895917-afdab827c52f?w=1920&fm=webp 1920w"
-                                sizes="(max-width: 640px) 640px, (max-width: 1024px) 1024px, 1920px"
-                                alt="Dashboard Preview"
-                                className="w-full h-full object-cover opacity-90 transition-transform duration-700 group-"
-                            />
-                            <div className="absolute inset-0 bg-gradient-to-t from-slate-900/20 to-transparent pointer-events-none"></div>
+            {/* Social Proof Stats */}
+            <section className="py-10 bg-white border-b border-slate-100">
+                <div className="max-w-5xl mx-auto px-6">
+                    <FadeIn y={16} duration={0.5}>
+                        <div className="grid grid-cols-2 md:grid-cols-4 gap-8 md:gap-4">
+                            {trustStats.map((stat) => (
+                                <div key={stat.label} className="flex flex-col items-center text-center gap-2">
+                                    <div className="w-10 h-10 rounded-xl bg-blue-50 text-blue-600 flex items-center justify-center text-lg">
+                                        <stat.icon />
+                                    </div>
+                                    <div className="flex items-baseline gap-1">
+                                        <span className="text-3xl md:text-4xl font-bold text-slate-900 tracking-tight">{stat.value}</span>
+                                        {stat.isStar && <RiStarFill className="text-amber-400 text-sm mb-1" />}
+                                    </div>
+                                    <span className="text-sm text-slate-500 font-medium">{stat.label}</span>
+                                </div>
+                            ))}
                         </div>
-                    </motion.div>
+                    </FadeIn>
                 </div>
             </section>
 
             {/* Industry Marquee */}
-            <section className="py-12 border-y border-slate-100 bg-slate-50/50 overflow-hidden">
+            <section className="py-12 border-b border-slate-100 bg-slate-50/50 overflow-hidden">
                 <div className="flex gap-12 animate-scroll w-max hover:pause-scroll">
                     {[...industries, ...industries, ...industries].map((ind, i) => (
-                        <div key={i} className="flex items-center gap-3 opacity-60 hover:opacity-100 transition-opacity cursor-default">
+                        <div key={`${ind.name}-${i}`} className="flex items-center gap-3 opacity-60 hover:opacity-100 transition-opacity cursor-default">
                             <div className={`w-10 h-10 rounded-lg ${ind.bg} ${ind.color} flex items-center justify-center text-xl`}>
-                                <i className={ind.icon}></i>
+                                <Icon name={ind.icon} />
                             </div>
                             <span className="font-semibold text-slate-700 text-lg whitespace-nowrap">{ind.name}</span>
                         </div>
@@ -234,37 +227,34 @@ export default function NexCRMLandingPage() {
 
             {/* Features (Bento Grid) */}
             <section className="py-32 bg-slate-50 relative overflow-hidden">
-                {/* Background Pattern */}
-                <div className="absolute inset-0 z-0 pointer-events-none opacity-[0.03]" style={{ backgroundImage: 'radial-gradient(#000 1px, transparent 1px)', backgroundSize: '24px 24px' }}></div>
+                <div className="absolute inset-0 z-0 pointer-events-none opacity-[0.03] bg-[radial-gradient(#000_1px,transparent_1px)] [background-size:24px_24px]"></div>
 
                 <div className="container-custom px-6 max-w-7xl mx-auto relative z-10">
-                    <div className="max-w-3xl mx-auto text-center mb-24">
-                        <span className="text-[#2563EB] font-bold tracking-wider uppercase text-sm mb-4 block">Capabilities</span>
-                        <h2 className="text-3xl md:text-5xl font-bold text-slate-900 mb-6 font-display">Everything you need to <span className="text-[#2563EB]">scale.</span></h2>
-                        <p className="text-xl text-slate-600 font-light">Unified tools that replace your fragmented tech stack.</p>
-                    </div>
+                    <FadeIn y={24} duration={0.6}>
+                        <div className="max-w-3xl mx-auto text-center mb-24">
+                            <span className="text-[#2563EB] font-bold tracking-wider uppercase text-sm mb-4 block">Capabilities</span>
+                            <h2 className="text-3xl md:text-5xl font-bold text-slate-900 mb-6 font-display">Everything you need to <span className="text-[#2563EB]">scale.</span></h2>
+                            <p className="text-xl text-slate-600 font-light">Unified tools that replace your fragmented tech stack.</p>
+                        </div>
+                    </FadeIn>
 
                     <div className="grid grid-cols-1 md:grid-cols-3 gap-8 auto-rows-[340px]">
-                        {/* Large Feature - Dashboard */}
-                        <div className="md:col-span-2 md:row-span-1 rounded-[2rem] border border-slate-200 shadow-xl shadow-slate-200/50 hover:shadow-2xl hover:border-slate-200 transition-all group overflow-hidden relative">
-                            <div className="absolute inset-0 bg-[url('https://images.unsplash.com/photo-1551288049-bebda4e38f71?ixlib=rb-4.0.3&auto=format&fit=crop&w=2600&q=80&fm=webp')] bg-cover bg-center transition-transform duration-700 group-"></div>
+                        <FadeIn y={30} delay={0} className="md:col-span-2 md:row-span-1 rounded-[2rem] border border-slate-200 shadow-xl shadow-slate-200/50 hover:shadow-2xl hover:border-slate-200 transition-all group overflow-hidden relative">
+                            <div className="absolute inset-0 bg-[url('https://images.unsplash.com/photo-1551288049-bebda4e38f71?ixlib=rb-4.0.3&auto=format&fit=crop&w=2600&q=80&fm=webp')] bg-cover bg-center transition-transform duration-700 group-hover:scale-105"></div>
                             <div className="absolute inset-0 bg-gradient-to-r from-white via-white/90 to-transparent"></div>
-
                             <div className="relative z-10 p-10 h-full flex flex-col justify-center max-w-md">
-                                <div className="w-14 h-14 bg-blue-600 text-white rounded-2xl flex items-center justify-center text-2xl mb-6 shadow-lg shadow-lg"><i className="ri-dashboard-3-line"></i></div>
+                                <div className="w-14 h-14 bg-blue-600 text-white rounded-2xl flex items-center justify-center text-2xl mb-6 shadow-lg"><RiDashboard3Line /></div>
                                 <h3 className="text-3xl font-bold text-slate-900 mb-4">Centralized Operations</h3>
                                 <p className="text-slate-600 text-lg leading-relaxed font-medium">See everything in one place. Revenue, project status, leads, and support tickets at a glance.</p>
                             </div>
-                        </div>
+                        </FadeIn>
 
-                        {/* Tall Feature - Mobile App */}
-                        <div className="md:col-span-1 md:row-span-2 bg-slate-900 rounded-[2rem] p-8 border border-slate-800 text-white hover:shadow-2xl hover:shadow-lg transition-all relative overflow-hidden group flex flex-col items-center text-center">
+                        <FadeIn y={30} delay={0.1} className="md:col-span-1 md:row-span-2 bg-slate-900 rounded-[2rem] p-8 border border-slate-800 text-white hover:shadow-2xl transition-all relative overflow-hidden group flex flex-col items-center text-center">
                             <div className="relative z-10 mb-8">
-                                <div className="w-14 h-14 bg-white/10 text-white rounded-2xl flex items-center justify-center text-2xl mb-6 mx-auto backdrop-blur-md border border-white/10"><i className="ri-smartphone-line"></i></div>
+                                <div className="w-14 h-14 bg-white/10 text-white rounded-2xl flex items-center justify-center text-2xl mb-6 mx-auto backdrop-blur-md border border-white/10"><RiSmartphoneLine /></div>
                                 <h3 className="text-2xl font-bold mb-3">Mobile App</h3>
                                 <p className="text-slate-400 leading-relaxed font-medium">Manage your agency from anywhere.</p>
                             </div>
-
                             <div className="w-56 flex-grow bg-slate-800 rounded-t-[2.5rem] border-[8px] border-slate-700 overflow-hidden relative shadow-2xl group-hover:translate-y-2 transition-transform duration-500">
                                 <div className="absolute top-0 left-1/2 -translate-x-1/2 w-24 h-6 bg-slate-700 rounded-b-xl z-20"></div>
                                 <img
@@ -273,60 +263,109 @@ export default function NexCRMLandingPage() {
                                     loading="lazy"
                                     className="w-full h-full object-cover"
                                 />
-                                {/* Phone Overlay */}
                                 <div className="absolute inset-0 bg-gradient-to-t from-slate-900/80 via-transparent to-transparent"></div>
-
-                                {/* Notification Mockup - Animated */}
                                 <div className="absolute bottom-6 left-4 right-4 bg-white/10 backdrop-blur-md border border-white/10 p-3 rounded-xl flex items-center gap-3 animate-pulse">
-                                    <div className="w-8 h-8 bg-emerald-500 rounded-full flex items-center justify-center text-xs text-white"><i className="ri-check-line"></i></div>
+                                    <div className="w-8 h-8 bg-emerald-500 rounded-full flex items-center justify-center text-xs text-white"><RiCheckLine /></div>
                                     <div className="text-left">
                                         <div className="text-xs text-slate-300">New Payment</div>
                                         <div className="text-sm font-bold">₹24,000 received</div>
                                     </div>
                                 </div>
                             </div>
-                        </div>
+                        </FadeIn>
 
-                        {/* Standard Feature - Invoicing */}
-                        <div className="md:col-span-1 bg-white rounded-[2rem] p-10 border border-slate-100 shadow-xl shadow-slate-200/50 hover:translate-y-[-4px] hover:shadow-2xl transition-all group">
-                            <div className="w-14 h-14 bg-[#F8FAFC] text-[#2563EB] rounded-2xl flex items-center justify-center text-2xl mb-6 group- transition-transform"><i className="ri-bank-card-line"></i></div>
+                        <FadeIn y={30} delay={0.2} className="md:col-span-1 bg-white rounded-[2rem] p-10 border border-slate-100 shadow-xl shadow-slate-200/50 hover:translate-y-[-4px] hover:shadow-2xl transition-all group">
+                            <div className="w-14 h-14 bg-[#F8FAFC] text-[#2563EB] rounded-2xl flex items-center justify-center text-2xl mb-6 group-hover:scale-110 transition-transform"><RiBankCardLine /></div>
                             <h3 className="text-xl font-bold text-slate-900 mb-3">Invoicing & Payments</h3>
                             <p className="text-slate-600 font-medium leading-relaxed">Accept payments via Razorpay with UPI, cards, and net banking.</p>
-                        </div>
+                        </FadeIn>
 
-                        {/* Standard Feature - Pipeline */}
-                        <div className="md:col-span-1 bg-white rounded-[2rem] p-10 border border-slate-100 shadow-xl shadow-slate-200/50 hover:translate-y-[-4px] hover:shadow-2xl transition-all group">
-                            <div className="w-14 h-14 bg-emerald-50 text-emerald-600 rounded-2xl flex items-center justify-center text-2xl mb-6 group- transition-transform"><i className="ri-user-follow-line"></i></div>
+                        <FadeIn y={30} delay={0.3} className="md:col-span-1 bg-white rounded-[2rem] p-10 border border-slate-100 shadow-xl shadow-slate-200/50 hover:translate-y-[-4px] hover:shadow-2xl transition-all group">
+                            <div className="w-14 h-14 bg-emerald-50 text-emerald-600 rounded-2xl flex items-center justify-center text-2xl mb-6 group-hover:scale-110 transition-transform"><RiUserFollowLine /></div>
                             <h3 className="text-xl font-bold text-slate-900 mb-3">Lead Pipeline</h3>
                             <p className="text-slate-600 font-medium leading-relaxed">Drag-and-drop kanban board to track deals from lead to close.</p>
-                        </div>
+                        </FadeIn>
 
-                        {/* Wide Feature - AI Automation */}
-                        <div className="md:col-span-3 rounded-[2rem] p-10 border border-slate-200 hover:border-slate-200 hover:shadow-lg transition-all flex flex-col md:flex-row items-center gap-10 overflow-hidden relative group">
-                            {/* Background Image */}
+                        <FadeIn y={30} delay={0.15} className="md:col-span-3 rounded-[2rem] p-10 border border-slate-200 hover:border-slate-200 hover:shadow-lg transition-all flex flex-col md:flex-row items-center gap-10 overflow-hidden relative group">
                             <div className="absolute inset-0 bg-[url('https://images.unsplash.com/photo-1620712943543-bcc4688e7485?ixlib=rb-4.0.3&auto=format&fit=crop&w=1000&q=80&fm=webp')] bg-cover bg-center opacity-10 group-hover:opacity-20 transition-opacity duration-500"></div>
                             <div className="absolute inset-0 bg-gradient-to-r from-white via-white to-transparent"></div>
-
                             <div className="flex-1 relative z-10 pl-4">
-                                <div className="w-14 h-14 bg-amber-50 text-amber-600 rounded-2xl flex items-center justify-center text-2xl mb-6"><i className="ri-robot-2-line"></i></div>
+                                <div className="w-14 h-14 bg-amber-50 text-amber-600 rounded-2xl flex items-center justify-center text-2xl mb-6"><RiRobot2Line /></div>
                                 <h3 className="text-3xl font-bold text-slate-900 mb-4">AI Automation</h3>
                                 <p className="text-slate-600 text-lg leading-relaxed font-medium max-w-lg">Let AI handle the busy work. Auto-responses, meeting scheduling, and smart follow-ups so you can focus on high-value work.</p>
                             </div>
-
                             <div className="flex-1 w-full max-w-md bg-white rounded-2xl shadow-lg border border-slate-100 p-6 relative z-10 transform translate-y-4 group-hover:translate-y-0 transition-transform duration-500">
                                 <div className="flex items-start gap-4 mb-6">
-                                    <div className="w-10 h-10 rounded-full bg-[#2563EB]/10 flex-shrink-0 flex items-center justify-center text-[#2563EB] font-bold border-2 border-white shadow-sm"><i className="ri-robot-line"></i></div>
+                                    <div className="w-10 h-10 rounded-full bg-[#2563EB]/10 flex-shrink-0 flex items-center justify-center text-[#2563EB] font-bold border-2 border-white shadow-sm"><RiRobotLine /></div>
                                     <div className="bg-slate-50 p-4 rounded-2xl rounded-tl-none text-slate-700 font-medium shadow-inner text-sm leading-relaxed border border-slate-100">
-                                        "I noticed the client hasn't replied to the proposal sent 3 days ago. Should I send a follow-up email?"
+                                        &ldquo;I noticed the client hasn&rsquo;t replied to the proposal sent 3 days ago. Should I send a follow-up email?&rdquo;
                                     </div>
                                 </div>
                                 <div className="flex gap-3 justify-end">
                                     <button className="bg-slate-100 text-slate-600 px-4 py-2 rounded-lg text-sm font-semibold hover:bg-slate-200 transition-colors">Edit</button>
-                                    <button className="bg-blue-600 text-white px-6 py-2 rounded-lg text-sm font-semibold hover:bg-blue-700 transition-colors shadow-md shadow-lg">Yes, Send it</button>
+                                    <button className="bg-blue-600 text-white px-6 py-2 rounded-lg text-sm font-semibold hover:bg-blue-700 transition-colors shadow-md">Yes, Send it</button>
                                 </div>
                             </div>
-                        </div>
+                        </FadeIn>
                     </div>
+                </div>
+            </section>
+
+            {/* How It Works */}
+            <section className="py-28 bg-white relative">
+                <div className="max-w-6xl mx-auto px-6">
+                    <FadeIn y={24} duration={0.6}>
+                        <div className="text-center mb-20">
+                            <span className="text-[#2563EB] font-bold tracking-wider uppercase text-sm mb-4 block">How It Works</span>
+                            <h2 className="text-3xl md:text-5xl font-bold text-slate-900 mb-6">Up and running in <span className="text-[#2563EB]">3 steps.</span></h2>
+                            <p className="text-xl text-slate-600 max-w-2xl mx-auto font-light">No lengthy onboarding. Go from sign-up to managing clients in under an hour.</p>
+                        </div>
+                    </FadeIn>
+
+                    <div className="grid grid-cols-1 md:grid-cols-3 gap-8 md:gap-6 relative">
+                        {/* Connecting line on desktop */}
+                        <div className="hidden md:block absolute top-16 left-[20%] right-[20%] h-px bg-gradient-to-r from-transparent via-slate-200 to-transparent" />
+
+                        {howItWorks.map((item, idx) => (
+                            <FadeIn key={item.step} y={30} delay={idx * 0.12} className="relative">
+                                <div className="bg-slate-50 border border-slate-100 rounded-2xl p-8 text-center hover:shadow-xl hover:-translate-y-1 transition-all duration-300 h-full">
+                                    <div className="relative mx-auto mb-6 w-16 h-16">
+                                        <div className="absolute inset-0 bg-blue-100 rounded-2xl rotate-6" />
+                                        <div className="relative w-16 h-16 bg-white border border-slate-200 rounded-2xl flex items-center justify-center text-2xl text-blue-600 shadow-sm">
+                                            <item.icon />
+                                        </div>
+                                    </div>
+                                    <div className="text-xs font-bold text-blue-600 tracking-widest uppercase mb-3">Step {item.step}</div>
+                                    <h3 className="text-xl font-bold text-slate-900 mb-3">{item.title}</h3>
+                                    <p className="text-slate-600 leading-relaxed">{item.description}</p>
+                                </div>
+                            </FadeIn>
+                        ))}
+                    </div>
+                </div>
+            </section>
+
+            {/* Integrations */}
+            <section className="py-20 bg-slate-50 border-y border-slate-100">
+                <div className="max-w-5xl mx-auto px-6">
+                    <FadeIn y={20} duration={0.5}>
+                        <div className="text-center mb-14">
+                            <h2 className="text-2xl md:text-3xl font-bold text-slate-900 mb-3">Integrates with your favorite tools</h2>
+                            <p className="text-slate-500 text-lg">Connect the services you already use. More integrations added regularly.</p>
+                        </div>
+                    </FadeIn>
+                    <FadeIn y={16} delay={0.1}>
+                        <div className="grid grid-cols-4 md:grid-cols-8 gap-4 md:gap-6 max-w-3xl mx-auto">
+                            {integrations.map((tool) => (
+                                <div key={tool.name} className="flex flex-col items-center gap-2 group">
+                                    <div className="w-14 h-14 bg-white border border-slate-200 rounded-2xl flex items-center justify-center text-2xl text-slate-600 group-hover:text-blue-600 group-hover:border-blue-200 group-hover:shadow-md transition-all duration-200">
+                                        <tool.icon />
+                                    </div>
+                                    <span className="text-xs text-slate-500 font-medium group-hover:text-slate-700 transition-colors">{tool.name}</span>
+                                </div>
+                            ))}
+                        </div>
+                    </FadeIn>
                 </div>
             </section>
 
@@ -334,151 +373,190 @@ export default function NexCRMLandingPage() {
             <section id="pricing" className="py-32 bg-white relative">
                 <div className="absolute inset-0 bg-[radial-gradient(#e5e7eb_1px,transparent_1px)] [background-size:16px_16px] [mask-image:radial-gradient(ellipse_50%_50%_at_50%_50%,#000_70%,transparent_100%)] opacity-20 pointer-events-none"></div>
                 <div className="max-w-7xl mx-auto px-6 relative z-10">
-                    <div className="text-center mb-16">
-                        <h2 className="text-4xl font-bold text-slate-900 mb-6">Simple, Transparent Pricing</h2>
-                        <p className="text-xl text-slate-600 max-w-2xl mx-auto mb-12">Start for free, scale as you grow.</p>
+                    <FadeIn y={24}>
+                        <div className="text-center mb-16">
+                            <h2 className="text-4xl font-bold text-slate-900 mb-6">Simple, Transparent Pricing</h2>
+                            <p className="text-xl text-slate-600 max-w-2xl mx-auto mb-12">Choose the plan that fits your agency.</p>
 
-                        {/* Custom Toggle */}
-                        <div className="inline-flex bg-slate-50 p-1 rounded-full border border-slate-200 shadow-sm relative">
-                            <div
-                                className={`absolute top-1 bottom-1 w-[120px] bg-white rounded-full transition-all duration-300 shadow-md border border-slate-100 ${isYearly ? 'left-[124px]' : 'left-1'}`}
-                            />
-                            <button onClick={() => setIsYearly(false)} className={`relative z-10 w-[120px] py-2.5 text-sm font-semibold rounded-full transition-colors ${!isYearly ? 'text-slate-900' : 'text-slate-500 hover:text-slate-900'}`}>
-                                Monthly
-                            </button>
-                            <button onClick={() => setIsYearly(true)} className={`relative z-10 w-[120px] py-2.5 text-sm font-semibold rounded-full transition-colors ${isYearly ? 'text-slate-900' : 'text-slate-500 hover:text-slate-900'}`}>
-                                Yearly <span className="text-xs opacity-80 font-normal ml-1 text-emerald-600 font-bold">(-15%)</span>
-                            </button>
-                        </div>
-                    </div>
-
-                    <div className="grid md:grid-cols-2 lg:grid-cols-4 gap-6">
-                        {tiers.map((tier) => (
-                            <div key={tier.name} className={`relative flex flex-col bg-slate-50 rounded-3xl p-8 transition-all duration-300 hover:-translate-y-1 overflow-hidden group ${tier.popular ? 'ring-2 ring-blue-600 shadow-2xl scale-[1.02] z-10 bg-white' : 'border border-slate-200 shadow-lg hover:shadow-xl hover:bg-white'}`}>
-                                {tier.popular && (
-                                    <div className="absolute top-0 right-0">
-                                        <div className="bg-blue-600 text-white text-xs font-bold px-3 py-1 rounded-bl-xl rounded-tr-2xl shadow-sm">POPULAR</div>
-                                    </div>
-                                )}
-
-                                <h3 className="text-xl font-bold text-slate-900 mb-2">{tier.name}</h3>
-                                <p className="text-slate-500 text-sm mb-6 min-h-[40px] leading-relaxed">{tier.description}</p>
-
-                                <div className="mb-8 relative">
-                                    {tier.isCustom ? (
-                                        <div className="h-16 flex items-center"><span className="text-4xl font-bold text-slate-900">Custom</span></div>
-                                    ) : (
-                                        <div className="h-16">
-                                            <div className="flex items-baseline">
-                                                <span className="text-4xl font-bold text-slate-900 tracking-tight">
-                                                    {tier.currency}{isYearly ? tier.price.yearly : tier.price.monthly}
-                                                </span>
-                                                <span className="text-slate-500 font-medium ml-1">/mo</span>
-                                            </div>
-                                            {isYearly && <p className="text-xs text-emerald-600 font-bold mt-1">Billed ₹{(tier.price.yearly * 12).toLocaleString()} yearly</p>}
-                                        </div>
-                                    )}
-                                </div>
-
-                                <ul className="space-y-4 mb-8 flex-grow relative z-10">
-                                    <li className="flex items-start gap-3 text-sm text-slate-600 group-hover:text-slate-700 transition-colors">
-                                        <div className="mt-0.5"><CheckIcon /></div>
-                                        <span><strong className="text-slate-900">{tier.limits.leads}</strong> Leads</span>
-                                    </li>
-                                    <li className="flex items-start gap-3 text-sm text-slate-600 group-hover:text-slate-700 transition-colors">
-                                        <div className="mt-0.5"><CheckIcon /></div>
-                                        <span><strong className="text-slate-900">{tier.limits.customers}</strong> Customers</span>
-                                    </li>
-                                    <li className="flex items-start gap-3 text-sm text-slate-600 group-hover:text-slate-700 transition-colors">
-                                        <div className="mt-0.5"><CheckIcon /></div>
-                                        <span><strong className="text-slate-900">{tier.limits.teamMembers}</strong> Team Members</span>
-                                    </li>
-                                    <li className="flex items-start gap-3 text-sm text-slate-600 group-hover:text-slate-700 transition-colors">
-                                        <div className="mt-0.5"><CheckIcon /></div>
-                                        <span>{tier.limits.storage} Storage</span>
-                                    </li>
-                                </ul>
-
-                                <button
-                                    onClick={() => handleAction(tier.name)}
-                                    className={`w-full py-4 rounded-xl font-bold transition-all duration-300 transform active:scale-95 border ${tier.popular ? 'bg-blue-600 text-white border-blue-600 hover:bg-blue-700 shadow-lg hover:shadow-lg' : 'bg-white text-slate-900 border-slate-200 hover:border-slate-300 hover:bg-slate-50 hover:shadow-md'}`}
-                                >
-                                    {tier.cta}
+                            <div className="inline-flex bg-slate-50 p-1 rounded-full border border-slate-200 shadow-sm relative">
+                                <div
+                                    className={`absolute top-1 bottom-1 w-[120px] bg-white rounded-full transition-all duration-300 shadow-md border border-slate-100 ${isYearly ? 'left-[124px]' : 'left-1'}`}
+                                />
+                                <button onClick={() => setIsYearly(false)} className={`relative z-10 w-[120px] py-2.5 text-sm font-semibold rounded-full transition-colors ${!isYearly ? 'text-slate-900' : 'text-slate-500 hover:text-slate-900'}`}>
+                                    Monthly
+                                </button>
+                                <button onClick={() => setIsYearly(true)} className={`relative z-10 w-[120px] py-2.5 text-sm font-semibold rounded-full transition-colors ${isYearly ? 'text-slate-900' : 'text-slate-500 hover:text-slate-900'}`}>
+                                    Yearly <span className="text-xs opacity-80 ml-1 text-emerald-600 font-bold">(-15%)</span>
                                 </button>
                             </div>
+                        </div>
+                    </FadeIn>
+
+                    <div className="grid md:grid-cols-2 lg:grid-cols-4 gap-6">
+                        {tiers.map((tier, idx) => (
+                            <FadeIn key={tier.name} y={30} delay={idx * 0.08}>
+                                <div className={`relative flex flex-col bg-slate-50 rounded-3xl p-8 transition-all duration-300 hover:-translate-y-1 overflow-hidden group h-full ${tier.popular ? 'ring-2 ring-blue-600 shadow-2xl scale-[1.02] z-10 bg-white' : 'border border-slate-200 shadow-lg hover:shadow-xl hover:bg-white'}`}>
+                                    {tier.popular && (
+                                        <div className="absolute top-0 right-0">
+                                            <div className="bg-blue-600 text-white text-xs font-bold px-3 py-1 rounded-bl-xl rounded-tr-2xl shadow-sm">POPULAR</div>
+                                        </div>
+                                    )}
+
+                                    <h3 className="text-xl font-bold text-slate-900 mb-2">{tier.name}</h3>
+                                    <p className="text-slate-500 text-sm mb-6 min-h-[40px] leading-relaxed">{tier.description}</p>
+
+                                    <div className="mb-8 relative">
+                                        {tier.isCustom ? (
+                                            <div className="h-16 flex items-center"><span className="text-4xl font-bold text-slate-900">Custom</span></div>
+                                        ) : (
+                                            <div className="h-16">
+                                                <div className="flex items-baseline">
+                                                    <span className="text-4xl font-bold text-slate-900 tracking-tight">
+                                                        {tier.currency}{isYearly ? tier.price.yearly : tier.price.monthly}
+                                                    </span>
+                                                    <span className="text-slate-500 font-medium ml-1">/mo</span>
+                                                </div>
+                                                {isYearly && <p className="text-xs text-emerald-600 font-bold mt-1">Billed ₹{(tier.price.yearly * 12).toLocaleString()} yearly</p>}
+                                            </div>
+                                        )}
+                                    </div>
+
+                                    <ul className="space-y-4 mb-8 flex-grow relative z-10">
+                                        <li className="flex items-start gap-3 text-sm text-slate-600 group-hover:text-slate-700 transition-colors">
+                                            <div className="mt-0.5"><CheckIcon /></div>
+                                            <span><strong className="text-slate-900">{tier.limits.leads}</strong> Leads</span>
+                                        </li>
+                                        <li className="flex items-start gap-3 text-sm text-slate-600 group-hover:text-slate-700 transition-colors">
+                                            <div className="mt-0.5"><CheckIcon /></div>
+                                            <span><strong className="text-slate-900">{tier.limits.customers}</strong> Customers</span>
+                                        </li>
+                                        <li className="flex items-start gap-3 text-sm text-slate-600 group-hover:text-slate-700 transition-colors">
+                                            <div className="mt-0.5"><CheckIcon /></div>
+                                            <span><strong className="text-slate-900">{tier.limits.teamMembers}</strong> Team Members</span>
+                                        </li>
+                                        <li className="flex items-start gap-3 text-sm text-slate-600 group-hover:text-slate-700 transition-colors">
+                                            <div className="mt-0.5"><CheckIcon /></div>
+                                            <span>{tier.limits.storage} Storage</span>
+                                        </li>
+                                    </ul>
+
+                                    <button
+                                        onClick={() => handleAction(tier.name)}
+                                        className={`w-full py-4 rounded-xl font-bold transition-all duration-300 transform active:scale-95 border ${tier.popular ? 'bg-blue-600 text-white border-blue-600 hover:bg-blue-700 shadow-lg' : 'bg-white text-slate-900 border-slate-200 hover:border-slate-300 hover:bg-slate-50 hover:shadow-md'}`}
+                                    >
+                                        {tier.cta}
+                                    </button>
+                                </div>
+                            </FadeIn>
                         ))}
                     </div>
                 </div>
             </section>
 
-            {/* Comparison Table (Refined) */}
+            {/* Comparison Table (Accordion) */}
             <section className="py-32 bg-slate-50 relative border-t border-slate-200">
                 <div className="max-w-7xl mx-auto px-6 relative z-10">
-                    <div className="text-center mb-16">
-                        <h2 className="text-3xl font-bold text-slate-900 mb-6">Compare features</h2>
-                        <p className="text-lg text-slate-600 max-w-2xl mx-auto"> detailed breakdown of what's included in each plan.</p>
-                    </div>
+                    <FadeIn y={24}>
+                        <div className="text-center mb-16">
+                            <h2 className="text-3xl font-bold text-slate-900 mb-6">Compare features</h2>
+                            <p className="text-lg text-slate-600 max-w-2xl mx-auto">A detailed breakdown of what&rsquo;s included in each plan.</p>
+                        </div>
+                    </FadeIn>
 
-                    <div className="overflow-x-auto bg-white border border-slate-200 rounded-[2rem] shadow-xl shadow-slate-200/40 custom-scrollbar">
-                        <table className="w-full min-w-[900px]">
-                            <thead>
-                                <tr className="bg-slate-50/50 border-b border-slate-200">
-                                    <th className="py-6 px-8 text-left text-sm font-semibold text-slate-900 w-1/4 uppercase tracking-wider">Feature</th>
-                                    {tiers.map((tier) => (
-                                        <th key={tier.name} className="py-6 px-6 text-center text-sm font-bold text-slate-900 w-[18%]">
-                                            {tier.name}
-                                        </th>
-                                    ))}
-                                </tr>
-                            </thead>
-                            <tbody className="divide-y divide-slate-100">
-                                {Object.keys(features).map((category) => (
-                                    <>
-                                        <tr key={category} className="bg-slate-50/80">
-                                            <td colSpan={5} className="py-3 px-8 text-xs font-bold text-slate-400 uppercase tracking-widest bg-slate-50/50 backdrop-blur-sm sticky left-0">
-                                                {category.charAt(0).toUpperCase() + category.slice(1)}
-                                            </td>
-                                        </tr>
-                                        {features[category].map((feature) => (
-                                            <tr key={feature.name} className="hover:bg-[#F8FAFC]/30 transition-colors group duration-150">
-                                                <td className="py-4 px-8 text-sm text-slate-600 font-medium group-hover:text-blue-900 group-hover:pl-9 transition-all">
-                                                    {feature.name}
-                                                    {feature.soon && <span className="ml-2 text-[10px] uppercase bg-amber-100 text-amber-700 px-1.5 py-0.5 rounded-full font-bold tracking-wide border border-amber-200">Soon</span>}
-                                                </td>
-                                                <td className="py-4 px-6 text-center"><FeatureValue value={feature.starter} soon={feature.soon} /></td>
-                                                <td className="py-4 px-6 text-center"><FeatureValue value={feature.growth} soon={feature.soon} /></td>
-                                                <td className="py-4 px-6 text-center"><FeatureValue value={feature.business} soon={feature.soon} /></td>
-                                                <td className="py-4 px-6 text-center"><FeatureValue value={feature.enterprise} soon={feature.soon} /></td>
-                                            </tr>
+                    <FadeIn y={20} delay={0.1}>
+                        <div className="bg-white border border-slate-200 rounded-[2rem] shadow-xl shadow-slate-200/40 overflow-hidden">
+                            {/* Sticky header row */}
+                            <div className="overflow-x-auto custom-scrollbar">
+                                <div className="min-w-[900px]">
+                                    <div className="grid grid-cols-[1fr_repeat(4,minmax(0,1fr))] bg-slate-50/50 border-b border-slate-200">
+                                        <div className="py-5 px-8 text-sm font-semibold text-slate-900 uppercase tracking-wider">Feature</div>
+                                        {tiers.map((tier) => (
+                                            <div key={tier.name} className="py-5 px-6 text-center text-sm font-bold text-slate-900">{tier.name}</div>
                                         ))}
-                                    </>
-                                ))}
-                            </tbody>
-                        </table>
+                                    </div>
+
+                                    {Object.keys(features).map((category, catIdx) => (
+                                        <details key={category} open={catIdx === 0} className="group/cat">
+                                            <summary className="grid grid-cols-[1fr_repeat(4,minmax(0,1fr))] bg-slate-50/80 cursor-pointer list-none select-none hover:bg-slate-100/60 transition-colors border-b border-slate-100">
+                                                <div className="py-3.5 px-8 text-xs font-bold text-slate-500 uppercase tracking-widest flex items-center gap-2">
+                                                    <RiArrowDownSLine className="text-slate-400 transition-transform group-open/cat:rotate-180 text-base flex-shrink-0" />
+                                                    {featureCategoryLabels[category] || (category.charAt(0).toUpperCase() + category.slice(1))}
+                                                </div>
+                                                <div className="col-span-4" />
+                                            </summary>
+                                            <div>
+                                                {features[category].map((feature) => (
+                                                    <div key={feature.name} className="grid grid-cols-[1fr_repeat(4,minmax(0,1fr))] hover:bg-blue-50/30 transition-colors group border-b border-slate-50 last:border-b-0">
+                                                        <div className="py-4 px-8 text-sm text-slate-600 font-medium group-hover:text-blue-900 group-hover:pl-9 transition-all">
+                                                            {feature.name}
+                                                            {feature.soon && <span className="ml-2 text-[10px] uppercase bg-amber-100 text-amber-700 px-1.5 py-0.5 rounded-full font-bold tracking-wide border border-amber-200">Soon</span>}
+                                                        </div>
+                                                        <div className="py-4 px-6 flex justify-center"><FeatureValue value={feature.starter} soon={feature.soon} /></div>
+                                                        <div className="py-4 px-6 flex justify-center"><FeatureValue value={feature.growth} soon={feature.soon} /></div>
+                                                        <div className="py-4 px-6 flex justify-center"><FeatureValue value={feature.business} soon={feature.soon} /></div>
+                                                        <div className="py-4 px-6 flex justify-center"><FeatureValue value={feature.enterprise} soon={feature.soon} /></div>
+                                                    </div>
+                                                ))}
+                                            </div>
+                                        </details>
+                                    ))}
+                                </div>
+                            </div>
+                        </div>
+                    </FadeIn>
+                </div>
+            </section>
+
+            {/* FAQ Section */}
+            <section className="py-28 bg-white">
+                <div className="max-w-3xl mx-auto px-6">
+                    <FadeIn y={24}>
+                        <div className="text-center mb-14">
+                            <span className="text-[#2563EB] font-bold tracking-wider uppercase text-sm mb-4 block">FAQ</span>
+                            <h2 className="text-3xl md:text-4xl font-bold text-slate-900">Frequently Asked Questions</h2>
+                        </div>
+                    </FadeIn>
+
+                    <div className="space-y-3">
+                        {faqs.map((faq, idx) => (
+                            <FadeIn key={faq.q} y={16} delay={idx * 0.05}>
+                                <details className="group bg-white rounded-xl border border-slate-200 overflow-hidden hover:border-slate-300 transition-colors">
+                                    <summary className="flex items-center justify-between p-5 cursor-pointer list-none">
+                                        <span className="font-medium text-slate-900 pr-4">{faq.q}</span>
+                                        <svg className="w-5 h-5 text-slate-400 transition-transform group-open:rotate-180 flex-shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                            <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M19 9l-7 7-7-7" />
+                                        </svg>
+                                    </summary>
+                                    <div className="px-5 pb-5 text-slate-600 leading-relaxed">
+                                        {faq.a}
+                                    </div>
+                                </details>
+                            </FadeIn>
+                        ))}
                     </div>
                 </div>
             </section>
 
             {/* CTA Section */}
             <section className="py-32 px-6">
-                <div className="max-w-5xl mx-auto bg-slate-900 rounded-[2.5rem] p-12 md:p-20 text-center relative overflow-hidden shadow-2xl">
-                    {/* Glow effects */}
-                    <div className="absolute top-0 left-1/2 -translate-x-1/2 w-full h-full bg-gradient-to-b from-[#2563EB]/10 to-transparent pointer-events-none" />
-
-                    <div className="relative z-10">
-                        <h2 className="text-4xl md:text-5xl font-bold text-white mb-6 tracking-tight">
-                            Ready to transform your agency?
-                        </h2>
-                        <p className="text-xl text-slate-400 mb-10 max-w-2xl mx-auto">
-                            Join 2,000+ agencies using NexCRM to scale their operations.
-                        </p>
-                        <div className="flex flex-col sm:flex-row gap-4 justify-center">
-                            <button onClick={() => document.getElementById('pricing').scrollIntoView({ behavior: 'smooth' })} className="px-10 py-5 bg-blue-600 text-white rounded-xl font-bold text-lg hover:bg-[#F8FAFC]0  transition-all shadow-lg shadow-lg">
-                                Get Started Now
-                            </button>
+                <FadeIn y={30}>
+                    <div className="max-w-5xl mx-auto bg-slate-900 rounded-[2.5rem] p-12 md:p-20 text-center relative overflow-hidden shadow-2xl">
+                        <div className="absolute top-0 left-1/2 -translate-x-1/2 w-full h-full bg-gradient-to-b from-[#2563EB]/10 to-transparent pointer-events-none" />
+                        <div className="relative z-10">
+                            <h2 className="text-4xl md:text-5xl font-bold text-white mb-6 tracking-tight">
+                                Ready to transform your agency?
+                            </h2>
+                            <p className="text-xl text-slate-400 mb-10 max-w-2xl mx-auto">
+                                Join 2,000+ agencies using NexCRM to scale their operations.
+                            </p>
+                            <div className="flex flex-col sm:flex-row gap-4 justify-center">
+                                <button onClick={() => document.getElementById('pricing').scrollIntoView({ behavior: 'smooth' })} className="px-10 py-5 bg-blue-600 text-white rounded-xl font-bold text-lg hover:bg-blue-700 transition-all shadow-lg">
+                                    Get Started Now
+                                </button>
+                            </div>
                         </div>
                     </div>
-                </div>
+                </FadeIn>
             </section>
 
             {/* Contact Modal */}
@@ -490,19 +568,19 @@ export default function NexCRMLandingPage() {
                         exit={{ opacity: 0, scale: 0.95 }}
                         className="bg-white rounded-3xl shadow-2xl max-w-lg w-full p-8 relative max-h-[90vh] overflow-y-auto"
                     >
-                        <button onClick={() => setShowContactModal(false)} className="absolute top-6 right-6 text-slate-400 hover:text-slate-600 p-2 hover:bg-slate-50 rounded-full transition-colors">
+                        <button onClick={() => setShowContactModal(false)} className="absolute top-6 right-6 text-slate-400 hover:text-slate-600 p-2 hover:bg-slate-50 rounded-full transition-colors" aria-label="Close contact form">
                             <XIcon />
                         </button>
 
                         <div className="text-center mb-8">
-                            <div className="w-14 h-14 bg-[#2563EB]/10 rounded-2xl flex items-center justify-center mx-auto mb-6 text-[#2563EB] text-2xl shadow-inner"><i className="ri-mail-send-line"></i></div>
+                            <div className="w-14 h-14 bg-[#2563EB]/10 rounded-2xl flex items-center justify-center mx-auto mb-6 text-[#2563EB] text-2xl shadow-inner"><RiMailSendLine /></div>
                             <h3 className="text-2xl font-bold text-slate-900">Contact Sales</h3>
-                            <p className="text-slate-500 mt-2">Let's simplify your agency operations.</p>
+                            <p className="text-slate-500 mt-2">Let&rsquo;s simplify your agency operations.</p>
                         </div>
 
                         {submitted ? (
                             <div className="text-center py-10">
-                                <div className="w-20 h-20 bg-emerald-50 rounded-full flex items-center justify-center mx-auto mb-6 text-emerald-600 text-4xl animate-bounce"><i className="ri-check-line"></i></div>
+                                <div className="w-20 h-20 bg-emerald-50 rounded-full flex items-center justify-center mx-auto mb-6 text-emerald-600 text-4xl animate-bounce"><RiCheckLine /></div>
                                 <h4 className="text-2xl font-bold text-slate-900 mb-2">Request Sent!</h4>
                                 <p className="text-slate-600 mb-8">Our team will reach out within 24 hours.</p>
                                 <button onClick={() => setShowContactModal(false)} className="px-8 py-3 bg-slate-900 text-white rounded-xl font-medium hover:bg-slate-800 transition-colors">Close</button>
@@ -510,35 +588,7 @@ export default function NexCRMLandingPage() {
                         ) : (
                             <form className="space-y-5" onSubmit={async (e) => {
                                 e.preventDefault();
-                                setSubmitting(true);
-                                let captchaToken;
-                                try {
-                                    captchaToken = await getCaptchaToken();
-                                } catch (captchaErr) {
-                                    showToast(captchaErr.message, 'error');
-                                    setSubmitting(false);
-                                    return;
-                                }
-                                const formData = new FormData(e.target);
-                                const data = {
-                                    name: formData.get('name'),
-                                    email: formData.get('email'),
-                                    phone: formData.get('phone'),
-                                    company: formData.get('company'),
-                                    message: `Plan: NexCRM ${selectedPlan}\n\n${formData.get('message')}`,
-                                    captchaToken
-                                };
-
-                                try {
-                                    const response = await fetch(`${import.meta.env.VITE_API_URL || ''}/inquiries`, {
-                                        method: 'POST',
-                                        headers: { 'Content-Type': 'application/json' },
-                                        body: JSON.stringify(data)
-                                    });
-                                    if (response.ok) setSubmitted(true);
-                                    else showToast('Submission failed.', 'error');
-                                } catch { showToast('Network error', 'error'); }
-                                finally { setSubmitting(false); }
+                                await submitContactForm(new FormData(e.target));
                             }}>
                                 <div className="space-y-4">
                                     <input type="text" name="name" required minLength={2} maxLength={100} placeholder="Full Name" aria-label="Full name" className="w-full px-5 py-4 bg-slate-50 border border-slate-200 rounded-xl focus:ring-2 focus:ring-[#2563EB] focus:bg-white outline-none transition-all" />
@@ -550,7 +600,7 @@ export default function NexCRMLandingPage() {
                                     <textarea name="message" rows="3" maxLength={2000} placeholder="Additional details..." aria-label="Your message" className="w-full px-5 py-4 bg-slate-50 border border-slate-200 rounded-xl focus:ring-2 focus:ring-[#2563EB] focus:bg-white outline-none resize-none transition-all"></textarea>
                                 </div>
                                 <button disabled={submitting} type="submit" className="w-full py-4 bg-slate-900 text-white font-bold rounded-xl hover:bg-slate-800 transition-colors disabled:opacity-70 flex items-center justify-center gap-3 shadow-lg hover:shadow-xl hover:-translate-y-0.5 transform duration-200">
-                                    {submitting && <i className="ri-loader-4-line animate-spin"></i>}
+                                    {submitting && <RiLoader4Line className="animate-spin" />}
                                     Submit Request
                                 </button>
                             </form>
