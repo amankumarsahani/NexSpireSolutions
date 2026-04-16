@@ -1,7 +1,8 @@
 // TODO: Replace console.error with Sentry or proper error tracking
 import { Component } from 'react';
+import { useLocation } from 'react-router-dom';
 
-class ErrorBoundary extends Component {
+class ErrorBoundaryInner extends Component {
     constructor(props) {
         super(props);
         this.state = { hasError: false };
@@ -9,6 +10,12 @@ class ErrorBoundary extends Component {
 
     static getDerivedStateFromError() {
         return { hasError: true };
+    }
+
+    componentDidUpdate(prevProps) {
+        if (this.state.hasError && prevProps.locationKey !== this.props.locationKey) {
+            this.setState({ hasError: false });
+        }
     }
 
     componentDidCatch(error, errorInfo) {
@@ -40,6 +47,15 @@ class ErrorBoundary extends Component {
 
         return this.props.children;
     }
+}
+
+function ErrorBoundary({ children }) {
+    const location = useLocation();
+    return (
+        <ErrorBoundaryInner locationKey={location.pathname}>
+            {children}
+        </ErrorBoundaryInner>
+    );
 }
 
 export default ErrorBoundary;
