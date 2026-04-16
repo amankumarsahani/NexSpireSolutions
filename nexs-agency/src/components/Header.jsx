@@ -1,6 +1,8 @@
 import { useState, useEffect, memo } from 'react';
 import { Link, useLocation } from 'react-router-dom';
 import { useAuth } from '../context/AuthContext';
+import { useBodyScrollLock } from '../hooks/useBodyScrollLock';
+import { RiArrowDownSLine, RiArrowRightLine } from 'react-icons/ri';
 
 const navItems = [
   { label: 'Home', path: '/' },
@@ -32,6 +34,11 @@ const Header = memo(function Header() {
   const showAdminBackups = isAuthenticated && user?.role === 'admin';
 
   useEffect(() => {
+    setActiveDropdown(null);
+    setIsMenuOpen(false);
+  }, [location.pathname]);
+
+  useEffect(() => {
     let ticking = false;
     const handleScroll = () => {
       if (!ticking) {
@@ -46,37 +53,7 @@ const Header = memo(function Header() {
     return () => window.removeEventListener('scroll', handleScroll);
   }, []);
 
-  useEffect(() => {
-    if (isMenuOpen) {
-      const scrollY = window.scrollY;
-      document.body.style.position = 'fixed';
-      document.body.style.top = `-${scrollY}px`;
-      document.body.style.left = '0';
-      document.body.style.right = '0';
-      document.body.style.width = '100%';
-    } else {
-      const scrollY = document.body.style.top;
-      document.body.style.position = '';
-      document.body.style.top = '';
-      document.body.style.left = '';
-      document.body.style.right = '';
-      document.body.style.width = '';
-      if (scrollY) {
-        window.scrollTo(0, parseInt(scrollY || '0', 10) * -1);
-      }
-    }
-    return () => {
-      const scrollY = document.body.style.top;
-      document.body.style.position = '';
-      document.body.style.top = '';
-      document.body.style.left = '';
-      document.body.style.right = '';
-      document.body.style.width = '';
-      if (scrollY) {
-        window.scrollTo(0, parseInt(scrollY || '0', 10) * -1);
-      }
-    };
-  }, [isMenuOpen]);
+  useBodyScrollLock(isMenuOpen);
 
   const handleNavClick = (e, path) => {
     setIsMenuOpen(false);
@@ -139,7 +116,7 @@ const Header = memo(function Header() {
                       }`}
                   >
                     {item.label}
-                    {item.children && <i className="ri-arrow-down-s-line text-xs font-bold mt-0.5"></i>}
+                    {item.children && <RiArrowDownSLine className="text-xs font-bold mt-0.5" />}
                   </Link>
 
                   {item.children && (
@@ -155,7 +132,7 @@ const Header = memo(function Header() {
                               className="px-4 py-3 text-sm font-medium text-slate-700 hover:bg-[#F8FAFC] hover:text-[#2563EB] rounded-xl transition-colors text-left flex items-center justify-between group/item"
                             >
                               {child.label}
-                              <i className="ri-arrow-right-line opacity-0 group-hover/item:opacity-100 -translate-x-2 group-hover/item:translate-x-0 transition-all text-xs"></i>
+                              <RiArrowRightLine className="opacity-0 group-hover/item:opacity-100 -translate-x-2 group-hover/item:translate-x-0 transition-all text-xs" />
                             </Link>
                           ))}
                         </div>
@@ -187,7 +164,7 @@ const Header = memo(function Header() {
             >
               <span className="relative z-10 flex items-center">
                 Get Started
-                <i className="ri-arrow-right-line ml-2 text-sm group-hover:translate-x-0.5 transition-transform duration-300"></i>
+                <RiArrowRightLine className="ml-2 text-sm group-hover:translate-x-0.5 transition-transform duration-300" />
               </span>
             </Link>
           </div>
@@ -229,15 +206,14 @@ const Header = memo(function Header() {
                       >
                         <div className="flex items-center justify-between">
                           <span>{item.label}</span>
-                          <i className={`ri-arrow-down-s-line transition-transform duration-300 ${activeDropdown === item.label ? 'rotate-180' : ''}`}></i>
+                          <RiArrowDownSLine className={`transition-transform duration-300 ${activeDropdown === item.label ? 'rotate-180' : ''}`} />
                         </div>
                       </button>
                     ) : (
-                    <div
-                      onClick={(e) => {
-                        handleNavClick(e, item.path);
-                      }}
-                      className={`relative z-10 block px-4 py-2 text-base font-semibold rounded-xl transition-all duration-300 cursor-pointer ${isActive(item.path)
+                    <Link
+                      to={item.path}
+                      onClick={() => setIsMenuOpen(false)}
+                      className={`relative z-10 block px-4 py-2 text-base font-semibold rounded-xl transition-all duration-300 ${isActive(item.path)
                         ? 'text-white bg-[#2563EB] shadow-lg'
                         : 'text-slate-700 hover:text-[#2563EB] hover:bg-[#F8FAFC]'
                         }`}
@@ -245,7 +221,7 @@ const Header = memo(function Header() {
                       <div className="flex items-center justify-between">
                         <span>{item.label}</span>
                       </div>
-                    </div>
+                    </Link>
                     )}
 
                     {item.children && (

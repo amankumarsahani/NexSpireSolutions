@@ -1,13 +1,13 @@
 import { useState, useMemo } from 'react';
 import { Link } from 'react-router-dom';
 import { Helmet } from 'react-helmet-async';
-// eslint-disable-next-line no-unused-vars
 import { motion, AnimatePresence } from 'framer-motion';
 import Breadcrumbs from '../components/ui/Breadcrumbs';
 import BackToTop from '../components/ui/BackToTop';
 
 import ReadingProgress from '../components/ui/ReadingProgress';
 import { SITE_URL } from '../constants/siteConfig';
+import { RiArrowDownSLine, RiArrowRightLine, RiCheckLine, RiCloseLine, RiSearchEyeLine, RiSearchLine, RiThumbDownLine, RiThumbUpLine } from 'react-icons/ri';
 
 const FAQPage = () => {
 
@@ -172,15 +172,17 @@ const FAQPage = () => {
                                 placeholder="Search for answers..."
                                 value={searchQuery}
                                 onChange={(e) => setSearchQuery(e.target.value)}
+                                aria-label="Search frequently asked questions"
                                 className="w-full px-6 py-4 pl-14 rounded-2xl bg-white border border-slate-200 focus:border-[#2563EB] focus:ring-2 focus:ring-[#2563EB]/20 shadow-sm transition-all text-lg outline-none"
                             />
-                            <i className="ri-search-line absolute left-5 top-1/2 -translate-y-1/2 text-slate-400 text-xl"></i>
+                            <RiSearchLine className="absolute left-5 top-1/2 -translate-y-1/2 text-slate-400 text-xl" />
                             {searchQuery && (
                                 <button
                                     onClick={() => setSearchQuery('')}
                                     className="absolute right-5 top-1/2 -translate-y-1/2 text-slate-400 hover:text-slate-600"
+                                    aria-label="Clear search"
                                 >
-                                    <i className="ri-close-line text-xl"></i>
+                                    <RiCloseLine className="text-xl" />
                                 </button>
                             )}
                         </div>
@@ -216,7 +218,7 @@ const FAQPage = () => {
                                     animate={{ opacity: 1 }}
                                     className="p-12 text-center"
                                 >
-                                    <i className="ri-search-eye-line text-6xl text-gray-200 mb-4 block"></i>
+                                    <RiSearchEyeLine className="text-6xl text-gray-200 mb-4 block" />
                                     <h3 className="text-xl font-bold text-slate-800 mb-2">No results found</h3>
                                     <p className="text-slate-500">Try adjusting your search or filter to find what you're looking for.</p>
                                 </motion.div>
@@ -246,7 +248,7 @@ const FAQPage = () => {
                                                     {faq.question}
                                                 </h3>
                                             </div>
-                                            <i className={`ri-arrow-down-s-line text-2xl text-slate-400 transition-transform duration-300 ${expandedIndex === index ? 'rotate-180' : ''}`}></i>
+                                            <RiArrowDownSLine className={`text-2xl text-slate-400 transition-transform duration-300 ${expandedIndex === index ? 'rotate-180' : ''}`} />
                                         </button>
 
                                         <AnimatePresence>
@@ -271,19 +273,21 @@ const FAQPage = () => {
                                                                     <button
                                                                         onClick={() => handleFeedback(index, true)}
                                                                         className="text-slate-400 hover:text-green-500 transition-colors"
+                                                                        aria-label="Yes, this was helpful"
                                                                     >
-                                                                        <i className="ri-thumb-up-line text-lg"></i>
+                                                                        <RiThumbUpLine className="text-lg" />
                                                                     </button>
                                                                     <button
                                                                         onClick={() => handleFeedback(index, false)}
                                                                         className="text-slate-400 hover:text-red-500 transition-colors"
+                                                                        aria-label="No, this was not helpful"
                                                                     >
-                                                                        <i className="ri-thumb-down-line text-lg"></i>
+                                                                        <RiThumbDownLine className="text-lg" />
                                                                     </button>
                                                                 </>
                                                             ) : (
                                                                 <span className="text-sm text-green-600 flex items-center gap-1">
-                                                                    <i className="ri-check-line"></i>
+                                                                    <RiCheckLine />
                                                                     Thanks for your feedback!
                                                                 </span>
                                                             )}
@@ -312,7 +316,7 @@ const FAQPage = () => {
                         className="inline-flex items-center gap-4 px-10 py-5 bg-blue-600 text-white rounded-full text-lg font-bold hover:bg-blue-700 transition-all duration-300 shadow-xl hover:shadow-2xl"
                     >
                         Contact Us
-                        <i className="ri-arrow-right-line"></i>
+                        <RiArrowRightLine />
                     </Link>
                 </div>
             </section>

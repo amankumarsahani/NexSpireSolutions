@@ -2,6 +2,23 @@
 import { useState, useRef, useEffect, memo } from 'react';
 import { inquiryAPI } from '../services/api';
 import { siteConfig } from '../constants/siteConfig';
+import {
+  RiBuildingLine,
+  RiCheckboxCircleLine,
+  RiCustomerServiceLine,
+  RiErrorWarningLine,
+  RiInformationLine,
+  RiLoader4Line,
+  RiMailLine,
+  RiMessage3Line,
+  RiPhoneLine,
+  RiSendPlaneLine,
+  RiShareLine,
+  RiShieldCheckLine,
+  RiTimeLine,
+  RiUserLine
+} from 'react-icons/ri';
+import Icon from './ui/Icon';
 
 const Contact = memo(function Contact() {
   const [formData, setFormData] = useState({
@@ -103,7 +120,7 @@ const Contact = memo(function Contact() {
             <div className="bg-white rounded-2xl p-6 shadow-lg border border-slate-200 h-full flex flex-col">
               <div className="flex items-center mb-6">
                 <div className="w-10 h-10 bg-[#2563EB] rounded-lg flex items-center justify-center mr-3">
-                  <i className="ri-mail-line text-lg text-white"></i>
+                  <RiMailLine className="text-lg text-white" />
                 </div>
                 <h3 className="text-xl font-bold text-slate-800">
                   Send us a message
@@ -131,7 +148,7 @@ const Contact = memo(function Contact() {
                           placeholder="Name"
                         />
                         <div className="absolute inset-y-0 right-3 flex items-center pointer-events-none">
-                          <i className="ri-user-line text-slate-400 text-sm"></i>
+                          <RiUserLine className="text-slate-400 text-sm" />
                         </div>
                       </div>
                     </div>
@@ -152,7 +169,7 @@ const Contact = memo(function Contact() {
                           placeholder="xyz@gmail.com"
                         />
                         <div className="absolute inset-y-0 right-3 flex items-center pointer-events-none">
-                          <i className="ri-mail-line text-slate-400 text-sm"></i>
+                          <RiMailLine className="text-slate-400 text-sm" />
                         </div>
                       </div>
                     </div>
@@ -174,7 +191,7 @@ const Contact = memo(function Contact() {
                         placeholder="Your Company"
                       />
                       <div className="absolute inset-y-0 right-3 flex items-center pointer-events-none">
-                        <i className="ri-building-line text-slate-400 text-sm"></i>
+                        <RiBuildingLine className="text-slate-400 text-sm" />
                       </div>
                     </div>
                   </div>
@@ -194,7 +211,7 @@ const Contact = memo(function Contact() {
                         placeholder="+91 12345 67890"
                       />
                       <div className="absolute inset-y-0 right-3 flex items-center pointer-events-none">
-                        <i className="ri-phone-line text-slate-400 text-sm"></i>
+                        <RiPhoneLine className="text-slate-400 text-sm" />
                       </div>
                     </div>
                   </div>
@@ -216,7 +233,7 @@ const Contact = memo(function Contact() {
                         placeholder="Tell us about your project..."
                       ></textarea>
                       <div className="absolute top-3 right-3 pointer-events-none">
-                        <i className="ri-message-3-line text-slate-400 text-sm"></i>
+                        <RiMessage3Line className="text-slate-400 text-sm" />
                       </div>
                     </div>
                   </div>
@@ -228,10 +245,10 @@ const Contact = memo(function Contact() {
                         : 'bg-red-50 text-red-700 border border-red-200'
                         }`}>
                         <div className="flex items-center">
-                          <i className={`${submitStatus.type === 'success'
-                            ? 'ri-checkbox-circle-line'
-                            : 'ri-error-warning-line'
-                            } mr-2`}></i>
+                          {(() => { const Ic = submitStatus.type === 'success'
+                            ? RiCheckboxCircleLine
+                            : RiErrorWarningLine
+                            ; return <Ic className="mr-2" />; })()}
                           <span>{submitStatus.message}</span>
                         </div>
                       </div>
@@ -245,13 +262,13 @@ const Contact = memo(function Contact() {
                       <span className="flex items-center justify-center">
                         {isSubmitting ? (
                           <>
-                            <i className="ri-loader-4-line animate-spin mr-2"></i>
+                            <RiLoader4Line className="animate-spin mr-2" />
                             Sending...
                           </>
                         ) : (
                           <>
                             Send Message
-                            <i className="ri-send-plane-line ml-2"></i>
+                            <RiSendPlaneLine className="ml-2" />
                           </>
                         )}
                       </span>
@@ -259,11 +276,11 @@ const Contact = memo(function Contact() {
 
                     <div className="flex items-center justify-between text-xs text-slate-500 pt-3 border-t border-slate-200">
                       <div className="flex items-center">
-                        <i className="ri-shield-check-line mr-2 text-green-500"></i>
+                        <RiShieldCheckLine className="mr-2 text-green-500" />
                         <span>Your information is secure</span>
                       </div>
                       <div className="flex items-center">
-                        <i className="ri-time-line mr-2 text-[#2563EB]"></i>
+                        <RiTimeLine className="mr-2 text-[#2563EB]" />
                         <span>Response in 24 hours</span>
                       </div>
                     </div>
@@ -277,7 +294,7 @@ const Contact = memo(function Contact() {
             <div className="bg-[#F8FAFC] rounded-2xl p-6 border border-slate-200 h-full flex flex-col">
               <div className="flex items-center mb-6">
                 <div className="w-10 h-10 bg-[#2563EB] rounded-lg flex items-center justify-center mr-3">
-                  <i className="ri-information-line text-lg text-white"></i>
+                  <RiInformationLine className="text-lg text-white" />
                 </div>
                 <h3 className="text-xl font-bold text-slate-800">
                   Get In Touch
@@ -288,12 +305,12 @@ const Contact = memo(function Contact() {
               </p>
 
               <div className="space-y-4 flex-1">
-                {contactInfo.map((info, index) => (
-                  <div key={index} className="group">
+                {contactInfo.map((info) => (
+                  <div key={info.title} className="group">
                     <div className="bg-white rounded-lg p-4 shadow-sm border border-slate-200 hover:shadow-lg transition-all duration-300">
                       <div className="flex items-center space-x-3">
                         <div className="w-10 h-10 bg-[#059669] rounded-lg flex items-center justify-center flex-shrink-0">
-                          <i className={`${info.icon} text-sm text-white`}></i>
+                          <Icon name={info.icon} className="text-sm text-white" />
                         </div>
                         <div className="flex-1">
                           <h4 className="text-sm font-semibold text-slate-800 mb-1">
@@ -314,7 +331,7 @@ const Contact = memo(function Contact() {
                 <div className="bg-white rounded-lg p-4 shadow-sm border border-slate-200">
                   <div className="flex items-center space-x-3 mb-3">
                     <div className="w-10 h-10 bg-[#2563EB] rounded-lg flex items-center justify-center flex-shrink-0">
-                      <i className="ri-share-line text-sm text-white"></i>
+                      <RiShareLine className="text-sm text-white" />
                     </div>
                     <div className="flex-1">
                       <h4 className="text-sm font-semibold text-slate-800 mb-1">
@@ -326,14 +343,14 @@ const Contact = memo(function Contact() {
                     </div>
                   </div>
                   <div className="flex space-x-2 pl-13">
-                    {socialLinks.map((social, index) => (
+                    {socialLinks.map((social) => (
                       <a
-                        key={index}
+                        key={social.label}
                         href={social.href}
                         aria-label={social.label}
                         className="w-8 h-8 bg-[#F8FAFC] rounded-lg flex items-center justify-center border border-slate-200 hover:border-[#2563EB]/30 hover:bg-[#2563EB]/5 transition-all duration-300 group"
                       >
-                        <i className={`${social.icon} text-xs text-slate-600 group-hover:text-[#2563EB]`}></i>
+                        <Icon name={social.icon} className="text-xs text-slate-600 group-hover:text-[#2563EB]" />
                       </a>
                     ))}
                   </div>
@@ -347,7 +364,7 @@ const Contact = memo(function Contact() {
           <div className="bg-[#F8FAFC] rounded-2xl p-6 border border-slate-200">
             <div className="flex items-center space-x-4">
               <div className="w-12 h-12 bg-emerald-500 rounded-lg flex items-center justify-center">
-                <i className="ri-time-line text-xl text-white"></i>
+                <RiTimeLine className="text-xl text-white" />
               </div>
               <div>
                 <h4 className="font-semibold text-slate-800">Quick Response</h4>
@@ -360,7 +377,7 @@ const Contact = memo(function Contact() {
           <div className="bg-[#F8FAFC] rounded-2xl p-6 border border-slate-200">
             <div className="flex items-center space-x-4">
               <div className="w-12 h-12 bg-[#D97706] rounded-lg flex items-center justify-center">
-                <i className="ri-customer-service-line text-xl text-white"></i>
+                <RiCustomerServiceLine className="text-xl text-white" />
               </div>
               <div>
                 <h4 className="font-semibold text-slate-800">24/7 Support</h4>

@@ -11,8 +11,13 @@ export const siteConfig = {
     },
     domain: SITE_URL,
     social: [
-        { icon: 'ri-github-line', href: 'https://github.com/orgs/Nexspire-Solutions/repositories', label: 'GitHub' },
-        { icon: 'ri-linkedin-line', href: 'https://www.linkedin.com/company/nexspire-solution', label: 'LinkedIn' },
-        { icon: 'ri-instagram-line', href: 'https://www.instagram.com/nexspire_solutions/', label: 'Instagram' },
+        { icon: 'ri-github-line', iconFill: 'ri-github-fill', href: 'https://github.com/orgs/Nexspire-Solutions/repositories', label: 'GitHub' },
+        { icon: 'ri-linkedin-line', iconFill: 'ri-linkedin-fill', href: 'https://www.linkedin.com/company/nexspire-solution', label: 'LinkedIn' },
+        { icon: 'ri-instagram-line', iconFill: 'ri-instagram-fill', href: 'https://www.instagram.com/nexspire_solutions/', label: 'Instagram' },
+    ],
+    socialUrls: [
+        'https://github.com/orgs/Nexspire-Solutions/repositories',
+        'https://www.linkedin.com/company/nexspire-solution',
+        'https://www.instagram.com/nexspire_solutions/',
     ],
 };

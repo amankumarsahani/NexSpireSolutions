@@ -1,6 +1,7 @@
 import { memo } from 'react';
 import { Link } from 'react-router-dom';
 import { siteConfig } from '../constants/siteConfig';
+import Icon from './ui/Icon';
 
 const Footer = memo(function Footer() {
   const currentYear = new Date().getFullYear();
@@ -49,9 +50,9 @@ const Footer = memo(function Footer() {
                 solutions that help businesses thrive in the digital world.
               </p>
               <div className="flex space-x-4">
-                {socialLinks.map((social, index) => (
+                {socialLinks.map((social) => (
                   <a
-                    key={index}
+                    key={social.label}
                     href={social.href}
                     aria-label={social.label}
                     target="_blank"
@@ -59,7 +60,7 @@ const Footer = memo(function Footer() {
                     className="w-10 h-10 bg-slate-800 rounded-full flex items-center justify-center hover:bg-[#2563EB] transition-all duration-300 hover:scale-[1.15] active:scale-100"
                     style={{ transitionTimingFunction: 'cubic-bezier(0.34, 1.56, 0.64, 1)' }}
                   >
-                    <i className={`${social.icon} text-lg`}></i>
+                    <Icon name={social.icon} className="text-lg" />
                   </a>
                 ))}
               </div>
@@ -69,8 +70,8 @@ const Footer = memo(function Footer() {
               <div key={category}>
                 <h3 className="text-lg font-semibold mb-4">{category}</h3>
                 <ul className="space-y-3">
-                  {links.map((link, index) => (
-                    <li key={index}>
+                  {links.map((link) => (
+                    <li key={link.href}>
                       <Link
                         to={link.href}
                         className="text-slate-400 hover:text-white transition-colors duration-300"
@@ -94,9 +95,9 @@ const Footer = memo(function Footer() {
               </p>
             </div>
             <div className="flex space-x-4">
-              {socialLinks.map((social, index) => (
+              {socialLinks.map((social) => (
                 <a
-                  key={index}
+                  key={social.label}
                   href={social.href}
                   aria-label={social.label}
                   target="_blank"
@@ -104,7 +105,7 @@ const Footer = memo(function Footer() {
                   className="w-12 h-12 bg-slate-800 rounded-full flex items-center justify-center hover:bg-[#2563EB] transition-all duration-300 hover:scale-[1.15] active:scale-100"
                   style={{ transitionTimingFunction: 'cubic-bezier(0.34, 1.56, 0.64, 1)' }}
                 >
-                  <i className={`${social.icon} text-xl`}></i>
+                  <Icon name={social.icon} className="text-xl" />
                 </a>
               ))}
             </div>
