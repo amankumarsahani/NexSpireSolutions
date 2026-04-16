@@ -78,8 +78,8 @@ const Blog = memo(function Blog() {
             description: blog.excerpt || blog.title,
             tags: blog.category ? [blog.category] : ["Technology"],
             author: blog.author || "Nexspire Team",
-            date: new Date(blog.created_at).toLocaleDateString('en-US', { month: 'long', day: 'numeric', year: 'numeric' }),
-            readTime: blog.read_time || "5 min read",
+            date: new Date(blog.createdAt).toLocaleDateString('en-US', { month: 'long', day: 'numeric', year: 'numeric' }),
+            readTime: blog.readTime || "5 min read",
             color: colors[index % colors.length],
             slug: blog.slug
           }))

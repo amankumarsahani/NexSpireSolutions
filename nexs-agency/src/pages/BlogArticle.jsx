@@ -93,7 +93,7 @@ const BlogArticle = () => {
                 "url": `${SITE_URL}/logo.png`
             }
         },
-        "datePublished": blog.created_at,
+        "datePublished": blog.createdAt,
         "description": blog.excerpt
     };
 
@@ -171,17 +171,17 @@ const BlogArticle = () => {
                             <span>{blog.author}</span>
                         </div>
                         <span>•</span>
-                        <span>{new Date(blog.created_at).toLocaleDateString('en-US', {
+                        <span>{new Date(blog.createdAt).toLocaleDateString('en-US', {
                             year: 'numeric',
                             month: 'short',
                             day: 'numeric'
                         })}</span>
-                        {blog.read_time && (
+                        {blog.readTime && (
                             <>
                                 <span>•</span>
                                 <span className="flex items-center gap-1">
                                     <RiTimeLine />
-                                    {blog.read_time}
+                                    {blog.readTime}
                                 </span>
                             </>
                         )}

@@ -46,12 +46,12 @@ const BlogPage = () => {
                     excerpt: blog.excerpt,
                     category: blog.category,
                     author: blog.author,
-                    date: new Date(blog.created_at).toLocaleDateString('en-US', {
+                    date: new Date(blog.createdAt).toLocaleDateString('en-US', {
                         year: 'numeric',
                         month: 'short',
                         day: 'numeric'
                     }),
-                    readTime: blog.read_time || '5 min read',
+                    readTime: blog.readTime || '5 min read',
                     image: blog.imageUrl,
                     featured: blog.featured,
                     slug: blog.slug
