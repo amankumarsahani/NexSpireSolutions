@@ -24,19 +24,39 @@ api.interceptors.request.use((config) => {
     return config;
 });
 
-api.interceptors.response.use((response) => {
-    if (response.data) {
-        response.data = snakeToCamel(response.data);
+api.interceptors.response.use(
+    (response) => {
+        if (response.data) {
+            response.data = snakeToCamel(response.data);
+        }
+        return response;
+    },
+    (error) => {
+        if (error.response?.status === 401) {
+            localStorage.removeItem('token');
+            cache.clear();
+            window.dispatchEvent(new CustomEvent('auth:logout'));
+        }
+        return Promise.reject(error);
     }
-    return response;
-});
+);
 
 const cache = new Map();
+const MAX_CACHE_SIZE = 100;
 const DEFAULT_TTL = 5 * 60 * 1000;
 
 function getCacheKey(url, params) {
     const paramStr = params ? JSON.stringify(params) : '';
     return `${url}::${paramStr}`;
+}
+
+function cacheSet(key, value) {
+    if (cache.size >= MAX_CACHE_SIZE) {
+        const oldestKey = cache.keys().next().value;
+        cache.delete(oldestKey);
+    }
+    cache.delete(key);
+    cache.set(key, value);
 }
 
 function cachedGet(url, options = {}, ttl = DEFAULT_TTL) {
@@ -45,11 +65,13 @@ function cachedGet(url, options = {}, ttl = DEFAULT_TTL) {
     const cached = cache.get(key);
 
     if (cached && Date.now() - cached.timestamp < ttl) {
+        cache.delete(key);
+        cache.set(key, cached);
         return Promise.resolve(cached.data);
     }
 
     return api.get(url, { params, ...rest }).then((response) => {
-        cache.set(key, { data: response, timestamp: Date.now() });
+        cacheSet(key, { data: response, timestamp: Date.now() });
         return response;
     });
 }

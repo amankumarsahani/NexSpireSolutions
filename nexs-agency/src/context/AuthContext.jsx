@@ -1,18 +1,52 @@
 // TODO: Replace console.error with Sentry or proper error tracking
-import { createContext, useContext, useState, useEffect } from 'react';
+import { createContext, useContext, useState, useEffect, useCallback } from 'react';
 import { authAPI } from '../services/api';
 
 const AuthContext = createContext(null);
 
+/**
+ * Decode JWT payload and check expiration.
+ * Returns false if token is missing, malformed, or expired.
+ */
+function isTokenValid(token) {
+    if (!token) return false;
+    try {
+        const payload = JSON.parse(atob(token.split('.')[1]));
+        // exp is in seconds, Date.now() in ms
+        return payload.exp * 1000 > Date.now();
+    } catch {
+        return false;
+    }
+}
+
 export const AuthProvider = ({ children }) => {
     const [user, setUser] = useState(null);
     const [loading, setLoading] = useState(true);
-    const [token, setToken] = useState(localStorage.getItem('token'));
+    const [token, setToken] = useState(() => {
+        const stored = localStorage.getItem('token');
+        if (stored && !isTokenValid(stored)) {
+            localStorage.removeItem('token');
+            return null;
+        }
+        return stored;
+    });
+
+    const logout = useCallback(() => {
+        localStorage.removeItem('token');
+        setToken(null);
+        setUser(null);
+    }, []);
+
+    useEffect(() => {
+        const handleForceLogout = () => logout();
+        window.addEventListener('auth:logout', handleForceLogout);
+        return () => window.removeEventListener('auth:logout', handleForceLogout);
+    }, [logout]);
 
     useEffect(() => {
         let cancelled = false;
         const storedToken = localStorage.getItem('token');
-        if (token && storedToken) {
+        if (token && storedToken && isTokenValid(storedToken)) {
             const doFetch = async () => {
                 try {
                     const response = await authAPI.getMe();
@@ -26,18 +60,19 @@ export const AuthProvider = ({ children }) => {
             };
             doFetch();
         } else {
+            if (token) logout(); // token exists but is expired/invalid
             setLoading(false);
         }
         return () => { cancelled = true; };
-    }, [token]);
+    }, [token, logout]);
 
     const login = async (email, password) => {
         try {
             const response = await authAPI.signin({ email, password });
-            const { token, user } = response.data;
-            localStorage.setItem('token', token);
-            setToken(token);
-            setUser(user);
+            const { token: newToken, user: newUser } = response.data;
+            localStorage.setItem('token', newToken);
+            setToken(newToken);
+            setUser(newUser);
             return { success: true };
         } catch (error) {
             return {
@@ -50,10 +85,10 @@ export const AuthProvider = ({ children }) => {
     const signup = async (userData) => {
         try {
             const response = await authAPI.signup(userData);
-            const { token, user } = response.data;
-            localStorage.setItem('token', token);
-            setToken(token);
-            setUser(user);
+            const { token: newToken, user: newUser } = response.data;
+            localStorage.setItem('token', newToken);
+            setToken(newToken);
+            setUser(newUser);
             return { success: true };
         } catch (error) {
             return {
@@ -61,12 +96,6 @@ export const AuthProvider = ({ children }) => {
                 message: error.response?.data?.error || 'Signup failed'
             };
         }
-    };
-
-    const logout = () => {
-        localStorage.removeItem('token');
-        setToken(null);
-        setUser(null);
     };
 
     return (

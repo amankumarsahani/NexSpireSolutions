@@ -1,9 +1,9 @@
-import { lazy, memo } from 'react';
-import { BrowserRouter, Routes, Route } from 'react-router-dom';
+import { lazy, memo, Suspense } from 'react';
+import { BrowserRouter, Routes, Route, Navigate } from 'react-router-dom';
 import { Helmet } from 'react-helmet-async';
-// eslint-disable-next-line no-unused-vars
 import { motion } from 'framer-motion';
 import { SITE_URL } from './constants/siteConfig';
+import { useAuth } from './context/AuthContext';
 import ScrollToTop from './components/ScrollToTop';
 import ErrorBoundary from './components/ErrorBoundary';
 
@@ -29,6 +29,7 @@ const PortfolioPage = lazy(() => import('./pages/PortfolioPage'));
 const ContactPage = lazy(() => import('./pages/ContactPage'));
 const BlogPage = lazy(() => import('./pages/BlogPage'));
 const NexCRMLandingPage = lazy(() => import('./pages/NexCRMLandingPage'));
+const CRMPricingPage = lazy(() => import('./pages/CRMPricingPage'));
 const PrivacyPolicy = lazy(() => import('./pages/PrivacyPolicy'));
 const TermsOfService = lazy(() => import('./pages/TermsOfService'));
 const FAQPage = lazy(() => import('./pages/FAQPage'));
@@ -57,6 +58,14 @@ const LoadingSpinner = () => (
     </div>
   </div>
 );
+
+function ProtectedRoute({ children }) {
+  const { isAuthenticated, loading, user } = useAuth();
+  if (loading) return <LoadingSpinner />;
+  if (!isAuthenticated) return <Navigate to="/" replace />;
+  if (!user?.role || user.role !== 'admin') return <Navigate to="/" replace />;
+  return children;
+}
 
 // Memoized Landing Page for better performance
 const LandingPage = memo(function LandingPage() {
@@ -144,7 +153,8 @@ function App() {
           <Route path="/contact" element={<ContactPage />} />
           <Route path="/blog" element={<BlogPage />} />
           <Route path="/nexcrm" element={<NexCRMLandingPage />} />
-          <Route path="/admin/backups" element={<AdminBackupsPage />} />
+          <Route path="/nexcrm/pricing" element={<CRMPricingPage />} />
+          <Route path="/admin/backups" element={<ProtectedRoute><AdminBackupsPage /></ProtectedRoute>} />
           <Route path="/privacy-policy" element={<PrivacyPolicy />} />
           <Route path="/terms" element={<TermsOfService />} />
           <Route path="/faq" element={<FAQPage />} />

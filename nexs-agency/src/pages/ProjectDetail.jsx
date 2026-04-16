@@ -4,6 +4,7 @@ import Breadcrumbs from '../components/ui/Breadcrumbs';
 import BackToTop from '../components/ui/BackToTop';
 import RelatedServices from '../components/seo/RelatedServices';
 import { SITE_URL } from '../constants/siteConfig';
+import { RiDoubleQuotesL } from 'react-icons/ri';
 
 const ProjectDetail = () => {
     const { slug } = useParams();
@@ -34,6 +35,7 @@ const ProjectDetail = () => {
         <div className="min-h-screen bg-white font-sans text-slate-800 selection:bg-blue-600 selection:text-white">
             <Helmet>
                 <title>{project.title} | Portfolio | Nexspire Solutions</title>
+                <meta name="robots" content="noindex, nofollow" />
                 <meta name="description" content={`Case study: ${project.title}. See how we delivered exceptional results.`} />
                 <link rel="canonical" href={`${SITE_URL}/portfolio/${slug}`} />
                 <meta property="og:title" content={`${project.title} | Portfolio | Nexspire Solutions`} />
@@ -88,7 +90,7 @@ const ProjectDetail = () => {
 
                             {/* Quote */}
                             <div className="bg-[#F8FAFC] p-8 rounded-2xl border border-slate-200">
-                                <i className="ri-double-quotes-l text-4xl text-blue-300 mb-4 block"></i>
+                                <RiDoubleQuotesL className="text-4xl text-blue-300 mb-4 block" />
                                 <p className="text-xl font-medium text-blue-900 mb-4 italic">
                                     "{project.testimonial.text}"
                                 </p>
