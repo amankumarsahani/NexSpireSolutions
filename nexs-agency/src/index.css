@@ -109,8 +109,8 @@ h6 {
   animation-delay: 300ms;
 }
 
-/* Technology Slider Animation */
-@keyframes slide-left {
+/* Shared infinite scroll keyframe (used by slide-left, scroll-infinite, marquee) */
+@keyframes scroll-x {
   0% {
     transform: translateX(0);
   }
@@ -121,43 +121,22 @@ h6 {
 }
 
 .animate-slide-left {
-  animation: slide-left 20s linear infinite;
-}
-
-/* Hero Tech Scroll Animation */
-@keyframes scroll-infinite {
-  0% {
-    transform: translateX(0);
-  }
-
-  100% {
-    transform: translateX(-50%);
-  }
+  animation: scroll-x 20s linear infinite;
 }
 
 .animate-scroll-infinite {
-  animation: scroll-infinite 20s linear infinite;
+  animation: scroll-x 20s linear infinite;
 }
 
 @media (min-width: 768px) {
   .animate-scroll-infinite {
-    animation: scroll-infinite 30s linear infinite;
+    animation: scroll-x 30s linear infinite;
   }
 }
 
 /* Marquee Animation for Services Page */
-@keyframes marquee {
-  0% {
-    transform: translateX(0);
-  }
-
-  100% {
-    transform: translateX(-50%);
-  }
-}
-
 .animate-marquee {
-  animation: marquee 40s linear infinite;
+  animation: scroll-x 40s linear infinite;
 }
 
 /* Utilities */

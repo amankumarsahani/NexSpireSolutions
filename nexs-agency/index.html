@@ -77,10 +77,10 @@
   <link rel="dns-prefetch" href="//images.unsplash.com">
 
   <!-- Google Fonts - Non-blocking load -->
-  <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=DM+Serif+Display:ital@0;1&family=Inter:wght@300;400;500;600;700&family=Outfit:wght@300;400;500;600;700;800&display=swap" media="print" onload="this.media='all'">
-  <noscript><link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=DM+Serif+Display:ital@0;1&family=Inter:wght@300;400;500;600;700&family=Outfit:wght@300;400;500;600;700;800&display=swap"></noscript>
+  <link rel="preload" href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&family=Outfit:wght@400;500;600;700&family=DM+Serif+Display:ital@1&display=swap" as="style" crossorigin>
+  <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&family=Outfit:wght@400;500;600;700&family=DM+Serif+Display:ital@1&display=swap" media="print" onload="this.media='all'">
+  <noscript><link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&family=Outfit:wght@400;500;600;700&family=DM+Serif+Display:ital@1&display=swap"></noscript>
 
-  <!-- Preload critical hero background -->
   <!-- Preload critical hero background -->
   <link rel="preload"
     href="https://images.unsplash.com/photo-1519389950473-47ba0277781c?q=80&w=1920&auto=format&fit=crop&fm=webp" as="image">
@@ -201,8 +201,6 @@
 <body>
   <noscript>This website requires JavaScript to function. Please enable JavaScript in your browser.</noscript>
   <div id="root"></div>
-  <!-- Google reCAPTCHA v3 -->
-  <script async defer src="https://www.google.com/recaptcha/api.js?render=6LcrNTYsAAAAAAiRJyNE6h2kWSsof7HrIHRx4Z8z"></script>
   <script type="module" src="/src/main.jsx"></script>
 </body>
 

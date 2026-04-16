@@ -1,5 +1,6 @@
 import { useState, useEffect, memo } from 'react'
 import MagneticButton from './ui/MagneticButton'
+import { RiArrowRightLine, RiCodeSSlashLine, RiPlayCircleLine } from 'react-icons/ri';
 
 const rotatingTexts = [
   "AI-Powered Software Solutions",
@@ -34,11 +35,8 @@ const technologies = [
 
 const Hero = memo(function Hero() {
   const [currentTextIndex, setCurrentTextIndex] = useState(0)
-  const [isVisible, setIsVisible] = useState(false)
 
   useEffect(() => {
-    setIsVisible(true)
-
     const interval = setInterval(() => {
       setCurrentTextIndex((prev) => (prev + 1) % rotatingTexts.length)
     }, 3000)
@@ -53,7 +51,9 @@ const Hero = memo(function Hero() {
           src="https://images.unsplash.com/photo-1519389950473-47ba0277781c?q=80&w=1920&auto=format&fit=crop&fm=webp"
           srcSet="https://images.unsplash.com/photo-1519389950473-47ba0277781c?q=80&w=640&fm=webp 640w, https://images.unsplash.com/photo-1519389950473-47ba0277781c?q=80&w=1024&fm=webp 1024w, https://images.unsplash.com/photo-1519389950473-47ba0277781c?q=80&w=1920&fm=webp 1920w"
           sizes="100vw"
-          alt=""
+          alt="Team of developers collaborating at a modern workspace with multiple screens"
+          fetchPriority="high"
+          decoding="sync"
           className="absolute inset-0 w-full h-full object-cover"
         />
         <div className="absolute inset-0 bg-black/60"></div>
@@ -61,11 +61,11 @@ const Hero = memo(function Hero() {
 
       <div className="relative z-10 w-full min-h-screen flex items-center px-4 sm:px-6 lg:px-8">
         <div className="max-w-5xl mx-auto py-20 sm:py-24">
-          <div className={`space-y-4 sm:space-y-6 text-center transition-all duration-700 ${isVisible ? 'opacity-100 translate-y-0' : 'opacity-0 translate-y-10'}`}>
+          <div className="space-y-4 sm:space-y-6 text-center animate-fade-in-up">
 
             <div className="inline-flex items-center bg-white/90 backdrop-blur-sm border border-white/30 rounded-full px-3 sm:px-4 py-2 text-[#2563EB] font-semibold text-sm sm:text-base">
               <div className="w-1.5 h-1.5 bg-green-500 rounded-full mr-2"></div>
-              <i className="ri-code-s-slash-line mr-1 text-sm"></i>
+              <RiCodeSSlashLine className="mr-1 text-sm" />
               Leading Software Development Agency
             </div>
 
@@ -73,7 +73,7 @@ const Hero = memo(function Hero() {
               <h1 className="font-bold text-white leading-tight drop-shadow-lg">
                 <span className="block mb-1 text-2xl sm:text-3xl md:text-4xl lg:text-5xl">Engineering Scalable</span>
                 <span className="block mb-1 text-2xl sm:text-3xl md:text-4xl lg:text-5xl">Digital Ecosystems for</span>
-                <span className="block relative text-3xl sm:text-4xl md:text-5xl lg:text-6xl xl:text-7xl">
+                <span className="block relative text-3xl sm:text-4xl md:text-5xl lg:text-6xl xl:text-7xl min-h-[1.2em]">
                   <span className="relative" aria-live="polite" aria-atomic="true">
                     <span className="text-[#D97706]">
                       {rotatingTexts[currentTextIndex]}
@@ -95,14 +95,14 @@ const Hero = memo(function Hero() {
                 className="bg-[#2563EB] text-white px-8 sm:px-8 lg:px-6 py-4 sm:py-4 lg:py-3 rounded-xl text-base sm:text-lg lg:text-base font-semibold shadow-xl inline-flex items-center justify-center hover:bg-[#1D4ED8] active:scale-95 transition-colors duration-300 group"
               >
                 Start Your Project
-                <i className="ri-arrow-right-line ml-2 text-lg group-hover:translate-x-1 transition-transform duration-300"></i>
+                <RiArrowRightLine className="ml-2 text-lg group-hover:translate-x-1 transition-transform duration-300" />
               </MagneticButton>
 
               <a
                 href="#portfolio"
                 className="bg-white/90 backdrop-blur-sm text-slate-700 border-2 border-white/30 px-8 sm:px-8 lg:px-6 py-4 sm:py-4 lg:py-3 rounded-xl text-base sm:text-lg lg:text-base font-semibold inline-flex items-center justify-center hover:bg-white active:scale-95 transition-all duration-300 group"
               >
-                <i className="ri-play-circle-line mr-2 text-lg"></i>
+                <RiPlayCircleLine className="mr-2 text-lg" />
                 View Our Work
               </a>
             </div>
@@ -115,11 +115,11 @@ const Hero = memo(function Hero() {
         <div className="overflow-hidden">
           <div className="flex animate-scroll-infinite">
             {[...technologies, ...technologies].map((tech, index) => (
-              <div key={index} className="flex-shrink-0 mx-4 sm:mx-6 lg:mx-8 flex items-center justify-center">
+              <div key={`${tech.name}-${index}`} className="flex-shrink-0 mx-4 sm:mx-6 lg:mx-8 flex items-center justify-center">
                 <img
                   src={tech.logo}
                   alt={tech.name}
-                  loading="eager"
+                  loading="lazy"
                   decoding="async"
                   width="32"
                   height="32"

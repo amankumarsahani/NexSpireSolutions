@@ -1,10 +1,11 @@
-// TODO: Replace console.error with Sentry or proper error tracking
-import { useState, useEffect, useCallback, memo } from 'react';
+import { useState, useEffect, useCallback, useRef, memo } from 'react';
 import { inquiryAPI } from '../services/api';
+import { getRecaptchaToken } from '../utils/recaptcha';
+import { useBodyScrollLock } from '../hooks/useBodyScrollLock';
+import { RiArrowRightLine, RiCloseLine, RiLoader4Line, RiShieldCheckLine, RiStarLine, RiTimeLine } from 'react-icons/ri';
 
-const RECAPTCHA_SITE_KEY = import.meta.env.VITE_RECAPTCHA_SITE_KEY;
-const POPUP_DELAY_MS = 15000; // 15 seconds
-const SCROLL_THRESHOLD = 0.5; // 50% scroll
+const POPUP_DELAY_MS = 15000;
+const SCROLL_THRESHOLD = 0.5;
 const STORAGE_KEY = 'nexspire_popup_dismissed';
 const DISMISS_DAYS = 7;
 
@@ -19,6 +20,16 @@ const EnquiryPopup = memo(function EnquiryPopup() {
     });
     const [isSubmitting, setIsSubmitting] = useState(false);
     const [submitStatus, setSubmitStatus] = useState({ type: '', message: '' });
+    const closeTimerRef = useRef(null);
+    const successTimerRef = useRef(null);
+
+    // Cleanup timers on unmount
+    useEffect(() => {
+        return () => {
+            if (closeTimerRef.current) clearTimeout(closeTimerRef.current);
+            if (successTimerRef.current) clearTimeout(successTimerRef.current);
+        };
+    }, []);
 
     // Check if popup was dismissed recently
     const wasRecentlyDismissed = useCallback(() => {
@@ -62,7 +73,7 @@ const EnquiryPopup = memo(function EnquiryPopup() {
     // Close popup with animation
     const closePopup = useCallback(() => {
         setIsClosing(true);
-        setTimeout(() => {
+        closeTimerRef.current = setTimeout(() => {
             setIsVisible(false);
             setIsClosing(false);
             localStorage.setItem(STORAGE_KEY, Date.now().toString());
@@ -78,38 +89,39 @@ const EnquiryPopup = memo(function EnquiryPopup() {
         return () => document.removeEventListener('keydown', handleEsc);
     }, [isVisible, closePopup]);
 
-    // Prevent body scroll when popup is open (iOS-compatible)
+    const dialogRef = useRef(null);
     useEffect(() => {
-        if (isVisible) {
-            const scrollY = window.scrollY;
-            document.body.style.position = 'fixed';
-            document.body.style.top = `-${scrollY}px`;
-            document.body.style.left = '0';
-            document.body.style.right = '0';
-            document.body.style.width = '100%';
-        } else {
-            const scrollY = document.body.style.top;
-            document.body.style.position = '';
-            document.body.style.top = '';
-            document.body.style.left = '';
-            document.body.style.right = '';
-            document.body.style.width = '';
-            if (scrollY) {
-                window.scrollTo(0, parseInt(scrollY || '0', 10) * -1);
-            }
-        }
-        return () => {
-            const scrollY = document.body.style.top;
-            document.body.style.position = '';
-            document.body.style.top = '';
-            document.body.style.left = '';
-            document.body.style.right = '';
-            document.body.style.width = '';
-            if (scrollY) {
-                window.scrollTo(0, parseInt(scrollY || '0', 10) * -1);
+        if (!isVisible || !dialogRef.current) return;
+
+        const dialog = dialogRef.current;
+        const focusableSelector = 'a[href], button:not([disabled]), input:not([disabled]), textarea:not([disabled]), select:not([disabled]), [tabindex]:not([tabindex="-1"])';
+        const focusableEls = dialog.querySelectorAll(focusableSelector);
+        if (focusableEls.length === 0) return;
+
+        const firstEl = focusableEls[0];
+        const lastEl = focusableEls[focusableEls.length - 1];
+        firstEl.focus();
+
+        const handleTab = (e) => {
+            if (e.key !== 'Tab') return;
+            if (e.shiftKey) {
+                if (document.activeElement === firstEl) {
+                    e.preventDefault();
+                    lastEl.focus();
+                }
+            } else {
+                if (document.activeElement === lastEl) {
+                    e.preventDefault();
+                    firstEl.focus();
+                }
             }
         };
+
+        dialog.addEventListener('keydown', handleTab);
+        return () => dialog.removeEventListener('keydown', handleTab);
     }, [isVisible]);
+
+    useBodyScrollLock(isVisible);
 
     const handleChange = (e) => {
         setFormData(prev => ({
@@ -124,18 +136,11 @@ const EnquiryPopup = memo(function EnquiryPopup() {
         setSubmitStatus({ type: '', message: '' });
 
         try {
-            // Get reCAPTCHA token
             let captchaToken = null;
-            if (window.grecaptcha) {
-                try {
-                    captchaToken = await window.grecaptcha.execute(RECAPTCHA_SITE_KEY, { action: 'submit_inquiry' });
-                } catch {
-                    setSubmitStatus({ type: 'error', message: 'reCAPTCHA verification failed. Please refresh and try again.' });
-                    setIsSubmitting(false);
-                    return;
-                }
-            } else {
-                setSubmitStatus({ type: 'error', message: 'reCAPTCHA failed to load. Please refresh the page and try again.' });
+            try {
+                captchaToken = await getRecaptchaToken('submit_inquiry');
+            } catch {
+                setSubmitStatus({ type: 'error', message: 'reCAPTCHA verification failed. Please refresh and try again.' });
                 setIsSubmitting(false);
                 return;
             }
@@ -151,7 +156,7 @@ const EnquiryPopup = memo(function EnquiryPopup() {
             });
 
             // Close after success
-            setTimeout(() => {
+            successTimerRef.current = setTimeout(() => {
                 localStorage.setItem(STORAGE_KEY, (Date.now() + 23 * 24 * 60 * 60 * 1000).toString()); // 30 days
                 closePopup();
             }, 2500);
@@ -169,6 +174,7 @@ const EnquiryPopup = memo(function EnquiryPopup() {
 
     return (
         <div
+            ref={dialogRef}
             className={`fixed inset-0 z-[9999] flex items-center justify-center p-4 transition-all duration-300 ${isClosing ? 'opacity-0' : 'opacity-100'}`}
             style={{ background: 'rgba(0, 0, 0, 0.7)', backdropFilter: 'blur(8px)' }}
             onClick={closePopup}
@@ -212,7 +218,7 @@ const EnquiryPopup = memo(function EnquiryPopup() {
                         aria-label="Close"
                         className="absolute top-4 right-4 z-10 w-8 h-8 flex items-center justify-center rounded-full bg-white/10 hover:bg-white/20 transition-colors group"
                     >
-                        <i className="ri-close-line text-white text-xl group- transition-transform"></i>
+                        <RiCloseLine className="text-white text-xl group- transition-transform" />
                     </button>
 
                     {/* Header */}
@@ -310,13 +316,13 @@ const EnquiryPopup = memo(function EnquiryPopup() {
                                 <span className="relative z-10 flex items-center justify-center">
                                     {isSubmitting ? (
                                         <>
-                                            <i className="ri-loader-4-line animate-spin mr-2"></i>
+                                            <RiLoader4Line className="animate-spin mr-2" />
                                             Sending...
                                         </>
                                     ) : (
                                         <>
                                             Get Free Consultation
-                                            <i className="ri-arrow-right-line ml-2 group-hover:translate-x-1 transition-transform"></i>
+                                            <RiArrowRightLine className="ml-2 group-hover:translate-x-1 transition-transform" />
                                         </>
                                     )}
                                 </span>
@@ -328,15 +334,15 @@ const EnquiryPopup = memo(function EnquiryPopup() {
                         {/* Trust badges */}
                         <div className="flex items-center justify-center gap-4 mt-4 text-xs text-slate-500">
                             <div className="flex items-center">
-                                <i className="ri-time-line mr-1 text-green-400"></i>
+                                <RiTimeLine className="mr-1 text-green-400" />
                                 24hr response
                             </div>
                             <div className="flex items-center">
-                                <i className="ri-shield-check-line mr-1 text-blue-400"></i>
+                                <RiShieldCheckLine className="mr-1 text-blue-400" />
                                 100% Secure
                             </div>
                             <div className="flex items-center">
-                                <i className="ri-star-line mr-1 text-yellow-400"></i>
+                                <RiStarLine className="mr-1 text-yellow-400" />
                                 150+ Projects
                             </div>
                         </div>
