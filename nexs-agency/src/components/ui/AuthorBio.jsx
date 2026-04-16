@@ -1,3 +1,4 @@
+import { RiLinkedinFill, RiMailLine, RiTwitterXFill } from 'react-icons/ri';
 export default function AuthorBio({
     name,
     role = 'Author',
@@ -49,7 +50,7 @@ export default function AuthorBio({
                                 rel="noopener noreferrer"
                                 className="w-9 h-9 rounded-full bg-white border border-slate-200 flex items-center justify-center text-slate-400 hover:text-[#0077B5] hover:border-[#0077B5] transition-all"
                             >
-                                <i className="ri-linkedin-fill text-lg"></i>
+                                <RiLinkedinFill className="text-lg" />
                             </a>
                         )}
                         {twitter && (
@@ -59,14 +60,14 @@ export default function AuthorBio({
                                 rel="noopener noreferrer"
                                 className="w-9 h-9 rounded-full bg-white border border-slate-200 flex items-center justify-center text-slate-400 hover:text-black hover:border-black transition-all"
                             >
-                                <i className="ri-twitter-x-fill text-lg"></i>
+                                <RiTwitterXFill className="text-lg" />
                             </a>
                         )}
                         <a
                             href={`mailto:hello@nexspiresolutions.co.in`}
                             className="w-9 h-9 rounded-full bg-white border border-slate-200 flex items-center justify-center text-slate-400 hover:text-[#2563EB] hover:border-blue-600 transition-all"
                         >
-                            <i className="ri-mail-line text-lg"></i>
+                            <RiMailLine className="text-lg" />
                         </a>
                     </div>
                 </div>

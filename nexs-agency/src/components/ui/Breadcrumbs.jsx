@@ -1,6 +1,7 @@
 import { Link, useLocation } from 'react-router-dom';
 import { Helmet } from 'react-helmet-async';
 import { SITE_URL } from '../../constants/siteConfig';
+import { RiArrowRightSLine, RiHome4Line } from 'react-icons/ri';
 
 const routeNames = {
     'services': 'Services',
@@ -61,7 +62,7 @@ export default function Breadcrumbs({ className = '' }) {
                 to="/"
                 className="text-slate-500 hover:text-[#2563EB] transition-colors flex items-center gap-1"
             >
-                <i className="ri-home-4-line"></i>
+                <RiHome4Line />
                 <span className="hidden sm:inline">Home</span>
             </Link>
 
@@ -74,7 +75,7 @@ export default function Breadcrumbs({ className = '' }) {
 
                 return (
                     <span key={name} className="flex items-center gap-2">
-                        <i className="ri-arrow-right-s-line text-gray-300"></i>
+                        <RiArrowRightSLine className="text-gray-300" />
                         {isLast ? (
                             <span className="text-slate-800 font-medium truncate max-w-[200px]">
                                 {displayName}

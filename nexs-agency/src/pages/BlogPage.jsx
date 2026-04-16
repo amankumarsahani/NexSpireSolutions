@@ -2,27 +2,17 @@
 import { useEffect, useState, useRef, useCallback } from 'react';
 import { Link } from 'react-router-dom';
 import { Helmet } from 'react-helmet-async';
-// eslint-disable-next-line no-unused-vars
 import { motion, AnimatePresence } from 'framer-motion';
 import { cn } from '../utils/cn';
 import { blogAPI } from '../services/api';
+import FadeIn from '../components/ui/FadeIn';
 import Breadcrumbs from '../components/ui/Breadcrumbs';
 import BackToTop from '../components/ui/BackToTop';
 import { SITE_URL, siteConfig } from '../constants/siteConfig';
+import Icon from '../components/ui/Icon';
+import { RiArrowRightLine, RiArticleLine, RiCalendarLine, RiSearchLine, RiShareCircleLine, RiTimeLine } from 'react-icons/ri';
 
-const FadeIn = ({ children, className, delay = 0 }) => {
-    return (
-        <motion.div
-            initial={{ opacity: 0, y: 20 }}
-            whileInView={{ opacity: 1, y: 0 }}
-            viewport={{ once: true, margin: "-50px" }}
-            transition={{ duration: 0.7, delay, ease: [0.21, 0.47, 0.32, 0.98] }}
-            className={className}
-        >
-            {children}
-        </motion.div>
-    );
-};
+const FADE_IN_SMOOTH = { duration: 0.7, ease: [0.21, 0.47, 0.32, 0.98] };
 
 const POSTS_PER_PAGE = 6;
 
@@ -40,46 +30,47 @@ const BlogPage = () => {
     const loaderRef = useRef(null);
 
     useEffect(() => {
+        let cancelled = false;
+
+        const loadBlogs = async () => {
+            try {
+                setLoading(true);
+                const response = await blogAPI.getAll();
+                if (cancelled) return;
+                const blogs = response.data.blogs || [];
+                const apiCategories = response.data.categories || [];
+
+                const transformedPosts = blogs.map(blog => ({
+                    id: blog.id,
+                    title: blog.title,
+                    excerpt: blog.excerpt,
+                    category: blog.category,
+                    author: blog.author,
+                    date: new Date(blog.created_at).toLocaleDateString('en-US', {
+                        year: 'numeric',
+                        month: 'short',
+                        day: 'numeric'
+                    }),
+                    readTime: blog.read_time || '5 min read',
+                    image: blog.imageUrl,
+                    featured: blog.featured,
+                    slug: blog.slug
+                }));
+
+                setAllPosts(transformedPosts);
+                setCategories(['All', ...apiCategories]);
+                setDisplayedPosts(transformedPosts.slice(0, POSTS_PER_PAGE));
+                setHasMore(transformedPosts.length > POSTS_PER_PAGE);
+            } catch (error) {
+                if (!cancelled) console.error('Error loading blogs:', error);
+            } finally {
+                if (!cancelled) setLoading(false);
+            }
+        };
+
         loadBlogs();
+        return () => { cancelled = true; };
     }, []);
-
-    const loadBlogs = async () => {
-        try {
-            setLoading(true);
-            const response = await blogAPI.getAll();
-            const blogs = response.data.blogs || [];
-            const apiCategories = response.data.categories || [];
-
-            // Transform API data to match existing format
-            const transformedPosts = blogs.map(blog => ({
-                id: blog.id,
-                title: blog.title,
-                excerpt: blog.excerpt,
-                category: blog.category,
-                author: blog.author,
-                date: new Date(blog.created_at).toLocaleDateString('en-US', {
-                    year: 'numeric',
-                    month: 'short',
-                    day: 'numeric'
-                }),
-                readTime: blog.read_time || '5 min read',
-                image: blog.image_url || blog.image,
-                featured: blog.featured,
-                slug: blog.slug
-            }));
-
-            setAllPosts(transformedPosts);
-            setCategories(['All', ...apiCategories]);
-
-            // Initial load - show first batch
-            setDisplayedPosts(transformedPosts.slice(0, POSTS_PER_PAGE));
-            setHasMore(transformedPosts.length > POSTS_PER_PAGE);
-        } catch (error) {
-            console.error('Error loading blogs:', error);
-        } finally {
-            setLoading(false);
-        }
-    };
 
     // Filter posts based on category and search
     const getFilteredPosts = useCallback(() => {
@@ -212,7 +203,7 @@ const BlogPage = () => {
                                 {featuredPost.excerpt}
                             </p>
 
-                            <div className="flex items-center gap-8 text-sm text-slate-400 font-medium">
+                            <div className="flex items-center gap-8 text-sm text-slate-500 font-medium">
                                 <div className="flex items-center gap-3">
                                     <div className="w-10 h-10 rounded-full bg-[#2563EB] flex items-center justify-center text-white font-bold text-lg">
                                         {featuredPost.author.charAt(0)}
@@ -220,11 +211,11 @@ const BlogPage = () => {
                                     <span className="text-white">{featuredPost.author}</span>
                                 </div>
                                 <div className="flex items-center gap-2">
-                                    <i className="ri-calendar-line"></i>
+                                    <RiCalendarLine />
                                     <span>{featuredPost.date}</span>
                                 </div>
                                 <div className="flex items-center gap-2">
-                                    <i className="ri-time-line"></i>
+                                    <RiTimeLine />
                                     <span>{featuredPost.readTime}</span>
                                 </div>
                             </div>
@@ -237,7 +228,7 @@ const BlogPage = () => {
             <section className="section-padding container-custom">
                 <div className="flex flex-col md:flex-row justify-between items-end mb-16 gap-8">
                     <div className="w-full md:w-auto">
-                        <FadeIn>
+                        <FadeIn {...FADE_IN_SMOOTH}>
                             <h2 className="text-4xl font-bold mb-8">Latest Insights</h2>
                             <div className="flex flex-wrap gap-3">
                                 {categories.map(cat => (
@@ -259,15 +250,16 @@ const BlogPage = () => {
                     </div>
 
                     <div className="w-full md:w-auto relative">
-                        <FadeIn delay={0.2}>
+                        <FadeIn {...FADE_IN_SMOOTH} delay={0.2}>
                             <input
                                 type="text"
                                 placeholder="Search articles..."
                                 value={searchQuery}
                                 onChange={(e) => setSearchQuery(e.target.value)}
+                                aria-label="Search blog articles"
                                 className="w-full md:w-80 pl-12 pr-6 py-4 rounded-full bg-[#F8FAFC] border border-slate-200 focus:border-blue-600 focus:outline-none shadow-sm transition-all focus:shadow-lg focus:bg-white"
                             />
-                            <i className="ri-search-line absolute left-5 top-1/2 -translate-y-1/2 text-slate-400 text-lg"></i>
+                            <RiSearchLine className="absolute left-5 top-1/2 -translate-y-1/2 text-slate-400 text-lg" />
                         </FadeIn>
                     </div>
                 </div>
@@ -321,7 +313,7 @@ const BlogPage = () => {
                                                 <span className="text-sm font-bold text-slate-800">{post.author}</span>
                                             </div>
                                             <button className="text-[#2563EB] font-bold text-sm group-hover:translate-x-1 transition-transform flex items-center gap-1">
-                                                Read Article <i className="ri-arrow-right-line"></i>
+                                                Read Article <RiArrowRightLine />
                                             </button>
                                         </div>
                                     </div>
@@ -340,13 +332,13 @@ const BlogPage = () => {
                         </div>
                     )}
                     {!hasMore && nonFeaturedDisplayed.length > 0 && (
-                        <p className="text-slate-400 text-sm font-medium">
+                        <p className="text-slate-500 text-sm font-medium">
                             You've reached the end • {nonFeaturedDisplayed.length} articles shown
                         </p>
                     )}
                     {nonFeaturedDisplayed.length === 0 && !loading && (
                         <div className="text-center py-12">
-                            <i className="ri-article-line text-6xl text-gray-300 mb-4 block"></i>
+                            <RiArticleLine className="text-6xl text-gray-300 mb-4 block" />
                             <p className="text-slate-500 text-lg">No articles found matching your criteria</p>
                         </div>
                     )}
@@ -361,23 +353,23 @@ const BlogPage = () => {
 
                         <div className="relative z-10 max-w-3xl mx-auto">
                             <div className="w-20 h-20 bg-white/10 rounded-3xl flex items-center justify-center mx-auto mb-8 backdrop-blur-md">
-                                <i className="ri-share-circle-line text-4xl"></i>
+                                <RiShareCircleLine className="text-4xl" />
                             </div>
                             <h2 className="text-4xl md:text-5xl font-bold mb-6 tracking-tight">Follow Us on Social Media</h2>
                             <p className="text-xl text-gray-300 mb-10 leading-relaxed">
                                 Stay up to date with the latest insights, tutorials, and trends. Connect with us on your favorite platform.
                             </p>
                             <div className="flex items-center justify-center gap-6">
-                                {siteConfig.social.map((social, index) => (
+                                {siteConfig.social.map((social) => (
                                     <a
-                                        key={index}
+                                        key={social.label}
                                         href={social.href}
                                         aria-label={social.label}
                                         target="_blank"
                                         rel="noopener noreferrer"
                                         className="w-16 h-16 bg-white/10 backdrop-blur-md rounded-2xl flex items-center justify-center border border-white/20 hover:bg-white/20  transition-all duration-300 shadow-lg"
                                     >
-                                        <i className={`${social.icon} text-3xl text-white`}></i>
+                                        <Icon name={social.icon} className="text-3xl text-white" />
                                     </a>
                                 ))}
                             </div>

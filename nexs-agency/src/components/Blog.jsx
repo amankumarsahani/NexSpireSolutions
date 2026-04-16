@@ -3,6 +3,8 @@ import { useState, useEffect, useMemo, memo } from 'react'
 import { Link } from 'react-router-dom'
 import { blogAPI } from '../services/api'
 import { siteConfig } from '../constants/siteConfig'
+import Icon from './ui/Icon';
+import { RiArrowRightLine, RiCalendarLine, RiHeartLine, RiShareCircleLine, RiShareLine, RiTimeLine } from 'react-icons/ri';
 
 const dummyPosts = [
   {
@@ -47,24 +49,20 @@ const categories = ["All", "Web Development", "Mobile Development", "Cloud & Dev
 
 const Blog = memo(function Blog() {
   const [activeCategory, setActiveCategory] = useState("All")
-  const [isVisible, setIsVisible] = useState(false)
   const [blogPosts, setBlogPosts] = useState([])
   const [, setLoading] = useState(true)
 
   useEffect(() => {
-    setIsVisible(true)
-    fetchBlogs()
-  }, [])
+    let cancelled = false
 
-  const fetchBlogs = async () => {
-    try {
-      setLoading(true)
-      const response = await blogAPI.getAll({ status: 'published', limit: 3 })
-      const blogs = response.data?.blogs || []
+    const fetchBlogs = async () => {
+      try {
+        setLoading(true)
+        const response = await blogAPI.getAll({ status: 'published', limit: 3 })
+        if (cancelled) return
+        const blogs = response.data?.blogs || []
 
-      if (blogs.length > 0) {
-        // Transform API data to match component format
-        const transformedPosts = blogs.map((blog, index) => {
+        if (blogs.length > 0) {
           const colors = [
             "from-[#2563EB] to-[#1D4ED8]",
             "from-[#2563EB] to-[#1D4ED8]",
@@ -73,10 +71,10 @@ const Blog = memo(function Blog() {
             "from-[#2563EB] to-[#1D4ED8]",
             "from-red-500 to-red-600"
           ]
-          return {
+          const transformedPosts = blogs.map((blog, index) => ({
             title: blog.title,
             category: blog.category || "Technology",
-            image: blog.image_url || blog.image || `https://images.unsplash.com/photo-1517180102446-f3ece451e9d8?w=400&h=250&fit=crop&fm=webp`,
+            image: blog.imageUrl || `https://images.unsplash.com/photo-1517180102446-f3ece451e9d8?w=400&h=250&fit=crop&fm=webp`,
             description: blog.excerpt || blog.title,
             tags: blog.category ? [blog.category] : ["Technology"],
             author: blog.author || "Nexspire Team",
@@ -84,21 +82,23 @@ const Blog = memo(function Blog() {
             readTime: blog.read_time || "5 min read",
             color: colors[index % colors.length],
             slug: blog.slug
-          }
-        })
-        setBlogPosts(transformedPosts)
-      } else {
-        // Use dummy posts if API returns empty
+          }))
+          setBlogPosts(transformedPosts)
+        } else {
+          setBlogPosts(dummyPosts)
+        }
+      } catch (error) {
+        if (cancelled) return
+        console.error('Error fetching blogs:', error)
         setBlogPosts(dummyPosts)
+      } finally {
+        if (!cancelled) setLoading(false)
       }
-    } catch (error) {
-      console.error('Error fetching blogs:', error)
-      // Use dummy posts on error
-      setBlogPosts(dummyPosts)
-    } finally {
-      setLoading(false)
     }
-  }
+
+    fetchBlogs()
+    return () => { cancelled = true }
+  }, [])
 
   const filteredPosts = useMemo(() => activeCategory === "All"
     ? blogPosts
@@ -109,8 +109,7 @@ const Blog = memo(function Blog() {
 
       <div className="relative z-10 max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
         {/* Modern Header */}
-        <div className={`text-center mb-16 transition-all duration-1000 transform ${isVisible ? 'translate-y-0 opacity-100' : 'translate-y-8 opacity-0'
-          }`}>
+        <div className="text-center mb-16 transition-all duration-1000 transform translate-y-0 opacity-100">
           <div className="inline-flex items-center bg-[#6366F1]/10 backdrop-blur-xl border border-white/20 text-gray-800 text-sm font-bold px-8 py-4 rounded-full mb-8 shadow-2xl hover:shadow-lg transition-all duration-500">
             <div className="w-3 h-3 bg-[#6366F1] rounded-full mr-3 animate-pulse shadow-lg"></div>
             Latest Insights
@@ -127,8 +126,7 @@ const Blog = memo(function Blog() {
         </div>
 
         {/* Modern Filter Buttons */}
-        <div className={`flex flex-wrap justify-center gap-3 mb-16 transition-all duration-1000 delay-300 transform ${isVisible ? 'translate-y-0 opacity-100' : 'translate-y-8 opacity-0'
-          }`}>
+        <div className="flex flex-wrap justify-center gap-3 mb-16 transition-all duration-1000 delay-300 transform translate-y-0 opacity-100">
           {categories.map((category) => (
             <button
               key={category}
@@ -144,13 +142,12 @@ const Blog = memo(function Blog() {
         </div>
 
         {/* Premium Blog Grid */}
-        <div className={`grid md:grid-cols-2 lg:grid-cols-3 gap-6 mb-16 transition-all duration-1000 delay-500 transform ${isVisible ? 'translate-y-0 opacity-100' : 'translate-y-8 opacity-0'
-          }`}>
+        <div className="grid md:grid-cols-2 lg:grid-cols-3 gap-6 mb-16 transition-all duration-1000 delay-500 transform translate-y-0 opacity-100">
           {filteredPosts.map((post, index) => {
             const delays = ['delay-0', 'delay-100', 'delay-200', 'delay-300', 'delay-400', 'delay-500'];
 
             return (
-              <article key={index} className={`group relative ${delays[index % delays.length]}`}>
+              <article key={post.slug || post.title || index} className={`group relative ${delays[index % delays.length]}`}>
                 {/* Floating Glow Effect */}
                 <div className={`absolute -inset-1 bg-gradient-to-r ${post.color} rounded-3xl blur-lg opacity-0 group-hover:opacity-30 transition-all duration-700`}></div>
 
@@ -184,7 +181,7 @@ const Blog = memo(function Blog() {
                     {/* Read Time with Icon */}
                     <div className="absolute top-4 right-4 transform group-hover:-translate-y-1 transition-transform duration-300">
                       <span className="text-xs bg-black/70 text-white px-3 py-2 rounded-full backdrop-blur-sm border border-white/20 flex items-center">
-                        <i className="ri-time-line mr-1"></i>
+                        <RiTimeLine className="mr-1" />
                         {post.readTime}
                       </span>
                     </div>
@@ -192,7 +189,7 @@ const Blog = memo(function Blog() {
                     {/* Hover Action Button */}
                     <div className="absolute inset-0 flex items-center justify-center opacity-0 group-hover:opacity-100 transition-all duration-300">
                       <Link to={`/blog/${post.slug}`} className="bg-white/20 backdrop-blur-lg text-white px-6 py-3 rounded-2xl font-semibold border border-white/30 hover:bg-white/30 transition-all duration-300 transform ">
-                        <i className="ri-arrow-right-line mr-2"></i>
+                        <RiArrowRightLine className="mr-2" />
                         Read Article
                       </Link>
                     </div>
@@ -236,7 +233,7 @@ const Blog = memo(function Blog() {
                         <div>
                           <div className="font-semibold text-slate-800 text-sm">{post.author}</div>
                           <div className="text-slate-500 text-xs flex items-center">
-                            <i className="ri-calendar-line mr-1"></i>
+                            <RiCalendarLine className="mr-1" />
                             {post.date}
                           </div>
                         </div>
@@ -245,10 +242,10 @@ const Blog = memo(function Blog() {
                       {/* Interactive Read More */}
                       <div className="flex items-center space-x-2">
                         <button className="group/like w-9 h-9 rounded-xl bg-[#F8FAFC] hover:bg-red-50 flex items-center justify-center transition-all duration-300 ">
-                          <i className="ri-heart-line text-slate-400 group-hover/like:text-red-500 transition-colors"></i>
+                          <RiHeartLine className="text-slate-400 group-hover/like:text-red-500 transition-colors" />
                         </button>
                         <button className="group/share w-9 h-9 rounded-xl bg-[#F8FAFC] hover:bg-[#F8FAFC] flex items-center justify-center transition-all duration-300 ">
-                          <i className="ri-share-line text-slate-400 group-hover/share:text-[#2563EB] transition-colors"></i>
+                          <RiShareLine className="text-slate-400 group-hover/share:text-[#2563EB] transition-colors" />
                         </button>
                       </div>
                     </div>
@@ -273,20 +270,18 @@ const Blog = memo(function Blog() {
         </div>
 
         {/* View All Button */}
-        <div className={`text-center mb-16 transition-all duration-1000 delay-700 transform ${isVisible ? 'translate-y-0 opacity-100' : 'translate-y-8 opacity-0'
-          }`}>
+        <div className="text-center mb-16 transition-all duration-1000 delay-700 transform translate-y-0 opacity-100">
           <Link to="/blog" className="group relative bg-[#2563EB] text-white px-10 py-4 rounded-2xl font-bold shadow-2xl shadow-lg hover:shadow-lg transition-all duration-300 transform  overflow-hidden inline-block">
             <span className="relative z-10 flex items-center">
               View All Articles
-              <i className="ri-arrow-right-line ml-2 group-hover:translate-x-1 transition-transform duration-300"></i>
+              <RiArrowRightLine className="ml-2 group-hover:translate-x-1 transition-transform duration-300" />
             </span>
             <div className="absolute inset-0 bg-[#2563EB] opacity-0 group-hover:opacity-100 transition-opacity duration-300"></div>
           </Link>
         </div>
 
         {/* Social Media CTA Banner */}
-        <div className={`transition-all duration-1000 delay-900 transform ${isVisible ? 'translate-y-0 opacity-100' : 'translate-y-8 opacity-0'
-          }`}>
+        <div className="transition-all duration-1000 delay-900 transform translate-y-0 opacity-100">
           <div className="relative overflow-hidden">
             <div className="absolute -inset-4 bg-gradient-to-r from-blue-600/30 to-indigo-600/30 rounded-[3rem] blur-3xl animate-pulse [animation-duration:4s]"></div>
 
@@ -303,7 +298,7 @@ const Blog = memo(function Blog() {
                   <div className="text-center lg:text-left lg:flex-1">
                     <div className="flex items-center justify-center lg:justify-start mb-4 group">
                       <div className="w-14 h-14 bg-white/15 backdrop-blur-2xl backdrop-saturate-200 rounded-2xl flex items-center justify-center mr-4 border border-white/40 shadow-lg shadow-white/10 group- group-hover:bg-white/25 transition-all duration-500">
-                        <i className="ri-share-circle-line text-2xl text-white drop-shadow-sm"></i>
+                        <RiShareCircleLine className="text-2xl text-white drop-shadow-sm" />
                       </div>
                       <div>
                         <h3 className="text-2xl md:text-3xl font-bold text-white drop-shadow-lg">
@@ -320,16 +315,16 @@ const Blog = memo(function Blog() {
                   </div>
 
                   <div className="flex items-center gap-4">
-                    {siteConfig.social.map((social, index) => (
+                    {siteConfig.social.map((social) => (
                       <a
-                        key={index}
+                        key={social.label}
                         href={social.href}
                         aria-label={social.label}
                         target="_blank"
                         rel="noopener noreferrer"
                         className="w-14 h-14 bg-white/15 backdrop-blur-2xl rounded-2xl flex items-center justify-center border border-white/30 shadow-lg hover:bg-white/30  transition-all duration-300"
                       >
-                        <i className={`${social.icon} text-2xl text-white`}></i>
+                        <Icon name={social.icon} className="text-2xl text-white" />
                       </a>
                     ))}
                   </div>

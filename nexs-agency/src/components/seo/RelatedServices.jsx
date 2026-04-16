@@ -1,4 +1,6 @@
 import { Link } from 'react-router-dom';
+import Icon from '../ui/Icon';
+import { RiArrowRightLine, RiLayoutGridLine } from 'react-icons/ri';
 
 const services = [
     {
@@ -53,7 +55,7 @@ const RelatedServices = ({ currentService }) => {
     return (
         <section className="border-t border-slate-200 pt-10 mt-10">
             <h3 className="text-2xl font-bold mb-8 flex items-center gap-3">
-                <i className="ri-layout-grid-line text-[#2563EB]"></i>
+                <RiLayoutGridLine className="text-[#2563EB]" />
                 More Services
             </h3>
             <div className="grid md:grid-cols-3 gap-5">
@@ -68,7 +70,7 @@ const RelatedServices = ({ currentService }) => {
 
                         <div className="relative z-10">
                             <div className={`w-12 h-12 rounded-xl flex items-center justify-center text-xl mb-4 transition-all duration-300 ${colorMap[s.color]}`}>
-                                <i className={s.icon}></i>
+                                <Icon name={s.icon} />
                             </div>
 
                             <h4 className="font-bold text-slate-800 group-hover:text-[#2563EB] transition-colors mb-2 text-lg">
@@ -81,7 +83,7 @@ const RelatedServices = ({ currentService }) => {
 
                             <div className="flex items-center text-sm font-semibold text-slate-400 group-hover:text-[#2563EB] transition-colors mt-auto">
                                 Explore
-                                <i className="ri-arrow-right-line ml-2 group-hover:translate-x-1 transition-transform"></i>
+                                <RiArrowRightLine className="ml-2 group-hover:translate-x-1 transition-transform" />
                             </div>
                         </div>
                     </Link>

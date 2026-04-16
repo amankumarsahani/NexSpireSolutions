@@ -1,4 +1,5 @@
 import { useState, useEffect, useRef, memo } from 'react'
+import Icon from './ui/Icon';
 
 const useCountUp = (target, duration = 2000, shouldAnimate = false) => {
   const [count, setCount] = useState(0)
@@ -41,28 +42,6 @@ const StatNumber = memo(function StatNumber({ stat, isVisible }) {
     </div>
   )
 })
-
-// eslint-disable-next-line no-unused-vars
-const teamMembers = [
-  {
-    name: "Aman Kumar Sahani",
-    role: "Founder & Lead Developer",
-    image: "https://images.unsplash.com/photo-1507003211169-0a1dd7228f2d?w=200&h=200&fit=crop&fm=webp",
-    skills: ["React", "Node.js", "Python", "AWS"],
-  },
-  {
-    name: "Anu Kumar",
-    role: "Senior UI/UX Designer",
-    image: "https://images.unsplash.com/photo-1506794778202-cad84cf45f1d?w=200&h=200&fit=crop&fm=webp",
-    skills: ["Figma", "React", "Design Systems"],
-  },
-  {
-    name: "Kshitij Bhardwaj",
-    role: "Backend Architect",
-    image: "https://images.unsplash.com/photo-1472099645785-5658abf4ff4e?w=200&h=200&fit=crop&fm=webp",
-    skills: ["Vue.js", "Django", "PostgreSQL", "Docker"],
-  }
-];
 
 const stats = [
   { number: "150+", label: "Projects Completed", icon: "ri-bar-chart-box-line" },
@@ -223,7 +202,7 @@ const About = memo(function About() {
                 <div key={index} className="flex items-start gap-6 group">
                   <div className="flex-shrink-0">
                     <div className="relative w-16 h-16 bg-[#4F46E5] rounded-xl flex items-center justify-center shadow-lg">
-                      <i className={`${feature.icon} text-2xl text-white`}></i>
+                      <Icon name={feature.icon} className="text-2xl text-white" />
                     </div>
                   </div>
 
@@ -262,7 +241,7 @@ const About = memo(function About() {
                   <div className="text-center mb-6">
                     <div className="relative w-16 h-16 mx-auto mb-4">
                       <div className="w-full h-full rounded-2xl bg-[#4F46E5] flex items-center justify-center shadow-lg">
-                        <i className={`${stat.icon} text-3xl text-white`}></i>
+                        <Icon name={stat.icon} className="text-3xl text-white" />
                       </div>
                     </div>
                   </div>

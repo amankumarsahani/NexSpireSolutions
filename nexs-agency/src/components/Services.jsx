@@ -1,8 +1,16 @@
 import { useState, useEffect, useRef, useCallback, memo } from 'react'
 import { Link } from 'react-router-dom'
-// eslint-disable-next-line no-unused-vars
 import { motion } from 'framer-motion'
 import MagneticButton from './ui/MagneticButton'
+import Icon from './ui/Icon'
+import {
+  RiArrowLeftLine,
+  RiArrowRightLine,
+  RiCheckLine,
+  RiPauseLine,
+  RiPhoneLine,
+  RiPlayLine
+} from 'react-icons/ri';
 
 const cardVariants = {
   hidden: { opacity: 0, y: 30 },
@@ -27,7 +35,7 @@ const ServiceCard = memo(function ServiceCard({ service, index }) {
 
       <div className="relative mb-8">
         <div className="relative w-16 h-16 sm:w-20 sm:h-20 bg-[#2563EB] rounded-2xl flex items-center justify-center shadow-lg transition-transform duration-300 group-hover:rotate-[5deg]">
-          <i className={`${service.icon} text-2xl sm:text-3xl text-white`}></i>
+          <Icon name={service.icon} className="text-2xl sm:text-3xl text-white" />
         </div>
       </div>
 
@@ -40,7 +48,7 @@ const ServiceCard = memo(function ServiceCard({ service, index }) {
         {service.features.map((feature, featureIndex) => (
           <li key={featureIndex} className="flex items-center text-sm text-slate-700">
             <div className="w-5 h-5 bg-[#2563EB] rounded-full flex items-center justify-center mr-4 shadow-sm">
-              <i className="ri-check-line text-white text-xs"></i>
+              <RiCheckLine className="text-white text-xs" />
             </div>
             <span className="font-semibold">{feature}</span>
           </li>
@@ -49,7 +57,7 @@ const ServiceCard = memo(function ServiceCard({ service, index }) {
 
       <Link to={service.link} className="relative z-10 inline-flex items-center text-sm font-bold text-[#2563EB] hover:opacity-80 transition-opacity duration-300">
         Learn More
-        <i className="ri-arrow-right-line ml-1 text-[#2563EB]"></i>
+        <RiArrowRightLine className="ml-1 text-[#2563EB]" />
       </Link>
     </motion.div>
   )
@@ -182,7 +190,7 @@ const Services = memo(function Services() {
               aria-label="Previous service"
               className="w-10 h-10 bg-white rounded-full shadow-lg hover:shadow-xl transition-all duration-300 flex items-center justify-center group"
             >
-              <i className="ri-arrow-left-line text-lg text-slate-700 group-hover:text-[#2563EB] transition-colors"></i>
+              <RiArrowLeftLine className="text-lg text-slate-700 group-hover:text-[#2563EB] transition-colors" />
             </button>
 
             <button
@@ -190,7 +198,7 @@ const Services = memo(function Services() {
               aria-label="Next service"
               className="w-10 h-10 bg-white rounded-full shadow-lg hover:shadow-xl transition-all duration-300 flex items-center justify-center group"
             >
-              <i className="ri-arrow-right-line text-lg text-slate-700 group-hover:text-[#2563EB] transition-colors"></i>
+              <RiArrowRightLine className="text-lg text-slate-700 group-hover:text-[#2563EB] transition-colors" />
             </button>
           </div>
 
@@ -214,7 +222,7 @@ const Services = memo(function Services() {
               onClick={togglePause}
               className="w-8 h-8 flex items-center justify-center rounded-full bg-white shadow-md hover:shadow-lg transition-all duration-300 ml-2"
             >
-              <i className={`${isPaused ? 'ri-play-line' : 'ri-pause-line'} text-slate-700`}></i>
+              {(() => { const Ic = isPaused ? RiPlayLine : RiPauseLine; return <Ic className="text-slate-700" />; })()}
             </button>
           </div>
 
@@ -232,7 +240,7 @@ const Services = memo(function Services() {
             aria-label="Previous service"
             className="absolute -left-16 top-1/2 transform -translate-y-1/2 w-12 h-12 bg-white rounded-full shadow-xl hover:shadow-2xl transition-all duration-300 flex items-center justify-center group lg:block hidden"
           >
-            <i className="ri-arrow-left-line text-xl text-slate-700 group-hover:text-[#2563EB] transition-colors"></i>
+            <RiArrowLeftLine className="text-xl text-slate-700 group-hover:text-[#2563EB] transition-colors" />
           </button>
 
           <button
@@ -240,7 +248,7 @@ const Services = memo(function Services() {
             aria-label="Next service"
             className="absolute -right-16 top-1/2 transform -translate-y-1/2 w-12 h-12 bg-white rounded-full shadow-xl hover:shadow-2xl transition-all duration-300 flex items-center justify-center group lg:block hidden"
           >
-            <i className="ri-arrow-right-line text-xl text-slate-700 group-hover:text-[#2563EB] transition-colors"></i>
+            <RiArrowRightLine className="text-xl text-slate-700 group-hover:text-[#2563EB] transition-colors" />
           </button>
         </div>
 
@@ -263,11 +271,11 @@ const Services = memo(function Services() {
                 className="group bg-white text-[#2563EB] px-8 py-4 rounded-xl font-bold hover:bg-[#F8FAFC] transition-colors duration-300 inline-flex items-center justify-center shadow-xl text-base"
               >
                 Start Your Project
-                <i className="ri-arrow-right-line ml-2 text-lg group-hover:translate-x-1 transition-transform duration-300"></i>
+                <RiArrowRightLine className="ml-2 text-lg group-hover:translate-x-1 transition-transform duration-300" />
               </MagneticButton>
 
               <a href="tel:+917696309551" className="group bg-white/15 text-white border-2 border-white/30 px-8 py-4 rounded-xl font-bold hover:bg-white/25 hover:border-white/50 transition-all duration-300 inline-flex items-center justify-center text-base">
-                <i className="ri-phone-line mr-2 text-lg"></i>
+                <RiPhoneLine className="mr-2 text-lg" />
                 Schedule Call
               </a>
             </div>

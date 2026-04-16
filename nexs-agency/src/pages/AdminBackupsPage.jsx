@@ -4,6 +4,7 @@ import { adminAPI } from '../services/api';
 import { useAuth } from '../context/AuthContext';
 import BackupAccountList from './admin/BackupAccountList';
 import ServerSnapshot from './admin/ServerSnapshot';
+import { RiGoogleLine, RiHardDrive3Line } from 'react-icons/ri';
 
 const EMPTY_FORM = {
     auth_type: 'oauth_personal',
@@ -43,7 +44,7 @@ function SignInPanel() {
             <div className="mx-auto grid max-w-5xl gap-8 lg:grid-cols-[1.1fr_0.9fr]">
                 <div className="rounded-[2rem] border border-white/10 bg-white/5 p-8 backdrop-blur">
                     <div className="inline-flex items-center gap-2 rounded-full border border-cyan-400/30 bg-cyan-400/10 px-4 py-2 text-sm font-medium text-cyan-100">
-                        <i className="ri-hard-drive-3-line" />
+                        <RiHardDrive3Line />
                         Backup admin
                     </div>
                     <h1 className="mt-6 font-display text-4xl font-bold leading-tight">Tenant backups to Google Drive.</h1>
@@ -192,7 +193,30 @@ export default function AdminBackupsPage() {
     };
 
     useEffect(() => {
-        loadData();
+        let cancelled = false;
+        const load = async () => {
+            if (!isAuthenticated || !isAdmin) {
+                setPageLoading(false);
+                return;
+            }
+            setPageLoading(true);
+            try {
+                const [accountsResponse, serversResponse] = await Promise.all([
+                    adminAPI.getBackupAccounts(),
+                    adminAPI.getServers()
+                ]);
+                if (cancelled) return;
+                setAccounts(accountsResponse.data?.data || []);
+                setServers(serversResponse.data?.data || []);
+            } catch (error) {
+                if (cancelled) return;
+                setMessage(error.response?.data?.message || error.response?.data?.error || 'Failed to load backup data', 'error');
+            } finally {
+                if (!cancelled) setPageLoading(false);
+            }
+        };
+        load();
+        return () => { cancelled = true };
         // eslint-disable-next-line react-hooks/exhaustive-deps
     }, [isAuthenticated, isAdmin]);
 
@@ -485,7 +509,7 @@ export default function AdminBackupsPage() {
                     <div className="flex flex-col gap-6 lg:flex-row lg:items-end lg:justify-between">
                         <div>
                             <div className="inline-flex items-center gap-2 rounded-full border border-slate-200 bg-white/80 px-4 py-2 text-sm font-medium text-[#2563EB]">
-                                <i className="ri-google-line" />
+                                <RiGoogleLine />
                                 Google Drive backups
                             </div>
                             <h1 className="mt-5 font-display text-4xl font-bold text-slate-900 md:text-5xl">Backup Management</h1>

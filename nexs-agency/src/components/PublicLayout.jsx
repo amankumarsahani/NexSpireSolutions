@@ -1,6 +1,5 @@
 import { Suspense } from 'react';
 import { Outlet, useLocation } from 'react-router-dom';
-// eslint-disable-next-line no-unused-vars
 import { motion } from 'framer-motion';
 import Header from './Header';
 import Footer from './Footer';

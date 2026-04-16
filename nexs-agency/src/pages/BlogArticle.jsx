@@ -13,6 +13,7 @@ import AuthorBio from '../components/ui/AuthorBio';
 import BackToTop from '../components/ui/BackToTop';
 import TableOfContents, { addIdsToHeadings } from '../components/ui/TableOfContents';
 import { SITE_URL } from '../constants/siteConfig';
+import { RiTimeLine } from 'react-icons/ri';
 
 const BlogArticle = () => {
     const { slug } = useParams();
@@ -22,30 +23,36 @@ const BlogArticle = () => {
     const [relatedPosts, setRelatedPosts] = useState([]);
 
     useEffect(() => {
+        let cancelled = false;
+
+        const loadBlog = async () => {
+            try {
+                setLoading(true);
+                const response = await blogAPI.getBySlug(slug);
+                if (cancelled) return;
+                setBlog(response.data.blog);
+
+                const allResponse = await blogAPI.getAll();
+                if (cancelled) return;
+                const allBlogs = allResponse.data.blogs || [];
+                const related = allBlogs
+                    .filter(b => b.slug !== slug && b.category === response.data.blog?.category)
+                    .slice(0, 3);
+                setRelatedPosts(related);
+            } catch (err) {
+                if (!cancelled) {
+                    console.error('Error loading blog:', err);
+                    setError('Blog not found');
+                }
+            } finally {
+                if (!cancelled) setLoading(false);
+            }
+        };
+
         loadBlog();
+        return () => { cancelled = true; };
         // eslint-disable-next-line react-hooks/exhaustive-deps
     }, [slug]);
-
-    const loadBlog = async () => {
-        try {
-            setLoading(true);
-            const response = await blogAPI.getBySlug(slug);
-            setBlog(response.data.blog);
-
-            // Load related posts
-            const allResponse = await blogAPI.getAll();
-            const allBlogs = allResponse.data.blogs || [];
-            const related = allBlogs
-                .filter(b => b.slug !== slug && b.category === response.data.blog?.category)
-                .slice(0, 3);
-            setRelatedPosts(related);
-        } catch (err) {
-            console.error('Error loading blog:', err);
-            setError('Blog not found');
-        } finally {
-            setLoading(false);
-        }
-    };
 
     if (loading) {
         return (
@@ -73,7 +80,7 @@ const BlogArticle = () => {
         "@context": "https://schema.org",
         "@type": "Article",
         "headline": blog.title,
-        "image": blog.image,
+        "image": blog.imageUrl,
         "author": {
             "@type": "Person",
             "name": blog.author
@@ -173,7 +180,7 @@ const BlogArticle = () => {
                             <>
                                 <span>•</span>
                                 <span className="flex items-center gap-1">
-                                    <i className="ri-time-line"></i>
+                                    <RiTimeLine />
                                     {blog.read_time}
                                 </span>
                             </>
@@ -182,10 +189,10 @@ const BlogArticle = () => {
                 </div>
 
                 {/* Featured Image */}
-                {blog.image && (
+                {blog.imageUrl && (
                     <div className="rounded-[2rem] overflow-hidden shadow-2xl mb-16 h-[500px]">
                         <img
-                            src={blog.image}
+                            src={blog.imageUrl}
                             alt={blog.title}
                             loading="lazy"
                             height={500}
@@ -240,10 +247,10 @@ const BlogArticle = () => {
                                     to={`/blog/${post.slug}`}
                                     className="bg-white rounded-2xl overflow-hidden shadow-sm hover:shadow-xl transition-all group"
                                 >
-                                    {post.image && (
+                                    {post.imageUrl && (
                                         <div className="h-48 overflow-hidden">
                                             <img
-                                                src={post.image}
+                                                src={post.imageUrl}
                                                 alt={post.title}
                                                 loading="lazy"
                                                 height={192}

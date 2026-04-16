@@ -1,31 +1,28 @@
 import { Link } from 'react-router-dom';
 import { Helmet } from 'react-helmet-async';
-// eslint-disable-next-line no-unused-vars
 import { motion } from 'framer-motion';
 
 // Import Assets
-import officeImg from '../assets/office_collaboration.png';
+import officeImg from '../assets/office_collaboration.jpg';
 
 // Import Components
 import Timeline from '../components/Timeline';
 import Breadcrumbs from '../components/ui/Breadcrumbs';
 import BackToTop from '../components/ui/BackToTop';
 import TrustBadges from '../components/ui/TrustBadges';
+import FadeIn from '../components/ui/FadeIn';
 import ReadingProgress from '../components/ui/ReadingProgress';
-import { SITE_URL } from '../constants/siteConfig';
+import { SITE_URL, siteConfig } from '../constants/siteConfig';
+import Icon from '../components/ui/Icon';
+import { RiArrowRightLine } from 'react-icons/ri';
 
-const FadeIn = ({ children, className, delay = 0 }) => {
-  return (
-    <motion.div
-      initial={{ opacity: 0, y: 30 }}
-      whileInView={{ opacity: 1, y: 0 }}
-      viewport={{ once: true, margin: "-50px" }}
-      transition={{ duration: 0.7, delay, ease: [0.21, 0.47, 0.32, 0.98] }}
-      className={className}
-    >
-      {children}
-    </motion.div>
-  );
+const FADE_IN_SMOOTH = { duration: 0.7, y: 30, ease: [0.21, 0.47, 0.32, 0.98] };
+
+const aboutColorMap = {
+  blue: { bg50: 'bg-blue-50', text600: 'text-blue-600' },
+  purple: { bg50: 'bg-purple-50', text600: 'text-purple-600' },
+  emerald: { bg50: 'bg-emerald-50', text600: 'text-emerald-600' },
+  pink: { bg50: 'bg-pink-50', text600: 'text-pink-600' },
 };
 
 const AboutPage = () => {
@@ -90,11 +87,7 @@ const AboutPage = () => {
             "email": "nexspiretechsolutions@gmail.com",
             "telephone": "+919729916844",
             "foundingDate": "2020",
-            "sameAs": [
-                "https://github.com/orgs/Nexspire-Solutions/repositories",
-                "https://www.linkedin.com/company/nexspire-solution",
-                "https://www.instagram.com/nexspire_solutions/"
-            ]
+            "sameAs": siteConfig.socialUrls
         })}</script>
       </Helmet>
 
@@ -124,7 +117,7 @@ const AboutPage = () => {
               Architects of the <br />
               <span className="text-[#D97706]">Digital Future.</span>
             </h1>
-            <p className="text-xl text-slate-400 max-w-2xl mx-auto leading-relaxed">
+            <p className="text-xl text-slate-500 max-w-2xl mx-auto leading-relaxed">
               Nexspire is more than an agency. We are a collective of dreamers, doers, and creators dedicated to building software that matters.
             </p>
           </motion.div>
@@ -136,7 +129,7 @@ const AboutPage = () => {
         <div className="container-custom">
           <div className="grid grid-cols-2 md:grid-cols-4 gap-12 text-center">
             {stats.map((stat, i) => (
-              <FadeIn key={i} delay={i * 0.1}>
+              <FadeIn {...FADE_IN_SMOOTH} key={i} delay={i * 0.1}>
                 <div className="text-4xl md:text-5xl font-bold text-[#2563EB] mb-2">{stat.value}</div>
                 <div className="text-sm text-slate-500 uppercase tracking-widest font-medium">{stat.label}</div>
               </FadeIn>
@@ -149,7 +142,7 @@ const AboutPage = () => {
       <section className="py-32 bg-white overflow-hidden">
         <div className="container-custom">
           <div className="grid lg:grid-cols-2 gap-16 items-center">
-            <FadeIn className="relative">
+            <FadeIn {...FADE_IN_SMOOTH} className="relative">
               <div className="absolute inset-0 bg-blue-600 rounded-[3rem] rotate-3 opacity-10"></div>
               <img
                 src={officeImg}
@@ -161,14 +154,14 @@ const AboutPage = () => {
             </FadeIn>
 
             <div className="space-y-12">
-              <FadeIn>
+              <FadeIn {...FADE_IN_SMOOTH}>
                 <h2 className="text-4xl md:text-5xl font-bold mb-6">The Origin Story</h2>
                 <p className="text-xl text-slate-600 leading-relaxed">
                   Founded in 2020, Nexspire began as a collective of passionate engineers and designers tired of the status quo. We saw a gap in the market for a development partner that truly understood both the <strong>technical</strong> and <strong>business</strong> aspects of building digital products.
                 </p>
               </FadeIn>
 
-              <FadeIn delay={0.2}>
+              <FadeIn {...FADE_IN_SMOOTH} delay={0.2}>
                 <h3 className="text-2xl font-bold mb-4">Our Mission</h3>
                 <p className="text-lg text-slate-600 leading-relaxed">
                   To empower businesses with cutting-edge technology that drives growth, efficiency, and innovation. We believe in building software that is not only functional but also delightful to use.
@@ -185,7 +178,7 @@ const AboutPage = () => {
       {/* Values - Grid Layout */}
       <section className="py-32 bg-[#F8FAFC] relative">
         <div className="container-custom">
-          <FadeIn className="text-center mb-20">
+          <FadeIn {...FADE_IN_SMOOTH} className="text-center mb-20">
             <h2 className="text-4xl md:text-5xl font-bold tracking-tight mb-6">Our Core Values</h2>
             <p className="text-xl text-slate-500 max-w-2xl mx-auto">
               The principles that guide every line of code we write and every pixel we design.
@@ -194,9 +187,9 @@ const AboutPage = () => {
 
           <div className="grid md:grid-cols-2 gap-8">
             {values.map((value, i) => (
-              <FadeIn key={i} delay={i * 0.1} className="bg-white p-10 rounded-[2rem] shadow-sm hover:shadow-xl transition-all duration-300 border border-slate-200 group">
-                <div className={`w-16 h-16 rounded-2xl bg-${value.color}-50 flex items-center justify-center text-3xl text-${value.color}-600 mb-6 group- transition-transform`}>
-                  <i className={value.icon}></i>
+              <FadeIn {...FADE_IN_SMOOTH} key={i} delay={i * 0.1} className="bg-white p-10 rounded-[2rem] shadow-sm hover:shadow-xl transition-all duration-300 border border-slate-200 group">
+                <div className={`w-16 h-16 rounded-2xl ${aboutColorMap[value.color]?.bg50 || 'bg-blue-50'} flex items-center justify-center text-3xl ${aboutColorMap[value.color]?.text600 || 'text-blue-600'} mb-6 group-hover:scale-110 transition-transform`}>
+                  <Icon name={value.icon} />
                 </div>
                 <h3 className="text-2xl font-bold mb-4">{value.title}</h3>
                 <p className="text-slate-600 text-lg leading-relaxed">{value.description}</p>
@@ -215,11 +208,11 @@ const AboutPage = () => {
       <section className="py-32 bg-slate-900 text-white text-center relative overflow-hidden">
         <div className="absolute inset-0 bg-[url('https://grainy-gradients.vercel.app/noise.svg')] opacity-10"></div>
         <div className="container-custom relative z-10">
-          <FadeIn>
+          <FadeIn {...FADE_IN_SMOOTH}>
             <h2 className="text-5xl md:text-7xl font-bold mb-12 tracking-tighter">Ready to innovate?</h2>
             <Link to="/contact" className="inline-flex items-center gap-4 px-12 py-6 bg-white text-black rounded-full text-xl font-bold hover:bg-[#2563EB] hover:text-white transition-all duration-300 group">
               Let's Talk
-              <i className="ri-arrow-right-line group-hover:translate-x-2 transition-transform"></i>
+              <RiArrowRightLine className="group-hover:translate-x-2 transition-transform" />
             </Link>
           </FadeIn>
         </div>

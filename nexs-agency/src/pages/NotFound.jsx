@@ -1,7 +1,7 @@
 import { Link } from 'react-router-dom';
 import { Helmet } from 'react-helmet-async';
-// eslint-disable-next-line no-unused-vars
 import { motion } from 'framer-motion';
+import { RiCompass3Line, RiHome4Line } from 'react-icons/ri';
 
 const NotFound = () => {
     return (
@@ -54,14 +54,14 @@ const NotFound = () => {
                     to="/"
                     className="inline-flex items-center gap-2 px-8 py-3 bg-blue-600 text-white rounded-full font-semibold hover:bg-blue-700 transition-all duration-300 shadow-lg shadow-lg "
                 >
-                    <i className="ri-home-4-line"></i>
+                    <RiHome4Line />
                     Back to Home
                 </Link>
                 <Link
                     to="/services"
                     className="inline-flex items-center gap-2 px-8 py-3 bg-white text-slate-600 border border-slate-200 rounded-full font-semibold hover:bg-[#F8FAFC] transition-all duration-300 "
                 >
-                    <i className="ri-compass-3-line"></i>
+                    <RiCompass3Line />
                     Explore Services
                 </Link>
             </motion.div>

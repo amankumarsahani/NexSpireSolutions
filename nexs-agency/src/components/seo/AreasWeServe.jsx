@@ -1,4 +1,5 @@
 import { Link } from 'react-router-dom';
+import { RiArrowRightLine, RiMapPinLine } from 'react-icons/ri';
 
 const cities = [
     {
@@ -73,13 +74,13 @@ const AreasWeServe = () => {
                             <div className="absolute inset-0 p-8 flex flex-col justify-end">
                                 <div className="transform translate-y-4 group-hover:translate-y-0 transition-transform duration-500">
                                     <div className="flex items-center gap-2 text-blue-400 text-sm font-bold mb-2 opacity-0 group-hover:opacity-100 transition-opacity duration-500 delay-100">
-                                        <i className="ri-map-pin-line"></i>
+                                        <RiMapPinLine />
                                         <span>{city.country}</span>
                                     </div>
                                     <h3 className="text-3xl font-bold text-white mb-2">{city.name}</h3>
                                     <div className="flex items-center text-white/80 text-sm font-medium border-b border-white/30 pb-1 w-max opacity-0 group-hover:opacity-100 transition-opacity duration-500 delay-200">
                                         View Local Services
-                                        <i className="ri-arrow-right-line ml-2"></i>
+                                        <RiArrowRightLine className="ml-2" />
                                     </div>
                                 </div>
                             </div>

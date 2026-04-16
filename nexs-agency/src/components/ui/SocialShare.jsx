@@ -1,8 +1,11 @@
-// TODO: Replace console.error with Sentry or proper error tracking
-import { useState } from 'react';
+import { useState, useRef, useEffect } from 'react';
+import { RiCheckLine, RiLink } from 'react-icons/ri';
+import Icon from './Icon';
 
 export default function SocialShare({ url, title, className = '' }) {
     const [copied, setCopied] = useState(false);
+    const timerRef = useRef(null);
+    useEffect(() => () => clearTimeout(timerRef.current), []);
 
     const shareUrl = url || window.location.href;
     const shareTitle = title || document.title;
@@ -38,9 +41,19 @@ export default function SocialShare({ url, title, className = '' }) {
         try {
             await navigator.clipboard.writeText(shareUrl);
             setCopied(true);
-            setTimeout(() => setCopied(false), 2000);
-        } catch (err) {
-            console.error('Failed to copy:', err);
+            timerRef.current = setTimeout(() => setCopied(false), 2000);
+        } catch {
+            // Clipboard API not available — try legacy fallback
+            const textarea = document.createElement('textarea');
+            textarea.value = shareUrl;
+            textarea.style.position = 'fixed';
+            textarea.style.opacity = '0';
+            document.body.appendChild(textarea);
+            textarea.select();
+            document.execCommand('copy');
+            document.body.removeChild(textarea);
+            setCopied(true);
+            timerRef.current = setTimeout(() => setCopied(false), 2000);
         }
     };
 
@@ -56,7 +69,7 @@ export default function SocialShare({ url, title, className = '' }) {
                     className={`w-10 h-10 rounded-full bg-gray-100 flex items-center justify-center text-slate-600 transition-all duration-300 ${link.color}`}
                     title={`Share on ${link.name}`}
                 >
-                    <i className={`${link.icon} text-lg`}></i>
+                    <Icon name={link.icon} className="text-lg" />
                 </a>
             ))}
             <button
@@ -67,7 +80,7 @@ export default function SocialShare({ url, title, className = '' }) {
                     }`}
                 title={copied ? 'Copied!' : 'Copy link'}
             >
-                <i className={copied ? 'ri-check-line text-lg' : 'ri-link text-lg'}></i>
+                {copied ? <RiCheckLine className="text-lg" /> : <RiLink className="text-lg" />}
             </button>
         </div>
     );
@@ -76,6 +89,8 @@ export default function SocialShare({ url, title, className = '' }) {
 // Floating version for blog articles
 export function FloatingSocialShare({ url, title }) {
     const [copied, setCopied] = useState(false);
+    const timerRef = useRef(null);
+    useEffect(() => () => clearTimeout(timerRef.current), []);
 
     const shareUrl = url || (typeof window !== 'undefined' ? window.location.href : '');
     const shareTitle = title || (typeof document !== 'undefined' ? document.title : '');
@@ -84,9 +99,18 @@ export function FloatingSocialShare({ url, title }) {
         try {
             await navigator.clipboard.writeText(shareUrl);
             setCopied(true);
-            setTimeout(() => setCopied(false), 2000);
-        } catch (err) {
-            console.error('Failed to copy:', err);
+            timerRef.current = setTimeout(() => setCopied(false), 2000);
+        } catch {
+            const textarea = document.createElement('textarea');
+            textarea.value = shareUrl;
+            textarea.style.position = 'fixed';
+            textarea.style.opacity = '0';
+            document.body.appendChild(textarea);
+            textarea.select();
+            document.execCommand('copy');
+            document.body.removeChild(textarea);
+            setCopied(true);
+            timerRef.current = setTimeout(() => setCopied(false), 2000);
         }
     };
 
@@ -122,7 +146,7 @@ export function FloatingSocialShare({ url, title }) {
                     className={`w-10 h-10 rounded-full bg-white shadow-lg border border-slate-200 flex items-center justify-center text-slate-500 transition-all duration-300 hover:text-white  ${link.color}`}
                     title={`Share on ${link.name}`}
                 >
-                    <i className={`${link.icon} text-lg`}></i>
+                    <Icon name={link.icon} className="text-lg" />
                 </a>
             ))}
             <button
@@ -133,7 +157,7 @@ export function FloatingSocialShare({ url, title }) {
                     }`}
                 title={copied ? 'Copied!' : 'Copy link'}
             >
-                <i className={copied ? 'ri-check-line text-lg' : 'ri-link text-lg'}></i>
+                {copied ? <RiCheckLine className="text-lg" /> : <RiLink className="text-lg" />}
             </button>
         </div>
     );

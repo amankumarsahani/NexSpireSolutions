@@ -1,3 +1,4 @@
+import Icon from './Icon';
 export default function TrustBadges({ className = '' }) {
     const badges = [
         {
@@ -29,7 +30,7 @@ export default function TrustBadges({ className = '' }) {
                     key={index}
                     className="flex items-center gap-3 text-slate-500"
                 >
-                    <i className={`${badge.icon} text-2xl text-[#2563EB]`}></i>
+                    <Icon name={badge.icon} className="text-2xl text-[#2563EB]" />
                     <div className="text-left">
                         <div className="text-sm font-semibold text-slate-600">{badge.title}</div>
                         <div className="text-xs text-slate-400">{badge.subtitle}</div>
@@ -52,7 +53,7 @@ export function TrustBadgesCompact({ className = '' }) {
         <div className={`flex items-center gap-4 ${className}`}>
             {badges.map((badge, index) => (
                 <div key={index} className="flex items-center gap-1.5 text-slate-400">
-                    <i className={`${badge.icon} text-green-500`}></i>
+                    <Icon name={badge.icon} className="text-green-500" />
                     <span className="text-xs font-medium">{badge.label}</span>
                 </div>
             ))}

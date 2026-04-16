@@ -1,4 +1,5 @@
 import { useState, memo } from 'react'
+import { RiArrowLeftSLine, RiArrowRightSLine, RiStarFill } from 'react-icons/ri';
 
 const testimonials = [
   {
@@ -76,11 +77,11 @@ const Testimonials = memo(function Testimonials() {
           <div className="bg-white rounded-2xl p-8 md:p-12 shadow-xl max-w-4xl mx-auto">
             <div className="flex items-center justify-center mb-6">
               <div className="flex space-x-1">
-                <i className="ri-star-fill text-yellow-400"></i>
-                <i className="ri-star-fill text-yellow-400"></i>
-                <i className="ri-star-fill text-yellow-400"></i>
-                <i className="ri-star-fill text-yellow-400"></i>
-                <i className="ri-star-fill text-yellow-400"></i>
+                <RiStarFill className="text-yellow-400" />
+                <RiStarFill className="text-yellow-400" />
+                <RiStarFill className="text-yellow-400" />
+                <RiStarFill className="text-yellow-400" />
+                <RiStarFill className="text-yellow-400" />
               </div>
             </div>
             <blockquote className="text-xl md:text-2xl text-slate-600 leading-relaxed text-center mb-8">
@@ -113,14 +114,14 @@ const Testimonials = memo(function Testimonials() {
             aria-label="Previous testimonial"
             className="hidden md:flex absolute -left-6 top-1/2 transform -translate-y-1/2 w-12 h-12 items-center justify-center bg-white rounded-full shadow-lg hover:bg-[#F8FAFC] transition-colors cursor-pointer"
           >
-            <i className="ri-arrow-left-s-line text-slate-600 text-xl"></i>
+            <RiArrowLeftSLine className="text-slate-600 text-xl" />
           </button>
           <button
             onClick={nextTestimonial}
             aria-label="Next testimonial"
             className="hidden md:flex absolute -right-6 top-1/2 transform -translate-y-1/2 w-12 h-12 items-center justify-center bg-white rounded-full shadow-lg hover:bg-[#F8FAFC] transition-colors cursor-pointer"
           >
-            <i className="ri-arrow-right-s-line text-slate-600 text-xl"></i>
+            <RiArrowRightSLine className="text-slate-600 text-xl" />
           </button>
         </div>
 
@@ -131,14 +132,14 @@ const Testimonials = memo(function Testimonials() {
             aria-label="Previous testimonial"
             className="w-10 h-10 flex items-center justify-center bg-white rounded-full shadow-lg hover:bg-[#F8FAFC] transition-colors cursor-pointer"
           >
-            <i className="ri-arrow-left-s-line text-slate-600 text-lg"></i>
+            <RiArrowLeftSLine className="text-slate-600 text-lg" />
           </button>
           <button
             onClick={nextTestimonial}
             aria-label="Next testimonial"
             className="w-10 h-10 flex items-center justify-center bg-white rounded-full shadow-lg hover:bg-[#F8FAFC] transition-colors cursor-pointer"
           >
-            <i className="ri-arrow-right-s-line text-slate-600 text-lg"></i>
+            <RiArrowRightSLine className="text-slate-600 text-lg" />
           </button>
         </div>
 

@@ -1,27 +1,16 @@
 import { useState } from 'react';
 import { Link } from 'react-router-dom';
 import { Helmet } from 'react-helmet-async';
-// eslint-disable-next-line no-unused-vars
 import { motion, AnimatePresence } from 'framer-motion';
 import { cn } from '../utils/cn';
+import FadeIn from '../components/ui/FadeIn';
 import Breadcrumbs from '../components/ui/Breadcrumbs';
 import BackToTop from '../components/ui/BackToTop';
 import ReadingProgress from '../components/ui/ReadingProgress';
 import { SITE_URL } from '../constants/siteConfig';
+import { RiArrowRightLine, RiArrowUpLine } from 'react-icons/ri';
 
-const FadeIn = ({ children, className, delay = 0 }) => {
-    return (
-        <motion.div
-            initial={{ opacity: 0, y: 20 }}
-            whileInView={{ opacity: 1, y: 0 }}
-            viewport={{ once: true, margin: "-50px" }}
-            transition={{ duration: 0.7, delay, ease: [0.21, 0.47, 0.32, 0.98] }}
-            className={className}
-        >
-            {children}
-        </motion.div>
-    );
-};
+const FADE_IN_SMOOTH = { duration: 0.7, ease: [0.21, 0.47, 0.32, 0.98] };
 
 const ProjectCard = ({ project }) => {
     return (
@@ -51,7 +40,7 @@ const ProjectCard = ({ project }) => {
                 {project.metric && (
                     <div className="absolute top-4 right-4 z-30">
                         <div className="px-4 py-2 bg-green-500 text-white rounded-full text-sm font-bold shadow-lg flex items-center gap-2">
-                            <i className="ri-arrow-up-line"></i>
+                            <RiArrowUpLine />
                             {project.metric}
                         </div>
                     </div>
@@ -75,7 +64,7 @@ const ProjectCard = ({ project }) => {
                         <div className="opacity-0 group-hover:opacity-100 transition-opacity duration-300 delay-200">
                             <span className="inline-flex items-center gap-2 px-5 py-2.5 bg-white text-slate-800 rounded-full text-sm font-bold hover:bg-[#2563EB] hover:text-white transition-colors">
                                 View Case Study
-                                <i className="ri-arrow-right-line"></i>
+                                <RiArrowRightLine />
                             </span>
                         </div>
                     </div>
@@ -209,7 +198,7 @@ const PortfolioPage = () => {
                 <div className="absolute top-0 right-0 w-2/3 h-full bg-gradient-to-l from-slate-900/30 to-transparent"></div>
 
                 <div className="container-custom relative z-10">
-                    <FadeIn>
+                    <FadeIn {...FADE_IN_SMOOTH}>
                         <span className="inline-block py-2 px-4 rounded-full bg-white/10 border border-white/10 backdrop-blur-md text-sm font-medium mb-6">
                             Selected Works 2023-2024
                         </span>
@@ -217,7 +206,7 @@ const PortfolioPage = () => {
                             We Create <br />
                             <span className="text-[#D97706]">Digital Legacies.</span>
                         </h1>
-                        <p className="text-xl text-slate-400 max-w-2xl mb-8">
+                        <p className="text-xl text-slate-500 max-w-2xl mb-8">
                             Real results for real businesses. Explore our portfolio of successful projects across web, mobile, and AI.
                         </p>
                     </FadeIn>
@@ -281,14 +270,14 @@ const PortfolioPage = () => {
             {/* CTA Section */}
             <section className="py-32 bg-white text-center relative overflow-hidden">
                 <div className="container-custom relative z-10">
-                    <FadeIn>
+                    <FadeIn {...FADE_IN_SMOOTH}>
                         <h2 className="text-5xl md:text-7xl font-bold mb-8 tracking-tighter">Have a vision?</h2>
                         <p className="text-xl text-slate-500 mb-12 max-w-2xl mx-auto">
                             Let's collaborate to turn your boldest ideas into reality. We are ready when you are.
                         </p>
                         <Link to="/contact" className="inline-flex items-center gap-4 px-12 py-6 bg-slate-900 text-white rounded-full text-xl font-bold hover:bg-[#2563EB] transition-all duration-300 group shadow-2xl">
                             Start a Project
-                            <i className="ri-arrow-right-line group-hover:translate-x-2 transition-transform"></i>
+                            <RiArrowRightLine className="group-hover:translate-x-2 transition-transform" />
                         </Link>
                     </FadeIn>
                 </div>

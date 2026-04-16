@@ -1,18 +1,14 @@
-import { useState, useEffect, memo } from 'react'
+import { memo } from 'react'
+import Icon from './ui/Icon';
+import { RiArrowRightLine, RiPhoneLine, RiShakeHandsLine, RiVerifiedBadgeLine } from 'react-icons/ri';
 
 const Partners = memo(function Partners() {
-  const [isVisible, setIsVisible] = useState(false)
-
-  useEffect(() => {
-    setIsVisible(true)
-  }, [])
 
   return (
     <section id="partners" className="relative py-20 bg-slate-50 overflow-hidden">
 
       <div className="relative z-10 max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-        <div className={`text-left mb-16 transition-all duration-1000 transform ${isVisible ? 'translate-y-0 opacity-100' : 'translate-y-8 opacity-0'
-          }`}>
+        <div className="text-left mb-16 transition-all duration-1000 transform translate-y-0 opacity-100">
           <span className="text-sm font-semibold text-[#2563EB] uppercase tracking-wider">Trusted Partnerships</span>
           <h2 className="text-3xl md:text-5xl font-bold mb-6 mt-4 leading-tight">
             Partners &
@@ -25,8 +21,7 @@ const Partners = memo(function Partners() {
           </p>
         </div>
 
-        <div className={`grid md:grid-cols-2 lg:grid-cols-4 gap-6 mb-20 transition-all duration-1000 delay-300 transform ${isVisible ? 'translate-y-0 opacity-100' : 'translate-y-8 opacity-0'
-          }`}>
+        <div className="grid md:grid-cols-2 lg:grid-cols-4 gap-6 mb-20 transition-all duration-1000 delay-300 transform translate-y-0 opacity-100">
           {[
             { icon: "ri-team-line", number: "50+", label: "Technology Partners", bgColor: "bg-[#2563EB]/10", textColor: "text-[#2563EB]" },
             { icon: "ri-award-line", number: "30+", label: "Certifications", bgColor: "bg-[#D97706]/10", textColor: "text-[#D97706]" },
@@ -36,7 +31,7 @@ const Partners = memo(function Partners() {
             <div key={index} className="group text-center">
               <div className="bg-white rounded-2xl p-8 shadow-sm border border-slate-200 group-hover:shadow-lg transition-all duration-300 hover:-translate-y-0.5">
                 <div className={`w-16 h-16 ${stat.bgColor} rounded-xl flex items-center justify-center mx-auto mb-4`}>
-                  <i className={`${stat.icon} text-2xl ${stat.textColor}`}></i>
+                  <Icon name={stat.icon} className={`text-2xl ${stat.textColor}`} />
                 </div>
                 <div className={`text-3xl font-bold mb-2 ${stat.textColor}`}>
                   {stat.number}
@@ -49,8 +44,7 @@ const Partners = memo(function Partners() {
           ))}
         </div>
 
-        <div className={`mb-20 transition-all duration-1000 delay-500 transform ${isVisible ? 'translate-y-0 opacity-100' : 'translate-y-8 opacity-0'
-          }`}>
+        <div className="mb-20 transition-all duration-1000 delay-500 transform translate-y-0 opacity-100">
           <div className="text-center mb-12">
             <h3 className="text-2xl md:text-3xl font-bold text-slate-800 mb-4">
               Technology Partners
@@ -130,8 +124,7 @@ const Partners = memo(function Partners() {
           </div>
         </div>
 
-        <div className={`mb-20 transition-all duration-1000 delay-700 transform ${isVisible ? 'translate-y-0 opacity-100' : 'translate-y-8 opacity-0'
-          }`}>
+        <div className="mb-20 transition-all duration-1000 delay-700 transform translate-y-0 opacity-100">
           <div className="text-center mb-12">
             <h3 className="text-2xl md:text-3xl font-bold text-slate-800 mb-4">
               Professional Certifications
@@ -159,7 +152,7 @@ const Partners = memo(function Partners() {
                     <div className="bg-white rounded-2xl p-6 shadow-sm border border-slate-200 hover:shadow-lg transition-all duration-300 hover:-translate-y-0.5 h-full">
                       <div className="flex items-center mb-4">
                         <div className={`w-12 h-12 ${cert.bgColor} rounded-xl flex items-center justify-center mr-4`}>
-                          <i className={`${cert.icon} text-xl ${cert.iconColor}`}></i>
+                          <Icon name={cert.icon} className={`text-xl ${cert.iconColor}`} />
                         </div>
                         <div className="flex-1">
                           <h4 className="font-semibold text-slate-800 text-base mb-1">
@@ -173,7 +166,7 @@ const Partners = memo(function Partners() {
                       </div>
 
                       <div className="flex items-center text-sm text-slate-500">
-                        <i className={`ri-verified-badge-line mr-2 ${cert.iconColor}`}></i>
+                        <RiVerifiedBadgeLine className={`mr-2 ${cert.iconColor}`} />
                         <span>Verified Certification</span>
                       </div>
                     </div>
@@ -192,7 +185,7 @@ const Partners = memo(function Partners() {
                     <div className="bg-white rounded-2xl p-6 shadow-sm border border-slate-200 hover:shadow-lg transition-all duration-300 hover:-translate-y-0.5 h-full">
                       <div className="flex items-center mb-4">
                         <div className={`w-12 h-12 ${cert.bgColor} rounded-xl flex items-center justify-center mr-4`}>
-                          <i className={`${cert.icon} text-xl ${cert.iconColor}`}></i>
+                          <Icon name={cert.icon} className={`text-xl ${cert.iconColor}`} />
                         </div>
                         <div className="flex-1">
                           <h4 className="font-semibold text-slate-800 text-base mb-1">
@@ -206,7 +199,7 @@ const Partners = memo(function Partners() {
                       </div>
 
                       <div className="flex items-center text-sm text-slate-500">
-                        <i className={`ri-verified-badge-line mr-2 ${cert.iconColor}`}></i>
+                        <RiVerifiedBadgeLine className={`mr-2 ${cert.iconColor}`} />
                         <span>Verified Certification</span>
                       </div>
                     </div>
@@ -217,11 +210,10 @@ const Partners = memo(function Partners() {
           </div>
         </div>
 
-        <div className={`transition-all duration-1000 delay-900 transform ${isVisible ? 'translate-y-0 opacity-100' : 'translate-y-8 opacity-0'
-          }`}>
+        <div className="transition-all duration-1000 delay-900 transform translate-y-0 opacity-100">
           <div className="bg-[#4F46E5] rounded-2xl p-8 md:p-12 text-center text-white shadow-xl">
             <div className="w-16 h-16 bg-white/20 rounded-2xl flex items-center justify-center mx-auto mb-6">
-              <i className="ri-handshake-line text-2xl text-white"></i>
+              <RiShakeHandsLine className="text-2xl text-white" />
             </div>
 
             <h3 className="text-2xl md:text-3xl font-bold mb-4">
@@ -239,7 +231,7 @@ const Partners = memo(function Partners() {
               >
                 <span className="flex items-center justify-center">
                   Start Your Project
-                  <i className="ri-arrow-right-line ml-2"></i>
+                  <RiArrowRightLine className="ml-2" />
                 </span>
               </a>
               <a
@@ -247,7 +239,7 @@ const Partners = memo(function Partners() {
                 href="#contact"
               >
                 <span className="flex items-center justify-center">
-                  <i className="ri-phone-line mr-2"></i>
+                  <RiPhoneLine className="mr-2" />
                   Schedule Call
                 </span>
               </a>

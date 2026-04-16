@@ -1,8 +1,9 @@
 import { useState, useEffect, useRef, memo } from 'react'
+import Icon from './ui/Icon';
+import { RiArrowRightUpLine, RiCodeLine, RiShieldCheckLine } from 'react-icons/ri';
 
 const Technologies = memo(function Technologies() {
   const [activeTab, setActiveTab] = useState("Frontend")
-  const [isVisible, setIsVisible] = useState(false)
   const [allTechs, setAllTechs] = useState([])
   const sliderRef = useRef(null)
 
@@ -81,10 +82,6 @@ const Technologies = memo(function Technologies() {
     }
   }
 
-  useEffect(() => {
-    setIsVisible(true)
-  }, [])
-
   // Update technologies when active tab changes
   useEffect(() => {
     const selectedTechs = techStacks[activeTab].technologies
@@ -98,8 +95,7 @@ const Technologies = memo(function Technologies() {
 
       <div className="relative z-10 max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
         {/* Modern Header */}
-        <div className={`text-center mb-8 sm:mb-12 lg:mb-16 transition-all duration-1000 transform ${isVisible ? 'translate-y-0 opacity-100' : 'translate-y-8 opacity-0'
-          }`}>
+        <div className="text-center mb-8 sm:mb-12 lg:mb-16 transition-all duration-1000 transform translate-y-0 opacity-100">
           <div className="inline-flex items-center bg-[#3B82F6]/10 border border-slate-200 text-slate-800 text-sm font-bold px-8 py-4 rounded-full mb-8">
             <div className="w-3 h-3 bg-[#3B82F6] rounded-full mr-3"></div>
             Our Tech Stack
@@ -116,7 +112,7 @@ const Technologies = memo(function Technologies() {
         </div>
 
         {/* Static Category Tabs */}
-        <div className={`flex flex-wrap justify-center gap-2 sm:gap-3 mb-8 sm:mb-12 lg:mb-16 transition-all duration-1000 delay-300 transform ${isVisible ? 'translate-y-0 opacity-100' : 'translate-y-8 opacity-0'
+        <div className={`flex flex-wrap justify-center gap-2 sm:gap-3 mb-8 sm:mb-12 lg:mb-16 transition-all duration-1000 delay-300 transform translate-y-0 opacity-100
           }`} role="tablist">
           {Object.keys(techStacks).map((tab) => (
             <button
@@ -141,8 +137,7 @@ const Technologies = memo(function Technologies() {
         </div>
 
         {/* Creative Tech Stack Layout */}
-        <div className={`mb-16 transition-all duration-1000 delay-500 transform ${isVisible ? 'translate-y-0 opacity-100' : 'translate-y-8 opacity-0'
-          }`} role="tabpanel" id={`tabpanel-${activeTab}`} aria-labelledby={`tab-${activeTab}`}>
+        <div className="mb-16 transition-all duration-1000 delay-500 transform translate-y-0 opacity-100" role="tabpanel" id={`tabpanel-${activeTab}`} aria-labelledby={`tab-${activeTab}`}>
           {/* Category Title */}
           <div className="text-center mb-12">
             <div className="inline-flex items-center bg-white/70 backdrop-blur-lg border border-slate-200/50 text-slate-600 text-lg font-bold px-8 py-4 rounded-2xl mb-6 shadow-lg">
@@ -180,8 +175,8 @@ const Technologies = memo(function Technologies() {
 
                       {/* Icon */}
                       <div className="flex flex-col items-center justify-center h-full space-y-3">
-                        <div className={`w-10 h-10 sm:w-14 sm:h-14 flex items-center justify-center bg-gradient-to-br ${tech.color} rounded-xl shadow-md group-hover:shadow-lg group- transition-all duration-300`}>
-                          <i className={`${tech.icon} text-lg sm:text-2xl text-white`}></i>
+                        <div className={`w-10 h-10 sm:w-14 sm:h-14 flex items-center justify-center bg-gradient-to-br ${tech.color} rounded-xl shadow-md group-hover:shadow-lg group-hover:scale-110 transition-all duration-300`}>
+                          <Icon name={tech.icon} className="text-lg sm:text-2xl text-white" />
                         </div>
 
                         {/* Tech Name */}
@@ -205,25 +200,25 @@ const Technologies = memo(function Technologies() {
             <div className="grid md:grid-cols-3 gap-8">
               <div className="text-center p-6 bg-white rounded-2xl border border-slate-200 shadow-lg">
                 <div className="w-12 h-12 bg-[#3B82F6] rounded-2xl flex items-center justify-center mx-auto mb-4 shadow-lg">
-                  <i className="ri-code-line text-2xl text-white"></i>
+                  <RiCodeLine className="text-2xl text-white" />
                 </div>
-                <h4 className="text-lg font-bold text-slate-800 mb-2">Modern Stack</h4>
+                <h3 className="text-lg font-bold text-slate-800 mb-2">Modern Stack</h3>
                 <p className="text-sm text-slate-600">Latest versions and cutting-edge technologies</p>
               </div>
 
               <div className="text-center p-6 bg-white rounded-2xl border border-slate-200 shadow-lg">
                 <div className="w-12 h-12 bg-[#3B82F6] rounded-2xl flex items-center justify-center mx-auto mb-4 shadow-lg">
-                  <i className="ri-arrow-right-up-line text-2xl text-white"></i>
+                  <RiArrowRightUpLine className="text-2xl text-white" />
                 </div>
-                <h4 className="text-lg font-bold text-slate-800 mb-2">High Performance</h4>
+                <h3 className="text-lg font-bold text-slate-800 mb-2">High Performance</h3>
                 <p className="text-sm text-slate-600">Optimized for speed and scalability</p>
               </div>
 
               <div className="text-center p-6 bg-white rounded-2xl border border-slate-200 shadow-lg">
                 <div className="w-12 h-12 bg-[#3B82F6] rounded-2xl flex items-center justify-center mx-auto mb-4 shadow-lg">
-                  <i className="ri-shield-check-line text-2xl text-white"></i>
+                  <RiShieldCheckLine className="text-2xl text-white" />
                 </div>
-                <h4 className="text-lg font-bold text-slate-800 mb-2">Production Ready</h4>
+                <h3 className="text-lg font-bold text-slate-800 mb-2">Production Ready</h3>
                 <p className="text-sm text-slate-600">Battle-tested in enterprise environments</p>
               </div>
             </div>

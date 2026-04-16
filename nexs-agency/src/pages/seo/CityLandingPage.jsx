@@ -1,10 +1,12 @@
 import { useEffect, useState } from 'react';
 import { Link, useParams } from 'react-router-dom';
 import { Helmet } from 'react-helmet-async';
-// eslint-disable-next-line no-unused-vars
 import { motion, useScroll, useTransform } from 'framer-motion';
+import FadeIn from '../../components/ui/FadeIn';
 import ReadingProgress from '../../components/ui/ReadingProgress';
 import { SITE_URL } from '../../constants/siteConfig';
+import Icon from '../../components/ui/Icon';
+import { RiArrowRightLine, RiBriefcase4Line, RiCheckLine, RiGlobalLine, RiMapPinLine, RiShieldCheckLine, RiTimeLine } from 'react-icons/ri';
 
 // City data with SEO content & Timezones
 const cityData = {
@@ -178,17 +180,7 @@ const cityData = {
     }
 };
 
-const FadeIn = ({ children, delay = 0, className = "" }) => (
-    <motion.div
-        initial={{ opacity: 0, y: 20 }}
-        whileInView={{ opacity: 1, y: 0 }}
-        viewport={{ once: true }}
-        transition={{ duration: 0.6, delay }}
-        className={className}
-    >
-        {children}
-    </motion.div>
-);
+const FADE_IN_MINIMAL = { margin: '0px', ease: 'linear' };
 
 const CityLandingPage = () => {
     const { city } = useParams();
@@ -324,7 +316,7 @@ const CityLandingPage = () => {
                                     <div className="text-2xl font-mono font-bold text-white tabular-nums tracking-widest leading-none">{time}</div>
                                 </div>
                                 <div className="w-10 h-10 rounded-xl bg-blue-600/50 flex items-center justify-center animate-pulse">
-                                    <i className="ri-time-line text-xl"></i>
+                                    <RiTimeLine className="text-xl" />
                                 </div>
                             </motion.div>
                         </div>
@@ -361,10 +353,10 @@ const CityLandingPage = () => {
                                     to="/contact"
                                     className="px-8 py-4 bg-blue-600 rounded-full font-bold text-white hover:bg-[#F8FAFC]0 transition-all shadow-lg hover:shadow-lg flex items-center gap-2 group"
                                 >
-                                    Start Project in {data.city} <i className="ri-arrow-right-line group-hover:translate-x-1 transition-transform"></i>
+                                    Start Project in {data.city} <RiArrowRightLine className="group-hover:translate-x-1 transition-transform" />
                                 </Link>
                                 <div className="px-6 py-4 rounded-full bg-white/5 backdrop-blur-sm border border-white/10 text-slate-300 flex items-center gap-3">
-                                    <i className="ri-shield-check-line text-green-400"></i>
+                                    <RiShieldCheckLine className="text-green-400" />
                                     Available Now
                                 </div>
                             </motion.div>
@@ -376,7 +368,7 @@ const CityLandingPage = () => {
                 <div className="container-custom relative z-40 -mt-20 sm:-mt-24 pointer-events-none">
                     <div className="bg-white/90 backdrop-blur-xl rounded-[2rem] shadow-2xl p-8 md:p-10 border border-white/50 grid grid-cols-2 lg:grid-cols-4 gap-8 max-w-6xl mx-auto hover:transform hover:-translate-y-2 transition-transform duration-500 pointer-events-auto">
                         {data.stats && data.stats.map((stat, i) => (
-                            <FadeIn key={i} delay={0.3 + (i * 0.1)} className="text-center group cursor-default relative">
+                            <FadeIn {...FADE_IN_MINIMAL} key={i} delay={0.3 + (i * 0.1)} className="text-center group cursor-default relative">
                                 <div className="text-4xl md:text-5xl font-bold text-slate-900 group-hover:text-[#2563EB] transition-all duration-300 mb-2 font-display">
                                     {stat.value}
                                 </div>
@@ -397,7 +389,7 @@ const CityLandingPage = () => {
                 <div className="container-custom">
                     <div className="flex flex-col lg:flex-row gap-16 items-start">
                         {/* Text Content */}
-                        <FadeIn className="lg:w-1/2">
+                        <FadeIn {...FADE_IN_MINIMAL} className="lg:w-1/2">
                             <span className="flex items-center gap-2 text-[#2563EB] font-bold tracking-widest uppercase text-sm mb-4">
                                 <span className="w-8 h-px bg-blue-600"></span>
                                 Strategic Hub
@@ -411,16 +403,16 @@ const CityLandingPage = () => {
 
                             <div className="bg-white p-8 rounded-3xl shadow-lg border border-slate-100 relative overflow-hidden">
                                 <div className="absolute top-0 right-0 p-4 opacity-5">
-                                    <i className="ri-map-pin-line text-9xl"></i>
+                                    <RiMapPinLine className="text-9xl" />
                                 </div>
                                 <h3 className="text-xl font-bold text-slate-900 mb-6 flex items-center gap-2">
-                                    <i className="ri-briefcase-4-line text-[#2563EB]"></i>
+                                    <RiBriefcase4Line className="text-[#2563EB]" />
                                     Key Capabilities
                                 </h3>
                                 <div className="grid sm:grid-cols-2 gap-4 relative z-10">
                                     {data.services.map((service, index) => (
                                         <div key={index} className="flex items-start gap-3">
-                                            <i className="ri-check-line text-green-500 font-bold mt-1"></i>
+                                            <RiCheckLine className="text-green-500 font-bold mt-1" />
                                             <span className="text-slate-700 font-medium text-sm">{service}</span>
                                         </div>
                                     ))}
@@ -429,7 +421,7 @@ const CityLandingPage = () => {
                         </FadeIn>
 
                         {/* Visual Content - Professional "Tech Specs" Look */}
-                        <FadeIn delay={0.2} className="lg:w-1/2 w-full">
+                        <FadeIn {...FADE_IN_MINIMAL} delay={0.2} className="lg:w-1/2 w-full">
                             <div className="relative rounded-[2.5rem] overflow-hidden shadow-2xl bg-slate-900 min-h-[500px] border-4 border-white">
                                 <img
                                     src="https://images.unsplash.com/photo-1486406146926-c627a92ad1ab?auto=format&fit=crop&q=80&w=1200&fm=webp"
@@ -443,7 +435,7 @@ const CityLandingPage = () => {
                                     <div className="bg-white border border-slate-200 bg-white/10 backdrop-blur-md rounded-2xl p-6 border border-white/10">
                                         <div className="flex items-center gap-4 mb-4">
                                             <div className="w-12 h-12 rounded-full bg-blue-600 flex items-center justify-center text-white shadow-lg shadow-lg">
-                                                <i className="ri-global-line text-2xl"></i>
+                                                <RiGlobalLine className="text-2xl" />
                                             </div>
                                             <div>
                                                 <p className="font-bold text-white text-lg">Global Standards</p>
@@ -485,10 +477,10 @@ const CityLandingPage = () => {
 
                     <div className="grid md:grid-cols-2 gap-8">
                         {data.whyUs?.reasons.map((reason, idx) => (
-                            <FadeIn key={idx} delay={idx * 0.1} className="group p-8 rounded-[2rem] bg-white border border-slate-100 hover:shadow-xl hover:shadow-lg hover:-translate-y-1 transition-all duration-300">
+                            <FadeIn {...FADE_IN_MINIMAL} key={idx} delay={idx * 0.1} className="group p-8 rounded-[2rem] bg-white border border-slate-100 hover:shadow-xl hover:shadow-lg hover:-translate-y-1 transition-all duration-300">
                                 <div className="flex gap-6 items-start">
                                     <div className="w-16 h-16 rounded-2xl bg-slate-50 flex items-center justify-center text-3xl text-[#2563EB] group-hover:bg-[#2563EB] group-hover:text-white transition-all duration-300 shrink-0">
-                                        <i className={reason.icon}></i>
+                                        <Icon name={reason.icon} />
                                     </div>
                                     <div>
                                         <h4 className="text-xl font-bold text-slate-900 mb-3">{reason.title}</h4>
@@ -512,7 +504,7 @@ const CityLandingPage = () => {
                     <h2 className="text-5xl md:text-6xl font-bold mb-8 tracking-tight">
                         Ready to Build in {data.city}?
                     </h2>
-                    <p className="text-xl text-slate-400 mb-12 max-w-2xl mx-auto leading-relaxed">
+                    <p className="text-xl text-slate-500 mb-12 max-w-2xl mx-auto leading-relaxed">
                         Join the hundreds of successful businesses that trust Nexspire for their mission-critical software.
                     </p>
                     <div className="flex flex-col sm:flex-row gap-6 justify-center">
@@ -521,7 +513,7 @@ const CityLandingPage = () => {
                             className="inline-flex items-center justify-center gap-4 px-10 py-5 bg-blue-600 text-white rounded-full text-lg font-bold hover:bg-[#F8FAFC]0 shadow-lg hover:shadow-lg transition-all duration-300 "
                         >
                             Start Your Project
-                            <i className="ri-arrow-right-line"></i>
+                            <RiArrowRightLine />
                         </Link>
                         <Link
                             to="/services"

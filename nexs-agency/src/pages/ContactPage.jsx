@@ -1,26 +1,15 @@
 // TODO: Replace console.error with Sentry or proper error tracking
 import { useState } from 'react';
 import { Helmet } from 'react-helmet-async';
-// eslint-disable-next-line no-unused-vars
 import { motion, AnimatePresence } from 'framer-motion';
-import confetti from 'canvas-confetti';
 import { inquiryAPI } from '../services/api';
+import FadeIn from '../components/ui/FadeIn';
 import ReadingProgress from '../components/ui/ReadingProgress';
-import { SITE_URL } from '../constants/siteConfig';
+import { SITE_URL, siteConfig } from '../constants/siteConfig';
+import Icon from '../components/ui/Icon';
+import { RiCheckLine, RiErrorWarningLine, RiLoader4Line, RiMailSendLine, RiMapPinLine, RiPhoneLine, RiSendPlaneFill } from 'react-icons/ri';
 
-const FadeIn = ({ children, className, delay = 0 }) => {
-    return (
-        <motion.div
-            initial={{ opacity: 0, y: 20 }}
-            whileInView={{ opacity: 1, y: 0 }}
-            viewport={{ once: true, margin: "-50px" }}
-            transition={{ duration: 0.7, delay, ease: [0.21, 0.47, 0.32, 0.98] }}
-            className={className}
-        >
-            {children}
-        </motion.div>
-    );
-};
+const FADE_IN_SMOOTH = { duration: 0.7, ease: [0.21, 0.47, 0.32, 0.98] };
 
 const ContactPage = () => {
 
@@ -56,11 +45,13 @@ const ContactPage = () => {
 
             setIsSubmitting(false);
             setIsSuccess(true);
-            confetti({
-                particleCount: 150,
-                spread: 70,
-                origin: { y: 0.6 },
-                colors: ['#3B82F6', '#8B5CF6', '#10B981']
+            import('canvas-confetti').then(({ default: confetti }) => {
+                confetti({
+                    particleCount: 150,
+                    spread: 70,
+                    origin: { y: 0.6 },
+                    colors: ['#3B82F6', '#8B5CF6', '#10B981']
+                });
             });
         } catch (err) {
             console.error('Form submission error:', err);
@@ -191,7 +182,7 @@ const ContactPage = () => {
                             <div className="space-y-10">
                                 <div className="flex items-start gap-6 group">
                                     <div className="w-14 h-14 rounded-2xl bg-white/10 backdrop-blur-md flex items-center justify-center text-white group-hover:bg-white group-hover:text-[#2563EB] transition-all duration-300 shadow-lg">
-                                        <i className="ri-mail-send-line text-2xl"></i>
+                                        <RiMailSendLine className="text-2xl" />
                                     </div>
                                     <div>
                                         <h3 className="font-bold text-xl mb-1">Email Us</h3>
@@ -201,7 +192,7 @@ const ContactPage = () => {
 
                                 <div className="flex items-start gap-6 group">
                                     <div className="w-14 h-14 rounded-2xl bg-white/10 backdrop-blur-md flex items-center justify-center text-white group-hover:bg-white group-hover:text-[#2563EB] transition-all duration-300 shadow-lg">
-                                        <i className="ri-phone-line text-2xl"></i>
+                                        <RiPhoneLine className="text-2xl" />
                                     </div>
                                     <div>
                                         <h3 className="font-bold text-xl mb-1">Call Us</h3>
@@ -212,7 +203,7 @@ const ContactPage = () => {
 
                                 <div className="flex items-start gap-6 group">
                                     <div className="w-14 h-14 rounded-2xl bg-white/10 backdrop-blur-md flex items-center justify-center text-white group-hover:bg-white group-hover:text-[#2563EB] transition-all duration-300 shadow-lg">
-                                        <i className="ri-map-pin-line text-2xl"></i>
+                                        <RiMapPinLine className="text-2xl" />
                                     </div>
                                     <div>
                                         <h3 className="font-bold text-xl mb-1">Visit Us</h3>
@@ -226,13 +217,9 @@ const ContactPage = () => {
                         <div className="relative z-10 mt-12">
                             <p className="text-blue-200 mb-6 font-medium">Connect with us</p>
                             <div className="flex gap-4">
-                                {[
-                                    { icon: 'ri-github-fill', href: 'https://github.com/orgs/Nexspire-Solutions/repositories', label: 'GitHub' },
-                                    { icon: 'ri-linkedin-fill', href: 'https://www.linkedin.com/company/nexspire-solution', label: 'LinkedIn' },
-                                    { icon: 'ri-instagram-fill', href: 'https://www.instagram.com/nexspire_solutions/', label: 'Instagram' }
-                                ].map((social, i) => (
-                                    <a key={i} href={social.href} target="_blank" rel="noopener noreferrer" aria-label={social.label} className="w-12 h-12 rounded-full border border-white/20 flex items-center justify-center hover:bg-white hover:text-blue-900 transition-all transform  hover:shadow-lg backdrop-blur-sm">
-                                        <i className={`${social.icon} text-xl`}></i>
+                                {siteConfig.social.map((social) => (
+                                    <a key={social.label} href={social.href} target="_blank" rel="noopener noreferrer" aria-label={social.label} className="w-12 h-12 rounded-full border border-white/20 flex items-center justify-center hover:bg-white hover:text-blue-900 transition-all transform  hover:shadow-lg backdrop-blur-sm">
+                                        <Icon name={social.iconFill} className="text-xl" />
                                     </a>
                                 ))}
                             </div>
@@ -250,7 +237,7 @@ const ContactPage = () => {
                                     className="text-center py-20"
                                 >
                                     <div className="w-24 h-24 bg-green-100 text-green-600 rounded-full flex items-center justify-center mx-auto mb-8 animate-bounce">
-                                        <i className="ri-check-line text-5xl"></i>
+                                        <RiCheckLine className="text-5xl" />
                                     </div>
                                     <h2 className="text-4xl font-bold text-slate-800 mb-4">Message Sent!</h2>
                                     <p className="text-xl text-slate-500 mb-12">
@@ -274,8 +261,9 @@ const ContactPage = () => {
 
                                     <form onSubmit={handleSubmit} className="space-y-8">
                                         <div className="space-y-2 group">
-                                            <label className="text-xs font-bold text-slate-500 uppercase tracking-widest group-focus-within:text-[#2563EB] transition-colors">Full Name</label>
+                                            <label htmlFor="contact-name" className="text-xs font-bold text-slate-500 uppercase tracking-widest group-focus-within:text-[#2563EB] transition-colors">Full Name</label>
                                             <input
+                                                id="contact-name"
                                                 type="text"
                                                 name="name"
                                                 value={formState.name}
@@ -289,8 +277,9 @@ const ContactPage = () => {
                                         </div>
 
                                         <div className="space-y-2 group">
-                                            <label className="text-xs font-bold text-slate-500 uppercase tracking-widest group-focus-within:text-[#2563EB] transition-colors">Email Address</label>
+                                            <label htmlFor="contact-email" className="text-xs font-bold text-slate-500 uppercase tracking-widest group-focus-within:text-[#2563EB] transition-colors">Email Address</label>
                                             <input
+                                                id="contact-email"
                                                 type="email"
                                                 name="email"
                                                 value={formState.email}
@@ -303,8 +292,9 @@ const ContactPage = () => {
 
                                         <div className="grid md:grid-cols-2 gap-8">
                                             <div className="space-y-2 group">
-                                                <label className="text-xs font-bold text-slate-500 uppercase tracking-widest group-focus-within:text-[#2563EB] transition-colors">Phone (Optional)</label>
+                                                <label htmlFor="contact-phone" className="text-xs font-bold text-slate-500 uppercase tracking-widest group-focus-within:text-[#2563EB] transition-colors">Phone (Optional)</label>
                                                 <input
+                                                    id="contact-phone"
                                                     type="tel"
                                                     name="phone"
                                                     value={formState.phone}
@@ -314,8 +304,9 @@ const ContactPage = () => {
                                                 />
                                             </div>
                                             <div className="space-y-2 group">
-                                                <label className="text-xs font-bold text-slate-500 uppercase tracking-widest group-focus-within:text-[#2563EB] transition-colors">Company (Optional)</label>
+                                                <label htmlFor="contact-company" className="text-xs font-bold text-slate-500 uppercase tracking-widest group-focus-within:text-[#2563EB] transition-colors">Company (Optional)</label>
                                                 <input
+                                                    id="contact-company"
                                                     type="text"
                                                     name="company"
                                                     value={formState.company}
@@ -328,8 +319,9 @@ const ContactPage = () => {
                                         </div>
 
                                         <div className="space-y-2 group">
-                                            <label className="text-xs font-bold text-slate-500 uppercase tracking-widest group-focus-within:text-[#2563EB] transition-colors">Message</label>
+                                            <label htmlFor="contact-message" className="text-xs font-bold text-slate-500 uppercase tracking-widest group-focus-within:text-[#2563EB] transition-colors">Message</label>
                                             <textarea
+                                                id="contact-message"
                                                 name="message"
                                                 value={formState.message}
                                                 onChange={handleChange}
@@ -346,7 +338,7 @@ const ContactPage = () => {
                                         {error && (
                                             <div className="bg-red-50 border border-red-200 text-red-700 px-4 py-3 rounded-lg text-sm">
                                                 <div className="flex items-center">
-                                                    <i className="ri-error-warning-line mr-2"></i>
+                                                    <RiErrorWarningLine className="mr-2" />
                                                     <span>{error}</span>
                                                 </div>
                                             </div>
@@ -358,13 +350,13 @@ const ContactPage = () => {
                                         >
                                             {isSubmitting ? (
                                                 <span className="flex items-center gap-2">
-                                                    <i className="ri-loader-4-line animate-spin text-xl"></i>
+                                                    <RiLoader4Line className="animate-spin text-xl" />
                                                     Sending...
                                                 </span>
                                             ) : (
                                                 <span className="flex items-center gap-2">
                                                     Send Message
-                                                    <i className="ri-send-plane-fill"></i>
+                                                    <RiSendPlaneFill />
                                                 </span>
                                             )}
                                         </button>
@@ -378,7 +370,7 @@ const ContactPage = () => {
 
             {/* FAQ Section */}
             <section className="py-24 max-w-4xl mx-auto px-4 sm:px-6 lg:px-8">
-                <FadeIn>
+                <FadeIn {...FADE_IN_SMOOTH}>
                     <h2 className="text-3xl font-bold text-center mb-12">Before you ask...</h2>
                     <div className="grid gap-6">
                         {faqs.map((faq, index) => (
@@ -387,7 +379,7 @@ const ContactPage = () => {
                                 whileInView={{ opacity: 1, y: 0 }}
                                 viewport={{ once: true }}
                                 transition={{ delay: index * 0.1 }}
-                                key={index}
+                                key={faq.question}
                                 className="bg-white p-8 rounded-2xl shadow-sm border border-slate-200 hover:shadow-lg hover:border-slate-200 transition-all duration-300"
                             >
                                 <h3 className="text-lg font-bold text-slate-800 mb-2">{faq.question}</h3>

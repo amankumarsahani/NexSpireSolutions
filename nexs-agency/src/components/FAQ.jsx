@@ -1,12 +1,8 @@
-import { useState, useEffect, memo } from 'react'
+import { useState, memo } from 'react'
+import { RiArrowDownSLine, RiArrowRightLine, RiPhoneLine, RiQuestionLine, RiThumbUpLine } from 'react-icons/ri';
 
 const FAQ = memo(function FAQ() {
   const [openFAQ, setOpenFAQ] = useState(0)
-  const [isVisible, setIsVisible] = useState(false)
-
-  useEffect(() => {
-    setIsVisible(true)
-  }, [])
 
   const faqs = [
     {
@@ -69,9 +65,7 @@ const FAQ = memo(function FAQ() {
     <section id="faq" className="relative py-20 bg-white overflow-hidden">
 
       <div className="relative z-10 max-w-5xl mx-auto px-4 sm:px-6 lg:px-8">
-        <div className={`text-center mb-16 transition-all duration-1000 transform ${
-          isVisible ? 'translate-y-0 opacity-100' : 'translate-y-8 opacity-0'
-        }`}>
+        <div className="text-center mb-16 transition-all duration-1000 transform translate-y-0 opacity-100">
           <span className="text-sm font-semibold text-[#2563EB] uppercase tracking-wider">Frequently Asked Questions</span>
           <h2 className="text-3xl md:text-4xl font-bold text-slate-800 mb-6 mt-4 leading-tight tracking-tight">
             Got Questions?
@@ -84,9 +78,7 @@ const FAQ = memo(function FAQ() {
           </p>
         </div>
         
-        <div className={`mb-16 transition-all duration-1000 delay-300 transform ${
-          isVisible ? 'translate-y-0 opacity-100' : 'translate-y-8 opacity-0'
-        }`}>
+        <div className="mb-16 transition-all duration-1000 delay-300 transform translate-y-0 opacity-100">
           
           <div className="max-w-4xl mx-auto space-y-3">
             {faqs.map((faq, index) => (
@@ -110,7 +102,7 @@ const FAQ = memo(function FAQ() {
                     
                     <div className={`transition-all duration-300 ${openFAQ === index ? 'rotate-180' : ''}`}>
                       <div className="w-8 h-8 bg-slate-100 rounded-lg flex items-center justify-center group-hover:bg-[#2563EB]/10 transition-colors duration-300">
-                        <i className="ri-arrow-down-s-line text-slate-600 group-hover:text-[#2563EB]"></i>
+                        <RiArrowDownSLine className="text-slate-600 group-hover:text-[#2563EB]" />
                       </div>
                     </div>
                   </button>
@@ -125,7 +117,7 @@ const FAQ = memo(function FAQ() {
                         
                         <div className="flex justify-between items-center">
                           <button className="text-green-600 hover:text-green-700 text-sm font-medium flex items-center transition-colors">
-                            <i className="ri-thumb-up-line mr-2"></i>
+                            <RiThumbUpLine className="mr-2" />
                             Helpful
                           </button>
                           <a 
@@ -148,9 +140,7 @@ const FAQ = memo(function FAQ() {
           </div>
         </div>
         
-        <div className={`transition-all duration-1000 delay-700 transform ${
-          isVisible ? 'translate-y-0 opacity-100' : 'translate-y-8 opacity-0'
-        }`}>
+        <div className="transition-all duration-1000 delay-700 transform translate-y-0 opacity-100">
           <div className="relative bg-[#2563EB] rounded-3xl p-8 md:p-12 text-center text-white overflow-hidden shadow-xl">
             <div className="absolute inset-0 opacity-10">
               <svg className="w-full h-full" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 100 100">
@@ -166,7 +156,7 @@ const FAQ = memo(function FAQ() {
             
             <div className="relative z-10">
               <div className="w-16 h-16 bg-white/20 rounded-2xl flex items-center justify-center mx-auto mb-6">
-                <i className="ri-question-line text-2xl text-white"></i>
+                <RiQuestionLine className="text-2xl text-white" />
               </div>
               <h3 className="text-3xl font-bold mb-4">
                 Still Have Questions?
@@ -181,7 +171,7 @@ const FAQ = memo(function FAQ() {
                 >
                   <span className="relative z-10 flex items-center justify-center">
                     Contact Us
-                    <i className="ri-arrow-right-line ml-2 group-hover:translate-x-1 transition-transform duration-300"></i>
+                    <RiArrowRightLine className="ml-2 group-hover:translate-x-1 transition-transform duration-300" />
                   </span>
                 </a>
                 <a
@@ -189,7 +179,7 @@ const FAQ = memo(function FAQ() {
                   className="group relative bg-white text-[#2563EB] px-8 py-4 rounded-2xl font-semibold hover:shadow-xl transition-all duration-300 cursor-pointer whitespace-nowrap"
                 >
                   <span className="flex items-center justify-center">
-                    <i className="ri-phone-line mr-2"></i>
+                    <RiPhoneLine className="mr-2" />
                     Call Us Now
                   </span>
                 </a>

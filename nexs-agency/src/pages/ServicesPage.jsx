@@ -1,15 +1,17 @@
 import { Link } from 'react-router-dom';
 import { Helmet } from 'react-helmet-async';
-// eslint-disable-next-line no-unused-vars
 import { motion } from 'framer-motion';
 import RelatedServices from '../components/seo/RelatedServices';
 import AreasWeServe from '../components/seo/AreasWeServe';
 import ProcessSection from '../components/ProcessSection';
 import ClientLogos from '../components/ClientLogos';
+import FadeIn from '../components/ui/FadeIn';
 import Breadcrumbs from '../components/ui/Breadcrumbs';
 import BackToTop from '../components/ui/BackToTop';
 import ReadingProgress from '../components/ui/ReadingProgress';
 import { SITE_URL } from '../constants/siteConfig';
+import Icon from '../components/ui/Icon';
+import { RiArrowRightLine } from 'react-icons/ri';
 
 // Refined Premium Styles
 const serviceStyles = {
@@ -50,18 +52,6 @@ const serviceStyles = {
     }
 };
 
-const FadeIn = ({ children, className, delay = 0 }) => (
-    <motion.div
-        initial={{ opacity: 0, y: 20 }}
-        whileInView={{ opacity: 1, y: 0 }}
-        viewport={{ once: true, margin: "-50px" }}
-        transition={{ duration: 0.6, delay, ease: "easeOut" }}
-        className={className}
-    >
-        {children}
-    </motion.div>
-);
-
 const ServiceCard = ({ service, index }) => {
     const styles = serviceStyles[service.color] || serviceStyles.blue;
 
@@ -80,7 +70,7 @@ const ServiceCard = ({ service, index }) => {
                 {/* Icon Container */}
                 <div className="relative mb-8 inline-block">
                     <div className={`relative z-10 w-20 h-20 rounded-2xl ${styles.bg} flex items-center justify-center text-3xl ${styles.icon} transition-transform duration-500 group- group-hover:rotate-3 shadow-sm`}>
-                        <i className={service.icon}></i>
+                        <Icon name={service.icon} />
                     </div>
                     <div className={`absolute inset-0 bg-gradient-to-br ${styles.gradient} opacity-20 blur-xl rounded-2xl transform scale-0 group-hover:scale-125 transition-transform duration-500`}></div>
                 </div>
@@ -121,7 +111,7 @@ const ServiceCard = ({ service, index }) => {
                             Explore Service
                         </span>
                         <div className={`w-8 h-8 rounded-full flex items-center justify-center bg-[#F8FAFC] group-hover/btn:bg-gray-100 transition-colors`}>
-                            <i className={`ri-arrow-right-line ${styles.text} group-hover/btn:translate-x-1 transition-transform`}></i>
+                            <RiArrowRightLine className={`${styles.text} group-hover/btn:translate-x-1 transition-transform`} />
                         </div>
                     </div>
                 </div>
@@ -312,7 +302,7 @@ const ServicesPage = () => {
             {/* Tech Stack Marquee */}
             <section className="py-20 bg-slate-50 border-y border-slate-100 overflow-hidden">
                 <div className="text-center mb-10">
-                    <h2 className="text-lg font-semibold text-slate-400 uppercase tracking-widest">Trusted Technology Stack</h2>
+                    <h2 className="text-lg font-semibold text-slate-500 uppercase tracking-widest">Trusted Technology Stack</h2>
                 </div>
                 <div className="flex animate-marquee gap-16 whitespace-nowrap opacity-50 hover:opacity-80 transition-opacity">
                     {[
@@ -356,7 +346,7 @@ const ServicesPage = () => {
                     </p>
                     <Link to="/contact" className="group inline-flex items-center gap-3 px-10 py-5 bg-white text-slate-900 rounded-full text-lg font-bold transition-all  shadow-2xl hover:shadow-white/20">
                         Get Your Free Quote
-                        <i className="ri-arrow-right-line group-hover:translate-x-1 transition-transform"></i>
+                        <RiArrowRightLine className="group-hover:translate-x-1 transition-transform" />
                     </Link>
                 </div>
             </section>

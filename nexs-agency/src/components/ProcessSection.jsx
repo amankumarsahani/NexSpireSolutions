@@ -1,6 +1,7 @@
 import { memo } from 'react';
-// eslint-disable-next-line no-unused-vars
 import { motion } from 'framer-motion';
+import Icon from './ui/Icon';
+import { RiArrowRightLine } from 'react-icons/ri';
 
 const steps = [
     {
@@ -65,7 +66,7 @@ const ProcessSection = memo(function ProcessSection({ className = '' }) {
                                 <div className="bg-white rounded-2xl p-8 shadow-sm hover:shadow-xl transition-all duration-500 border border-slate-200 text-center h-full">
                                     {/* Step Number Badge */}
                                     <div className={`w-16 h-16 rounded-2xl bg-[#2563EB] flex items-center justify-center mx-auto mb-6 text-white text-2xl shadow-lg group- transition-transform duration-500`}>
-                                        <i className={step.icon}></i>
+                                        <Icon name={step.icon} />
                                     </div>
 
                                     <span className="text-sm font-bold text-[#2563EB]">
@@ -84,7 +85,7 @@ const ProcessSection = memo(function ProcessSection({ className = '' }) {
                                 {/* Arrow for desktop */}
                                 {index < steps.length - 1 && (
                                     <div className="hidden lg:block absolute top-1/2 -right-4 transform -translate-y-1/2 text-gray-300 z-20">
-                                        <i className="ri-arrow-right-line text-2xl"></i>
+                                        <RiArrowRightLine className="text-2xl" />
                                     </div>
                                 )}
                             </motion.div>

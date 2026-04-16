@@ -1,13 +1,9 @@
-import { useState, useEffect, useMemo, memo } from 'react'
+import { useState, useMemo, memo } from 'react'
 import { Link } from 'react-router-dom'
+import { RiArrowRightLine, RiEyeLine } from 'react-icons/ri';
 
 const Portfolio = memo(function Portfolio() {
   const [activeCategory, setActiveCategory] = useState("All")
-  const [isVisible, setIsVisible] = useState(false)
-
-  useEffect(() => {
-    setIsVisible(true)
-  }, [])
 
   const projects = [
     {
@@ -72,8 +68,7 @@ const Portfolio = memo(function Portfolio() {
     <section id="portfolio" className="relative py-12 sm:py-16 lg:py-20 bg-slate-50 overflow-hidden">
 
       <div className="relative z-10 max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-        <div className={`text-left mb-8 sm:mb-12 lg:mb-16 transition-all duration-1000 transform ${isVisible ? 'translate-y-0 opacity-100' : 'translate-y-8 opacity-0'
-          }`}>
+        <div className="text-left mb-8 sm:mb-12 lg:mb-16 transition-all duration-1000 transform translate-y-0 opacity-100">
           <span className="text-sm font-semibold text-[#2563EB] uppercase tracking-wider">Our Portfolio</span>
           <h2 className="text-2xl sm:text-3xl md:text-4xl font-bold text-slate-800 mb-4 sm:mb-6 mt-4 leading-tight tracking-tight">
             Showcasing Our
@@ -86,8 +81,7 @@ const Portfolio = memo(function Portfolio() {
           </p>
         </div>
 
-        <div className={`flex flex-wrap justify-center gap-2 sm:gap-3 mb-8 sm:mb-12 lg:mb-16 transition-all duration-1000 delay-300 transform ${isVisible ? 'translate-y-0 opacity-100' : 'translate-y-8 opacity-0'
-          }`}>
+        <div className="flex flex-wrap justify-center gap-2 sm:gap-3 mb-8 sm:mb-12 lg:mb-16 transition-all duration-1000 delay-300 transform translate-y-0 opacity-100">
           {categories.map((category, index) => (
             <button
               key={index}
@@ -102,8 +96,7 @@ const Portfolio = memo(function Portfolio() {
           ))}
         </div>
 
-        <div className={`grid sm:grid-cols-2 lg:grid-cols-3 gap-4 sm:gap-6 lg:gap-8 mb-8 sm:mb-12 lg:mb-16 transition-all duration-1000 delay-500 transform ${isVisible ? 'translate-y-0 opacity-100' : 'translate-y-8 opacity-0'
-          }`}>
+        <div className="grid sm:grid-cols-2 lg:grid-cols-3 gap-4 sm:gap-6 lg:gap-8 mb-8 sm:mb-12 lg:mb-16 transition-all duration-1000 delay-500 transform translate-y-0 opacity-100">
           {filteredProjects.map((project, index) => (
             <div key={index} className="group relative">
               <div className="relative bg-white rounded-2xl overflow-hidden shadow-lg border border-slate-200 hover:shadow-xl transition-all duration-300 hover:-translate-y-1">
@@ -123,7 +116,7 @@ const Portfolio = memo(function Portfolio() {
                       to={`/portfolio/${project.slug}`}
                       className="w-12 h-12 bg-white/90 rounded-full flex items-center justify-center hover:bg-white transition-all duration-300 shadow-lg text-[#9333EA]"
                     >
-                      <i className="ri-eye-line text-xl"></i>
+                      <RiEyeLine className="text-xl" />
                     </Link>
                   </div>
 
@@ -164,12 +157,11 @@ const Portfolio = memo(function Portfolio() {
           ))}
         </div>
 
-        <div className={`text-center transition-all duration-1000 delay-700 transform ${isVisible ? 'translate-y-0 opacity-100' : 'translate-y-8 opacity-0'
-          }`}>
+        <div className="text-center transition-all duration-1000 delay-700 transform translate-y-0 opacity-100">
           <Link to="/portfolio" className="group relative inline-block bg-[#2563EB] hover:bg-[#1D4ED8] text-white px-10 py-4 rounded-2xl font-bold shadow-lg transition-all duration-300 overflow-hidden">
             <span className="relative z-10 flex items-center">
               View More Projects
-              <i className="ri-arrow-right-line ml-2 group-hover:translate-x-1 transition-transform duration-300"></i>
+              <RiArrowRightLine className="ml-2 group-hover:translate-x-1 transition-transform duration-300" />
             </span>
           </Link>
         </div>

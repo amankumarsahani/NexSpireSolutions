@@ -1,6 +1,6 @@
 import { memo } from 'react';
-// eslint-disable-next-line no-unused-vars
 import { motion } from 'framer-motion';
+import Icon from './ui/Icon';
 
 const milestones = [
     {
@@ -41,11 +41,11 @@ const milestones = [
 ];
 
 const colorMap = {
-    blue: { bg: 'bg-[#2563EB]/10', text: 'text-[#2563EB]', border: 'border-[#2563EB]' },
-    purple: { bg: 'bg-[#D97706]/10', text: 'text-[#D97706]', border: 'border-[#D97706]' },
-    emerald: { bg: 'bg-emerald-100', text: 'text-emerald-600', border: 'border-emerald-500' },
-    orange: { bg: 'bg-orange-100', text: 'text-orange-600', border: 'border-orange-500' },
-    pink: { bg: 'bg-pink-100', text: 'text-pink-600', border: 'border-pink-500' }
+    blue: { bg: 'bg-[#2563EB]/10', text: 'text-[#2563EB]', border: 'border-[#2563EB]', borderHex: '#2563EB' },
+    purple: { bg: 'bg-[#D97706]/10', text: 'text-[#D97706]', border: 'border-[#D97706]', borderHex: '#D97706' },
+    emerald: { bg: 'bg-emerald-100', text: 'text-emerald-600', border: 'border-emerald-500', borderHex: '#10b981' },
+    orange: { bg: 'bg-orange-100', text: 'text-orange-600', border: 'border-orange-500', borderHex: '#f97316' },
+    pink: { bg: 'bg-pink-100', text: 'text-pink-600', border: 'border-pink-500', borderHex: '#ec4899' }
 };
 
 const Timeline = memo(function Timeline({ className = '' }) {
@@ -100,10 +100,10 @@ const Timeline = memo(function Timeline({ className = '' }) {
 
                                     {/* Center Icon */}
                                     <div className="hidden md:flex absolute left-1/2 transform -translate-x-1/2 w-14 h-14 rounded-2xl bg-white shadow-lg border-2 items-center justify-center z-10"
-                                        style={{ borderColor: colors.border.replace('border-', '#').replace('-500', '') }}
+                                         style={{ borderColor: colors.borderHex }}
                                     >
                                         <div className={`w-10 h-10 rounded-xl ${colors.bg} flex items-center justify-center`}>
-                                            <i className={`${milestone.icon} text-xl ${colors.text}`}></i>
+                                            <Icon name={milestone.icon} className={`text-xl ${colors.text}`} />
                                         </div>
                                     </div>
 
