@@ -216,9 +216,9 @@ const BlogPage = () => {
                             <div className="flex items-center gap-8 text-sm text-slate-500 font-medium">
                                 <div className="flex items-center gap-3">
                                     <div className="w-10 h-10 rounded-full bg-[#2563EB] flex items-center justify-center text-white font-bold text-lg">
-                                        {featuredPost.author.charAt(0)}
+                                        {(featuredPost.author || 'A').charAt(0)}
                                     </div>
-                                    <span className="text-white">{featuredPost.author}</span>
+                                    <span className="text-white">{featuredPost.author || 'Admin'}</span>
                                 </div>
                                 <div className="flex items-center gap-2">
                                     <RiCalendarLine />
@@ -330,9 +330,9 @@ const BlogPage = () => {
                                         <div className="flex items-center justify-between pt-6 border-t border-slate-200 mt-auto">
                                             <div className="flex items-center gap-2">
                                                 <div className="w-8 h-8 rounded-full bg-gray-100 flex items-center justify-center text-slate-600 font-bold text-xs">
-                                                    {post.author.charAt(0)}
+                                                    {(post.author || 'A').charAt(0)}
                                                 </div>
-                                                <span className="text-sm font-bold text-slate-800">{post.author}</span>
+                                                <span className="text-sm font-bold text-slate-800">{post.author || 'Admin'}</span>
                                             </div>
                                             <button className="text-[#2563EB] font-bold text-sm group-hover:translate-x-1 transition-transform flex items-center gap-1">
                                                 Read Article <RiArrowRightLine />

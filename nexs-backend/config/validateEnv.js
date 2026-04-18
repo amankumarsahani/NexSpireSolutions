@@ -16,7 +16,7 @@ const validateEnv = () => {
     if (!process.env.DB_USER) {
         required.push('DB_USER');
     }
-    if (!process.env.DB_PASSWORD) {
+    if (process.env.DB_PASSWORD === undefined) {
         required.push('DB_PASSWORD');
     }
     if (!process.env.DB_NAME) {
