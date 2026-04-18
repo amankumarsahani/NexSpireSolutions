@@ -6,8 +6,8 @@ export const siteConfig = {
         sales: 'sales@nexspire.com',
     },
     phone: {
-        primary: '+91 9729916844',
-        tel: '+919729916844',
+        primary: '+91 7696309551',
+        tel: '+917696309551',
     },
     domain: SITE_URL,
     social: [

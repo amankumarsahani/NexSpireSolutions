@@ -175,7 +175,7 @@ const FAQ = memo(function FAQ() {
                   </span>
                 </a>
                 <a
-                  href="tel:+919729916844"
+                  href="tel:+917696309551"
                   className="group relative bg-white text-[#2563EB] px-8 py-4 rounded-2xl font-semibold hover:shadow-xl transition-all duration-300 cursor-pointer whitespace-nowrap"
                 >
                   <span className="flex items-center justify-center">

@@ -85,7 +85,7 @@ const AboutPage = () => {
             "logo": `${SITE_URL}/og-image.jpg`,
             "description": "Top software development agency delivering web, mobile, AI, cloud, and enterprise solutions to clients globally.",
             "email": "nexspiretechsolutions@gmail.com",
-            "telephone": "+919729916844",
+            "telephone": "+917696309551, +917009614671",
             "foundingDate": "2020",
             "sameAs": siteConfig.socialUrls
         })}</script>
