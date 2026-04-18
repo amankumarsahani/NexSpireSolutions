@@ -1,6 +1,6 @@
 // TODO: Replace console.error with Sentry or proper error tracking
 import { useEffect, useState, useRef, useCallback } from 'react';
-import { Link } from 'react-router-dom';
+import { Link, useSearchParams } from 'react-router-dom';
 import { Helmet } from 'react-helmet-async';
 import { motion, AnimatePresence } from 'framer-motion';
 import { cn } from '../utils/cn';
@@ -10,23 +10,25 @@ import Breadcrumbs from '../components/ui/Breadcrumbs';
 import BackToTop from '../components/ui/BackToTop';
 import { SITE_URL, siteConfig } from '../constants/siteConfig';
 import Icon from '../components/ui/Icon';
-import { RiArrowRightLine, RiArticleLine, RiCalendarLine, RiSearchLine, RiShareCircleLine, RiTimeLine } from 'react-icons/ri';
+import { RiArrowRightLine, RiArticleLine, RiCalendarLine, RiSearchLine, RiShareCircleLine, RiTimeLine, RiEyeLine } from 'react-icons/ri';
 
 const FADE_IN_SMOOTH = { duration: 0.7, ease: [0.21, 0.47, 0.32, 0.98] };
 
 const POSTS_PER_PAGE = 6;
 
 const BlogPage = () => {
+    const [searchParams, setSearchParams] = useSearchParams();
     const [activeCategory, setActiveCategory] = useState('All');
+    const [activeTag, setActiveTag] = useState(searchParams.get('tag') || '');
     const [searchQuery, setSearchQuery] = useState('');
     const [allPosts, setAllPosts] = useState([]);
     const [displayedPosts, setDisplayedPosts] = useState([]);
     const [categories, setCategories] = useState(['All']);
+    const [allTags, setAllTags] = useState([]);
     const [loading, setLoading] = useState(true);
     const [loadingMore, setLoadingMore] = useState(false);
     const [hasMore, setHasMore] = useState(true);
     const [page, setPage] = useState(1);
-    // const [page, setPage] = useState(1);
     const loaderRef = useRef(null);
 
     useEffect(() => {
@@ -35,10 +37,14 @@ const BlogPage = () => {
         const loadBlogs = async () => {
             try {
                 setLoading(true);
-                const response = await blogAPI.getAll();
+                const [response, tagsResponse] = await Promise.all([
+                    blogAPI.getAll(),
+                    blogAPI.getTags().catch(() => ({ data: { tags: [] } }))
+                ]);
                 if (cancelled) return;
                 const blogs = response.data.blogs || [];
                 const apiCategories = response.data.categories || [];
+                setAllTags(tagsResponse.data?.tags || []);
 
                 const transformedPosts = blogs.map(blog => ({
                     id: blog.id,
@@ -52,9 +58,12 @@ const BlogPage = () => {
                         day: 'numeric'
                     }),
                     readTime: blog.readTime || '5 min read',
+                    viewCount: blog.viewCount || 0,
                     image: blog.imageUrl,
+                    imageAlt: blog.imageAlt || blog.title,
                     featured: blog.featured,
-                    slug: blog.slug
+                    slug: blog.slug,
+                    tags: blog.tags || []
                 }));
 
                 setAllPosts(transformedPosts);
@@ -78,9 +87,10 @@ const BlogPage = () => {
             const matchesCategory = activeCategory === 'All' || post.category === activeCategory;
             const matchesSearch = post.title.toLowerCase().includes(searchQuery.toLowerCase()) ||
                 (post.excerpt || '').toLowerCase().includes(searchQuery.toLowerCase());
-            return matchesCategory && matchesSearch;
+            const matchesTag = !activeTag || (post.tags && post.tags.some(t => t.toLowerCase() === activeTag.toLowerCase()));
+            return matchesCategory && matchesSearch && matchesTag;
         });
-    }, [allPosts, activeCategory, searchQuery]);
+    }, [allPosts, activeCategory, searchQuery, activeTag]);
 
     // Reset displayed posts when filter changes
     useEffect(() => {
@@ -88,7 +98,7 @@ const BlogPage = () => {
         setDisplayedPosts(filtered.slice(0, POSTS_PER_PAGE));
         setPage(1);
         setHasMore(filtered.length > POSTS_PER_PAGE);
-    }, [activeCategory, searchQuery, getFilteredPosts]);
+    }, [activeCategory, searchQuery, activeTag, getFilteredPosts]);
 
     // Load more posts
     const loadMorePosts = useCallback(() => {
@@ -246,6 +256,18 @@ const BlogPage = () => {
                                     </button>
                                 ))}
                             </div>
+                            {activeTag && (
+                                <div className="flex items-center gap-2 mt-4">
+                                    <span className="text-sm text-slate-500">Tag:</span>
+                                    <span className="inline-flex items-center gap-1 px-3 py-1 bg-blue-50 text-blue-600 text-sm font-medium rounded-full">
+                                        #{activeTag}
+                                        <button
+                                            onClick={() => { setActiveTag(''); setSearchParams({}); }}
+                                            className="ml-1 hover:text-blue-800"
+                                        >×</button>
+                                    </span>
+                                </div>
+                            )}
                         </FadeIn>
                     </div>
 
@@ -283,7 +305,7 @@ const BlogPage = () => {
                                     <div className="relative h-64 overflow-hidden">
                                         <img
                                             src={post.image}
-                                            alt={post.title}
+                                            alt={post.imageAlt || post.title}
                                             className="w-full h-full object-cover transition-transform duration-700 group-"
                                             loading="lazy"
                                         />

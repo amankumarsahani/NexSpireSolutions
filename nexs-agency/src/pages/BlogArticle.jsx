@@ -13,7 +13,7 @@ import AuthorBio from '../components/ui/AuthorBio';
 import BackToTop from '../components/ui/BackToTop';
 import TableOfContents, { addIdsToHeadings } from '../components/ui/TableOfContents';
 import { SITE_URL } from '../constants/siteConfig';
-import { RiTimeLine } from 'react-icons/ri';
+import { RiTimeLine, RiEyeLine } from 'react-icons/ri';
 
 const BlogArticle = () => {
     const { slug } = useParams();
@@ -31,14 +31,7 @@ const BlogArticle = () => {
                 const response = await blogAPI.getBySlug(slug);
                 if (cancelled) return;
                 setBlog(response.data.blog);
-
-                const allResponse = await blogAPI.getAll();
-                if (cancelled) return;
-                const allBlogs = allResponse.data.blogs || [];
-                const related = allBlogs
-                    .filter(b => b.slug !== slug && b.category === response.data.blog?.category)
-                    .slice(0, 3);
-                setRelatedPosts(related);
+                setRelatedPosts(response.data.related || []);
             } catch (err) {
                 if (!cancelled) {
                     console.error('Error loading blog:', err);
@@ -94,8 +87,11 @@ const BlogArticle = () => {
             }
         },
         "datePublished": blog.createdAt,
-        "description": blog.excerpt
+        "description": blog.metaDescription || blog.excerpt
     };
+
+    const ogImage = blog.ogImage || blog.imageUrl || `${SITE_URL}/og-image.jpg`;
+    const metaDesc = blog.metaDescription || blog.excerpt;
 
     const authorBios = {
         'Aman Kumar': {
@@ -123,16 +119,17 @@ const BlogArticle = () => {
         <div className="min-h-screen bg-white font-sans text-slate-800 selection:bg-blue-600 selection:text-white pt-20">
             <Helmet>
                 <title>{blog.title} | Nexspire Insights</title>
-                <meta name="description" content={blog.excerpt} />
+                <meta name="description" content={metaDesc} />
                 <link rel="canonical" href={`${SITE_URL}/blog/${blog.slug}`} />
                 <meta property="og:title" content={`${blog.title} | Nexspire Insights`} />
-                <meta property="og:description" content={blog.excerpt} />
+                <meta property="og:description" content={metaDesc} />
                 <meta property="og:type" content="article" />
                 <meta property="og:url" content={`${SITE_URL}/blog/${blog.slug}`} />
-                <meta property="og:image" content={`${SITE_URL}/og-image.jpg`} />
+                <meta property="og:image" content={ogImage} />
                 <meta name="twitter:card" content="summary_large_image" />
                 <meta name="twitter:title" content={`${blog.title} | Nexspire Insights`} />
-                <meta name="twitter:description" content={blog.excerpt} />
+                <meta name="twitter:description" content={metaDesc} />
+                <meta name="twitter:image" content={ogImage} />
                 <script type="application/ld+json">
                     {JSON.stringify(articleSchema)}
                 </script>
@@ -185,6 +182,15 @@ const BlogArticle = () => {
                                 </span>
                             </>
                         )}
+                        {blog.viewCount > 0 && (
+                            <>
+                                <span>•</span>
+                                <span className="flex items-center gap-1">
+                                    <RiEyeLine />
+                                    {blog.viewCount.toLocaleString()} views
+                                </span>
+                            </>
+                        )}
                     </div>
                 </div>
 
@@ -193,7 +199,7 @@ const BlogArticle = () => {
                     <div className="rounded-[2rem] overflow-hidden shadow-2xl mb-16 h-[500px]">
                         <img
                             src={blog.imageUrl}
-                            alt={blog.title}
+                            alt={blog.imageAlt || blog.title}
                             loading="lazy"
                             height={500}
                             className="w-full h-full object-cover"
@@ -211,6 +217,20 @@ const BlogArticle = () => {
                             className="prose prose-lg prose-blue max-w-none mb-16 prose-dropcap"
                             dangerouslySetInnerHTML={{ __html: DOMPurify.sanitize(addIdsToHeadings(blog.content), { ADD_ATTR: ['id', 'target'] }) }}
                         />
+
+                        {blog.tags && blog.tags.length > 0 && (
+                            <div className="flex flex-wrap gap-2 mb-8">
+                                {blog.tags.map(tag => (
+                                    <Link
+                                        key={tag}
+                                        to={`/blog?tag=${encodeURIComponent(tag)}`}
+                                        className="px-3 py-1 bg-slate-100 text-slate-600 text-sm rounded-full hover:bg-blue-50 hover:text-blue-600 transition-colors"
+                                    >
+                                        #{tag}
+                                    </Link>
+                                ))}
+                            </div>
+                        )}
 
                         {/* Social Share (Inline) */}
                         <div className="border-t border-b border-slate-200 py-6 mb-12">

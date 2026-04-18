@@ -9,6 +9,7 @@ const AIService = require('./ai.service');
 const AIBlogService = require('./aiBlog.service');
 const PDFService = require('./pdf.service');
 const DocumentTemplateModel = require('../models/document-template.model');
+const SEOIndexingService = require('./seoIndexing.service');
 
 class WorkflowEngine {
     constructor() {
@@ -36,7 +37,10 @@ class WorkflowEngine {
             ai_pick_topic: this.handleAIPickTopic.bind(this),
             ai_write_blog: this.handleAIWriteBlog.bind(this),
             ai_fetch_image: this.handleAIFetchImage.bind(this),
-            ai_post_blog: this.handleAIPostBlog.bind(this)
+            ai_post_blog: this.handleAIPostBlog.bind(this),
+
+            // SEO
+            index_url: this.handleIndexUrl.bind(this)
         };
     }
 
@@ -938,11 +942,13 @@ class WorkflowEngine {
         try {
             const result = await AIBlogService.postBlog(blogData);
             console.log(`[WorkflowEngine] Blog posted: ${result.title} (ID: ${result.id})`);
+            const siteUrl = await SEOIndexingService.getSiteUrl();
             return {
                 ...contextData,
                 blog_posted: true,
                 blog_id: result.id,
-                blog_slug: result.slug
+                blog_slug: result.slug,
+                blog_url: `${siteUrl}/blog/${result.slug}`
             };
         } catch (error) {
             console.error('[WorkflowEngine] Post blog error:', error.message);
@@ -950,6 +956,70 @@ class WorkflowEngine {
                 ...contextData,
                 blog_posted: false,
                 blog_error: error.message
+            };
+        }
+    }
+
+    async handleIndexUrl(node, contextData) {
+        console.log(`[WorkflowEngine] Executing Index URL node`);
+
+        let config = node.config || {};
+        if (typeof config === 'string') {
+            try { config = JSON.parse(config); } catch (e) { config = {}; }
+        }
+
+        const engines = config.engines || ['indexnow', 'google', 'websub'];
+        const siteUrl = await SEOIndexingService.getSiteUrl();
+
+        let urls = [];
+
+        if (config.url) {
+            let resolvedUrl = config.url;
+            for (const [key, value] of Object.entries(contextData)) {
+                resolvedUrl = resolvedUrl.replace(new RegExp(`{{${key}}}`, 'g'), value || '');
+            }
+            urls.push(resolvedUrl);
+        }
+
+        if (contextData.blog_url) urls.push(contextData.blog_url);
+        if (contextData.blog_slug && !contextData.blog_url) {
+            urls.push(`${siteUrl}/blog/${contextData.blog_slug}`);
+        }
+
+        if (config.additional_urls) {
+            const additional = Array.isArray(config.additional_urls) ? config.additional_urls : [config.additional_urls];
+            urls.push(...additional.map(u => {
+                if (u.startsWith('/')) return `${siteUrl}${u}`;
+                return u;
+            }));
+        }
+
+        urls = [...new Set(urls)].filter(Boolean);
+
+        if (urls.length === 0) {
+            console.log('[WorkflowEngine] Index URL: no URLs to submit');
+            return { ...contextData, indexed: false, index_reason: 'no_urls' };
+        }
+
+        try {
+            const result = await SEOIndexingService.notifyAll(urls, {
+                engines,
+                feedUrl: config.feed_url || `${siteUrl}/sitemap.xml`
+            });
+
+            console.log(`[WorkflowEngine] Indexed ${urls.length} URL(s): ${result.summary.succeeded}/${result.summary.total} engines succeeded`);
+            return {
+                ...contextData,
+                indexed: true,
+                indexed_urls: urls,
+                index_results: result.summary
+            };
+        } catch (error) {
+            console.error('[WorkflowEngine] Index URL error:', error.message);
+            return {
+                ...contextData,
+                indexed: false,
+                index_error: error.message
             };
         }
     }

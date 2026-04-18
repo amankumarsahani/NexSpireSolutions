@@ -1,4 +1,5 @@
 const BlogModel = require('../models/blog.model');
+const SEOIndexingService = require('../services/seoIndexing.service');
 
 const BlogController = {
     // Get all blogs (public)
@@ -46,7 +47,13 @@ const BlogController = {
                 return res.status(404).json({ error: 'Blog not found' });
             }
 
-            res.json({ success: true, blog });
+            BlogModel.incrementViewCount(blog.id).catch(() => {});
+
+            const related = await BlogModel.findRelated(
+                blog.id, blog.category, blog.keywords, 3
+            );
+
+            res.json({ success: true, blog, related });
         } catch (error) {
             console.error('Get blog error:', error);
             res.status(500).json({ error: 'Failed to fetch blog' });
@@ -72,7 +79,8 @@ const BlogController = {
     // Create blog (admin)
     async create(req, res) {
         try {
-            const { title, slug, excerpt, content, category, author, image, featured, status, read_time } = req.body;
+            const { title, slug, excerpt, meta_description, content, category, author,
+                    image, featured, status, read_time, keywords, tags, og_image, image_alt } = req.body;
 
             if (!title || !slug) {
                 return res.status(400).json({ error: 'Title and slug are required' });
@@ -82,16 +90,25 @@ const BlogController = {
                 title,
                 slug,
                 excerpt,
+                meta_description,
                 content,
                 category,
                 author,
                 image_url: image,
+                og_image: og_image || image,
+                image_alt,
                 featured,
                 status,
-                read_time
+                read_time,
+                keywords,
+                tags
             });
 
             const blog = await BlogModel.findById(blogId);
+
+            if (status === 'published') {
+                SEOIndexingService.notifyBlogPublished(blog.slug).catch(() => {});
+            }
 
             res.status(201).json({
                 success: true,
@@ -117,6 +134,10 @@ const BlogController = {
             }
 
             const updatedBlog = await BlogModel.update(req.params.id, req.body);
+
+            if (req.body.status === 'published' || blog.status === 'published') {
+                SEOIndexingService.notifyBlogPublished(updatedBlog.slug).catch(() => {});
+            }
 
             res.json({
                 success: true,

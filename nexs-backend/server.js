@@ -88,6 +88,13 @@ app.use(express.urlencoded({ limit: '100mb', extended: true })); // Parse URL-en
 // Static files (for uploaded documents)
 app.use('/uploads', express.static('uploads'));
 
+// IndexNow key verification
+const SEOIndexingService = require('./services/seoIndexing.service');
+app.get('/indexnow-key.txt', async (req, res) => {
+    const key = await SEOIndexingService.getIndexNowKey();
+    res.type('text/plain').send(key);
+});
+
 // Health check endpoint
 app.get('/health', (req, res) => {
     res.json({
