@@ -18,7 +18,7 @@ const TeamModel = {
                 params.push(filters.department);
             }
 
-            query += ' ORDER BY created_at DESC';
+            query += ' ORDER BY createdAt DESC';
 
             const limit = parseInt(filters.limit) || 10;
             const page = parseInt(filters.page) || 1;
@@ -177,7 +177,7 @@ const TeamModel = {
             `);
 
             const [recentMembers] = await pool.query(
-                'SELECT * FROM team_members ORDER BY created_at DESC LIMIT 5'
+                'SELECT * FROM team_members ORDER BY createdAt DESC LIMIT 5'
             );
 
             return {
