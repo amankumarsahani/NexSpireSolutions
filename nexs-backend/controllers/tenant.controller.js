@@ -793,11 +793,13 @@ class TenantController {
             let planBillingCycle = 'Monthly';
 
             if (tenant.plan_id) {
-                const [plans] = await pool.query('SELECT name, slug, price, billing_cycle FROM plans WHERE id = ?', [tenant.plan_id]);
+                const [plans] = await pool.query('SELECT name, slug, price_monthly, price_yearly FROM plans WHERE id = ?', [tenant.plan_id]);
                 if (plans.length) {
                     planName = plans[0].name || planName;
-                    planPrice = plans[0].price ? `INR ${plans[0].price}` : planPrice;
-                    planBillingCycle = plans[0].billing_cycle || planBillingCycle;
+                    const billingCycle = tenant.billing_cycle || 'monthly';
+                    const price = billingCycle === 'yearly' ? plans[0].price_yearly : plans[0].price_monthly;
+                    planPrice = price ? `INR ${price}` : planPrice;
+                    planBillingCycle = billingCycle === 'yearly' ? 'Yearly' : 'Monthly';
                 }
             }
 
