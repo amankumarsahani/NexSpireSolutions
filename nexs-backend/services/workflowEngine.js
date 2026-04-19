@@ -7,6 +7,8 @@ const db = require('../config/database');
 const EmailService = require('./email.service');
 const AIService = require('./ai.service');
 const AIBlogService = require('./aiBlog.service');
+const PDFService = require('./pdf.service');
+const DocumentTemplateModel = require('../models/document-template.model');
 
 class WorkflowEngine {
     constructor() {
@@ -442,11 +444,60 @@ class WorkflowEngine {
         // Final cleanup for HTML: convert actual newlines AND literal \n strings to <br />
         const htmlBody = body.replace(/\\n/g, '<br />').replace(/\n/g, '<br />');
 
+        // Build attachments — if document_slug is set, render that document as PDF and attach
+        const attachments = [];
+        if (config.document_slug) {
+            try {
+                const docTemplate = await DocumentTemplateModel.findBySlug(config.document_slug);
+                if (docTemplate) {
+                    // Build document variables from context
+                    const docVars = { ...contextData };
+                    const today = new Date().toLocaleDateString('en-IN', { year: 'numeric', month: 'long', day: 'numeric' });
+                    docVars.agreement_date = docVars.agreement_date || today;
+                    docVars.start_date = docVars.start_date || (contextData.created_at ? new Date(contextData.created_at).toLocaleDateString('en-IN') : today);
+                    docVars.tenant_name = docVars.tenant_name || contextData.owner_name || contextData.name || '';
+                    docVars.tenant_email = docVars.tenant_email || toEmail;
+                    docVars.tenant_company = docVars.tenant_company || contextData.business_name || contextData.name || '';
+                    docVars.tenant_slug = docVars.tenant_slug || contextData.slug || '';
+                    docVars.tenant_phone = docVars.tenant_phone || contextData.owner_phone || contextData.phone || '';
+                    docVars.plan_name = docVars.plan_name || config.plan_name || 'Standard';
+                    docVars.plan_price = docVars.plan_price || config.plan_price || 'As per agreement';
+                    docVars.plan_billing_cycle = docVars.plan_billing_cycle || config.billing_cycle || 'Monthly';
+                    docVars.trial_period = docVars.trial_period || (contextData.trial_days ? `${contextData.trial_days} days` : '14 days');
+
+                    const renderedDoc = DocumentTemplateModel.renderTemplate(docTemplate.content, docVars);
+                    const pdfBuffer = await PDFService.generateFromHtml(renderedDoc, {
+                        format: 'A4',
+                        margin: { top: '15mm', right: '15mm', bottom: '15mm', left: '15mm' },
+                        printBackground: true
+                    });
+
+                    const filename = config.attachment_filename
+                        ? config.attachment_filename.replace(/\{\{(\w+)\}\}/g, (_, k) => docVars[k] || '')
+                        : `NexSpire-${docTemplate.name.replace(/\s+/g, '-')}-${docVars.tenant_slug || 'document'}.pdf`;
+
+                    attachments.push({
+                        filename,
+                        content: pdfBuffer,
+                        contentType: 'application/pdf'
+                    });
+
+                    console.log(`[WorkflowEngine] PDF generated from document "${config.document_slug}"`);
+                } else {
+                    console.warn(`[WorkflowEngine] Document template "${config.document_slug}" not found, skipping attachment`);
+                }
+            } catch (pdfErr) {
+                console.error('[WorkflowEngine] PDF attachment error:', pdfErr.message);
+                // Continue sending email without attachment rather than failing the whole workflow
+            }
+        }
+
         // Send email
         await EmailService.sendEmail({
             to: toEmail,
             subject: subject,
-            html: htmlBody
+            html: htmlBody,
+            attachments
         });
 
         console.log(`[WorkflowEngine] Email sent to ${toEmail}`);

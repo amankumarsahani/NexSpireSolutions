@@ -351,6 +351,206 @@ const templates = [
     </div>
 </div>`,
         variables: ["contact_name", "company_name", "project_name", "start_date", "completion_date", "deliverables_completed", "handover_items", "access_credentials", "support_details", "support_email"]
+    },
+    {
+        name: 'Tenant Service Agreement',
+        slug: 'tenant-agreement',
+        description: 'Service agreement for NexCRM SaaS tenants',
+        category: 'legal',
+        isDefault: true,
+        content: `<div style="font-family: 'Segoe UI', Arial, sans-serif; max-width: 800px; margin: 0 auto; padding: 60px 50px; color: #1e293b; line-height: 1.7;">
+    <!-- Letterhead -->
+    <div style="border-bottom: 3px solid #4f46e5; padding-bottom: 30px; margin-bottom: 40px;">
+        <table style="width: 100%;">
+            <tr>
+                <td style="vertical-align: top;">
+                    <div style="width: 48px; height: 48px; background: #4f46e5; border-radius: 10px; display: inline-block; text-align: center; line-height: 48px;">
+                        <span style="color: #ffffff; font-size: 22px; font-weight: bold;">N</span>
+                    </div>
+                    <span style="font-size: 22px; font-weight: 700; color: #1e293b; margin-left: 12px; vertical-align: middle;">NexSpire Solutions</span>
+                </td>
+                <td style="text-align: right; vertical-align: top; color: #64748b; font-size: 13px;">
+                    NexSpire Solutions Pvt. Ltd.<br>
+                    {{business_address}}<br>
+                    support@nexspiresolutions.co.in
+                </td>
+            </tr>
+        </table>
+    </div>
+
+    <!-- Title -->
+    <div style="text-align: center; margin-bottom: 40px;">
+        <h1 style="color: #1e293b; font-size: 28px; margin: 0; letter-spacing: 2px;">SERVICE AGREEMENT</h1>
+        <p style="color: #64748b; font-size: 14px; margin: 10px 0 0;">Agreement No: AGR-{{tenant_slug}}-{{agreement_date}}</p>
+        <p style="color: #64748b; font-size: 14px; margin: 5px 0 0;">Date: {{agreement_date}}</p>
+    </div>
+
+    <!-- Parties -->
+    <div style="margin-bottom: 35px;">
+        <h2 style="color: #4f46e5; font-size: 18px; border-bottom: 1px solid #e2e8f0; padding-bottom: 8px;">1. PARTIES</h2>
+        <p style="margin: 15px 0;">This Service Agreement ("Agreement") is entered into between:</p>
+        <div style="background: #f8fafc; padding: 20px; border-radius: 8px; margin: 15px 0; border-left: 4px solid #4f46e5;">
+            <p style="margin: 0 0 10px;"><strong>Provider:</strong> NexSpire Solutions Pvt. Ltd. ("NexSpire", "Provider")</p>
+            <p style="margin: 0;">Address: {{business_address}}</p>
+        </div>
+        <div style="background: #f8fafc; padding: 20px; border-radius: 8px; margin: 15px 0; border-left: 4px solid #10b981;">
+            <p style="margin: 0 0 10px;"><strong>Client:</strong> {{tenant_name}} ("Client")</p>
+            <p style="margin: 0 0 5px;">Company: {{tenant_company}}</p>
+            <p style="margin: 0 0 5px;">Email: {{tenant_email}}</p>
+            <p style="margin: 0;">Phone: {{tenant_phone}}</p>
+        </div>
+    </div>
+
+    <!-- Scope of Services -->
+    <div style="margin-bottom: 35px;">
+        <h2 style="color: #4f46e5; font-size: 18px; border-bottom: 1px solid #e2e8f0; padding-bottom: 8px;">2. SCOPE OF SERVICES</h2>
+        <p>The Provider agrees to provide the Client with access to the NexCRM SaaS platform, which includes:</p>
+        <ul style="padding-left: 20px; color: #475569;">
+            <li style="margin-bottom: 8px;">Cloud-hosted CRM dashboard with full feature access per the selected plan</li>
+            <li style="margin-bottom: 8px;">Customer-facing storefront with e-commerce capabilities</li>
+            <li style="margin-bottom: 8px;">RESTful API access for integrations and custom development</li>
+            <li style="margin-bottom: 8px;">Automated database provisioning and process management</li>
+            <li style="margin-bottom: 8px;">SSL certificates and subdomain configuration</li>
+            <li style="margin-bottom: 8px;">Email and notification services</li>
+            <li style="margin-bottom: 8px;">Technical support via email during business hours</li>
+        </ul>
+    </div>
+
+    <!-- Service Plan Details -->
+    <div style="margin-bottom: 35px;">
+        <h2 style="color: #4f46e5; font-size: 18px; border-bottom: 1px solid #e2e8f0; padding-bottom: 8px;">3. SERVICE PLAN DETAILS</h2>
+        <table style="width: 100%; border-collapse: collapse; margin-top: 15px;">
+            <thead>
+                <tr style="background: #4f46e5; color: white;">
+                    <th style="padding: 12px 16px; text-align: left; font-size: 13px; text-transform: uppercase; letter-spacing: 0.5px;">Detail</th>
+                    <th style="padding: 12px 16px; text-align: left; font-size: 13px; text-transform: uppercase; letter-spacing: 0.5px;">Value</th>
+                </tr>
+            </thead>
+            <tbody>
+                <tr style="border-bottom: 1px solid #e2e8f0;">
+                    <td style="padding: 12px 16px; color: #64748b;">Plan Name</td>
+                    <td style="padding: 12px 16px; font-weight: 600;">{{plan_name}}</td>
+                </tr>
+                <tr style="border-bottom: 1px solid #e2e8f0; background: #f8fafc;">
+                    <td style="padding: 12px 16px; color: #64748b;">Price</td>
+                    <td style="padding: 12px 16px; font-weight: 600;">{{plan_price}}</td>
+                </tr>
+                <tr style="border-bottom: 1px solid #e2e8f0;">
+                    <td style="padding: 12px 16px; color: #64748b;">Billing Cycle</td>
+                    <td style="padding: 12px 16px; font-weight: 600;">{{plan_billing_cycle}}</td>
+                </tr>
+                <tr style="border-bottom: 1px solid #e2e8f0; background: #f8fafc;">
+                    <td style="padding: 12px 16px; color: #64748b;">Tenant Identifier</td>
+                    <td style="padding: 12px 16px; font-family: monospace;">{{tenant_slug}}</td>
+                </tr>
+            </tbody>
+        </table>
+    </div>
+
+    <!-- Term & Renewal -->
+    <div style="margin-bottom: 35px;">
+        <h2 style="color: #4f46e5; font-size: 18px; border-bottom: 1px solid #e2e8f0; padding-bottom: 8px;">4. TERM AND RENEWAL</h2>
+        <p><strong>Effective Date:</strong> {{start_date}}</p>
+        <p><strong>Trial Period:</strong> {{trial_period}}</p>
+        <p>Following the trial period, this Agreement shall automatically renew at the end of each billing cycle ({{plan_billing_cycle}}) unless either party provides written notice of termination at least 15 days before the end of the current billing period.</p>
+    </div>
+
+    <!-- Payment Terms -->
+    <div style="margin-bottom: 35px;">
+        <h2 style="color: #4f46e5; font-size: 18px; border-bottom: 1px solid #e2e8f0; padding-bottom: 8px;">5. PAYMENT TERMS</h2>
+        <ul style="padding-left: 20px; color: #475569;">
+            <li style="margin-bottom: 8px;">Billing shall occur on a {{plan_billing_cycle}} basis at the rate of {{plan_price}}.</li>
+            <li style="margin-bottom: 8px;">Payment is due within 7 days of invoice issuance.</li>
+            <li style="margin-bottom: 8px;">Accepted payment methods: Razorpay (UPI, Cards, Net Banking, Wallets).</li>
+            <li style="margin-bottom: 8px;">Late payments exceeding 15 days may result in service suspension.</li>
+            <li style="margin-bottom: 8px;">A reactivation fee may apply for accounts suspended due to non-payment.</li>
+        </ul>
+    </div>
+
+    <!-- Data & Privacy -->
+    <div style="margin-bottom: 35px;">
+        <h2 style="color: #4f46e5; font-size: 18px; border-bottom: 1px solid #e2e8f0; padding-bottom: 8px;">6. DATA AND PRIVACY</h2>
+        <ul style="padding-left: 20px; color: #475569;">
+            <li style="margin-bottom: 8px;"><strong>Data Ownership:</strong> All data uploaded, created, or managed by the Client within the platform remains the sole property of the Client.</li>
+            <li style="margin-bottom: 8px;"><strong>Data Security:</strong> The Provider implements industry-standard encryption (TLS/SSL), secure database isolation per tenant, and regular automated backups.</li>
+            <li style="margin-bottom: 8px;"><strong>Data Processing:</strong> The Provider processes Client data solely for the purpose of delivering the contracted services.</li>
+            <li style="margin-bottom: 8px;"><strong>Data Export:</strong> The Client may request a full export of their data at any time during or within 30 days after the termination of this Agreement.</li>
+            <li style="margin-bottom: 8px;"><strong>Data Deletion:</strong> Upon termination and after the 30-day grace period, all Client data will be permanently deleted from the Provider's systems.</li>
+        </ul>
+    </div>
+
+    <!-- Confidentiality -->
+    <div style="margin-bottom: 35px;">
+        <h2 style="color: #4f46e5; font-size: 18px; border-bottom: 1px solid #e2e8f0; padding-bottom: 8px;">7. CONFIDENTIALITY</h2>
+        <p>Both parties agree to maintain the confidentiality of all proprietary information exchanged during the course of this Agreement. Neither party shall disclose confidential information to third parties without prior written consent, except as required by law. This obligation survives termination of this Agreement for a period of 2 years.</p>
+    </div>
+
+    <!-- Termination -->
+    <div style="margin-bottom: 35px;">
+        <h2 style="color: #4f46e5; font-size: 18px; border-bottom: 1px solid #e2e8f0; padding-bottom: 8px;">8. TERMINATION</h2>
+        <p>Either party may terminate this Agreement:</p>
+        <ul style="padding-left: 20px; color: #475569;">
+            <li style="margin-bottom: 8px;">With 15 days written notice before the end of the current billing period.</li>
+            <li style="margin-bottom: 8px;">Immediately, if the other party materially breaches this Agreement and fails to cure within 10 days of written notice.</li>
+            <li style="margin-bottom: 8px;">The Provider may suspend services immediately if the Client violates acceptable use policies or engages in illegal activity.</li>
+        </ul>
+        <p>Upon termination, the Client's access will be revoked, and data will be retained for 30 days before permanent deletion.</p>
+    </div>
+
+    <!-- Limitation of Liability -->
+    <div style="margin-bottom: 35px;">
+        <h2 style="color: #4f46e5; font-size: 18px; border-bottom: 1px solid #e2e8f0; padding-bottom: 8px;">9. LIMITATION OF LIABILITY</h2>
+        <p>To the maximum extent permitted by applicable law:</p>
+        <ul style="padding-left: 20px; color: #475569;">
+            <li style="margin-bottom: 8px;">The Provider's total liability shall not exceed the total fees paid by the Client in the 3 months preceding the claim.</li>
+            <li style="margin-bottom: 8px;">The Provider shall not be liable for any indirect, incidental, special, or consequential damages.</li>
+            <li style="margin-bottom: 8px;">The Provider does not guarantee 100% uptime but commits to a 99.5% availability target.</li>
+        </ul>
+    </div>
+
+    <!-- Governing Law -->
+    <div style="margin-bottom: 35px;">
+        <h2 style="color: #4f46e5; font-size: 18px; border-bottom: 1px solid #e2e8f0; padding-bottom: 8px;">10. GOVERNING LAW</h2>
+        <p>This Agreement shall be governed by and construed in accordance with the laws of India. Any disputes arising from this Agreement shall be subject to the exclusive jurisdiction of the courts in the Provider's registered state.</p>
+    </div>
+
+    <!-- Custom Terms -->
+    <div style="margin-bottom: 35px;">
+        <h2 style="color: #4f46e5; font-size: 18px; border-bottom: 1px solid #e2e8f0; padding-bottom: 8px;">11. ADDITIONAL TERMS</h2>
+        <p>{{custom_terms}}</p>
+    </div>
+
+    <!-- Acceptance / Signature Blocks -->
+    <div style="margin-bottom: 40px; margin-top: 50px;">
+        <h2 style="color: #4f46e5; font-size: 18px; border-bottom: 1px solid #e2e8f0; padding-bottom: 8px;">12. ACCEPTANCE</h2>
+        <p>By signing below, both parties acknowledge that they have read, understood, and agree to be bound by the terms and conditions set forth in this Agreement.</p>
+
+        <table style="width: 100%; margin-top: 40px;">
+            <tr>
+                <td style="width: 45%; vertical-align: top;">
+                    <div style="border-bottom: 1px solid #1e293b; padding-bottom: 8px; margin-bottom: 10px; min-height: 60px;"></div>
+                    <p style="margin: 0; font-weight: 700; color: #1e293b;">NexSpire Solutions Pvt. Ltd.</p>
+                    <p style="margin: 4px 0; color: #64748b; font-size: 13px;">Authorized Signatory (Provider)</p>
+                    <p style="margin: 4px 0; color: #64748b; font-size: 13px;">Date: {{agreement_date}}</p>
+                </td>
+                <td style="width: 10%;"></td>
+                <td style="width: 45%; vertical-align: top;">
+                    <div style="border-bottom: 1px solid #1e293b; padding-bottom: 8px; margin-bottom: 10px; min-height: 60px;"></div>
+                    <p style="margin: 0; font-weight: 700; color: #1e293b;">{{tenant_name}}</p>
+                    <p style="margin: 4px 0; color: #64748b; font-size: 13px;">Authorized Signatory (Client)</p>
+                    <p style="margin: 4px 0; color: #64748b; font-size: 13px;">Date: _______________</p>
+                </td>
+            </tr>
+        </table>
+    </div>
+
+    <!-- Footer -->
+    <div style="border-top: 2px solid #e2e8f0; padding-top: 20px; margin-top: 50px; text-align: center;">
+        <p style="color: #64748b; font-size: 12px; margin: 0;">NexSpire Solutions Pvt. Ltd. | support@nexspiresolutions.co.in | nexspiresolutions.co.in</p>
+        <p style="color: #94a3b8; font-size: 11px; margin: 8px 0 0;">This document is a legally binding agreement. Please retain a copy for your records.</p>
+    </div>
+</div>`,
+        variables: ["tenant_name", "tenant_email", "tenant_phone", "tenant_company", "tenant_slug", "plan_name", "plan_price", "plan_billing_cycle", "start_date", "agreement_date", "trial_period", "business_address", "custom_terms"]
     }
 ];
 

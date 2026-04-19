@@ -284,6 +284,90 @@ const templates = [
         description: 'Meeting confirmation email with details',
         variables: JSON.stringify(['contact_name', 'meeting_date', 'meeting_time', 'meeting_location', 'meeting_agenda']),
         category: 'transactional'
+    },
+    {
+        name: 'tenant-agreement-email',
+        type: 'email',
+        subject: 'Service Agreement - NexSpire Solutions | {{plan_name}} Plan',
+        html_content: `<!DOCTYPE html>
+<html>
+<head>
+    <style>
+        body { font-family: Arial, sans-serif; line-height: 1.6; color: #333; margin: 0; padding: 0; background: #f1f5f9; }
+        .container { max-width: 600px; margin: 0 auto; padding: 20px; }
+        .header { background: linear-gradient(135deg, #4f46e5, #6366f1); padding: 40px 30px; text-align: center; border-radius: 12px 12px 0 0; }
+        .header h1 { color: white; margin: 0; font-size: 24px; font-weight: 700; }
+        .header p { color: rgba(255,255,255,0.85); margin: 8px 0 0; font-size: 14px; }
+        .content { background: #ffffff; padding: 36px 30px; border: 1px solid #e2e8f0; border-top: none; }
+        .content p { color: #334155; font-size: 15px; margin-bottom: 16px; }
+        .plan-box { background: #f8fafc; border: 1px solid #e2e8f0; border-radius: 10px; padding: 20px; margin: 24px 0; }
+        .plan-box h3 { margin: 0 0 12px; color: #1e293b; font-size: 16px; }
+        .plan-row { display: flex; justify-content: space-between; padding: 8px 0; border-bottom: 1px solid #f1f5f9; }
+        .plan-row:last-child { border-bottom: none; }
+        .plan-label { color: #64748b; font-size: 14px; }
+        .plan-value { color: #1e293b; font-weight: 600; font-size: 14px; }
+        .attachment-note { background: #eef2ff; border: 1px solid #c7d2fe; border-radius: 8px; padding: 16px; margin: 24px 0; display: flex; align-items: center; gap: 12px; }
+        .attachment-note svg { flex-shrink: 0; }
+        .attachment-note p { margin: 0; color: #4338ca; font-size: 14px; }
+        .steps { margin: 24px 0; }
+        .step { display: flex; align-items: flex-start; gap: 12px; margin-bottom: 14px; }
+        .step-num { width: 28px; height: 28px; background: #4f46e5; color: white; border-radius: 50%; display: flex; align-items: center; justify-content: center; font-size: 13px; font-weight: 700; flex-shrink: 0; }
+        .step-text { color: #475569; font-size: 14px; padding-top: 3px; }
+        .btn { display: inline-block; background: #4f46e5; color: white; padding: 14px 32px; text-decoration: none; border-radius: 8px; margin-top: 8px; font-weight: 600; font-size: 15px; }
+        .footer { text-align: center; padding: 24px 20px; color: #94a3b8; font-size: 12px; border-radius: 0 0 12px 12px; }
+        .footer a { color: #6366f1; text-decoration: none; }
+        .divider { border: none; border-top: 1px solid #e2e8f0; margin: 24px 0; }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <div class="header">
+            <h1>NexSpire Solutions</h1>
+            <p>Service Agreement</p>
+        </div>
+        <div class="content">
+            <p>Dear <strong>{{tenant_name}}</strong>,</p>
+            <p>Thank you for choosing <strong>NexSpire Solutions</strong> as your CRM partner. We are delighted to welcome you on board.</p>
+            <p>Please find attached your <strong>Service Agreement</strong> for the <strong>{{plan_name}}</strong> plan. This document outlines the terms and conditions of our engagement.</p>
+
+            <div class="plan-box">
+                <h3>Plan Summary</h3>
+                <div class="plan-row"><span class="plan-label">Plan</span><span class="plan-value">{{plan_name}}</span></div>
+                <div class="plan-row"><span class="plan-label">Price</span><span class="plan-value">{{plan_price}}</span></div>
+                <div class="plan-row"><span class="plan-label">Billing</span><span class="plan-value">{{plan_billing_cycle}}</span></div>
+                <div class="plan-row"><span class="plan-label">Start Date</span><span class="plan-value">{{start_date}}</span></div>
+                <div class="plan-row"><span class="plan-label">Trial Period</span><span class="plan-value">{{trial_period}}</span></div>
+            </div>
+
+            <div class="attachment-note">
+                <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="#4338ca" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M21.44 11.05l-9.19 9.19a6 6 0 01-8.49-8.49l9.19-9.19a4 4 0 015.66 5.66l-9.2 9.19a2 2 0 01-2.83-2.83l8.49-8.48"/></svg>
+                <p><strong>Agreement attached as PDF.</strong> Please review and keep a copy for your records.</p>
+            </div>
+
+            <hr class="divider">
+
+            <p><strong>Next Steps:</strong></p>
+            <div class="steps">
+                <div class="step"><div class="step-num">1</div><div class="step-text">Review the attached Service Agreement carefully</div></div>
+                <div class="step"><div class="step-num">2</div><div class="step-text">Your NexCRM dashboard is being set up at <strong>{{tenant_slug}}.nexspiresolutions.co.in</strong></div></div>
+                <div class="step"><div class="step-num">3</div><div class="step-text">Our team will reach out to assist you with onboarding</div></div>
+            </div>
+
+            <p>If you have any questions about the agreement or need any modifications, please do not hesitate to contact us.</p>
+
+            <p>Best regards,<br><strong>NexSpire Solutions Team</strong></p>
+        </div>
+        <div class="footer">
+            <p>&copy; 2024 NexSpire Solutions. All rights reserved.</p>
+            <p><a href="https://nexspiresolutions.co.in">nexspiresolutions.co.in</a></p>
+            <p style="margin-top: 8px;">This email was sent to {{tenant_email}}</p>
+        </div>
+    </div>
+</body>
+</html>`,
+        description: 'Professional email for sending tenant service agreement with PDF attachment. Used by the tenant onboarding workflow.',
+        variables: JSON.stringify(['tenant_name', 'tenant_email', 'tenant_slug', 'plan_name', 'plan_price', 'plan_billing_cycle', 'start_date', 'trial_period']),
+        category: 'transactional'
     }
 ];
 

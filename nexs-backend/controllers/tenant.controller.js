@@ -3,6 +3,10 @@ const PlanModel = require('../models/plan.model');
 const ServerModel = require('../models/server.model');
 const Provisioner = require('../services/provisioner');
 const RazorpayService = require('../services/razorpay.service');
+const DocumentTemplateModel = require('../models/document-template.model');
+const pdfService = require('../services/pdf.service');
+const emailService = require('../services/email.service');
+const workflowEngine = require('../services/workflowEngine');
 
 class TenantController {
     /**
@@ -161,6 +165,27 @@ class TenantController {
                         status: 'provisioning'
                     }
                 });
+
+                // Fire workflow trigger for tenant creation
+                try {
+                    const plan = plan_id ? await PlanModel.findById(plan_id) : null;
+                    workflowEngine.trigger('tenant_created', 'tenant', tenantId, {
+                        id: tenantId,
+                        name,
+                        slug,
+                        email,
+                        owner_email: email,
+                        owner_name: name,
+                        phone: phone || '',
+                        industry_type: industry_type || 'general',
+                        plan_name: plan?.name || 'Starter',
+                        plan_price: plan?.price ? `${plan.price}` : 'As per agreement',
+                        plan_billing_cycle: plan?.billing_cycle || 'Monthly',
+                        trial_days: plan?.trial_days || 14
+                    });
+                } catch (triggerErr) {
+                    console.error('[TenantController] Workflow trigger error:', triggerErr.message);
+                }
 
                 // 5. Background Provisioning (Heavy Lifting)
                 // We deliberately do NOT await this. We let it run in the background.
@@ -740,6 +765,201 @@ class TenantController {
         } catch (error) {
             console.error('Send payment link error:', error);
             res.status(500).json({ error: 'Failed to send payment link' });
+        }
+    }
+
+    /**
+     * Send Service Agreement PDF to tenant via email
+     */
+    async sendAgreement(req, res) {
+        try {
+            const { id } = req.params;
+            const { pool } = require('../config/database');
+
+            const tenant = await TenantModel.findById(id);
+            if (!tenant) {
+                return res.status(404).json({ error: 'Tenant not found' });
+            }
+
+            // Find the tenant-agreement template
+            const template = await DocumentTemplateModel.findBySlug('tenant-agreement');
+            if (!template) {
+                return res.status(404).json({ error: 'Agreement template not found. Please run seed-templates first.' });
+            }
+
+            // Resolve plan details
+            let planName = 'Standard';
+            let planPrice = 'As per selected plan';
+            let planBillingCycle = 'Monthly';
+
+            if (tenant.plan_id) {
+                const [plans] = await pool.query('SELECT name, slug, price, billing_cycle FROM plans WHERE id = ?', [tenant.plan_id]);
+                if (plans.length) {
+                    planName = plans[0].name || planName;
+                    planPrice = plans[0].price ? `INR ${plans[0].price}` : planPrice;
+                    planBillingCycle = plans[0].billing_cycle || planBillingCycle;
+                }
+            }
+
+            // Build template variables
+            const today = new Date();
+            const agreementDate = today.toLocaleDateString('en-IN', { day: '2-digit', month: '2-digit', year: 'numeric' });
+            const startDate = tenant.created_at
+                ? new Date(tenant.created_at).toLocaleDateString('en-IN', { day: '2-digit', month: '2-digit', year: 'numeric' })
+                : agreementDate;
+
+            const variables = {
+                tenant_name: tenant.owner_name || tenant.name,
+                tenant_email: tenant.owner_email || tenant.email,
+                tenant_phone: tenant.phone || 'Not provided',
+                tenant_company: tenant.business_name || tenant.name,
+                tenant_slug: tenant.slug,
+                plan_name: tenant.plan_name || planName,
+                plan_price: planPrice,
+                plan_billing_cycle: planBillingCycle,
+                start_date: startDate,
+                agreement_date: agreementDate,
+                trial_period: tenant.trial_days ? `${tenant.trial_days} days` : '14 days',
+                business_address: 'India',
+                custom_terms: 'No additional terms apply unless mutually agreed upon in writing.'
+            };
+
+            // Render the template
+            const renderedHtml = DocumentTemplateModel.renderTemplate(template.content, variables);
+
+            // Generate PDF
+            const pdfBuffer = await pdfService.generateFromHtml(renderedHtml);
+
+            // Build professional email wrapper
+            const tenantDisplayName = variables.tenant_name;
+            const emailHtml = `<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Service Agreement - NexSpire Solutions</title>
+</head>
+<body style="margin:0;padding:0;background-color:#f1f5f9;font-family:-apple-system,BlinkMacSystemFont,'Segoe UI',Roboto,'Helvetica Neue',Arial,sans-serif;">
+    <table width="100%" cellpadding="0" cellspacing="0" style="background-color:#f1f5f9;padding:32px 16px;">
+        <tr>
+            <td align="center">
+                <table width="100%" cellpadding="0" cellspacing="0" style="max-width:600px;background-color:#ffffff;border-radius:12px;overflow:hidden;box-shadow:0 4px 12px rgba(0,0,0,0.1);">
+                    <!-- Header -->
+                    <tr>
+                        <td style="background-color:#4f46e5;padding:32px 40px;text-align:center;">
+                            <table width="100%" cellpadding="0" cellspacing="0">
+                                <tr>
+                                    <td align="center" style="padding-bottom:12px;">
+                                        <div style="width:48px;height:48px;background-color:rgba(255,255,255,0.2);border-radius:10px;display:inline-block;line-height:48px;text-align:center;">
+                                            <span style="color:#ffffff;font-size:22px;font-weight:bold;">N</span>
+                                        </div>
+                                    </td>
+                                </tr>
+                                <tr>
+                                    <td align="center">
+                                        <h1 style="color:#ffffff;margin:0;font-size:22px;font-weight:600;">Service Agreement</h1>
+                                        <p style="color:rgba(255,255,255,0.8);margin:6px 0 0;font-size:14px;">NexSpire Solutions</p>
+                                    </td>
+                                </tr>
+                            </table>
+                        </td>
+                    </tr>
+                    <!-- Body -->
+                    <tr>
+                        <td style="padding:40px;">
+                            <p style="color:#1e293b;font-size:16px;line-height:1.6;margin:0 0 20px;">
+                                Dear <strong>${tenantDisplayName}</strong>,
+                            </p>
+                            <p style="color:#475569;font-size:15px;line-height:1.7;margin:0 0 20px;">
+                                Thank you for choosing NexSpire Solutions. Please find attached your Service Agreement for the <strong>${variables.plan_name}</strong> plan.
+                            </p>
+                            <p style="color:#475569;font-size:15px;line-height:1.7;margin:0 0 28px;">
+                                Please review the attached agreement carefully. If you have any questions, don't hesitate to reach out to our team.
+                            </p>
+                            <!-- Agreement Summary Box -->
+                            <table width="100%" cellpadding="0" cellspacing="0" style="background-color:#f8fafc;border:1px solid #e2e8f0;border-radius:8px;margin-bottom:28px;">
+                                <tr>
+                                    <td style="padding:20px;">
+                                        <table width="100%" cellpadding="0" cellspacing="0">
+                                            <tr>
+                                                <td style="padding-bottom:12px;border-bottom:1px solid #e2e8f0;">
+                                                    <span style="color:#64748b;font-size:12px;text-transform:uppercase;letter-spacing:1px;font-weight:600;">Agreement Summary</span>
+                                                </td>
+                                            </tr>
+                                            <tr>
+                                                <td style="padding-top:12px;">
+                                                    <table width="100%" cellpadding="0" cellspacing="0">
+                                                        <tr>
+                                                            <td style="padding:6px 0;color:#64748b;font-size:13px;">Plan</td>
+                                                            <td style="padding:6px 0;font-weight:600;color:#1e293b;text-align:right;font-size:13px;">${variables.plan_name}</td>
+                                                        </tr>
+                                                        <tr>
+                                                            <td style="padding:6px 0;color:#64748b;font-size:13px;">Billing</td>
+                                                            <td style="padding:6px 0;font-weight:600;color:#1e293b;text-align:right;font-size:13px;">${variables.plan_billing_cycle}</td>
+                                                        </tr>
+                                                        <tr>
+                                                            <td style="padding:6px 0;color:#64748b;font-size:13px;">Effective Date</td>
+                                                            <td style="padding:6px 0;font-weight:600;color:#1e293b;text-align:right;font-size:13px;">${variables.start_date}</td>
+                                                        </tr>
+                                                    </table>
+                                                </td>
+                                            </tr>
+                                        </table>
+                                    </td>
+                                </tr>
+                            </table>
+                            <p style="color:#475569;font-size:14px;line-height:1.7;margin:0 0 8px;">
+                                Best regards,
+                            </p>
+                            <p style="color:#1e293b;font-size:14px;font-weight:600;margin:0;">
+                                NexSpire Solutions Team
+                            </p>
+                        </td>
+                    </tr>
+                    <!-- Footer -->
+                    <tr>
+                        <td style="background-color:#f8fafc;padding:20px 40px;border-top:1px solid #e2e8f0;">
+                            <table width="100%" cellpadding="0" cellspacing="0">
+                                <tr>
+                                    <td align="center">
+                                        <p style="color:#94a3b8;font-size:12px;margin:0;">
+                                            &copy; ${new Date().getFullYear()} NexSpire Solutions Pvt. Ltd. All rights reserved.
+                                        </p>
+                                    </td>
+                                </tr>
+                            </table>
+                        </td>
+                    </tr>
+                </table>
+            </td>
+        </tr>
+    </table>
+</body>
+</html>`;
+
+            // Send email with PDF attachment
+            const emailResult = await emailService.sendEmail({
+                to: variables.tenant_email,
+                subject: 'Service Agreement - NexSpire Solutions',
+                html: emailHtml,
+                attachments: [{
+                    filename: `NexSpire-Agreement-${tenant.slug}.pdf`,
+                    content: pdfBuffer,
+                    contentType: 'application/pdf'
+                }]
+            });
+
+            if (!emailResult.success) {
+                return res.status(500).json({ error: emailResult.error || 'Failed to send agreement email' });
+            }
+
+            res.json({
+                success: true,
+                message: `Agreement sent successfully to ${variables.tenant_email}`
+            });
+        } catch (error) {
+            console.error('Send agreement error:', error);
+            res.status(500).json({ error: 'Failed to send agreement: ' + error.message });
         }
     }
 }

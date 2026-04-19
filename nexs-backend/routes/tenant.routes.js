@@ -41,5 +41,8 @@ router.post('/:id/end-trial', tenantController.endTrialAndRequestPayment);
 // Payment Management
 router.post('/:id/send-payment-link', tenantController.sendPaymentLink);
 
+// Agreement
+router.post('/:id/send-agreement', tenantController.sendAgreement);
+
 module.exports = router;
 
