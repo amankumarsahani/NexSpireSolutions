@@ -295,9 +295,9 @@ const templates = [
     <style>
         body { font-family: Arial, sans-serif; line-height: 1.6; color: #333; margin: 0; padding: 0; background: #f1f5f9; }
         .container { max-width: 600px; margin: 0 auto; padding: 20px; }
-        .header { background: linear-gradient(135deg, #4f46e5, #6366f1); padding: 40px 30px; text-align: center; border-radius: 12px 12px 0 0; }
+        .header { background-color: #4f46e5; padding: 40px 30px; text-align: center; border-radius: 12px 12px 0 0; }
         .header h1 { color: white; margin: 0; font-size: 24px; font-weight: 700; }
-        .header p { color: rgba(255,255,255,0.85); margin: 8px 0 0; font-size: 14px; }
+        .header p { color: #c7d2fe; margin: 8px 0 0; font-size: 14px; }
         .content { background: #ffffff; padding: 36px 30px; border: 1px solid #e2e8f0; border-top: none; }
         .content p { color: #334155; font-size: 15px; margin-bottom: 16px; }
         .plan-box { background: #f8fafc; border: 1px solid #e2e8f0; border-radius: 10px; padding: 20px; margin: 24px 0; }

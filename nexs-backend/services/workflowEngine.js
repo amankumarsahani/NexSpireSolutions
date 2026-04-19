@@ -487,7 +487,8 @@ class WorkflowEngine {
                     console.warn(`[WorkflowEngine] Document template "${config.document_slug}" not found, skipping attachment`);
                 }
             } catch (pdfErr) {
-                console.error('[WorkflowEngine] PDF attachment error:', pdfErr.message);
+                console.error('[WorkflowEngine] PDF attachment FAILED:', pdfErr.message);
+                console.error('[WorkflowEngine] PDF stack:', pdfErr.stack?.split('\n').slice(0, 3).join('\n'));
                 // Continue sending email without attachment rather than failing the whole workflow
             }
         }

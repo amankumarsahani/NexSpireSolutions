@@ -37,9 +37,9 @@ module.exports = async function(connection) {
     // 4. Email body for the send_email node
     const emailBody = [
         '<div style="font-family:Arial,sans-serif;max-width:600px;margin:0 auto;">',
-        '<div style="background:linear-gradient(135deg,#4f46e5,#6366f1);padding:40px 30px;text-align:center;border-radius:12px 12px 0 0;">',
-        '<h1 style="color:white;margin:0;font-size:24px;">NexSpire Solutions</h1>',
-        '<p style="color:rgba(255,255,255,0.85);margin:8px 0 0;font-size:14px;">Service Agreement</p>',
+        '<div style="background-color:#4f46e5;padding:40px 30px;text-align:center;border-radius:12px 12px 0 0;">',
+        '<h1 style="color:#ffffff;margin:0;font-size:24px;">NexSpire Solutions</h1>',
+        '<p style="color:#c7d2fe;margin:8px 0 0;font-size:14px;">Service Agreement</p>',
         '</div>',
         '<div style="background:#fff;padding:36px 30px;border:1px solid #e2e8f0;border-top:none;">',
         '<p style="color:#334155;">Dear <strong>{{owner_name}}</strong>,</p>',
