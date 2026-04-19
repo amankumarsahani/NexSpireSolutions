@@ -28,7 +28,8 @@ const runMigrations = async () => {
         }
 
         const files = fs.readdirSync(migrationsDir)
-            .filter(file => file.endsWith('.sql'))
+            .filter(file => file.endsWith('.sql') || file.endsWith('.js'))
+            .filter(file => !file.startsWith('nexcrm_')) // skip nexcrm base schema
             .sort(); // Sort to ensure order
 
         if (files.length === 0) {
@@ -46,14 +47,31 @@ const runMigrations = async () => {
 
             console.log(`Running migration: ${file}...`);
             const filePath = path.join(migrationsDir, file);
-            const sql = fs.readFileSync(filePath, 'utf8');
 
+            try {
+                if (file.endsWith('.js')) {
+                    // JS migration — require and execute
+                    const migration = require(filePath);
+                    if (typeof migration === 'function') {
+                        await migration(connection);
+                    } else if (typeof migration.up === 'function') {
+                        await migration.up(connection);
+                    } else if (typeof migration.run === 'function') {
+                        await migration.run(connection);
+                    }
+                    // Record migration
+                    await connection.query('INSERT INTO migrations (filename) VALUES (?)', [file]);
+                    console.log(`✅ ${file} completed successfully.`);
+                    migrationCount++;
+                } else {
+                    // SQL migration — split and execute
+                    const sql = fs.readFileSync(filePath, 'utf8');
 
-            // Split by semicolon for multiple statements
-            const statements = sql
-                .split(';')
-                .map(s => s.trim())
-                .filter(s => s.length > 0);
+                    // Split by semicolon for multiple statements
+                    const statements = sql
+                        .split(';')
+                        .map(s => s.trim())
+                        .filter(s => s.length > 0);
 
             try {
                 await connection.beginTransaction();
@@ -84,6 +102,7 @@ const runMigrations = async () => {
 
                 console.log(`✅ ${file} completed successfully.`);
                 migrationCount++;
+                } // end SQL block
             } catch (err) {
                 await connection.rollback();
                 console.error(`❌ Error in ${file}:`, err.message);
