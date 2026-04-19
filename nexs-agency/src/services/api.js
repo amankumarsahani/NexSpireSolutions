@@ -129,6 +129,7 @@ export const blogAPI = {
     getAll: (params) => cachedGet('/blogs', { params }),
     getBySlug: (slug) => cachedGet(`/blogs/slug/${slug}`),
     getById: (id) => cachedGet(`/blogs/${id}`),
+    getTags: () => cachedGet('/blogs/tags'),
     create: (data) => api.post('/blogs', data),
     update: (id, data) => api.put(`/blogs/${id}`, data),
     delete: (id) => api.delete(`/blogs/${id}`)

@@ -21,6 +21,13 @@ exports.getSettings = async (req, res) => {
                 } else {
                     settingsMap[s.setting_key] = '****';
                 }
+            } else if (s.setting_key === 'google_service_account_json' && s.setting_value) {
+                try {
+                    const parsed = JSON.parse(s.setting_value);
+                    settingsMap[s.setting_key] = `configured (${parsed.client_email || 'service account'})`;
+                } catch {
+                    settingsMap[s.setting_key] = 'configured';
+                }
             } else {
                 settingsMap[s.setting_key] = s.setting_value;
             }

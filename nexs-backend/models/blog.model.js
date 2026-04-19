@@ -83,8 +83,8 @@ const BlogModel = {
         if (!row) return null;
         return {
             ...row,
-            // keywords is usually parsed by mysql2 if column type is JSON, but generic fallback:
-            keywords: typeof row.keywords === 'string' ? JSON.parse(row.keywords || '[]') : (row.keywords || [])
+            keywords: typeof row.keywords === 'string' ? JSON.parse(row.keywords || '[]') : (row.keywords || []),
+            tags: typeof row.tags === 'string' ? JSON.parse(row.tags || '[]') : (row.tags || [])
         };
     },
 
@@ -102,34 +102,43 @@ const BlogModel = {
             title,
             slug,
             excerpt,
+            meta_description = '',
             content,
             category,
             author,
             image_url,
+            og_image = '',
+            image_alt = '',
             featured = false,
             status = 'draft',
             read_time,
-            keywords = []
+            keywords = [],
+            tags = []
         } = blogData;
 
         const keywordsJson = JSON.stringify(keywords);
+        const tagsJson = JSON.stringify(tags);
 
         const [result] = await pool.query(
             `INSERT INTO blogs 
-            (title, slug, excerpt, content, category, author, image_url, featured, status, read_time, keywords)
-             VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)`,
+            (title, slug, excerpt, meta_description, content, category, author, image_url, og_image, image_alt, featured, status, read_time, keywords, tags)
+             VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)`,
             [
                 title,
                 slug,
                 excerpt,
+                meta_description,
                 content,
                 category,
                 author,
                 image_url,
+                og_image,
+                image_alt,
                 featured,
                 status,
                 read_time,
-                keywordsJson
+                keywordsJson,
+                tagsJson
             ]
         );
 
@@ -146,13 +155,17 @@ const BlogModel = {
             'title': 'title',
             'slug': 'slug',
             'excerpt': 'excerpt',
+            'meta_description': 'meta_description',
             'content': 'content',
             'category': 'category',
             'author': 'author',
             'image_url': 'image_url',
+            'og_image': 'og_image',
+            'image_alt': 'image_alt',
             'featured': 'featured',
             'read_time': 'read_time',
-            'status': 'status'
+            'status': 'status',
+            'view_count': 'view_count'
         };
 
         // Handle standard fields
@@ -168,6 +181,11 @@ const BlogModel = {
         if (blogData.keywords !== undefined) {
             updates.push('keywords = ?');
             values.push(JSON.stringify(blogData.keywords));
+        }
+
+        if (blogData.tags !== undefined) {
+            updates.push('tags = ?');
+            values.push(JSON.stringify(blogData.tags));
         }
 
         if (updates.length === 0) {
@@ -192,6 +210,59 @@ const BlogModel = {
             "SELECT DISTINCT category FROM blogs WHERE category IS NOT NULL AND status = 'published'"
         );
         return rows.map(r => r.category);
+    },
+
+    async incrementViewCount(id) {
+        await pool.query('UPDATE blogs SET view_count = COALESCE(view_count, 0) + 1 WHERE id = ?', [id]);
+    },
+
+    async findRelated(blogId, category, keywords = [], limit = 3) {
+        const [rows] = await pool.query(
+            `SELECT id, title, slug, excerpt, image_url, category, author, read_time, created_at, keywords, tags, view_count
+             FROM blogs 
+             WHERE id != ? AND status = 'published'
+             ORDER BY 
+                (category = ?) * 5 +
+                COALESCE(view_count, 0) * 0.01
+             DESC
+             LIMIT ?`,
+            [blogId, category, limit + 5]
+        );
+
+        if (!keywords || keywords.length === 0) {
+            return rows.slice(0, limit).map(r => this._mapRow(r));
+        }
+
+        const scored = rows.map(row => {
+            const mapped = this._mapRow(row);
+            const rowKeywords = [...(mapped.keywords || []), ...(mapped.tags || [])].map(k => k.toLowerCase());
+            const queryKeywords = keywords.map(k => k.toLowerCase());
+            let overlapScore = 0;
+            for (const qk of queryKeywords) {
+                for (const rk of rowKeywords) {
+                    if (rk.includes(qk) || qk.includes(rk)) {
+                        overlapScore += 1;
+                    }
+                }
+            }
+            const categoryBonus = mapped.category === category ? 5 : 0;
+            return { ...mapped, _score: overlapScore + categoryBonus };
+        });
+
+        scored.sort((a, b) => b._score - a._score);
+        return scored.slice(0, limit).map(({ _score, ...rest }) => rest);
+    },
+
+    async getAllTags() {
+        const [rows] = await pool.query(
+            "SELECT tags FROM blogs WHERE tags IS NOT NULL AND status = 'published'"
+        );
+        const tagSet = new Set();
+        for (const row of rows) {
+            const parsed = typeof row.tags === 'string' ? JSON.parse(row.tags || '[]') : (row.tags || []);
+            parsed.forEach(t => tagSet.add(t));
+        }
+        return [...tagSet].sort();
     }
 };
 
