@@ -464,6 +464,8 @@ class WorkflowEngine {
                     docVars.plan_price = docVars.plan_price || config.plan_price || 'As per agreement';
                     docVars.plan_billing_cycle = docVars.plan_billing_cycle || config.billing_cycle || 'Monthly';
                     docVars.trial_period = docVars.trial_period || (contextData.trial_days ? `${contextData.trial_days} days` : '14 days');
+                    docVars.business_address = docVars.business_address || config.business_address || 'Nexspire Solutions, India';
+                    docVars.custom_terms = docVars.custom_terms || config.custom_terms || 'No additional terms apply unless mutually agreed upon in writing by both parties.';
 
                     const renderedDoc = DocumentTemplateModel.renderTemplate(docTemplate.content, docVars);
                     const pdfBuffer = await PDFService.generateFromHtml(renderedDoc, {

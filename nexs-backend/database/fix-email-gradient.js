@@ -63,12 +63,12 @@ async function fix() {
 <body>
     <div class="container">
         <div class="header">
-            <h1>NexSpire Solutions</h1>
+            <h1>Nexspire Solutions</h1>
             <p>Service Agreement</p>
         </div>
         <div class="content">
             <p>Dear <strong>{{tenant_name}}</strong>,</p>
-            <p>Thank you for choosing <strong>NexSpire Solutions</strong> as your CRM partner. We are delighted to welcome you on board.</p>
+            <p>Thank you for choosing <strong>Nexspire Solutions</strong> as your CRM partner. We are delighted to welcome you on board.</p>
             <p>Please find attached your <strong>Service Agreement</strong> for the <strong>{{plan_name}}</strong> plan.</p>
             <div class="plan-box">
                 <h3>Plan Summary</h3>
@@ -82,10 +82,10 @@ async function fix() {
                 <p><strong>Agreement attached as PDF.</strong> Please review and keep a copy for your records.</p>
             </div>
             <p>If you have any questions about the agreement, please do not hesitate to contact us.</p>
-            <p>Best regards,<br><strong>NexSpire Solutions Team</strong></p>
+            <p>Best regards,<br><strong>Nexspire Solutions Team</strong></p>
         </div>
         <div class="footer">
-            <p>2024 NexSpire Solutions. All rights reserved.</p>
+            <p>${new Date().getFullYear()} Nexspire Solutions. All rights reserved.</p>
             <p><a href="https://nexspiresolutions.co.in">nexspiresolutions.co.in</a></p>
             <p style="margin-top: 8px;">This email was sent to {{tenant_email}}</p>
         </div>

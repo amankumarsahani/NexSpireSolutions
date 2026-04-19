@@ -820,8 +820,8 @@ class TenantController {
                 start_date: startDate,
                 agreement_date: agreementDate,
                 trial_period: tenant.trial_days ? `${tenant.trial_days} days` : '14 days',
-                business_address: 'India',
-                custom_terms: 'No additional terms apply unless mutually agreed upon in writing.'
+                business_address: 'Nexspire Solutions, India',
+                custom_terms: 'No additional terms apply unless mutually agreed upon in writing by both parties.'
             };
 
             // Render the template
@@ -943,7 +943,7 @@ class TenantController {
                 subject: 'Service Agreement - NexSpire Solutions',
                 html: emailHtml,
                 attachments: [{
-                    filename: `NexSpire-Agreement-${tenant.slug}.pdf`,
+                    filename: `Nexspire-Agreement-${tenant.slug}.pdf`,
                     content: pdfBuffer,
                     contentType: 'application/pdf'
                 }]

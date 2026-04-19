@@ -367,10 +367,10 @@ const templates = [
                     <div style="width: 48px; height: 48px; background: #4f46e5; border-radius: 10px; display: inline-block; text-align: center; line-height: 48px;">
                         <span style="color: #ffffff; font-size: 22px; font-weight: bold;">N</span>
                     </div>
-                    <span style="font-size: 22px; font-weight: 700; color: #1e293b; margin-left: 12px; vertical-align: middle;">NexSpire Solutions</span>
+                    <span style="font-size: 22px; font-weight: 700; color: #1e293b; margin-left: 12px; vertical-align: middle;">Nexspire Solutions</span>
                 </td>
                 <td style="text-align: right; vertical-align: top; color: #64748b; font-size: 13px;">
-                    NexSpire Solutions Pvt. Ltd.<br>
+                    Nexspire Solutions Pvt. Ltd.<br>
                     {{business_address}}<br>
                     support@nexspiresolutions.co.in
                 </td>
@@ -390,7 +390,7 @@ const templates = [
         <h2 style="color: #4f46e5; font-size: 18px; border-bottom: 1px solid #e2e8f0; padding-bottom: 8px;">1. PARTIES</h2>
         <p style="margin: 15px 0;">This Service Agreement ("Agreement") is entered into between:</p>
         <div style="background: #f8fafc; padding: 20px; border-radius: 8px; margin: 15px 0; border-left: 4px solid #4f46e5;">
-            <p style="margin: 0 0 10px;"><strong>Provider:</strong> NexSpire Solutions Pvt. Ltd. ("NexSpire", "Provider")</p>
+            <p style="margin: 0 0 10px;"><strong>Provider:</strong> Nexspire Solutions Pvt. Ltd. ("NexSpire", "Provider")</p>
             <p style="margin: 0;">Address: {{business_address}}</p>
         </div>
         <div style="background: #f8fafc; padding: 20px; border-radius: 8px; margin: 15px 0; border-left: 4px solid #10b981;">
@@ -529,7 +529,7 @@ const templates = [
             <tr>
                 <td style="width: 45%; vertical-align: top;">
                     <div style="border-bottom: 1px solid #1e293b; padding-bottom: 8px; margin-bottom: 10px; min-height: 60px;"></div>
-                    <p style="margin: 0; font-weight: 700; color: #1e293b;">NexSpire Solutions Pvt. Ltd.</p>
+                    <p style="margin: 0; font-weight: 700; color: #1e293b;">Nexspire Solutions Pvt. Ltd.</p>
                     <p style="margin: 4px 0; color: #64748b; font-size: 13px;">Authorized Signatory (Provider)</p>
                     <p style="margin: 4px 0; color: #64748b; font-size: 13px;">Date: {{agreement_date}}</p>
                 </td>
@@ -546,7 +546,7 @@ const templates = [
 
     <!-- Footer -->
     <div style="border-top: 2px solid #e2e8f0; padding-top: 20px; margin-top: 50px; text-align: center;">
-        <p style="color: #64748b; font-size: 12px; margin: 0;">NexSpire Solutions Pvt. Ltd. | support@nexspiresolutions.co.in | nexspiresolutions.co.in</p>
+        <p style="color: #64748b; font-size: 12px; margin: 0;">Nexspire Solutions Pvt. Ltd. | support@nexspiresolutions.co.in | nexspiresolutions.co.in</p>
         <p style="color: #94a3b8; font-size: 11px; margin: 8px 0 0;">This document is a legally binding agreement. Please retain a copy for your records.</p>
     </div>
 </div>`,

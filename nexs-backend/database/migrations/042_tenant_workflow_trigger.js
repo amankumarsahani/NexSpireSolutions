@@ -38,12 +38,12 @@ module.exports = async function(connection) {
     const emailBody = [
         '<div style="font-family:Arial,sans-serif;max-width:600px;margin:0 auto;">',
         '<div style="background-color:#4f46e5;padding:40px 30px;text-align:center;border-radius:12px 12px 0 0;">',
-        '<h1 style="color:#ffffff;margin:0;font-size:24px;">NexSpire Solutions</h1>',
+        '<h1 style="color:#ffffff;margin:0;font-size:24px;">Nexspire Solutions</h1>',
         '<p style="color:#c7d2fe;margin:8px 0 0;font-size:14px;">Service Agreement</p>',
         '</div>',
         '<div style="background:#fff;padding:36px 30px;border:1px solid #e2e8f0;border-top:none;">',
         '<p style="color:#334155;">Dear <strong>{{owner_name}}</strong>,</p>',
-        '<p style="color:#334155;">Thank you for choosing <strong>NexSpire Solutions</strong> as your CRM partner. Please find attached your <strong>Service Agreement</strong> for the <strong>{{plan_name}}</strong> plan.</p>',
+        '<p style="color:#334155;">Thank you for choosing <strong>Nexspire Solutions</strong> as your CRM partner. Please find attached your <strong>Service Agreement</strong> for the <strong>{{plan_name}}</strong> plan.</p>',
         '<div style="background:#f8fafc;border:1px solid #e2e8f0;border-radius:10px;padding:20px;margin:24px 0;">',
         '<p style="margin:0 0 8px;color:#1e293b;font-weight:600;">Plan Details</p>',
         '<p style="margin:4px 0;color:#64748b;font-size:14px;">Plan: <strong style="color:#1e293b;">{{plan_name}}</strong></p>',
@@ -54,10 +54,10 @@ module.exports = async function(connection) {
         '<p style="margin:0;color:#4338ca;font-size:14px;"><strong>Agreement attached as PDF.</strong> Please review and keep a copy for your records.</p>',
         '</div>',
         '<p style="color:#334155;">If you have any questions, do not hesitate to contact us.</p>',
-        '<p style="color:#334155;">Best regards,<br><strong>NexSpire Solutions Team</strong></p>',
+        '<p style="color:#334155;">Best regards,<br><strong>Nexspire Solutions Team</strong></p>',
         '</div>',
         '<div style="text-align:center;padding:20px;color:#94a3b8;font-size:12px;">',
-        '<p>2024 NexSpire Solutions. All rights reserved.</p>',
+        `<p>${new Date().getFullYear()} Nexspire Solutions. All rights reserved.</p>`,
         '</div>',
         '</div>'
     ].join('');
@@ -75,10 +75,10 @@ module.exports = async function(connection) {
          VALUES (?, 'action-1', 'action', 'send_email', 'Send Agreement Email', ?, 400, 200)`,
         [wfId, JSON.stringify({
             to_email: '{{email}}',
-            subject: 'Service Agreement - NexSpire Solutions | {{plan_name}} Plan',
+            subject: 'Service Agreement - Nexspire Solutions | {{plan_name}} Plan',
             body: emailBody,
             document_slug: 'tenant-agreement',
-            attachment_filename: 'NexSpire-Agreement-{{slug}}.pdf'
+            attachment_filename: 'Nexspire-Agreement-{{slug}}.pdf'
         })]
     );
     console.log('   Created node: Send Agreement Email (with PDF attachment)');
