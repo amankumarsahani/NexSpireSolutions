@@ -29,8 +29,8 @@ const runMigrations = async () => {
 
         const files = fs.readdirSync(migrationsDir)
             .filter(file => file.endsWith('.sql') || file.endsWith('.js'))
-            .filter(file => !file.startsWith('nexcrm_')) // skip nexcrm base schema
-            .sort(); // Sort to ensure order
+            .filter(file => !file.startsWith('nexcrm_'))
+            .sort();
 
         if (files.length === 0) {
             console.log('No migration files found.');
@@ -42,7 +42,7 @@ const runMigrations = async () => {
         // 4. Run pending migrations
         for (const file of files) {
             if (executedFiles.has(file)) {
-                continue; // Skip already executed
+                continue;
             }
 
             console.log(`Running migration: ${file}...`);
@@ -59,52 +59,46 @@ const runMigrations = async () => {
                     } else if (typeof migration.run === 'function') {
                         await migration.run(connection);
                     }
-                    // Record migration
+
                     await connection.query('INSERT INTO migrations (filename) VALUES (?)', [file]);
                     console.log(`✅ ${file} completed successfully.`);
                     migrationCount++;
                 } else {
                     // SQL migration — split and execute
                     const sql = fs.readFileSync(filePath, 'utf8');
-
-                    // Split by semicolon for multiple statements
                     const statements = sql
                         .split(';')
                         .map(s => s.trim())
                         .filter(s => s.length > 0);
 
-            try {
-                await connection.beginTransaction();
+                    await connection.beginTransaction();
 
-                for (const statement of statements) {
-                    try {
-                        await connection.query(statement);
-                    } catch (stmtErr) {
-                        // Ignore "column already exists" or "table already exists" errors
-                        const ignorableErrors = [
-                            'ER_DUP_FIELDNAME',      // Duplicate column name
-                            'ER_TABLE_EXISTS_ERROR', // Table already exists
-                            'ER_DUP_ENTRY',          // Duplicate entry
-                            'ER_BAD_FIELD_ERROR',    // Unknown column (for SELECT statements)
-                            'ER_DUP_KEYNAME'         // Duplicate key/index name
-                        ];
-                        if (ignorableErrors.includes(stmtErr.code)) {
-                            console.log(`   ⚠️ Skipped (already exists): ${stmtErr.message.substring(0, 50)}...`);
-                        } else {
-                            throw stmtErr;
+                    for (const statement of statements) {
+                        try {
+                            await connection.query(statement);
+                        } catch (stmtErr) {
+                            const ignorableErrors = [
+                                'ER_DUP_FIELDNAME',
+                                'ER_TABLE_EXISTS_ERROR',
+                                'ER_DUP_ENTRY',
+                                'ER_BAD_FIELD_ERROR',
+                                'ER_DUP_KEYNAME'
+                            ];
+                            if (ignorableErrors.includes(stmtErr.code)) {
+                                console.log(`   ⚠️ Skipped (already exists): ${stmtErr.message.substring(0, 50)}...`);
+                            } else {
+                                throw stmtErr;
+                            }
                         }
                     }
+
+                    await connection.query('INSERT INTO migrations (filename) VALUES (?)', [file]);
+                    await connection.commit();
+                    console.log(`✅ ${file} completed successfully.`);
+                    migrationCount++;
                 }
-
-                // Record migration
-                await connection.query('INSERT INTO migrations (filename) VALUES (?)', [file]);
-                await connection.commit();
-
-                console.log(`✅ ${file} completed successfully.`);
-                migrationCount++;
-                } // end SQL block
             } catch (err) {
-                await connection.rollback();
+                try { await connection.rollback(); } catch (_) {}
                 console.error(`❌ Error in ${file}:`, err.message);
                 throw err;
             }
