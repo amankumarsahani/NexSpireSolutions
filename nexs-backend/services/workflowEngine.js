@@ -961,7 +961,7 @@ class WorkflowEngine {
     }
 
     async handleIndexUrl(node, contextData) {
-        console.log(`[WorkflowEngine] Executing Index URL node`);
+        console.log(`[WorkflowEngine] Executing Google Search URL Index node`);
 
         let config = node.config || {};
         if (typeof config === 'string') {
@@ -969,7 +969,7 @@ class WorkflowEngine {
         }
 
         const engines = config.engines || ['indexnow', 'google', 'websub'];
-        const siteUrl = await SEOIndexingService.getSiteUrl();
+        const siteUrl = config.websiteUrl || await SEOIndexingService.getSiteUrl();
 
         let urls = [];
 
@@ -1004,7 +1004,10 @@ class WorkflowEngine {
         try {
             const result = await SEOIndexingService.notifyAll(urls, {
                 engines,
-                feedUrl: config.feed_url || `${siteUrl}/sitemap.xml`
+                feedUrl: config.feed_url || `${siteUrl}/sitemap.xml`,
+                indexnowKey: config.indexnowKey,
+                googleServiceAccountJson: config.googleServiceAccountJson,
+                websiteUrl: config.websiteUrl
             });
 
             console.log(`[WorkflowEngine] Indexed ${urls.length} URL(s): ${result.summary.succeeded}/${result.summary.total} engines succeeded`);

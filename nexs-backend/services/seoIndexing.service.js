@@ -91,13 +91,13 @@ class SEOIndexingService {
     // INDEXNOW
     // ============================================
 
-    async notifyIndexNow(urls) {
+    async notifyIndexNow(urls, overrides = {}) {
         const urlList = Array.isArray(urls) ? urls : [urls];
         if (urlList.length === 0) return { success: false, reason: 'no_urls' };
 
-        const siteUrl = await this.getSiteUrl();
-        const host = await this.getSiteHost();
-        const key = await this.getIndexNowKey();
+        const siteUrl = overrides.websiteUrl || await this.getSiteUrl();
+        const host = new URL(siteUrl).hostname;
+        const key = overrides.indexnowKey || await this.getIndexNowKey();
 
         const absoluteUrls = urlList.map(u => u.startsWith('/') ? `${siteUrl}${u}` : u);
 
@@ -126,7 +126,23 @@ class SEOIndexingService {
     // GOOGLE INDEXING API
     // ============================================
 
-    async _getGoogleIndexingClient() {
+    async _getGoogleIndexingClient(overrideJson) {
+        // If override provided, create a fresh client (don't cache — different creds per node)
+        if (overrideJson) {
+            try {
+                const { google } = require('googleapis');
+                const creds = typeof overrideJson === 'string' ? JSON.parse(overrideJson) : overrideJson;
+                const auth = new google.auth.GoogleAuth({
+                    credentials: creds,
+                    scopes: ['https://www.googleapis.com/auth/indexing'],
+                });
+                return google.indexing({ version: 'v3', auth });
+            } catch (error) {
+                console.error('[SEO-Google] Failed to init with override creds:', error.message);
+                return null;
+            }
+        }
+
         const creds = await this.getGoogleCredentials();
         if (!creds) return null;
 
@@ -156,11 +172,11 @@ class SEOIndexingService {
         }
     }
 
-    async notifyGoogle(url) {
-        const siteUrl = await this.getSiteUrl();
+    async notifyGoogle(url, overrides = {}) {
+        const siteUrl = overrides.websiteUrl || await this.getSiteUrl();
         const absoluteUrl = url.startsWith('/') ? `${siteUrl}${url}` : url;
 
-        const client = await this._getGoogleIndexingClient();
+        const client = await this._getGoogleIndexingClient(overrides.googleServiceAccountJson);
         if (!client) return { success: false, reason: 'not_configured' };
 
         try {
@@ -245,7 +261,7 @@ class SEOIndexingService {
 
         if (engines.includes('indexnow')) {
             tasks.push(
-                this.notifyIndexNow(urlList)
+                this.notifyIndexNow(urlList, { indexnowKey: options.indexnowKey, websiteUrl: options.websiteUrl })
                     .then(r => ({ engine: 'indexnow', ...r }))
                     .catch(e => ({ engine: 'indexnow', success: false, error: e.message }))
             );
@@ -254,7 +270,7 @@ class SEOIndexingService {
         if (engines.includes('google')) {
             for (const url of urlList) {
                 tasks.push(
-                    this.notifyGoogle(url)
+                    this.notifyGoogle(url, { googleServiceAccountJson: options.googleServiceAccountJson, websiteUrl: options.websiteUrl })
                         .then(r => ({ engine: 'google', ...r }))
                         .catch(e => ({ engine: 'google', success: false, error: e.message }))
                 );
