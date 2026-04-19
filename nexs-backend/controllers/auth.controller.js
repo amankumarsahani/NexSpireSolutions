@@ -219,6 +219,42 @@ const AuthController = {
         }
     },
 
+    // Refresh token — issue a new access token from a valid (but potentially near-expiry) token
+    async refreshToken(req, res) {
+        try {
+            const userId = req.user.id;
+            const user = await UserModel.findById(userId);
+
+            if (!user) {
+                return res.status(404).json({ error: 'User not found' });
+            }
+
+            if (user.status !== 'active') {
+                return res.status(401).json({ error: 'Account is inactive.' });
+            }
+
+            // Issue fresh token
+            const token = jwt.sign(
+                { id: user.id, email: user.email, role: user.role },
+                process.env.JWT_SECRET,
+                { expiresIn: process.env.JWT_EXPIRE || '7d' }
+            );
+
+            res.json({
+                token,
+                user: {
+                    id: user.id,
+                    email: user.email,
+                    firstName: user.firstName,
+                    lastName: user.lastName,
+                    role: user.role
+                }
+            });
+        } catch (error) {
+            res.status(500).json({ error: 'Failed to refresh token' });
+        }
+    },
+
     // Logout (client-side token removal)
     async logout(req, res) {
         res.json({
