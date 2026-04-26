@@ -54,6 +54,7 @@ const Header = memo(function Header() {
   useEffect(() => {
     setActiveDropdown(null);
     setIsMenuOpen(false);
+    setOpenDesktopDropdown(null);
   }, [location.pathname]);
 
   useEffect(() => {
@@ -118,15 +119,22 @@ const Header = memo(function Header() {
           <nav className="hidden lg:flex items-center">
             <div className="relative flex items-center space-x-1 bg-slate-100 rounded-full px-3 py-2">
               {navItems.map((item) => (
-                <div key={item.label} className="relative group">
+                <div
+                  key={item.label}
+                  className="relative"
+                  onMouseEnter={() => item.children && setOpenDesktopDropdown(item.label)}
+                  onMouseLeave={() => item.children && setOpenDesktopDropdown(null)}
+                >
                   <Link
                     to={item.path}
-                    onClick={(e) => handleNavClick(e, item.path)}
+                    onClick={(e) => {
+                      handleNavClick(e, item.path);
+                      setOpenDesktopDropdown(null);
+                    }}
                     {...(item.children ? {
                       'aria-haspopup': 'true',
                       'aria-expanded': openDesktopDropdown === item.label,
                       onFocus: () => setOpenDesktopDropdown(item.label),
-                      onBlur: () => { setTimeout(() => setOpenDesktopDropdown(null), 150); }
                     } : {})}
                     className={`relative z-10 px-4 py-2 text-sm font-semibold rounded-full transition-all duration-300 inline-flex items-center gap-1 ${isActive(item.path)
                       ? 'bg-[#2563EB] text-white shadow-lg'
@@ -134,33 +142,62 @@ const Header = memo(function Header() {
                       }`}
                   >
                     {item.label}
-                    {item.children && <RiArrowDownSLine className="text-xs font-bold mt-0.5" />}
+                    {item.children && <RiArrowDownSLine className={`text-xs font-bold mt-0.5 transition-transform duration-200 ${openDesktopDropdown === item.label ? 'rotate-180' : ''}`} />}
                   </Link>
 
                   {item.children && (
-                    <div className={`absolute top-full left-1/2 -translate-x-1/2 pt-4 transition-all duration-300 ${item.children.length > 8 ? 'w-[420px]' : 'w-64'} transform ${openDesktopDropdown === item.label ? 'opacity-100 visible translate-y-0' : 'opacity-0 invisible translate-y-2'} group-hover:opacity-100 group-hover:visible group-hover:translate-y-0`}>
+                    <div className={`absolute top-full pt-4 transition-all duration-200 z-50 ${openDesktopDropdown === item.label ? 'opacity-100 visible translate-y-0' : 'opacity-0 invisible translate-y-2 pointer-events-none'} ${item.children.length > 8 ? 'w-[480px] right-0' : 'w-64 left-1/2 -translate-x-1/2'}`}>
                       <div className="bg-white rounded-2xl shadow-xl border border-slate-200 overflow-hidden p-2 max-h-[70vh] overflow-y-auto">
-                        <div className={`flex flex-col gap-0.5 ${item.children.some(c => c.type === 'divider') ? '' : ''}`}>
-                          {item.children.map((child, ci) => (
-                            child.type === 'divider' ? (
-                              <div key={ci} className="px-4 pt-3 pb-1.5">
+                        {item.children.some(c => c.type === 'divider') ? (
+                          <>
+                            <div className="flex flex-col gap-0.5">
+                              {item.children.filter(c => !c.type).slice(0, item.children.findIndex(c => c.type === 'divider')).map((child) => (
+                                <Link
+                                  key={child.label}
+                                  to={child.path}
+                                  onClick={() => setOpenDesktopDropdown(null)}
+                                  className="px-4 py-2.5 text-sm font-medium text-slate-700 hover:bg-[#F8FAFC] hover:text-[#2563EB] rounded-xl transition-colors text-left flex items-center justify-between group/item"
+                                >
+                                  {child.label}
+                                  <RiArrowRightLine className="opacity-0 group-hover/item:opacity-100 -translate-x-2 group-hover/item:translate-x-0 transition-all text-xs" />
+                                </Link>
+                              ))}
+                            </div>
+                            {item.children.filter(c => c.type === 'divider').map((divider, di) => (
+                              <div key={di} className="px-4 pt-3 pb-1.5">
                                 <div className="border-t border-slate-100" />
-                                <span className="block text-[11px] font-semibold text-slate-400 uppercase tracking-wider mt-2">{child.label}</span>
+                                <span className="block text-[11px] font-semibold text-slate-400 uppercase tracking-wider mt-2">{divider.label}</span>
                               </div>
-                            ) : (
-                            <Link
-                              key={child.label}
-                              to={child.path}
-                              onFocus={() => setOpenDesktopDropdown(item.label)}
-                              onBlur={() => { setTimeout(() => setOpenDesktopDropdown(null), 150); }}
-                              className="px-4 py-2.5 text-sm font-medium text-slate-700 hover:bg-[#F8FAFC] hover:text-[#2563EB] rounded-xl transition-colors text-left flex items-center justify-between group/item"
-                            >
-                              {child.label}
-                              <RiArrowRightLine className="opacity-0 group-hover/item:opacity-100 -translate-x-2 group-hover/item:translate-x-0 transition-all text-xs" />
-                            </Link>
-                            )
-                          ))}
-                        </div>
+                            ))}
+                            <div className="grid grid-cols-2 gap-0.5">
+                              {item.children.filter(c => !c.type).slice(item.children.findIndex(c => c.type === 'divider')).map((child) => (
+                                <Link
+                                  key={child.label}
+                                  to={child.path}
+                                  onClick={() => setOpenDesktopDropdown(null)}
+                                  className="px-4 py-2.5 text-sm font-medium text-slate-700 hover:bg-[#F8FAFC] hover:text-[#2563EB] rounded-xl transition-colors text-left flex items-center justify-between group/item"
+                                >
+                                  {child.label}
+                                  <RiArrowRightLine className="opacity-0 group-hover/item:opacity-100 -translate-x-2 group-hover/item:translate-x-0 transition-all text-xs" />
+                                </Link>
+                              ))}
+                            </div>
+                          </>
+                        ) : (
+                          <div className="flex flex-col gap-0.5">
+                            {item.children.map((child) => (
+                              <Link
+                                key={child.label}
+                                to={child.path}
+                                onClick={() => setOpenDesktopDropdown(null)}
+                                className="px-4 py-2.5 text-sm font-medium text-slate-700 hover:bg-[#F8FAFC] hover:text-[#2563EB] rounded-xl transition-colors text-left flex items-center justify-between group/item"
+                              >
+                                {child.label}
+                                <RiArrowRightLine className="opacity-0 group-hover/item:opacity-100 -translate-x-2 group-hover/item:translate-x-0 transition-all text-xs" />
+                              </Link>
+                            ))}
+                          </div>
+                        )}
                       </div>
                     </div>
                   )}
