@@ -18,7 +18,7 @@ const cities = [
         name: "Dubai",
         slug: "dubai",
         country: "UAE",
-        image: "https://images.unsplash.com/photo-1512453979798-5ea936a7d40b?auto=format&fit=crop&q=80&w=800&fm=webp"
+        image: "https://images.unsplash.com/photo-1518684079-3c830dcef090?auto=format&fit=crop&q=80&w=800&fm=webp"
     },
     {
         name: "Sydney",
