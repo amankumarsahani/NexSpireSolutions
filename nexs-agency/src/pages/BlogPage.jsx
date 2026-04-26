@@ -162,6 +162,13 @@ const BlogPage = () => {
                 <meta name="twitter:card" content="summary_large_image" />
                 <meta name="twitter:title" content="Blog - Tech Insights & Trends | Nexspire Solutions" />
                 <meta name="twitter:description" content="Read expert articles on AI, Cloud, and Software Development." />
+                <meta name="robots" content="index, follow, max-image-preview:large, max-snippet:-1" />
+                <meta property="og:site_name" content="Nexspire Solutions" />
+                <meta property="og:locale" content="en_IN" />
+                <meta property="og:image:width" content="1200" />
+                <meta property="og:image:height" content="630" />
+                <meta name="twitter:site" content="@nexspiresolutions" />
+                <meta name="twitter:creator" content="@nexspiresolutions" />
                 <script type="application/ld+json">{JSON.stringify({
                     "@context": "https://schema.org",
                     "@type": "Blog",
@@ -173,6 +180,14 @@ const BlogPage = () => {
                         "name": "Nexspire Solutions",
                         "url": SITE_URL
                     }
+                })}</script>
+                <script type="application/ld+json">{JSON.stringify({
+                    "@context": "https://schema.org",
+                    "@type": "BreadcrumbList",
+                    "itemListElement": [
+                        { "@type": "ListItem", "position": 1, "name": "Home", "item": SITE_URL },
+                        { "@type": "ListItem", "position": 2, "name": "Blog", "item": `${SITE_URL}/blog` }
+                    ]
                 })}</script>
             </Helmet>
 

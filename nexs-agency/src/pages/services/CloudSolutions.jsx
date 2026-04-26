@@ -74,6 +74,7 @@ const data = {
     seo: {
         title: 'Cloud Solutions & DevOps Services | AWS & Azure Experts',
         description: 'Scale your business with expert Cloud and DevOps services from Nexspire. Security, migration, and automation on AWS, Azure, and GCP.',
+        keywords: 'cloud solutions India, AWS cloud services, cloud migration, DevOps services Mohali, cloud infrastructure management, serverless architecture India, cloud consulting',
         canonicalPath: '/services/cloud-solutions',
         ogTitle: 'Cloud Solutions & DevOps Services | AWS & Azure Experts',
         ogDescription: 'Scale your business with expert Cloud and DevOps services from Nexspire. Security, migration, and automation on AWS, Azure, and GCP.',

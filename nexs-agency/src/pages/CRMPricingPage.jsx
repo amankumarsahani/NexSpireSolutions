@@ -1,7 +1,7 @@
 import { Helmet } from 'react-helmet-async';
 import { CheckIcon } from '../components/ui/Icons';
 import { crmTiers, crmFeatures } from '../constants/crmPricing';
-import { SITE_URL } from '../constants/siteConfig';
+import { SITE_URL, siteConfig } from '../constants/siteConfig';
 import FeatureValue from '../components/crm/FeatureValue';
 import useCRMPricing from '../hooks/useCRMPricing';
 
@@ -24,18 +24,59 @@ export default function CRMPricingPage() {
     return (
         <div className="min-h-screen bg-gradient-to-b from-slate-50 to-white">
             <Helmet>
-                <title>NexCRM Pricing - Affordable Plans for Every Business | Nexspire Solutions</title>
-                <meta name="description" content="Choose the perfect NexCRM plan for your business. Starter from ₹999/month. Leads, E-commerce, Team Chat, Mobile App - all included." />
+                <title>NexCRM Pricing - Plans from ₹999/mo | Starter, Growth, Business, Enterprise</title>
+                <meta name="description" content="Compare NexCRM pricing plans. Starter ₹999/mo, Growth ₹2,499/mo, Business ₹5,999/mo, Enterprise custom. Save 15% with yearly billing. 14-day free trial on all plans." />
+                <meta name="keywords" content="NexCRM pricing, CRM pricing India, affordable CRM plans, CRM software cost, business CRM pricing, agency CRM plans, CRM monthly pricing, CRM enterprise pricing" />
+                <meta name="robots" content="index, follow, max-image-preview:large, max-snippet:-1" />
                 <link rel="canonical" href={`${SITE_URL}/nexcrm/pricing`} />
-                <meta property="og:title" content="NexCRM Pricing - Affordable Plans for Every Business | Nexspire Solutions" />
-                <meta property="og:description" content="Choose the perfect NexCRM plan for your business. Starter from ₹999/month. Leads, E-commerce, Team Chat, Mobile App - all included." />
+                <meta property="og:site_name" content="Nexspire Solutions" />
+                <meta property="og:locale" content="en_IN" />
+                <meta property="og:title" content="NexCRM Pricing - Plans from ₹999/mo" />
+                <meta property="og:description" content="Compare NexCRM pricing plans. Starter, Growth, Business, Enterprise. Save 15% yearly. 14-day free trial." />
                 <meta property="og:type" content="website" />
                 <meta property="og:url" content={`${SITE_URL}/nexcrm/pricing`} />
                 <meta property="og:image" content={`${SITE_URL}/og-image.jpg`} />
+                <meta property="og:image:width" content="1200" />
+                <meta property="og:image:height" content="630" />
                 <meta name="twitter:card" content="summary_large_image" />
-                <meta name="twitter:title" content="NexCRM Pricing - Affordable Plans for Every Business | Nexspire Solutions" />
-                <meta name="twitter:description" content="Choose the perfect NexCRM plan for your business. Starter from ₹999/month." />
+                <meta name="twitter:site" content="@nexspiresolutions" />
+                <meta name="twitter:creator" content="@nexspiresolutions" />
+                <meta name="twitter:title" content="NexCRM Pricing - Plans from ₹999/mo" />
+                <meta name="twitter:description" content="Starter ₹999/mo, Growth ₹2,499/mo, Business ₹5,999/mo. Save 15% yearly. 14-day free trial." />
             </Helmet>
+            <script type="application/ld+json">{JSON.stringify({
+                "@context": "https://schema.org",
+                "@type": "BreadcrumbList",
+                "itemListElement": [
+                    { "@type": "ListItem", "position": 1, "name": "Home", "item": SITE_URL },
+                    { "@type": "ListItem", "position": 2, "name": "NexCRM", "item": `${SITE_URL}/nexcrm` },
+                    { "@type": "ListItem", "position": 3, "name": "Pricing", "item": `${SITE_URL}/nexcrm/pricing` }
+                ]
+            })}</script>
+            <script type="application/ld+json">{JSON.stringify({
+                "@context": "https://schema.org",
+                "@type": "ItemList",
+                "name": "NexCRM Pricing Plans",
+                "description": "CRM pricing plans for agencies and businesses",
+                "numberOfItems": 4,
+                "itemListElement": crmTiers.map((tier, i) => ({
+                    "@type": "ListItem",
+                    "position": i + 1,
+                    "item": {
+                        "@type": "Product",
+                        "name": `NexCRM ${tier.name}`,
+                        "description": tier.tagline,
+                        ...(tier.price !== 'Custom' ? {
+                            "offers": {
+                                "@type": "Offer",
+                                "price": String(tier.price),
+                                "priceCurrency": "INR",
+                                "availability": "https://schema.org/InStock"
+                            }
+                        } : {})
+                    }
+                }))
+            })}</script>
 
             {toast.show && (
                 <div className={`fixed top-4 right-4 z-[100] px-4 py-3 rounded-lg shadow-lg flex items-center gap-3 animate-fade-in ${toast.type === 'error' ? 'bg-red-500 text-white' : (toast.type === 'info' ? 'bg-[#F8FAFC]0 text-white' : 'bg-emerald-500 text-white')

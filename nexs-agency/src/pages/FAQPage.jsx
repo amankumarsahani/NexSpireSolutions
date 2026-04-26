@@ -6,7 +6,7 @@ import Breadcrumbs from '../components/ui/Breadcrumbs';
 import BackToTop from '../components/ui/BackToTop';
 
 import ReadingProgress from '../components/ui/ReadingProgress';
-import { SITE_URL } from '../constants/siteConfig';
+import { SITE_URL, siteConfig } from '../constants/siteConfig';
 import { RiArrowDownSLine, RiArrowRightLine, RiCheckLine, RiCloseLine, RiSearchEyeLine, RiSearchLine, RiThumbDownLine, RiThumbUpLine } from 'react-icons/ri';
 
 const FAQPage = () => {
@@ -112,18 +112,33 @@ const FAQPage = () => {
                 <meta name="description" content="Get answers to common questions about Nexspire Solutions' software development services, technologies, project timelines, support, and more. Learn about our web, mobile, AI, and cloud solutions." />
                 <meta name="keywords" content="software development FAQ, web development questions, mobile app development process, project timeline, post-launch support, data security, SEO websites, custom software solutions" />
                 <link rel="canonical" href={`${SITE_URL}/faq`} />
+                <meta name="robots" content="index, follow, max-image-preview:large, max-snippet:-1" />
                 <meta property="og:title" content="Frequently Asked Questions | Nexspire Solutions" />
                 <meta property="og:description" content="Common questions answered about our software development services, process, and technologies." />
                 <meta property="og:type" content="website" />
                 <meta property="og:url" content={`${SITE_URL}/faq`} />
                 <meta property="og:image" content={`${SITE_URL}/og-image.jpg`} />
+                <meta property="og:image:width" content="1200" />
+                <meta property="og:image:height" content="630" />
+                <meta property="og:site_name" content="Nexspire Solutions" />
+                <meta property="og:locale" content="en_IN" />
                 <meta name="twitter:card" content="summary_large_image" />
                 <meta name="twitter:title" content="Frequently Asked Questions | Nexspire Solutions" />
                 <meta name="twitter:description" content="Common questions answered about our software development services, process, and technologies." />
+                <meta name="twitter:site" content="@nexspiresolutions" />
+                <meta name="twitter:creator" content="@nexspiresolutions" />
                 <script type="application/ld+json">
                     {JSON.stringify(faqSchema)}
                 </script>
             </Helmet>
+            <script type="application/ld+json">{JSON.stringify({
+                "@context": "https://schema.org",
+                "@type": "BreadcrumbList",
+                "itemListElement": [
+                    { "@type": "ListItem", "position": 1, "name": "Home", "item": SITE_URL },
+                    { "@type": "ListItem", "position": 2, "name": "FAQ", "item": `${SITE_URL}/faq` }
+                ]
+            })}</script>
 
             {/* Scroll Progress Bar */}
             <ReadingProgress />

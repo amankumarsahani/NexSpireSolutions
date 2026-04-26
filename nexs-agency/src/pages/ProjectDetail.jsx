@@ -46,6 +46,8 @@ const ProjectDetail = () => {
                 <meta name="twitter:card" content="summary_large_image" />
                 <meta name="twitter:title" content={`${project.title} | Portfolio | Nexspire Solutions`} />
                 <meta name="twitter:description" content={`Case study: ${project.title}. See how we delivered exceptional results.`} />
+                <meta property="og:site_name" content="Nexspire Solutions" />
+                <meta name="twitter:site" content="@nexspiresolutions" />
             </Helmet>
 
             {/* Breadcrumbs */}

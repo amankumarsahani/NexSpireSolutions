@@ -1,7 +1,7 @@
 import { Helmet } from 'react-helmet-async';
 import { Link } from 'react-router-dom';
 import RelatedServices from '../../components/seo/RelatedServices';
-import { SITE_URL } from '../../constants/siteConfig';
+import { SITE_URL, siteConfig } from '../../constants/siteConfig';
 
 const MonolithToMicroservices = () => {
 
@@ -17,10 +17,8 @@ const MonolithToMicroservices = () => {
         "publisher": {
             "@type": "Organization",
             "name": "Nexspire Solutions",
-            "logo": {
-                "@type": "ImageObject",
-                "url": `${SITE_URL}/logo.png`
-            }
+            "url": SITE_URL,
+            "logo": { "@type": "ImageObject", "url": `${SITE_URL}/logo.png` }
         },
         "datePublished": "2024-03-25",
         "description": "Is your legacy monolith slowing you down? Learn the risks and rewards of migrating to a microservices architecture in 2026."
@@ -40,6 +38,16 @@ const MonolithToMicroservices = () => {
                 <meta name="twitter:card" content="summary_large_image" />
                 <meta name="twitter:title" content="Monolith to Microservices Migration Guide | Nexspire Cloud" />
                 <meta name="twitter:description" content="Is your legacy monolith slowing you down? Learn the risks and rewards of migrating to a microservices architecture." />
+                <meta name="robots" content="index, follow, max-image-preview:large, max-snippet:-1" />
+                <meta name="keywords" content="monolith to microservices, microservices migration, software architecture modernization, microservices India, legacy system migration, distributed systems, containerization Docker Kubernetes" />
+                <meta property="og:site_name" content="Nexspire Solutions" />
+                <meta property="og:locale" content="en_IN" />
+                <meta property="og:image:width" content="1200" />
+                <meta property="og:image:height" content="630" />
+                <meta name="twitter:site" content="@nexspiresolutions" />
+                <meta name="twitter:creator" content="@nexspiresolutions" />
+                <meta property="article:published_time" content="2024-03-25" />
+                <meta property="article:author" content="Nexspire Solutions" />
                 <script type="application/ld+json">
                     {JSON.stringify(articleSchema)}
                 </script>

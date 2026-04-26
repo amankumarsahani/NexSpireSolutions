@@ -4,7 +4,7 @@ import { Helmet } from 'react-helmet-async';
 import { motion, useScroll, useTransform } from 'framer-motion';
 import FadeIn from '../../components/ui/FadeIn';
 import ReadingProgress from '../../components/ui/ReadingProgress';
-import { SITE_URL } from '../../constants/siteConfig';
+import { SITE_URL, siteConfig } from '../../constants/siteConfig';
 import Icon from '../../components/ui/Icon';
 import { RiArrowRightLine, RiBriefcase4Line, RiCheckLine, RiGlobalLine, RiMapPinLine, RiShieldCheckLine, RiTimeLine } from 'react-icons/ri';
 
@@ -103,7 +103,7 @@ const cityData = {
         heroText: 'Smart Solutions for a Smart City.',
         content: 'Nexspire Solutions empowers Dubai\'s vision with futuristic technologies. We build bilingual, compliant, and scalable digital platforms for government, retail, and real estate.',
         services: ['Arabic-Enabled Apps', 'Mobile App Development', 'Smart City AI', 'E-commerce Solutions', 'Fintech Development'],
-        image: 'https://images.unsplash.com/photo-1512453979798-5ea266f8880c?auto=format&fit=crop&q=80&w=1200&fm=webp',
+        image: 'https://images.unsplash.com/photo-1518684079-3c830dcef090?auto=format&fit=crop&q=80&w=1200&fm=webp',
         coordinates: { lat: 25.2048, lng: 55.2708 },
         color: 'emerald',
         stats: [
@@ -257,13 +257,30 @@ const CityLandingPage = () => {
                 <meta property="og:type" content="website" />
                 <meta property="og:url" content={`${SITE_URL}/software-development-company/${city}`} />
                 <meta property="og:image" content={`${SITE_URL}/og-image.jpg`} />
+                <meta name="keywords" content={`software development company ${data.city}, web development ${data.city}, mobile app development ${data.city}, IT company ${data.city}, Nexspire Solutions ${data.city}, ${data.country} software services`} />
+                <meta name="robots" content="index, follow, max-image-preview:large, max-snippet:-1" />
+                <meta property="og:site_name" content="Nexspire Solutions" />
+                <meta property="og:locale" content="en_IN" />
+                <meta property="og:image:width" content="1200" />
+                <meta property="og:image:height" content="630" />
                 <meta name="twitter:card" content="summary_large_image" />
+                <meta name="twitter:site" content="@nexspiresolutions" />
+                <meta name="twitter:creator" content="@nexspiresolutions" />
                 <meta name="twitter:title" content={data.title} />
                 <meta name="twitter:description" content={data.description} />
                 <script type="application/ld+json">
                     {JSON.stringify(localBusinessSchema)}
                 </script>
             </Helmet>
+
+            <script type="application/ld+json">{JSON.stringify({
+                "@context": "https://schema.org",
+                "@type": "BreadcrumbList",
+                "itemListElement": [
+                    { "@type": "ListItem", "position": 1, "name": "Home", "item": SITE_URL },
+                    { "@type": "ListItem", "position": 2, "name": data.city, "item": `${SITE_URL}/software-development-company/${city}` }
+                ]
+            })}</script>
 
             <ReadingProgress />
 

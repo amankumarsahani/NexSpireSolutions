@@ -18,6 +18,8 @@ const PrivacyPolicy = () => {
                 <meta name="twitter:card" content="summary_large_image" />
                 <meta name="twitter:title" content="Privacy Policy | Nexspire Solutions" />
                 <meta name="twitter:description" content="Read the Nexspire Solutions privacy policy. Learn how we collect, use, and protect your personal data." />
+                <meta property="og:site_name" content="Nexspire Solutions" />
+                <meta name="twitter:site" content="@nexspiresolutions" />
             </Helmet>
             <div className="max-w-3xl mx-auto px-4 sm:px-6 lg:px-8">
                 <h1 className="text-4xl font-bold text-slate-800 mb-8">Privacy Policy</h1>

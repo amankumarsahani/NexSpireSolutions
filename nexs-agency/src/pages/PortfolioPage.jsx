@@ -7,7 +7,7 @@ import FadeIn from '../components/ui/FadeIn';
 import Breadcrumbs from '../components/ui/Breadcrumbs';
 import BackToTop from '../components/ui/BackToTop';
 import ReadingProgress from '../components/ui/ReadingProgress';
-import { SITE_URL } from '../constants/siteConfig';
+import { SITE_URL, siteConfig } from '../constants/siteConfig';
 import { RiArrowRightLine, RiArrowUpLine } from 'react-icons/ri';
 
 const FADE_IN_SMOOTH = { duration: 0.7, ease: [0.21, 0.47, 0.32, 0.98] };
@@ -170,6 +170,13 @@ const PortfolioPage = () => {
                 <meta name="twitter:card" content="summary_large_image" />
                 <meta name="twitter:title" content="Portfolio - Custom Software Case Studies | Nexspire Solutions" />
                 <meta name="twitter:description" content="See how we've helped businesses worldwide with custom E-commerce, Mobile, and AI solutions." />
+                <meta name="robots" content="index, follow, max-image-preview:large, max-snippet:-1" />
+                <meta property="og:site_name" content="Nexspire Solutions" />
+                <meta property="og:locale" content="en_IN" />
+                <meta property="og:image:width" content="1200" />
+                <meta property="og:image:height" content="630" />
+                <meta name="twitter:site" content="@nexspiresolutions" />
+                <meta name="twitter:creator" content="@nexspiresolutions" />
                 <script type="application/ld+json">{JSON.stringify({
                     "@context": "https://schema.org",
                     "@type": "ItemList",
@@ -184,6 +191,14 @@ const PortfolioPage = () => {
                         { "@type": "ListItem", "position": 4, "name": "Urban Pulse" },
                         { "@type": "ListItem", "position": 5, "name": "Crypto Exchange" },
                         { "@type": "ListItem", "position": 6, "name": "EcoEnergy" }
+                    ]
+                })}</script>
+                <script type="application/ld+json">{JSON.stringify({
+                    "@context": "https://schema.org",
+                    "@type": "BreadcrumbList",
+                    "itemListElement": [
+                        { "@type": "ListItem", "position": 1, "name": "Home", "item": SITE_URL },
+                        { "@type": "ListItem", "position": 2, "name": "Portfolio", "item": `${SITE_URL}/portfolio` }
                     ]
                 })}</script>
             </Helmet>

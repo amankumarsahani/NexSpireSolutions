@@ -149,17 +149,35 @@ export default function ServicePageTemplate({ data }) {
             <Helmet>
                 <title>{seo.title}</title>
                 <meta name="description" content={seo.description} />
+                {seo.keywords && <meta name="keywords" content={seo.keywords} />}
+                <meta name="robots" content="index, follow, max-image-preview:large, max-snippet:-1" />
                 <link rel="canonical" href={`${SITE_URL}${seo.canonicalPath}`} />
                 <meta property="og:title" content={seo.ogTitle || seo.title} />
                 <meta property="og:description" content={seo.ogDescription || seo.description} />
                 <meta property="og:type" content="website" />
                 <meta property="og:url" content={`${SITE_URL}${seo.canonicalPath}`} />
                 <meta property="og:image" content={`${SITE_URL}/og-image.jpg`} />
+                <meta property="og:image:width" content="1200" />
+                <meta property="og:image:height" content="630" />
+                <meta property="og:site_name" content="Nexspire Solutions" />
+                <meta property="og:locale" content="en_IN" />
                 <meta name="twitter:card" content="summary_large_image" />
+                <meta name="twitter:site" content="@nexspiresolutions" />
+                <meta name="twitter:creator" content="@nexspiresolutions" />
                 <meta name="twitter:title" content={seo.twitterTitle || seo.title} />
                 <meta name="twitter:description" content={seo.twitterDescription || seo.description} />
                 <script type="application/ld+json">{JSON.stringify(serviceSchema)}</script>
             </Helmet>
+
+            <script type="application/ld+json">{JSON.stringify({
+                "@context": "https://schema.org",
+                "@type": "BreadcrumbList",
+                "itemListElement": [
+                    { "@type": "ListItem", "position": 1, "name": "Home", "item": SITE_URL },
+                    { "@type": "ListItem", "position": 2, "name": "Services", "item": `${SITE_URL}/services` },
+                    { "@type": "ListItem", "position": 3, "name": data.hero?.title || data.seo.title, "item": `${SITE_URL}${data.seo.canonicalPath}` }
+                ]
+            })}</script>
 
             <ReadingProgress />
 

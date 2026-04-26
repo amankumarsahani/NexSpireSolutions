@@ -1,0 +1,55 @@
+# Nexspire Solutions
+
+> Nexspire Solutions is an India-based software development company building custom web applications, mobile apps, cloud infrastructure, AI/ML solutions, and NexCRM — an industry-specific CRM platform starting at ₹999/month.
+
+Nexspire Solutions (nexspiresolutions.co.in) specializes in end-to-end digital product development for startups and enterprises. Founded in 2023, headquartered in IT Park Sector 67, Mohali, Punjab, India. Core expertise: React, Node.js, Flutter, AWS, AI/ML. Contact: nexspiretechsolutions@gmail.com | +91 7696309551.
+
+## Products
+
+- [NexCRM](https://nexspiresolutions.co.in/nexcrm): Industry-specific CRM platform with lead management, e-commerce tools, automation, and multi-channel communication. Plans from ₹999/month (Starter) to ₹5,999/month (Business), plus custom Enterprise tier.
+- [NexCRM Pricing](https://nexspiresolutions.co.in/nexcrm/pricing): Detailed feature comparison across Starter, Growth, Business, and Enterprise plans with yearly discount options.
+
+## Services
+
+- [Custom Web Development](https://nexspiresolutions.co.in/services/custom-web-development): Full-stack web application development — React, Next.js, Node.js, Python, cloud-native architectures.
+- [Mobile App Development](https://nexspiresolutions.co.in/services/mobile-app-development): iOS, Android, and cross-platform apps using Flutter and React Native.
+- [E-commerce Development](https://nexspiresolutions.co.in/services/ecommerce-development): Shopify, WooCommerce, headless commerce, and custom marketplace platforms.
+- [Cloud Solutions](https://nexspiresolutions.co.in/services/cloud-solutions): AWS, Azure, GCP infrastructure, DevOps, CI/CD pipelines, containerization.
+- [AI & Machine Learning](https://nexspiresolutions.co.in/services/ai-machine-learning): Custom AI models, NLP, computer vision, predictive analytics, and ML pipeline development.
+
+## NexCRM Industry Solutions
+
+- [CRM for E-commerce](https://nexspiresolutions.co.in/nexcrm/industries/ecommerce): Abandoned cart recovery, product catalog sync, order tracking, customer segmentation.
+- [CRM for Real Estate](https://nexspiresolutions.co.in/nexcrm/industries/realestate): Property listing management, lead scoring, site visit scheduling, document management.
+- [CRM for Healthcare](https://nexspiresolutions.co.in/nexcrm/industries/healthcare): Patient management, appointment scheduling, HIPAA-compliant communication, treatment tracking.
+- [CRM for Education](https://nexspiresolutions.co.in/nexcrm/industries/education): Student enrollment tracking, course management, parent communication, fee tracking.
+- [CRM for Hospitality](https://nexspiresolutions.co.in/nexcrm/industries/hospitality): Reservation management, guest profiles, loyalty programs, review management.
+- [CRM for Restaurants](https://nexspiresolutions.co.in/nexcrm/industries/restaurant): Table reservation, menu management, delivery integration, customer loyalty.
+- [CRM for Salons & Spas](https://nexspiresolutions.co.in/nexcrm/industries/salon): Appointment booking, stylist scheduling, membership management, product inventory.
+- [CRM for Fitness](https://nexspiresolutions.co.in/nexcrm/industries/fitness): Member management, class scheduling, trainer assignments, attendance tracking.
+- [CRM for Travel](https://nexspiresolutions.co.in/nexcrm/industries/travel): Itinerary management, booking workflows, traveler profiles, supplier coordination.
+- [CRM for Legal](https://nexspiresolutions.co.in/nexcrm/industries/legal): Case management, client intake, document management, billing and time tracking.
+- [CRM for Manufacturing](https://nexspiresolutions.co.in/nexcrm/industries/manufacturing): Order management, inventory tracking, supplier relations, quality control.
+- [CRM for Logistics](https://nexspiresolutions.co.in/nexcrm/industries/logistics): Shipment tracking, fleet management, route optimization, warehouse management.
+- [CRM for Service Businesses](https://nexspiresolutions.co.in/nexcrm/industries/services): Project tracking, client communication, invoicing, team collaboration.
+- [CRM for Small Business](https://nexspiresolutions.co.in/nexcrm/industries/general): Contact management, deal pipeline, task automation, email campaigns.
+
+## Company
+
+- [About Us](https://nexspiresolutions.co.in/about): Company story, team, values, and mission.
+- [Portfolio](https://nexspiresolutions.co.in/portfolio): Case studies and delivered projects.
+- [Contact](https://nexspiresolutions.co.in/contact): Project inquiries and consultation requests.
+- [FAQ](https://nexspiresolutions.co.in/faq): Common questions about our services, pricing, and process.
+
+## Blog
+
+- [Top 10 AI Trends Shaping Business in 2026](https://nexspiresolutions.co.in/blog/ai-trends-2026): Analysis of AI trends transforming enterprise software — from agentic AI to multimodal systems.
+- [Cost of Building a Custom CRM in 2026](https://nexspiresolutions.co.in/blog/cost-of-custom-crm-2026): Detailed breakdown of CRM development costs, timelines, and build-vs-buy analysis.
+- [React Native vs Flutter 2026](https://nexspiresolutions.co.in/blog/react-native-vs-flutter): Technical comparison of cross-platform mobile frameworks — performance, ecosystem, and use cases.
+- [Monolith to Microservices Migration Guide](https://nexspiresolutions.co.in/blog/monolith-to-microservices): Step-by-step guide to decomposing monolithic applications into microservices architecture.
+- [Why Your Business Needs a PWA](https://nexspiresolutions.co.in/blog/why-business-needs-pwa): Benefits of Progressive Web Apps — offline support, performance, and installation.
+
+## Optional
+
+- [Privacy Policy](https://nexspiresolutions.co.in/privacy-policy): Data handling and privacy practices.
+- [Terms of Service](https://nexspiresolutions.co.in/terms): Service agreement and usage terms.

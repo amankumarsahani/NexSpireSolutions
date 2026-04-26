@@ -1,7 +1,7 @@
 import { Helmet } from 'react-helmet-async';
 import { Link } from 'react-router-dom';
 import RelatedServices from '../../components/seo/RelatedServices';
-import { SITE_URL } from '../../constants/siteConfig';
+import { SITE_URL, siteConfig } from '../../constants/siteConfig';
 
 const ReactVsFlutter = () => {
 
@@ -17,10 +17,8 @@ const ReactVsFlutter = () => {
         "publisher": {
             "@type": "Organization",
             "name": "Nexspire Solutions",
-            "logo": {
-                "@type": "ImageObject",
-                "url": `${SITE_URL}/logo.png`
-            }
+            "url": SITE_URL,
+            "logo": { "@type": "ImageObject", "url": `${SITE_URL}/logo.png` }
         },
         "datePublished": "2024-03-12",
         "description": "Decidign between React Native and Flutter? We compare performance, developer cost, and time-to-market to help you choose the right stack for your mobile app in 2026."
@@ -40,6 +38,16 @@ const ReactVsFlutter = () => {
                 <meta name="twitter:card" content="summary_large_image" />
                 <meta name="twitter:title" content="React Native vs Flutter 2026: Comparison Guide | Nexspire Blog" />
                 <meta name="twitter:description" content="Deciding between React Native and Flutter? We compare performance, developer cost, and time-to-market." />
+                <meta name="robots" content="index, follow, max-image-preview:large, max-snippet:-1" />
+                <meta name="keywords" content="React vs Flutter 2026, React Native vs Flutter, cross-platform app development, mobile framework comparison, Flutter India, React Native India, hybrid app development" />
+                <meta property="og:site_name" content="Nexspire Solutions" />
+                <meta property="og:locale" content="en_IN" />
+                <meta property="og:image:width" content="1200" />
+                <meta property="og:image:height" content="630" />
+                <meta name="twitter:site" content="@nexspiresolutions" />
+                <meta name="twitter:creator" content="@nexspiresolutions" />
+                <meta property="article:published_time" content="2024-03-12" />
+                <meta property="article:author" content="Nexspire Solutions" />
                 <script type="application/ld+json">
                     {JSON.stringify(articleSchema)}
                 </script>

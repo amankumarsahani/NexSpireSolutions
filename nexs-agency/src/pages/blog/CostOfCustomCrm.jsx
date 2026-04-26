@@ -1,7 +1,7 @@
 import { Helmet } from 'react-helmet-async';
 import { Link } from 'react-router-dom';
 import RelatedServices from '../../components/seo/RelatedServices';
-import { SITE_URL } from '../../constants/siteConfig';
+import { SITE_URL, siteConfig } from '../../constants/siteConfig';
 
 const CostOfCustomCrm = () => {
 
@@ -17,10 +17,8 @@ const CostOfCustomCrm = () => {
         "publisher": {
             "@type": "Organization",
             "name": "Nexspire Solutions",
-            "logo": {
-                "@type": "ImageObject",
-                "url": `${SITE_URL}/logo.png`
-            }
+            "url": SITE_URL,
+            "logo": { "@type": "ImageObject", "url": `${SITE_URL}/logo.png` }
         },
         "datePublished": "2024-03-20",
         "description": "How much does it cost to build a custom CRM in 2026? We break down the costs for MVPs, mid-sized, and enterprise solutions, plus hidden costs to watch for."
@@ -40,6 +38,16 @@ const CostOfCustomCrm = () => {
                 <meta name="twitter:card" content="summary_large_image" />
                 <meta name="twitter:title" content="Cost of Building a Custom CRM 2026 | Nexspire Blog" />
                 <meta name="twitter:description" content="How much does it cost to build a custom CRM in 2026? We break down costs for MVPs, mid-sized, and enterprise solutions." />
+                <meta name="robots" content="index, follow, max-image-preview:large, max-snippet:-1" />
+                <meta name="keywords" content="custom CRM cost India, CRM development pricing, build vs buy CRM, custom CRM ROI, CRM software development cost, affordable CRM development India" />
+                <meta property="og:site_name" content="Nexspire Solutions" />
+                <meta property="og:locale" content="en_IN" />
+                <meta property="og:image:width" content="1200" />
+                <meta property="og:image:height" content="630" />
+                <meta name="twitter:site" content="@nexspiresolutions" />
+                <meta name="twitter:creator" content="@nexspiresolutions" />
+                <meta property="article:published_time" content="2024-03-20" />
+                <meta property="article:author" content="Nexspire Solutions" />
                 <script type="application/ld+json">
                     {JSON.stringify(articleSchema)}
                 </script>

@@ -12,7 +12,7 @@ import SocialShare from '../components/ui/SocialShare';
 import AuthorBio from '../components/ui/AuthorBio';
 import BackToTop from '../components/ui/BackToTop';
 import TableOfContents, { addIdsToHeadings } from '../components/ui/TableOfContents';
-import { SITE_URL } from '../constants/siteConfig';
+import { SITE_URL, siteConfig } from '../constants/siteConfig';
 import { RiTimeLine, RiEyeLine } from 'react-icons/ri';
 
 const BlogArticle = () => {
@@ -81,12 +81,14 @@ const BlogArticle = () => {
         "publisher": {
             "@type": "Organization",
             "name": "Nexspire Solutions",
+            "url": SITE_URL,
             "logo": {
                 "@type": "ImageObject",
                 "url": `${SITE_URL}/logo.png`
             }
         },
         "datePublished": blog.createdAt,
+        "dateModified": blog.updatedAt || blog.createdAt,
         "description": blog.metaDescription || blog.excerpt
     };
 
@@ -130,9 +132,28 @@ const BlogArticle = () => {
                 <meta name="twitter:title" content={`${blog.title} | Nexspire Insights`} />
                 <meta name="twitter:description" content={metaDesc} />
                 <meta name="twitter:image" content={ogImage} />
+                <meta name="robots" content="index, follow, max-image-preview:large, max-snippet:-1" />
+                <meta property="og:site_name" content="Nexspire Solutions" />
+                <meta property="og:locale" content="en_IN" />
+                <meta property="og:image:width" content="1200" />
+                <meta property="og:image:height" content="630" />
+                <meta name="twitter:site" content="@nexspiresolutions" />
+                <meta name="twitter:creator" content="@nexspiresolutions" />
+                <meta property="article:published_time" content={blog.publishedDate || blog.createdAt} />
+                <meta property="article:author" content="Nexspire Solutions" />
+                <meta property="article:section" content={blog.category || 'Technology'} />
                 <script type="application/ld+json">
                     {JSON.stringify(articleSchema)}
                 </script>
+                <script type="application/ld+json">{JSON.stringify({
+                    "@context": "https://schema.org",
+                    "@type": "BreadcrumbList",
+                    "itemListElement": [
+                        { "@type": "ListItem", "position": 1, "name": "Home", "item": SITE_URL },
+                        { "@type": "ListItem", "position": 2, "name": "Blog", "item": `${SITE_URL}/blog` },
+                        { "@type": "ListItem", "position": 3, "name": blog.title, "item": `${SITE_URL}/blog/${blog.slug}` }
+                    ]
+                })}</script>
             </Helmet>
 
             {/* Reading Progress */}

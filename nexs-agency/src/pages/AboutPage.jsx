@@ -69,14 +69,21 @@ const AboutPage = () => {
         <meta name="description" content="Discover Nexspire Solutions, a top software development agency delivering web, mobile, AI, cloud, and enterprise solutions to clients globally. Founded in 2020, serving startups, SMEs, and enterprises across North America, Europe, Middle East, and Asia-Pacific." />
         <meta name="keywords" content="global software agency, top software company worldwide, international software solutions, AI software development, about nexspire solutions, software company india, tech experts usa uk, digital transformation partners" />
         <link rel="canonical" href={`${SITE_URL}/about`} />
+        <meta name="robots" content="index, follow, max-image-preview:large, max-snippet:-1" />
         <meta property="og:title" content="About Nexspire Solutions – Global Software Agency" />
         <meta property="og:description" content="Top software development agency delivering web, mobile, AI, cloud, and enterprise solutions to clients globally." />
         <meta property="og:type" content="website" />
         <meta property="og:url" content={`${SITE_URL}/about`} />
         <meta property="og:image" content={`${SITE_URL}/og-image.jpg`} />
+        <meta property="og:image:width" content="1200" />
+        <meta property="og:image:height" content="630" />
+        <meta property="og:site_name" content="Nexspire Solutions" />
+        <meta property="og:locale" content="en_IN" />
         <meta name="twitter:card" content="summary_large_image" />
         <meta name="twitter:title" content="About Nexspire Solutions – Global Software Agency" />
         <meta name="twitter:description" content="Top software development agency delivering web, mobile, AI, cloud, and enterprise solutions to clients globally." />
+        <meta name="twitter:site" content="@nexspiresolutions" />
+        <meta name="twitter:creator" content="@nexspiresolutions" />
         <script type="application/ld+json">{JSON.stringify({
             "@context": "https://schema.org",
             "@type": "Organization",
@@ -86,10 +93,29 @@ const AboutPage = () => {
             "description": "Top software development agency delivering web, mobile, AI, cloud, and enterprise solutions to clients globally.",
             "email": "nexspiretechsolutions@gmail.com",
             "telephone": "+917696309551, +917009614671",
-            "foundingDate": "2020",
+            "foundingDate": "2023",
+            "address": {
+                "@type": "PostalAddress",
+                "addressLocality": "Mohali",
+                "addressRegion": "Punjab",
+                "addressCountry": "IN"
+            },
+            "numberOfEmployees": {
+                "@type": "QuantitativeValue",
+                "minValue": 10,
+                "maxValue": 50
+            },
             "sameAs": siteConfig.socialUrls
         })}</script>
       </Helmet>
+      <script type="application/ld+json">{JSON.stringify({
+          "@context": "https://schema.org",
+          "@type": "BreadcrumbList",
+          "itemListElement": [
+              { "@type": "ListItem", "position": 1, "name": "Home", "item": SITE_URL },
+              { "@type": "ListItem", "position": 2, "name": "About", "item": `${SITE_URL}/about` }
+          ]
+      })}</script>
 
       {/* Scroll Progress Bar */}
       <ReadingProgress />

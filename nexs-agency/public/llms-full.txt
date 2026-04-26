@@ -1,0 +1,163 @@
+# Nexspire Solutions — Full Reference
+
+> Nexspire Solutions is an India-based software development company building custom web applications, mobile apps, cloud infrastructure, AI/ML solutions, and NexCRM — an industry-specific CRM platform starting at ₹999/month.
+
+## Company Overview
+
+Nexspire Solutions is a technology company headquartered in IT Park, Sector 67, Mohali, Punjab, India. Founded in 2023, we build scalable digital products for businesses ranging from startups to enterprises.
+
+**Contact Information:**
+- Email: nexspiretechsolutions@gmail.com
+- Phone: +91 7696309551
+- Website: https://nexspiresolutions.co.in
+- LinkedIn: https://www.linkedin.com/company/nexspire-solution
+- GitHub: https://github.com/orgs/Nexspire-Solutions/repositories
+- Instagram: https://www.instagram.com/nexspire_solutions/
+
+**Core Technology Stack:**
+- Frontend: React, Next.js, Vue.js, Tailwind CSS
+- Mobile: Flutter, React Native
+- Backend: Node.js, Express, Python, Django
+- Cloud: AWS, Azure, Google Cloud Platform
+- AI/ML: TensorFlow, PyTorch, OpenAI, custom models
+- Databases: PostgreSQL, MongoDB, Redis, Elasticsearch
+
+---
+
+## NexCRM — Industry-Specific CRM Platform
+
+NexCRM is a multi-tenant CRM platform designed for specific industries. Each tenant gets isolated data, customized modules, and industry-specific workflows.
+
+### Pricing Plans
+
+| Plan | Monthly Price | Yearly Price (per month) | Leads | Customers | Products | Team Members | Storage |
+|---|---|---|---|---|---|---|---|
+| Starter | ₹999 | ₹849 | 500 | 200 | 50 | 3 | 1 GB |
+| Growth | ₹2,499 | ₹2,124 | 2,000 | 1,000 | 200 | 10 | 5 GB |
+| Business | ₹5,999 | ₹5,099 | 10,000 | 5,000 | 1,000 | 25 | 20 GB |
+| Enterprise | Custom | Custom | Unlimited | Unlimited | Unlimited | Unlimited | Unlimited |
+
+All plans include a 14-day free trial.
+
+### Core CRM Features (Available in All Plans)
+
+- **Lead Management**: Capture, score, assign, and track leads through customizable pipelines.
+- **Contact Management**: Centralized contact database with interaction history, notes, and custom fields.
+- **Deal Pipeline**: Visual kanban-style deal tracking with stage management and win/loss analytics.
+- **Task Automation**: Automated workflows triggered by lead actions, deal stage changes, or time-based rules.
+- **Reporting & Analytics**: Dashboard with KPIs, conversion funnels, revenue forecasting, and exportable reports.
+
+### E-commerce Features (Growth Plan and Above)
+
+- Product catalog management with variants, pricing, and inventory sync
+- Order management and fulfillment tracking
+- Abandoned cart recovery with automated email sequences
+- Customer segmentation based on purchase history
+- Storefront integration with Shopify, WooCommerce, and custom stores
+- Payment gateway integration (Razorpay, Stripe, PayPal)
+- Inventory alerts and stock management
+
+### Communication Features (All Plans)
+
+- Email campaigns with templates and scheduling
+- WhatsApp Business API integration for messaging
+- SMS campaigns and notifications
+- In-app chat and customer messaging
+- Call logging and recording integration
+- Multi-channel inbox for unified communication
+- Automated follow-up sequences
+- Customer feedback and survey tools
+
+### Automation Features (Business Plan and Above)
+
+- Workflow builder with drag-and-drop visual editor
+- AI-powered lead scoring based on behavioral signals
+- Predictive analytics for deal forecasting and churn prediction
+
+### Support Features
+
+- Email support (all plans)
+- Priority support (Growth and above)
+- Dedicated account manager (Business and above)
+- Custom training sessions (Enterprise)
+- 99.9% uptime SLA (Enterprise)
+
+### Industry-Specific Solutions
+
+**E-commerce CRM**: Abandoned cart recovery, product catalog sync, order lifecycle management, customer lifetime value tracking, RFM segmentation, delivery partner integration.
+
+**Real Estate CRM**: Property listing management with photos and virtual tours, automated lead scoring based on property preferences, site visit scheduling with calendar sync, document management for agreements and contracts, broker commission tracking, project inventory management.
+
+**Healthcare CRM**: Patient management with medical history, appointment scheduling with automated reminders, HIPAA-compliant secure communication, treatment plan tracking, prescription management, insurance and billing integration.
+
+**Education CRM**: Student enrollment pipeline from inquiry to admission, course and curriculum management, parent-teacher communication portal, fee tracking with payment reminders, attendance management, Examination and grade management.
+
+**Hospitality CRM**: Reservation and booking management, guest preference profiles, room inventory and housekeeping coordination, loyalty program management, online review monitoring and response, event and banquet management.
+
+**Restaurant CRM**: Table reservation with floor plan management, digital menu management, Online ordering and delivery integration, Customer loyalty and rewards programs, Kitchen order management, Inventory and supplier management.
+
+**Salon & Spa CRM**: Online appointment booking with stylist selection, Staff scheduling and availability management, Membership and package management, Product inventory for retail, Treatment history and preference tracking, Automated birthday and anniversary reminders.
+
+**Fitness CRM**: Member registration and management, Class and session scheduling, Trainer assignment and performance tracking, Attendance tracking with check-in, Membership renewal and payment automation, Diet and workout plan management.
+
+**Travel CRM**: Itinerary building and management, Booking workflows for flights, hotels, and activities, Traveler profile management, Supplier and vendor coordination, Group tour management, Visa and document tracking.
+
+**Legal CRM**: Case management with timeline tracking, Client intake and conflict checking, Document management with version control, Time tracking and billing, Court date and deadline management, Matter-specific communication threads.
+
+**Manufacturing CRM**: Order and production tracking, Raw material and finished goods inventory, Supplier relationship management, Quality control checkpoints, Purchase order automation, Production scheduling and capacity planning.
+
+**Logistics CRM**: Shipment tracking with real-time updates, Fleet management and maintenance scheduling, Route optimization, Warehouse and inventory management, Proof of delivery and documentation, Customer portal for tracking.
+
+**Service Businesses CRM**: Project management with milestones, Client communication and ticketing, Time tracking and invoicing, Team collaboration and task assignment, Proposal and contract management, Resource utilization dashboards.
+
+**General / Small Business CRM**: Contact and company management, Deal pipeline with visual kanban board, Email campaign management, Task automation and reminders, Basic reporting and dashboards, Team collaboration tools.
+
+---
+
+## Development Services
+
+### Custom Web Development
+Full-stack web application development using modern frameworks. We build enterprise dashboards, SaaS platforms, marketplace applications, and complex web systems. Tech stack: React, Next.js, Node.js, Python, PostgreSQL, Redis. We handle frontend architecture, backend engineering, API development, and cloud infrastructure setup.
+
+### Mobile App Development
+Native and cross-platform mobile application development. We build consumer apps, enterprise mobility solutions, and IoT-connected applications. Platforms: iOS (Swift), Android (Kotlin), Flutter, React Native. We handle UI/UX design, development, testing, App Store/Play Store deployment, and post-launch support.
+
+### E-commerce Development
+End-to-end e-commerce platform development. We build custom Shopify stores, WooCommerce solutions, headless commerce architectures, and multi-vendor marketplace platforms. Features include payment integration, inventory management, order fulfillment, and analytics dashboards.
+
+### Cloud Solutions
+Cloud infrastructure design and implementation. We work with AWS, Azure, and Google Cloud Platform. Services include cloud migration, DevOps pipeline setup (CI/CD), containerization with Docker and Kubernetes, serverless architecture, auto-scaling, monitoring, and cost optimization.
+
+### AI & Machine Learning
+Custom AI/ML solution development. We build natural language processing systems, computer vision applications, recommendation engines, predictive analytics models, and conversational AI. We handle data pipeline development, model training, deployment, and ongoing optimization.
+
+---
+
+## Service Areas
+
+Nexspire Solutions serves clients globally, with dedicated landing pages for these regions:
+- London, United Kingdom
+- New York, United States
+- Bangalore, India
+- Dubai, United Arab Emirates
+- Sydney, Australia
+- Toronto, Canada
+
+---
+
+## Blog & Technical Insights
+
+### Top 10 AI Trends Shaping Business in 2026
+Published analysis covering the most impactful AI trends for enterprise software — agentic AI systems, multimodal AI, AI governance, edge AI, and AI-powered development tools. Includes practical implications for businesses adopting AI.
+
+### Cost of Building a Custom CRM in 2026
+Comprehensive breakdown of CRM development costs including team composition, timeline estimates (3-12 months), technology choices, and a detailed build-vs-buy analysis comparing custom development against platforms like Salesforce and HubSpot.
+
+### React Native vs Flutter 2026: Complete Comparison
+Technical comparison covering performance benchmarks, developer ecosystem, community size, learning curve, code sharing capabilities, and platform-specific considerations. Includes recommendations by use case.
+
+### Monolith to Microservices Migration Guide
+Step-by-step methodology for decomposing monolithic applications. Covers the Strangler Fig pattern, domain-driven design, service boundaries, data management strategies, and DevOps requirements for microservices.
+
+### Why Your Business Needs a Progressive Web App
+Analysis of PWA benefits including offline functionality, push notifications, installation without app stores, performance improvements, and cross-platform compatibility. Includes ROI data and implementation considerations.

@@ -34,6 +34,7 @@ const PrivacyPolicy = lazy(() => import('./pages/PrivacyPolicy'));
 const TermsOfService = lazy(() => import('./pages/TermsOfService'));
 const FAQPage = lazy(() => import('./pages/FAQPage'));
 const CityLandingPage = lazy(() => import('./pages/seo/CityLandingPage'));
+const IndustryLandingPage = lazy(() => import('./pages/IndustryLandingPage'));
 const CustomWebDevelopment = lazy(() => import('./pages/services/CustomWebDevelopment'));
 const MobileAppDevelopment = lazy(() => import('./pages/services/MobileAppDevelopment'));
 const AiMachineLearning = lazy(() => import('./pages/services/AiMachineLearning'));
@@ -154,6 +155,7 @@ function App() {
           <Route path="/blog" element={<BlogPage />} />
           <Route path="/nexcrm" element={<NexCRMLandingPage />} />
           <Route path="/nexcrm/pricing" element={<CRMPricingPage />} />
+          <Route path="/nexcrm/industries/:industry" element={<IndustryLandingPage />} />
           <Route path="/admin/backups" element={<ProtectedRoute><AdminBackupsPage /></ProtectedRoute>} />
           <Route path="/privacy-policy" element={<PrivacyPolicy />} />
           <Route path="/terms" element={<TermsOfService />} />

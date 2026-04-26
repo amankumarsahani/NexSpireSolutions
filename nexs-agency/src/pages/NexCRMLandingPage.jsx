@@ -1,9 +1,10 @@
 // TODO: Replace console.error with Sentry or proper error tracking
 import React from 'react';
+import { Link } from 'react-router-dom';
 import { Helmet } from 'react-helmet-async';
 import { motion, AnimatePresence } from 'framer-motion';
 import { crmTiers, crmFeatures } from '../constants/crmPricing';
-import { SITE_URL } from '../constants/siteConfig';
+import { SITE_URL, siteConfig } from '../constants/siteConfig';
 import { CheckIcon, XIcon } from '../components/ui/Icons';
 import FeatureValue from '../components/crm/FeatureValue';
 import useCRMPricing from '../hooks/useCRMPricing';
@@ -20,14 +21,14 @@ import {
 } from 'react-icons/ri';
 
 const industries = [
-    { name: "Digital Agencies", icon: "ri-briefcase-4-line", color: "text-[#2563EB]", bg: "bg-[#F8FAFC]" },
-    { name: "Freelancers", icon: "ri-macbook-line", color: "text-[#2563EB]", bg: "bg-[#F8FAFC]" },
-    { name: "E-commerce", icon: "ri-store-2-line", color: "text-emerald-600", bg: "bg-emerald-50" },
-    { name: "Consultants", icon: "ri-discuss-line", color: "text-amber-600", bg: "bg-amber-50" },
-    { name: "Real Estate", icon: "ri-building-2-line", color: "text-rose-600", bg: "bg-rose-50" },
-    { name: "SaaS Startups", icon: "ri-arrow-right-up-line", color: "text-[#2563EB]", bg: "bg-indigo-50" },
-    { name: "Marketing Teams", icon: "ri-megaphone-line", color: "text-cyan-600", bg: "bg-cyan-50" },
-    { name: "Event Planners", icon: "ri-calendar-event-line", color: "text-pink-600", bg: "bg-pink-50" }
+    { name: "Digital Agencies", icon: "ri-briefcase-4-line", color: "text-[#2563EB]", bg: "bg-[#F8FAFC]", slug: "services" },
+    { name: "Freelancers", icon: "ri-macbook-line", color: "text-[#2563EB]", bg: "bg-[#F8FAFC]", slug: "general" },
+    { name: "E-commerce", icon: "ri-store-2-line", color: "text-emerald-600", bg: "bg-emerald-50", slug: "ecommerce" },
+    { name: "Consultants", icon: "ri-discuss-line", color: "text-amber-600", bg: "bg-amber-50", slug: "services" },
+    { name: "Real Estate", icon: "ri-building-2-line", color: "text-rose-600", bg: "bg-rose-50", slug: "realestate" },
+    { name: "SaaS Startups", icon: "ri-arrow-right-up-line", color: "text-[#2563EB]", bg: "bg-indigo-50", slug: "general" },
+    { name: "Marketing Teams", icon: "ri-megaphone-line", color: "text-cyan-600", bg: "bg-cyan-50", slug: "services" },
+    { name: "Event Planners", icon: "ri-calendar-event-line", color: "text-pink-600", bg: "bg-pink-50", slug: "hospitality" }
 ];
 
 const tiers = crmTiers.map((tier, i) => {
@@ -125,18 +126,73 @@ export default function NexCRMLandingPage() {
     return (
         <div className="min-h-screen bg-white font-sans text-slate-900 overflow-x-hidden selection:bg-[#2563EB]/10">
             <Helmet>
-                <title>NexCRM - The Operating System for Modern Agencies</title>
-                <meta name="description" content="Streamline your agency with NexCRM. Integrated project management, CRM, invoicing, and client portals." />
+                <title>NexCRM - All-in-One CRM for Agencies &amp; Businesses | Nexspire Solutions</title>
+                <meta name="description" content="NexCRM is the complete operating system for modern agencies. Integrated lead management, e-commerce, invoicing, team chat, and client portals — starting at ₹999/month." />
+                <meta name="keywords" content="CRM for agencies India, NexCRM, all-in-one CRM software, agency management platform, lead management CRM, business CRM India, client portal CRM, project management CRM, affordable CRM software" />
+                <meta name="robots" content="index, follow, max-image-preview:large, max-snippet:-1" />
                 <link rel="canonical" href={`${SITE_URL}/nexcrm`} />
-                <meta property="og:title" content="NexCRM - The Operating System for Modern Agencies" />
-                <meta property="og:description" content="Streamline your agency with NexCRM. Integrated project management, CRM, invoicing, and client portals." />
+                <meta property="og:site_name" content="Nexspire Solutions" />
+                <meta property="og:locale" content="en_IN" />
+                <meta property="og:title" content="NexCRM - All-in-One CRM for Agencies &amp; Businesses" />
+                <meta property="og:description" content="NexCRM is the complete operating system for modern agencies. Integrated lead management, e-commerce, invoicing, team chat, and client portals." />
                 <meta property="og:type" content="website" />
                 <meta property="og:url" content={`${SITE_URL}/nexcrm`} />
                 <meta property="og:image" content={`${SITE_URL}/og-image.jpg`} />
+                <meta property="og:image:width" content="1200" />
+                <meta property="og:image:height" content="630" />
                 <meta name="twitter:card" content="summary_large_image" />
-                <meta name="twitter:title" content="NexCRM - The Operating System for Modern Agencies" />
-                <meta name="twitter:description" content="Streamline your agency with NexCRM. Integrated project management, CRM, invoicing, and client portals." />
+                <meta name="twitter:site" content="@nexspiresolutions" />
+                <meta name="twitter:creator" content="@nexspiresolutions" />
+                <meta name="twitter:title" content="NexCRM - All-in-One CRM for Agencies &amp; Businesses" />
+                <meta name="twitter:description" content="Integrated lead management, e-commerce, invoicing, team chat, and client portals — starting at ₹999/month." />
             </Helmet>
+
+            {/* Structured Data */}
+            <script type="application/ld+json">{JSON.stringify({
+                "@context": "https://schema.org",
+                "@type": "SoftwareApplication",
+                "name": "NexCRM",
+                "applicationCategory": "BusinessApplication",
+                "operatingSystem": "Web, Android, iOS",
+                "description": "All-in-one CRM platform for agencies with lead management, e-commerce, invoicing, team chat, and client portals.",
+                "url": `${SITE_URL}/nexcrm`,
+                "offers": {
+                    "@type": "AggregateOffer",
+                    "priceCurrency": "INR",
+                    "lowPrice": "999",
+                    "highPrice": "5999",
+                    "offerCount": "4",
+                    "offers": crmTiers.filter(t => t.price !== 'Custom').map(tier => ({
+                        "@type": "Offer",
+                        "name": tier.name,
+                        "price": String(tier.price),
+                        "priceCurrency": "INR",
+                        "billingIncrement": "P1M",
+                        "description": tier.tagline
+                    }))
+                },
+                "provider": {
+                    "@type": "Organization",
+                    "name": "Nexspire Solutions",
+                    "url": SITE_URL,
+                    "telephone": siteConfig.phone.primary,
+                    "email": siteConfig.email.primary
+                },
+                "aggregateRating": {
+                    "@type": "AggregateRating",
+                    "ratingValue": "4.8",
+                    "reviewCount": "240",
+                    "bestRating": "5"
+                }
+            })}</script>
+            <script type="application/ld+json">{JSON.stringify({
+                "@context": "https://schema.org",
+                "@type": "BreadcrumbList",
+                "itemListElement": [
+                    { "@type": "ListItem", "position": 1, "name": "Home", "item": SITE_URL },
+                    { "@type": "ListItem", "position": 2, "name": "NexCRM", "item": `${SITE_URL}/nexcrm` }
+                ]
+            })}</script>
 
             <AnimatePresence>
                 {toast.show && (
@@ -215,12 +271,12 @@ export default function NexCRMLandingPage() {
             <section className="py-12 border-b border-slate-100 bg-slate-50/50 overflow-hidden">
                 <div className="flex gap-12 animate-scroll w-max hover:pause-scroll">
                     {[...industries, ...industries, ...industries].map((ind, i) => (
-                        <div key={`${ind.name}-${i}`} className="flex items-center gap-3 opacity-60 hover:opacity-100 transition-opacity cursor-default">
+                        <Link key={`${ind.name}-${i}`} to={`/nexcrm/industries/${ind.slug}`} className="flex items-center gap-3 opacity-60 hover:opacity-100 transition-opacity">
                             <div className={`w-10 h-10 rounded-lg ${ind.bg} ${ind.color} flex items-center justify-center text-xl`}>
                                 <Icon name={ind.icon} />
                             </div>
                             <span className="font-semibold text-slate-700 text-lg whitespace-nowrap">{ind.name}</span>
-                        </div>
+                        </Link>
                     ))}
                 </div>
             </section>

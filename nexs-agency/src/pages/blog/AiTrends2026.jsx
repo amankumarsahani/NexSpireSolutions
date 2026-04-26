@@ -1,7 +1,7 @@
 import { Helmet } from 'react-helmet-async';
 import { Link } from 'react-router-dom';
 import RelatedServices from '../../components/seo/RelatedServices';
-import { SITE_URL } from '../../constants/siteConfig';
+import { SITE_URL, siteConfig } from '../../constants/siteConfig';
 
 const AiTrends2026 = () => {
 
@@ -17,10 +17,8 @@ const AiTrends2026 = () => {
         "publisher": {
             "@type": "Organization",
             "name": "Nexspire Solutions",
-            "logo": {
-                "@type": "ImageObject",
-                "url": `${SITE_URL}/logo.png`
-            }
+            "url": SITE_URL,
+            "logo": { "@type": "ImageObject", "url": `${SITE_URL}/logo.png` }
         },
         "datePublished": "2024-03-15",
         "description": "Discover the top AI trends for 2026 including Generative AI, Predictive Analytics, and Autonomous Agents. Learn how enterprises are leveraging these technologies."
@@ -40,6 +38,16 @@ const AiTrends2026 = () => {
                 <meta name="twitter:card" content="summary_large_image" />
                 <meta name="twitter:title" content="Top 10 AI Trends Shaping Business in 2026 | Nexspire Insights" />
                 <meta name="twitter:description" content="Discover the top AI trends for 2026 including Generative AI, Predictive Analytics, and Autonomous Agents." />
+                <meta name="robots" content="index, follow, max-image-preview:large, max-snippet:-1" />
+                <meta name="keywords" content="AI trends 2026, artificial intelligence business, AI adoption India, machine learning trends, AI automation, generative AI business, enterprise AI solutions" />
+                <meta property="og:site_name" content="Nexspire Solutions" />
+                <meta property="og:locale" content="en_IN" />
+                <meta property="og:image:width" content="1200" />
+                <meta property="og:image:height" content="630" />
+                <meta name="twitter:site" content="@nexspiresolutions" />
+                <meta name="twitter:creator" content="@nexspiresolutions" />
+                <meta property="article:published_time" content="2024-03-15" />
+                <meta property="article:author" content="Nexspire Solutions" />
                 <script type="application/ld+json">
                     {JSON.stringify(articleSchema)}
                 </script>

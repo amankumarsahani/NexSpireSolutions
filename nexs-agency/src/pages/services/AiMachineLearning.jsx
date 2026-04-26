@@ -74,6 +74,7 @@ const data = {
     seo: {
         title: 'AI & Machine Learning Services | Generative AI Solutions',
         description: 'Unlock the power of AI with Nexspire Solutions. Custom Machine Learning, Generative AI, and Predictive Analytics for enterprise growth.',
+        keywords: 'AI ML development India, machine learning solutions, artificial intelligence services, NLP development, computer vision India, AI consulting Mohali, predictive analytics, deep learning',
         canonicalPath: '/services/ai-machine-learning',
         ogTitle: 'AI & Machine Learning Services | Generative AI Solutions',
         ogDescription: 'Unlock the power of AI with Nexspire Solutions. Custom Machine Learning, Generative AI, and Predictive Analytics.',

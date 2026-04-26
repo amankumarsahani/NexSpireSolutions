@@ -17,7 +17,25 @@ const navItems = [
       { label: 'E-commerce', path: '/services/ecommerce-development' },
     ]
   },
-  { label: 'NexCRM', path: '/nexcrm' },
+  { label: 'NexCRM', path: '/nexcrm', children: [
+    { label: 'Overview', path: '/nexcrm' },
+    { label: 'Pricing', path: '/nexcrm/pricing' },
+    { type: 'divider', label: 'Industries' },
+    { label: 'E-commerce', path: '/nexcrm/industries/ecommerce' },
+    { label: 'Real Estate', path: '/nexcrm/industries/realestate' },
+    { label: 'Healthcare', path: '/nexcrm/industries/healthcare' },
+    { label: 'Education', path: '/nexcrm/industries/education' },
+    { label: 'Hospitality', path: '/nexcrm/industries/hospitality' },
+    { label: 'Restaurant', path: '/nexcrm/industries/restaurant' },
+    { label: 'Salon & Spa', path: '/nexcrm/industries/salon' },
+    { label: 'Fitness', path: '/nexcrm/industries/fitness' },
+    { label: 'Travel', path: '/nexcrm/industries/travel' },
+    { label: 'Legal', path: '/nexcrm/industries/legal' },
+    { label: 'Manufacturing', path: '/nexcrm/industries/manufacturing' },
+    { label: 'Logistics', path: '/nexcrm/industries/logistics' },
+    { label: 'Services', path: '/nexcrm/industries/services' },
+    { label: 'General', path: '/nexcrm/industries/general' },
+  ]},
   { label: 'About', path: '/about' },
   { label: 'Portfolio', path: '/portfolio' },
   { label: 'Blog', path: '/blog' },
@@ -28,7 +46,7 @@ const Header = memo(function Header() {
   const [isMenuOpen, setIsMenuOpen] = useState(false);
   const [activeDropdown, setActiveDropdown] = useState(null);
   const [scrolled, setScrolled] = useState(false);
-  const [isServicesOpen, setIsServicesOpen] = useState(false);
+  const [openDesktopDropdown, setOpenDesktopDropdown] = useState(null);
   const location = useLocation();
   const { user, isAuthenticated } = useAuth();
   const showAdminBackups = isAuthenticated && user?.role === 'admin';
@@ -106,9 +124,9 @@ const Header = memo(function Header() {
                     onClick={(e) => handleNavClick(e, item.path)}
                     {...(item.children ? {
                       'aria-haspopup': 'true',
-                      'aria-expanded': isServicesOpen,
-                      onFocus: () => setIsServicesOpen(true),
-                      onBlur: () => { setTimeout(() => setIsServicesOpen(false), 150); }
+                      'aria-expanded': openDesktopDropdown === item.label,
+                      onFocus: () => setOpenDesktopDropdown(item.label),
+                      onBlur: () => { setTimeout(() => setOpenDesktopDropdown(null), 150); }
                     } : {})}
                     className={`relative z-10 px-4 py-2 text-sm font-semibold rounded-full transition-all duration-300 inline-flex items-center gap-1 ${isActive(item.path)
                       ? 'bg-[#2563EB] text-white shadow-lg'
@@ -120,20 +138,27 @@ const Header = memo(function Header() {
                   </Link>
 
                   {item.children && (
-                    <div className={`absolute top-full left-1/2 -translate-x-1/2 pt-4 transition-all duration-300 w-64 transform ${isServicesOpen ? 'opacity-100 visible translate-y-0' : 'opacity-0 invisible translate-y-2'} group-hover:opacity-100 group-hover:visible group-hover:translate-y-0`}>
-                      <div className="bg-white rounded-2xl shadow-xl border border-slate-200 overflow-hidden p-2">
-                        <div className="flex flex-col gap-1">
-                          {item.children.map((child) => (
+                    <div className={`absolute top-full left-1/2 -translate-x-1/2 pt-4 transition-all duration-300 ${item.children.length > 8 ? 'w-[420px]' : 'w-64'} transform ${openDesktopDropdown === item.label ? 'opacity-100 visible translate-y-0' : 'opacity-0 invisible translate-y-2'} group-hover:opacity-100 group-hover:visible group-hover:translate-y-0`}>
+                      <div className="bg-white rounded-2xl shadow-xl border border-slate-200 overflow-hidden p-2 max-h-[70vh] overflow-y-auto">
+                        <div className={`flex flex-col gap-0.5 ${item.children.some(c => c.type === 'divider') ? '' : ''}`}>
+                          {item.children.map((child, ci) => (
+                            child.type === 'divider' ? (
+                              <div key={ci} className="px-4 pt-3 pb-1.5">
+                                <div className="border-t border-slate-100" />
+                                <span className="block text-[11px] font-semibold text-slate-400 uppercase tracking-wider mt-2">{child.label}</span>
+                              </div>
+                            ) : (
                             <Link
                               key={child.label}
                               to={child.path}
-                              onFocus={() => setIsServicesOpen(true)}
-                              onBlur={() => { setTimeout(() => setIsServicesOpen(false), 150); }}
-                              className="px-4 py-3 text-sm font-medium text-slate-700 hover:bg-[#F8FAFC] hover:text-[#2563EB] rounded-xl transition-colors text-left flex items-center justify-between group/item"
+                              onFocus={() => setOpenDesktopDropdown(item.label)}
+                              onBlur={() => { setTimeout(() => setOpenDesktopDropdown(null), 150); }}
+                              className="px-4 py-2.5 text-sm font-medium text-slate-700 hover:bg-[#F8FAFC] hover:text-[#2563EB] rounded-xl transition-colors text-left flex items-center justify-between group/item"
                             >
                               {child.label}
                               <RiArrowRightLine className="opacity-0 group-hover/item:opacity-100 -translate-x-2 group-hover/item:translate-x-0 transition-all text-xs" />
                             </Link>
+                            )
                           ))}
                         </div>
                       </div>
@@ -225,9 +250,14 @@ const Header = memo(function Header() {
                     )}
 
                     {item.children && (
-                      <div className={`overflow-hidden transition-all duration-300 ${activeDropdown === item.label ? 'max-h-96 opacity-100 mt-1' : 'max-h-0 opacity-0'}`}>
-                        <div className="pl-6 pr-2 space-y-1 border-l-2 border-slate-200 ml-4 pb-2">
-                          {item.children.map(child => (
+                      <div className={`overflow-hidden transition-all duration-300 ${activeDropdown === item.label ? 'max-h-[600px] opacity-100 mt-1' : 'max-h-0 opacity-0'}`}>
+                        <div className="pl-6 pr-2 space-y-0.5 border-l-2 border-slate-200 ml-4 pb-2">
+                          {item.children.map((child, ci) => (
+                            child.type === 'divider' ? (
+                              <div key={ci} className="pt-2 pb-1">
+                                <span className="block text-[11px] font-semibold text-slate-400 uppercase tracking-wider px-4">{child.label}</span>
+                              </div>
+                            ) : (
                             <Link
                               key={child.label}
                               to={child.path}
@@ -236,6 +266,7 @@ const Header = memo(function Header() {
                             >
                               {child.label}
                             </Link>
+                            )
                           ))}
                         </div>
                       </div>

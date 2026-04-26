@@ -18,6 +18,8 @@ const TermsOfService = () => {
                 <meta name="twitter:card" content="summary_large_image" />
                 <meta name="twitter:title" content="Terms of Service | Nexspire Solutions" />
                 <meta name="twitter:description" content="Read the Nexspire Solutions terms of service. Understand the terms and conditions for using our website and services." />
+                <meta property="og:site_name" content="Nexspire Solutions" />
+                <meta name="twitter:site" content="@nexspiresolutions" />
             </Helmet>
             <div className="max-w-3xl mx-auto px-4 sm:px-6 lg:px-8">
                 <h1 className="text-4xl font-bold text-slate-800 mb-8">Terms of Service</h1>
