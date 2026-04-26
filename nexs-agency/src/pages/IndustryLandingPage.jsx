@@ -145,9 +145,9 @@ export default function IndustryLandingPage() {
                 )}
             </AnimatePresence>
 
-            <section className="relative pt-32 pb-20 lg:pt-48 lg:pb-32 overflow-hidden">
-                <div className="absolute inset-0 bg-gradient-to-b from-slate-50 to-white z-0" />
-                <div className={`absolute top-0 left-1/2 -translate-x-1/2 w-[1000px] h-[600px] bg-gradient-to-b ${colors.glow} to-transparent rounded-full blur-3xl opacity-60 pointer-events-none z-0`} />
+            <section className="relative pt-32 pb-20 lg:pt-48 lg:pb-32 overflow-hidden" style={{ backgroundImage: `url(${data.hero.image})`, backgroundSize: 'cover', backgroundPosition: 'center' }}>
+                <div className="absolute inset-0 bg-white/90 backdrop-blur-sm z-0" />
+                <div className={`absolute top-0 left-1/2 -translate-x-1/2 w-[1000px] h-[600px] bg-gradient-to-b ${colors.glow} to-transparent rounded-full blur-3xl opacity-60 pointer-events-none z-[1]`} />
 
                 <div className="max-w-7xl mx-auto px-6 relative z-10 text-center">
                     <motion.div
@@ -201,7 +201,10 @@ export default function IndustryLandingPage() {
                     <FadeIn y={16} duration={0.5}>
                         <div className="grid grid-cols-2 md:grid-cols-4 gap-8 md:gap-4">
                             {data.stats.map((stat) => (
-                                <div key={stat.label} className="flex flex-col items-center text-center gap-1">
+                                <div key={stat.label} className="flex flex-col items-center text-center gap-2">
+                                    <div className={`w-10 h-10 rounded-xl flex items-center justify-center text-lg ${colors.bg} ${colors.text}`}>
+                                        <Icon name={data.icon} />
+                                    </div>
                                     <span className="text-3xl md:text-4xl font-bold text-slate-900 tracking-tight">{stat.value}</span>
                                     <span className="text-sm text-slate-500 font-medium">{stat.label}</span>
                                 </div>
@@ -225,48 +228,83 @@ export default function IndustryLandingPage() {
                         </div>
                     </FadeIn>
 
-                    <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8">
-                        {data.services.map((service, idx) => (
-                            <FadeIn key={service.title} y={30} delay={idx * 0.08}>
-                                <div className="bg-white rounded-2xl p-8 border border-slate-200 shadow-xl shadow-slate-200/50 hover:-translate-y-1 hover:shadow-2xl transition-all duration-300 group h-full">
+                    <div className="grid grid-cols-1 md:grid-cols-3 gap-8 auto-rows-[340px]">
+                        {data.services.map((service, idx) => {
+                            if (idx === 0) return (
+                                <FadeIn key={service.title} y={30} delay={0} className="md:col-span-2 md:row-span-1 rounded-[2rem] border border-slate-200 shadow-xl shadow-slate-200/50 hover:shadow-2xl hover:border-slate-200 transition-all group overflow-hidden relative">
+                                    <div className="absolute inset-0 transition-transform duration-700 group-hover:scale-105" style={{ backgroundImage: `url(${data.hero.image})`, backgroundSize: 'cover', backgroundPosition: 'center' }} />
+                                    <div className="absolute inset-0 bg-gradient-to-r from-white via-white/90 to-transparent" />
+                                    <div className="relative z-10 p-10 h-full flex flex-col justify-center max-w-md">
+                                        <div className={`w-14 h-14 rounded-2xl flex items-center justify-center text-2xl mb-6 shadow-lg ${colors.dark} text-white`}>
+                                            <Icon name={service.icon} />
+                                        </div>
+                                        <h3 className="text-3xl font-bold text-slate-900 mb-4">{service.title}</h3>
+                                        <p className="text-slate-600 text-lg leading-relaxed font-medium">{service.desc}</p>
+                                    </div>
+                                </FadeIn>
+                            );
+
+                            if (idx === 1) return (
+                                <FadeIn key={service.title} y={30} delay={0.1} className="md:col-span-1 md:row-span-2 bg-slate-900 rounded-[2rem] p-8 border border-slate-800 text-white hover:shadow-2xl transition-all relative overflow-hidden group flex flex-col items-center text-center justify-center">
+                                    <div className={`absolute top-0 right-0 w-[300px] h-[300px] rounded-full blur-[100px] opacity-20 pointer-events-none ${colors.dark}`} />
+                                    <div className="relative z-10 flex flex-col items-center">
+                                        <div className="w-20 h-20 bg-white/10 text-white rounded-3xl flex items-center justify-center text-4xl mb-8 backdrop-blur-md border border-white/10 group-hover:scale-110 transition-transform">
+                                            <Icon name={service.icon} />
+                                        </div>
+                                        <h3 className="text-2xl font-bold mb-3">{service.title}</h3>
+                                        <p className="text-slate-400 leading-relaxed font-medium mb-8 max-w-xs">{service.desc}</p>
+                                        {data.stats[0] && (
+                                            <div className="bg-white/5 backdrop-blur-md border border-white/10 rounded-2xl px-8 py-5">
+                                                <div className="text-3xl font-bold text-white tracking-tight">{data.stats[0].value}</div>
+                                                <div className="text-xs text-slate-400 font-medium uppercase tracking-wider mt-1">{data.stats[0].label}</div>
+                                            </div>
+                                        )}
+                                    </div>
+                                </FadeIn>
+                            );
+
+                            return (
+                                <FadeIn key={service.title} y={30} delay={idx * 0.08} className="md:col-span-1 bg-white rounded-[2rem] p-10 border border-slate-100 shadow-xl shadow-slate-200/50 hover:translate-y-[-4px] hover:shadow-2xl transition-all group">
                                     <div className={`w-14 h-14 rounded-2xl flex items-center justify-center text-2xl mb-6 group-hover:scale-110 transition-transform ${colors.bg} ${colors.text}`}>
                                         <Icon name={service.icon} />
                                     </div>
                                     <h3 className="text-xl font-bold text-slate-900 mb-3">{service.title}</h3>
                                     <p className="text-slate-600 font-medium leading-relaxed">{service.desc}</p>
-                                </div>
-                            </FadeIn>
-                        ))}
+                                </FadeIn>
+                            );
+                        })}
                     </div>
                 </div>
             </section>
 
             <section className="py-28 bg-white">
                 <div className="max-w-7xl mx-auto px-6">
-                    <FadeIn y={24} duration={0.6}>
-                        <div className="max-w-3xl mx-auto text-center mb-20">
-                            <span className={`font-bold tracking-wider uppercase text-sm mb-4 block ${colors.text}`}>Why NexCRM</span>
-                            <h2 className="text-3xl md:text-5xl font-bold text-slate-900 mb-6">
-                                Built for teams like yours
-                            </h2>
-                            <p className="text-xl text-slate-600 font-light">Here&rsquo;s why {data.name.toLowerCase()} businesses trust NexCRM.</p>
-                        </div>
-                    </FadeIn>
+                    <div className="grid grid-cols-1 lg:grid-cols-[2fr_3fr] gap-16 items-start">
+                        <FadeIn y={24} duration={0.6}>
+                            <div className="lg:sticky lg:top-32">
+                                <span className={`font-bold tracking-wider uppercase text-sm mb-4 block ${colors.text}`}>Why NexCRM</span>
+                                <h2 className="text-3xl md:text-5xl font-bold text-slate-900 mb-6">
+                                    Built for teams like yours
+                                </h2>
+                                <p className="text-xl text-slate-600 font-light leading-relaxed">Here&rsquo;s why {data.name.toLowerCase()} businesses trust NexCRM to streamline operations and accelerate growth.</p>
+                            </div>
+                        </FadeIn>
 
-                    <div className="grid grid-cols-1 md:grid-cols-2 gap-8">
-                        {data.whyChooseUs.map((item, idx) => (
-                            <FadeIn key={item.title} y={24} delay={idx * 0.1}>
-                                <div className="flex gap-6 p-8 bg-slate-50 rounded-2xl border border-slate-100 hover:border-slate-200 hover:shadow-lg transition-all duration-300 group h-full">
-                                    <div className={`w-14 h-14 rounded-2xl flex items-center justify-center text-2xl flex-shrink-0 group-hover:scale-110 transition-transform ${colors.bg} ${colors.text}`}>
-                                        <Icon name={item.icon} />
+                        <div className="grid grid-cols-1 sm:grid-cols-2 gap-6">
+                            {data.whyChooseUs.map((item, idx) => (
+                                <FadeIn key={item.title} y={24} delay={idx * 0.1}>
+                                    <div className="flex flex-col gap-4 p-7 bg-slate-50 rounded-2xl border border-slate-100 hover:border-slate-200 hover:shadow-lg transition-all duration-300 group h-full">
+                                        <div className={`w-12 h-12 rounded-2xl flex items-center justify-center text-xl flex-shrink-0 group-hover:scale-110 transition-transform ${colors.bg} ${colors.text}`}>
+                                            <Icon name={item.icon} />
+                                        </div>
+                                        <div>
+                                            <h3 className="text-lg font-bold text-slate-900 mb-2">{item.title}</h3>
+                                            <p className="text-slate-600 leading-relaxed text-sm">{item.desc}</p>
+                                        </div>
                                     </div>
-                                    <div>
-                                        <h3 className="text-lg font-bold text-slate-900 mb-2">{item.title}</h3>
-                                        <p className="text-slate-600 leading-relaxed">{item.desc}</p>
-                                    </div>
-                                </div>
-                            </FadeIn>
-                        ))}
+                                </FadeIn>
+                            ))}
+                        </div>
                     </div>
                 </div>
             </section>
@@ -430,16 +468,26 @@ export default function IndustryLandingPage() {
                 <section className="py-20 bg-white">
                     <div className="max-w-4xl mx-auto px-6">
                         <FadeIn y={24} duration={0.6}>
-                            <div className="text-center">
-                                <div className={`w-14 h-14 rounded-2xl flex items-center justify-center text-2xl mx-auto mb-10 ${colors.bg} ${colors.text}`}>
+                            <div className={`border-l-4 ${colors.border} pl-10 md:pl-14`}>
+                                <div className={`w-14 h-14 rounded-2xl flex items-center justify-center text-2xl mb-8 ${colors.bg} ${colors.text}`}>
                                     <RiDoubleQuotesL />
                                 </div>
                                 <blockquote className="text-2xl md:text-3xl font-medium text-slate-900 leading-relaxed mb-10">
                                     &ldquo;{data.testimonial.quote}&rdquo;
                                 </blockquote>
-                                <div className="flex flex-col items-center gap-1">
-                                    <span className="font-bold text-slate-900">{data.testimonial.author}</span>
-                                    <span className="text-sm text-slate-500">{data.testimonial.role}, {data.testimonial.company}</span>
+                                <div className="flex items-center gap-4">
+                                    {data.testimonial.image && (
+                                        <img
+                                            src={data.testimonial.image}
+                                            alt={data.testimonial.author}
+                                            loading="lazy"
+                                            className="w-14 h-14 rounded-full object-cover border-2 border-white shadow-md"
+                                        />
+                                    )}
+                                    <div className="flex flex-col gap-0.5">
+                                        <span className="font-bold text-slate-900">{data.testimonial.author}</span>
+                                        <span className="text-sm text-slate-500">{data.testimonial.role}, {data.testimonial.company}</span>
+                                    </div>
                                 </div>
                             </div>
                         </FadeIn>

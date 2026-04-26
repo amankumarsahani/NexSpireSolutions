@@ -10,6 +10,7 @@ export const industryData = {
       badge: { text: 'All-Purpose CRM', icon: 'ri-building-line' },
       title: 'The CRM That Adapts to Any Business',
       subtitle: 'Manage leads, close deals, and automate communications from a single dashboard — built for teams that need a CRM without the bloat.',
+      image: 'https://images.unsplash.com/photo-1557804506-669a67965ba0?auto=format&fit=crop&q=80&w=1600&fm=webp',
     },
     stats: [
       { value: '9+', label: 'Core Modules' },
@@ -55,6 +56,7 @@ export const industryData = {
       author: 'Rahul Mehta',
       role: 'Founder',
       company: 'BrightPath Consulting',
+      image: 'https://images.unsplash.com/photo-1560250097-0b93528c311a?w=100&h=100&fit=crop&q=80&fm=webp',
     },
     faqs: [
       { q: 'Is NexCRM suitable for small businesses?', a: 'Yes. The Starter plan supports up to 3 team members and 500 leads — enough for most small businesses to get started.' },
@@ -77,6 +79,7 @@ export const industryData = {
       badge: { text: 'E-Commerce CRM', icon: 'ri-shopping-cart-2-line' },
       title: 'Sell More. Manage Smarter. Grow Faster.',
       subtitle: 'CRM built for online stores — manage products, orders, inventory, shipping, returns, and customer relationships from one dashboard.',
+      image: 'https://images.unsplash.com/photo-1556742049-0cfed4f7a07d?auto=format&fit=crop&q=80&w=1600&fm=webp',
     },
     stats: [
       { value: '10+', label: 'E-Commerce Modules' },
@@ -122,6 +125,7 @@ export const industryData = {
       author: 'Priya Sharma',
       role: 'Co-founder',
       company: 'UrbanKraft D2C',
+      image: 'https://images.unsplash.com/photo-1573496359142-b8d87734a5a2?w=100&h=100&fit=crop&q=80&fm=webp',
     },
     faqs: [
       { q: 'Can I manage product variants and categories?', a: 'Yes. The product catalog supports variants (size, color, etc.), categories, pricing tiers, and real-time inventory tracking.' },
@@ -144,6 +148,7 @@ export const industryData = {
       badge: { text: 'Real Estate CRM', icon: 'ri-home-smile-line' },
       title: 'Track Every Property. Close Every Deal.',
       subtitle: 'CRM for brokers, developers, and agencies — manage properties, listings, site visits, transactions, and agent teams from a single platform.',
+      image: 'https://images.unsplash.com/photo-1560518883-ce09059eeffa?auto=format&fit=crop&q=80&w=1600&fm=webp',
     },
     stats: [
       { value: '8+', label: 'Real Estate Modules' },
@@ -189,6 +194,7 @@ export const industryData = {
       author: 'Vikram Desai',
       role: 'Director',
       company: 'Horizon Realty Group',
+      image: 'https://images.unsplash.com/photo-1519085360753-af0119f7cbe7?w=100&h=100&fit=crop&q=80&fm=webp',
     },
     faqs: [
       { q: 'Can I manage multiple projects?', a: 'Yes. Track properties, agents, and leads across multiple projects from a single dashboard with project-wise reporting.' },
@@ -211,6 +217,7 @@ export const industryData = {
       badge: { text: 'Services CRM', icon: 'ri-briefcase-line' },
       title: 'Book Appointments. Manage Clients. Grow Revenue.',
       subtitle: 'CRM for consultants, agencies, and service professionals — manage bookings, schedules, service packages, and client relationships in one place.',
+      image: 'https://images.unsplash.com/photo-1521737711867-e3b97375f902?auto=format&fit=crop&q=80&w=1600&fm=webp',
     },
     stats: [
       { value: '10+', label: 'Service Modules' },
@@ -256,6 +263,7 @@ export const industryData = {
       author: 'Ankit Jain',
       role: 'Managing Partner',
       company: 'Stride Digital Agency',
+      image: 'https://images.unsplash.com/photo-1500648767791-00dcc994a43e?w=100&h=100&fit=crop&q=80&fm=webp',
     },
     faqs: [
       { q: 'Is this suitable for freelancers?', a: 'Yes. The Starter plan is perfect for solo consultants with appointment scheduling, client management, and basic CRM included.' },
@@ -278,6 +286,7 @@ export const industryData = {
       badge: { text: 'Education CRM', icon: 'ri-graduation-cap-line' },
       title: 'Manage Courses. Track Students. Grow Enrollments.',
       subtitle: 'CRM for schools, coaching institutes, and edtech platforms — manage courses, batches, student records, attendance, and grades in one system.',
+      image: 'https://images.unsplash.com/photo-1523050854058-8df90110c9f1?auto=format&fit=crop&q=80&w=1600&fm=webp',
     },
     stats: [
       { value: '5+', label: 'Education Modules' },
@@ -323,6 +332,7 @@ export const industryData = {
       author: 'Dr. Meena Krishnan',
       role: 'Director',
       company: 'Vidya International School',
+      image: 'https://images.unsplash.com/photo-1580489944761-15a19d654956?w=100&h=100&fit=crop&q=80&fm=webp',
     },
     faqs: [
       { q: 'Is this suitable for coaching institutes?', a: 'Yes. NexCRM works for schools, coaching centers, and edtech platforms. Batch management and attendance are designed around how institutes operate.' },
@@ -345,6 +355,7 @@ export const industryData = {
       badge: { text: 'Healthcare CRM', icon: 'ri-heart-pulse-line' },
       title: 'Better Patient Management. Better Outcomes.',
       subtitle: 'CRM for hospitals, clinics, and wellness centers — manage patients, appointments, prescriptions, lab results, billing, and medical records.',
+      image: 'https://images.unsplash.com/photo-1576091160399-112ba8d25d1d?auto=format&fit=crop&q=80&w=1600&fm=webp',
     },
     stats: [
       { value: '10+', label: 'Healthcare Modules' },
@@ -390,6 +401,7 @@ export const industryData = {
       author: 'Dr. Suresh Patel',
       role: 'Chief Medical Officer',
       company: 'LifeCare Clinics',
+      image: 'https://images.unsplash.com/photo-1612349317150-e413f6a5b16d?w=100&h=100&fit=crop&q=80&fm=webp',
     },
     faqs: [
       { q: 'Is patient data secure?', a: 'Yes. All data is encrypted at rest and in transit. Role-based access and audit logs protect sensitive patient information.' },
@@ -412,6 +424,7 @@ export const industryData = {
       badge: { text: 'Hospitality CRM', icon: 'ri-hotel-line' },
       title: 'Manage Rooms. Delight Guests. Run Smooth Operations.',
       subtitle: 'CRM for hotels, resorts, and vacation properties — manage reservations, room inventory, guest profiles, housekeeping, and tour packages.',
+      image: 'https://images.unsplash.com/photo-1566073771259-6a8506099945?auto=format&fit=crop&q=80&w=1600&fm=webp',
     },
     stats: [
       { value: '7+', label: 'Hospitality Modules' },
@@ -457,6 +470,7 @@ export const industryData = {
       author: 'Aisha Khan',
       role: 'General Manager',
       company: 'Seaside Heritage Resort',
+      image: 'https://images.unsplash.com/photo-1594744803329-e58b31de8bf5?w=100&h=100&fit=crop&q=80&fm=webp',
     },
     faqs: [
       { q: 'Can I manage room types and availability?', a: 'Yes. Define room types with pricing, amenities, and capacity. Track real-time availability across your property.' },
@@ -479,6 +493,7 @@ export const industryData = {
       badge: { text: 'Travel CRM', icon: 'ri-flight-takeoff-line' },
       title: 'Manage Tours. Book Travelers. Grow Your Agency.',
       subtitle: 'CRM for travel agencies, tour operators, and DMCs — manage packages, itineraries, bookings, agents, and traveler profiles from one platform.',
+      image: 'https://images.unsplash.com/photo-1488646953014-85cb44e25828?auto=format&fit=crop&q=80&w=1600&fm=webp',
     },
     stats: [
       { value: '11+', label: 'Travel Modules' },
@@ -524,6 +539,7 @@ export const industryData = {
       author: 'Deepak Nair',
       role: 'Founder',
       company: 'Wanderlust Holidays',
+      image: 'https://images.unsplash.com/photo-1506794778202-cad84cf45f1d?w=100&h=100&fit=crop&q=80&fm=webp',
     },
     faqs: [
       { q: 'Can I manage both B2C and B2B bookings?', a: 'Yes. Direct customer bookings and agent-sourced bookings are both tracked with separate attribution and reporting.' },
@@ -546,6 +562,7 @@ export const industryData = {
       badge: { text: 'Fitness CRM', icon: 'ri-boxing-line' },
       title: 'Manage Members. Run Classes. Grow Your Gym.',
       subtitle: 'CRM for gyms, yoga studios, and fitness centers — manage memberships, class schedules, trainers, workouts, subscriptions, and equipment.',
+      image: 'https://images.unsplash.com/photo-1534438327276-14e5300c3a48?auto=format&fit=crop&q=80&w=1600&fm=webp',
     },
     stats: [
       { value: '10+', label: 'Fitness Modules' },
@@ -591,6 +608,7 @@ export const industryData = {
       author: 'Ravi Kumar',
       role: 'Owner',
       company: 'IronFit Gym Chain',
+      image: 'https://images.unsplash.com/photo-1507003211169-0a1dd7228f2d?w=100&h=100&fit=crop&q=80&fm=webp',
     },
     faqs: [
       { q: 'Can members book classes online?', a: 'Yes. Members can view the class schedule and book available slots. The system respects capacity limits and trainer availability.' },
@@ -613,6 +631,7 @@ export const industryData = {
       badge: { text: 'Legal CRM', icon: 'ri-scales-3-line' },
       title: 'Manage Cases. Track Deadlines. Bill Accurately.',
       subtitle: 'CRM for law firms, advocates, and legal consultants — manage cases, court dates, client files, time tracking, invoicing, and task assignments.',
+      image: 'https://images.unsplash.com/photo-1589829545856-d10d557cf95f?auto=format&fit=crop&q=80&w=1600&fm=webp',
     },
     stats: [
       { value: '8+', label: 'Legal Modules' },
@@ -658,6 +677,7 @@ export const industryData = {
       author: 'Adv. Neha Gupta',
       role: 'Senior Partner',
       company: 'Gupta & Associates',
+      image: 'https://images.unsplash.com/photo-1573496359142-b8d87734a5a2?w=100&h=100&fit=crop&q=80&fm=webp',
     },
     faqs: [
       { q: 'Is client data secure?', a: 'Yes. All data is encrypted. Role-based access and audit logs ensure only authorized team members see case information.' },
@@ -680,6 +700,7 @@ export const industryData = {
       badge: { text: 'Manufacturing CRM', icon: 'ri-settings-3-line' },
       title: 'From Raw Material to Finished Product — All in One.',
       subtitle: 'The most comprehensive manufacturing CRM available — 26+ modules for production, inventory, quality, MRP, equipment, invoicing, and advanced analytics.',
+      image: 'https://images.unsplash.com/photo-1581091226825-a6a2a5aee158?auto=format&fit=crop&q=80&w=1600&fm=webp',
     },
     stats: [
       { value: '26+', label: 'Manufacturing Modules' },
@@ -735,6 +756,7 @@ export const industryData = {
       author: 'Rajesh Agarwal',
       role: 'Managing Director',
       company: 'PrecisionTech Industries',
+      image: 'https://images.unsplash.com/photo-1472099645785-5658abf4ff4e?w=100&h=100&fit=crop&q=80&fm=webp',
     },
     faqs: [
       { q: 'How many modules does manufacturing include?', a: '26+ modules covering production, scheduling, inventory, quality (basic and advanced), MRP, equipment, invoicing, IoT, and analytics.' },
@@ -757,6 +779,7 @@ export const industryData = {
       badge: { text: 'Logistics CRM', icon: 'ri-truck-line' },
       title: 'Track Shipments. Manage Fleets. Serve Clients.',
       subtitle: 'CRM for logistics companies, freight forwarders, and courier services — manage shipments, tracking, vehicles, drivers, warehouses, and routes.',
+      image: 'https://images.unsplash.com/photo-1586528116311-ad8dd3c8310d?auto=format&fit=crop&q=80&w=1600&fm=webp',
     },
     stats: [
       { value: '9+', label: 'Logistics Modules' },
@@ -802,6 +825,7 @@ export const industryData = {
       author: 'Sanjay Mittal',
       role: 'Operations Head',
       company: 'SwiftFreight Logistics',
+      image: 'https://images.unsplash.com/photo-1560250097-0b93528c311a?w=100&h=100&fit=crop&q=80&fm=webp',
     },
     faqs: [
       { q: 'Can clients track shipments in real-time?', a: 'Yes. Shipment status updates are available in real-time via the logistics dashboard and automated WhatsApp notifications.' },
@@ -824,6 +848,7 @@ export const industryData = {
       badge: { text: 'Restaurant CRM', icon: 'ri-restaurant-2-line' },
       title: 'Manage Orders. Run Your Kitchen. Know Your Diners.',
       subtitle: 'CRM for restaurants, cafes, and cloud kitchens — manage menus, orders, tables, kitchen operations, inventory, staff scheduling, and customer data.',
+      image: 'https://images.unsplash.com/photo-1517248135467-4c7edcad34c4?auto=format&fit=crop&q=80&w=1600&fm=webp',
     },
     stats: [
       { value: '11+', label: 'Restaurant Modules' },
@@ -869,6 +894,7 @@ export const industryData = {
       author: 'Chef Arjun Reddy',
       role: 'Owner',
       company: 'Spice Route Kitchen',
+      image: 'https://images.unsplash.com/photo-1507003211169-0a1dd7228f2d?w=100&h=100&fit=crop&q=80&fm=webp',
     },
     faqs: [
       { q: 'Can customers reserve tables online?', a: 'Yes. Share a booking link on your website or social media. Customers pick a date, time, and party size with instant confirmation.' },
@@ -891,6 +917,7 @@ export const industryData = {
       badge: { text: 'Salon CRM', icon: 'ri-scissors-line' },
       title: 'Book Appointments. Manage Staff. Showcase Your Work.',
       subtitle: 'CRM for salons, spas, and beauty studios — manage bookings, services, staff, packages, products, customer profiles, and a portfolio gallery.',
+      image: 'https://images.unsplash.com/photo-1560066984-138dadb4c035?auto=format&fit=crop&q=80&w=1600&fm=webp',
     },
     stats: [
       { value: '9+', label: 'Salon Modules' },
@@ -936,6 +963,7 @@ export const industryData = {
       author: 'Pooja Nair',
       role: 'Founder',
       company: 'Glow Studio Salon',
+      image: 'https://images.unsplash.com/photo-1438761681033-6461ffad8d80?w=100&h=100&fit=crop&q=80&fm=webp',
     },
     faqs: [
       { q: 'Can clients book online?', a: 'Yes. Share a branded booking page on social media or your website. Clients pick a service, stylist, and time slot with instant confirmation.' },
