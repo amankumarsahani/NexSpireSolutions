@@ -1,20 +1,45 @@
 import { useState, useCallback, useRef, useEffect } from 'react';
 import { Link } from 'react-router-dom';
 import { Helmet } from 'react-helmet-async';
-import { motion, AnimatePresence } from 'framer-motion';
+import { motion, AnimatePresence, useInView } from 'framer-motion';
 import { nexmailTiers, nexmailFeatures } from '../constants/nexmailPricing';
 import { SITE_URL, siteConfig } from '../constants/siteConfig';
 import { CheckIcon, XIcon } from '../components/ui/Icons';
 import FeatureValue from '../components/crm/FeatureValue';
 import FadeIn from '../components/ui/FadeIn';
 import {
-    RiMailSendLine, RiRobot2Line, RiBarChartBoxLine, RiShieldCheckLine,
-    RiDragDropLine, RiTimeLine, RiUserFollowLine, RiSpamLine,
-    RiMailCheckLine, RiFlowChart, RiDashboard3Line, RiServerLine,
-    RiCheckLine, RiArrowRightLine, RiStarFill, RiGroupLine,
-    RiLinksLine, RiArrowDownSLine, RiLoader4Line, RiCloseLine,
-    RiMailLine, RiSendPlaneLine, RiPieChartLine, RiSettings3Line
+    RiMailSendLine, RiBarChartBoxLine, RiShieldCheckLine,
+    RiDragDropLine, RiTimeLine, RiUserFollowLine,
+    RiMailCheckLine, RiFlowChart, RiServerLine,
+    RiCheckLine, RiArrowRightLine, RiStarFill,
+    RiLinksLine, RiArrowDownSLine, RiLoader4Line, RiCloseLine
 } from 'react-icons/ri';
+
+function AnimatedCounter({ value, suffix = '' }) {
+    const [count, setCount] = useState(0);
+    const ref = useRef(null);
+    const isInView = useInView(ref, { once: true, margin: '-50px' });
+    const numericValue = parseInt(value.replace(/\D/g, ''), 10) || 0;
+
+    useEffect(() => {
+        if (!isInView) return;
+        let start = 0;
+        const duration = 1200;
+        const increment = numericValue / (duration / 16);
+        const timer = setInterval(() => {
+            start += increment;
+            if (start >= numericValue) {
+                setCount(numericValue);
+                clearInterval(timer);
+            } else {
+                setCount(Math.floor(start));
+            }
+        }, 16);
+        return () => clearInterval(timer);
+    }, [isInView, numericValue]);
+
+    return <span ref={ref}>{count}{suffix}</span>;
+}
 
 const features = [
     { title: 'Drag & Drop Builder', desc: '18 block types with mobile preview, undo/redo, and template versioning.', icon: RiDragDropLine, color: 'text-blue-600', bg: 'bg-blue-50' },
@@ -35,10 +60,10 @@ const howItWorks = [
 ];
 
 const trustStats = [
-    { value: '18', label: 'Block Types', icon: RiDragDropLine },
-    { value: '50+', label: 'Spam Checks', icon: RiShieldCheckLine },
-    { value: '14', label: 'Domain Throttles', icon: RiTimeLine },
-    { value: '9', label: 'Auto Triggers', icon: RiFlowChart },
+    { value: '18', suffix: '', label: 'Block Types', icon: RiDragDropLine },
+    { value: '50', suffix: '+', label: 'Spam Checks', icon: RiShieldCheckLine },
+    { value: '14', suffix: '', label: 'Domain Throttles', icon: RiTimeLine },
+    { value: '9', suffix: '', label: 'Auto Triggers', icon: RiFlowChart },
 ];
 
 const comparisonItems = [
@@ -73,196 +98,6 @@ const featureCategoryLabels = {
     support: 'Support',
 };
 
-const pipelineStages = [
-    {
-        id: 'compose', label: 'Compose', num: '01',
-        color: 'blue', icon: RiDragDropLine,
-        title: 'Drag & Drop Builder',
-        desc: '18 block types, live mobile preview, undo/redo history, template versioning. Build production-grade emails without touching code.',
-        detail: ['Text', 'Image', 'Button', 'Columns', 'Spacer', 'HTML', 'Social', 'Video', '+10 more'],
-    },
-    {
-        id: 'check', label: 'Spam Check', num: '02',
-        color: 'emerald', icon: RiShieldCheckLine,
-        title: 'Anti-Spam Engine',
-        desc: '50+ checks on every email. Subject analysis, trigger words, HTML structure, image ratio, CAN-SPAM compliance.',
-        detail: ['Subject: No triggers ✓', 'HTML: Clean ratio ✓', 'Compliance: CAN-SPAM ✓', 'Score: 87/100'],
-    },
-    {
-        id: 'route', label: 'SMTP Route', num: '03',
-        color: 'indigo', icon: RiServerLine,
-        title: 'Smart SMTP Rotation',
-        desc: 'Weighted multi-account rotation. Higher reputation = more sends. Auto-disable on issues.',
-        detail: ['SES: 96 rep → 45%', 'Postmark: 91 rep → 35%', 'Gmail: 72 rep → 20%'],
-    },
-    {
-        id: 'throttle', label: 'Throttle', num: '04',
-        color: 'amber', icon: RiTimeLine,
-        title: 'Domain Throttling',
-        desc: 'Per-provider sending limits with human-like variable delays. Never trip rate limits.',
-        detail: ['Gmail: 78/80 per hr', 'Yahoo: 34/60 per hr', 'Outlook: 61/100 per hr'],
-    },
-    {
-        id: 'deliver', label: 'Deliver', num: '05',
-        color: 'cyan', icon: RiMailCheckLine,
-        title: 'Inbox Delivery',
-        desc: 'SPF/DKIM/DMARC verified. Warmup mode for new domains. Bounce handling keeps reputation pristine.',
-        detail: ['Delivered: 4,847 (98.2%)', 'Bounced: 12 (0.2%)', 'Suppressed: 79 (1.6%)'],
-    },
-    {
-        id: 'analyze', label: 'Analyze', num: '06',
-        color: 'purple', icon: RiBarChartBoxLine,
-        title: 'Campaign Analytics',
-        desc: 'Open rates, click maps, delivery funnels, engagement heatmaps, and campaign leaderboards.',
-        detail: ['Opens: 61.4%', 'Clicks: 8.7%', 'Unsubs: 0.3%', 'Score: 72/100'],
-    },
-];
-
-const hexColors = {
-    blue:    { bg: 'bg-blue-500/10', border: 'border-blue-500/30', text: 'text-blue-400', glow: 'shadow-blue-500/20', activeBg: 'bg-blue-500', ring: 'ring-blue-400/30' },
-    emerald: { bg: 'bg-emerald-500/10', border: 'border-emerald-500/30', text: 'text-emerald-400', glow: 'shadow-emerald-500/20', activeBg: 'bg-emerald-500', ring: 'ring-emerald-400/30' },
-    indigo:  { bg: 'bg-indigo-500/10', border: 'border-indigo-500/30', text: 'text-indigo-400', glow: 'shadow-indigo-500/20', activeBg: 'bg-indigo-500', ring: 'ring-indigo-400/30' },
-    amber:   { bg: 'bg-amber-500/10', border: 'border-amber-500/30', text: 'text-amber-400', glow: 'shadow-amber-500/20', activeBg: 'bg-amber-500', ring: 'ring-amber-400/30' },
-    cyan:    { bg: 'bg-cyan-500/10', border: 'border-cyan-500/30', text: 'text-cyan-400', glow: 'shadow-cyan-500/20', activeBg: 'bg-cyan-500', ring: 'ring-cyan-400/30' },
-    purple:  { bg: 'bg-purple-500/10', border: 'border-purple-500/30', text: 'text-purple-400', glow: 'shadow-purple-500/20', activeBg: 'bg-purple-500', ring: 'ring-purple-400/30' },
-};
-
-function HoneycombPipeline() {
-    const [active, setActive] = useState(0);
-    const stage = pipelineStages[active];
-    const colors = hexColors[stage.color];
-
-    return (
-        <div className="flex flex-col items-center gap-12 lg:gap-0 lg:flex-row lg:items-start lg:justify-center">
-            <div className="hidden lg:block relative flex-shrink-0" style={{ width: 420, height: 460 }}>
-                <svg className="absolute inset-0 w-full h-full pointer-events-none z-0" viewBox="0 0 420 460">
-                    <defs>
-                        <linearGradient id="line-grad" x1="0%" y1="0%" x2="100%" y2="100%">
-                            <stop offset="0%" stopColor="#3b82f6" stopOpacity="0.3" />
-                            <stop offset="100%" stopColor="#a855f7" stopOpacity="0.3" />
-                        </linearGradient>
-                    </defs>
-                    {/* Row 1→2 connections */}
-                    <line x1="145" y1="105" x2="80" y2="190" stroke="url(#line-grad)" strokeWidth="1.5" />
-                    <line x1="275" y1="105" x2="210" y2="190" />
-                    <line x1="275" y1="105" x2="340" y2="190" stroke="url(#line-grad)" strokeWidth="1.5" />
-                    <line x1="145" y1="105" x2="210" y2="190" stroke="url(#line-grad)" strokeWidth="1.5" />
-                    {/* Row 2→3 connections */}
-                    <line x1="80" y1="270" x2="145" y2="355" stroke="url(#line-grad)" strokeWidth="1.5" />
-                    <line x1="210" y1="270" x2="145" y2="355" stroke="url(#line-grad)" strokeWidth="1.5" />
-                    <line x1="210" y1="270" x2="275" y2="355" stroke="url(#line-grad)" strokeWidth="1.5" />
-                    <line x1="340" y1="270" x2="275" y2="355" stroke="url(#line-grad)" strokeWidth="1.5" />
-                </svg>
-
-                {/* Hex nodes: 2-3-1 honeycomb layout, positions are center-points of 100x110 hex cells */}
-                {[
-                    { idx: 0, x: 110, y: 50 },
-                    { idx: 1, x: 240, y: 50 },
-                    { idx: 2, x: 45, y: 185 },
-                    { idx: 3, x: 175, y: 185 },
-                    { idx: 4, x: 305, y: 185 },
-                    { idx: 5, x: 110, y: 320 },
-                ].map(({ idx, x, y }) => {
-                    const s = pipelineStages[idx];
-                    const c = hexColors[s.color];
-                    const isActive = active === idx;
-                    return (
-                        <button
-                            key={s.id}
-                            onClick={() => setActive(idx)}
-                            className={`absolute z-10 w-[100px] h-[110px] flex flex-col items-center justify-center transition-all duration-300 cursor-pointer group ${isActive ? 'scale-110' : 'hover:scale-105'}`}
-                            style={{ left: x, top: y }}
-                        >
-                            <div className={`absolute inset-0 transition-all duration-300 ${isActive ? `${c.bg} ring-2 ${c.ring}` : 'bg-slate-800/60 hover:bg-slate-800'}`}
-                                style={{ clipPath: 'polygon(50% 0%, 100% 25%, 100% 75%, 50% 100%, 0% 75%, 0% 25%)' }} />
-                            <div className="relative z-10 flex flex-col items-center gap-1.5">
-                                <s.icon className={`text-2xl transition-colors duration-300 ${isActive ? c.text : 'text-slate-500 group-hover:text-slate-300'}`} />
-                                <span className={`text-[10px] font-bold uppercase tracking-wider transition-colors duration-300 ${isActive ? c.text : 'text-slate-600 group-hover:text-slate-400'}`}>{s.num}</span>
-                            </div>
-                            {isActive && <div className={`absolute -inset-2 ${c.bg} rounded-full blur-xl opacity-50 -z-10`} />}
-                        </button>
-                    );
-                })}
-
-                <div className="absolute z-0" style={{ left: 240, top: 320 }}>
-                    <div className="w-[100px] h-[110px] bg-slate-800/20" style={{ clipPath: 'polygon(50% 0%, 100% 25%, 100% 75%, 50% 100%, 0% 75%, 0% 25%)' }} />
-                </div>
-            </div>
-
-            <div className="lg:hidden flex gap-2 overflow-x-auto pb-2 px-1 w-full max-w-full scrollbar-hide">
-                {pipelineStages.map((s, idx) => {
-                    const c = hexColors[s.color];
-                    const isActive = active === idx;
-                    return (
-                        <button
-                            key={s.id}
-                            onClick={() => setActive(idx)}
-                            className={`flex-shrink-0 flex items-center gap-2 px-4 py-2.5 rounded-full border transition-all duration-200 ${isActive ? `${c.bg} ${c.border} ${c.text}` : 'bg-slate-900 border-slate-800 text-slate-500 hover:text-slate-300 hover:border-slate-700'}`}
-                        >
-                            <s.icon className="text-base" />
-                            <span className="text-xs font-bold uppercase tracking-wider whitespace-nowrap">{s.label}</span>
-                        </button>
-                    );
-                })}
-            </div>
-
-            <div className="flex-1 lg:pl-8 lg:max-w-lg w-full">
-                <AnimatePresence mode="wait">
-                    <motion.div
-                        key={stage.id}
-                        initial={{ opacity: 0, y: 16 }}
-                        animate={{ opacity: 1, y: 0 }}
-                        exit={{ opacity: 0, y: -12 }}
-                        transition={{ duration: 0.25 }}
-                        className="bg-slate-900/60 backdrop-blur-sm border border-slate-800 rounded-2xl p-8"
-                    >
-                        <div className="flex items-center gap-3 mb-5">
-                            <span className={`font-mono text-xs ${colors.text} ${colors.bg} px-3 py-1 rounded-full border ${colors.border}`}>STAGE {stage.num}</span>
-                            <span className="text-slate-600 font-mono text-xs">{stage.id}</span>
-                        </div>
-
-                        <h3 className="text-2xl font-bold text-white mb-3">{stage.title}</h3>
-                        <p className="text-slate-400 leading-relaxed mb-6">{stage.desc}</p>
-
-                        <div className="bg-slate-800/50 rounded-xl p-4 border border-slate-700 space-y-2">
-                            {stage.detail.map((line, i) => (
-                                <div key={i} className="flex items-center gap-2.5">
-                                    <RiCheckLine className={`flex-shrink-0 text-sm ${colors.text}`} />
-                                    <span className="text-sm text-slate-300 font-mono">{line}</span>
-                                </div>
-                            ))}
-                        </div>
-
-                        <div className="flex items-center gap-2 mt-6">
-                            {pipelineStages.map((_, i) => (
-                                <button
-                                    key={i}
-                                    onClick={() => setActive(i)}
-                                    className={`h-1.5 rounded-full transition-all duration-300 ${active === i ? `w-6 ${hexColors[pipelineStages[i].color].activeBg}` : 'w-1.5 bg-slate-700 hover:bg-slate-600'}`}
-                                />
-                            ))}
-                        </div>
-                    </motion.div>
-                </AnimatePresence>
-
-                <div className="mt-8 grid grid-cols-2 gap-3">
-                    {[
-                        { icon: RiFlowChart, label: 'Visual Automations' },
-                        { icon: RiUserFollowLine, label: 'Contact Scoring' },
-                        { icon: RiLinksLine, label: 'CRM Integration' },
-                        { icon: RiGroupLine, label: 'List Segmentation' },
-                    ].map(item => (
-                        <div key={item.label} className="flex items-center gap-2.5 p-3 rounded-xl bg-slate-900/30 border border-slate-800/50">
-                            <item.icon className="text-base text-slate-600 flex-shrink-0" />
-                            <span className="text-xs font-medium text-slate-500">{item.label}</span>
-                        </div>
-                    ))}
-                </div>
-            </div>
-        </div>
-    );
-}
-
 export default function NexMailLandingPage() {
     const [isYearly, setIsYearly] = useState(false);
     const [showContactModal, setShowContactModal] = useState(false);
@@ -270,7 +105,13 @@ export default function NexMailLandingPage() {
     const [submitting, setSubmitting] = useState(false);
     const [submitted, setSubmitted] = useState(false);
     const [toast, setToast] = useState({ show: false, message: '', type: 'error' });
+    const [activeTestimonial, setActiveTestimonial] = useState(0);
     const toastTimerRef = useRef(null);
+
+    useEffect(() => {
+        const timer = setInterval(() => setActiveTestimonial(prev => (prev + 1) % 3), 6000);
+        return () => clearInterval(timer);
+    }, []);
 
     const showToast = useCallback((message, type = 'error') => {
         setToast({ show: true, message, type });
@@ -355,6 +196,18 @@ export default function NexMailLandingPage() {
                     { "@type": "ListItem", "position": 2, "name": "NexMail", "item": `${SITE_URL}/nexmail` }
                 ]
             })}</script>
+            <script type="application/ld+json">{JSON.stringify({
+                "@context": "https://schema.org",
+                "@type": "FAQPage",
+                "mainEntity": faqs.map(faq => ({
+                    "@type": "Question",
+                    "name": faq.q,
+                    "acceptedAnswer": {
+                        "@type": "Answer",
+                        "text": faq.a
+                    }
+                }))
+            })}</script>
 
             <AnimatePresence>
                 {toast.show && (
@@ -396,9 +249,9 @@ export default function NexMailLandingPage() {
                             <button onClick={() => handleAction('Free')} className="px-8 py-4 bg-slate-900 text-white rounded-xl font-semibold shadow-xl shadow-slate-900/20 hover:bg-slate-800 transition-all duration-300 ring-4 ring-slate-900/10">
                                 Start Free
                             </button>
-                            <a href="#features" className="px-8 py-4 bg-white text-slate-700 border border-slate-200 rounded-xl font-semibold hover:bg-slate-50 hover:border-slate-300 transition-all duration-300 shadow-sm">
+                            <button onClick={() => document.getElementById('features')?.scrollIntoView({ behavior: 'smooth' })} className="px-8 py-4 bg-white text-slate-700 border border-slate-200 rounded-xl font-semibold hover:bg-slate-50 hover:border-slate-300 transition-all duration-300 shadow-sm">
                                 See Features
-                            </a>
+                            </button>
                         </div>
                     </motion.div>
                 </div>
@@ -414,7 +267,9 @@ export default function NexMailLandingPage() {
                                     <div className="w-10 h-10 rounded-xl bg-blue-50 text-blue-600 flex items-center justify-center text-lg">
                                         <stat.icon />
                                     </div>
-                                    <span className="text-3xl md:text-4xl font-bold text-slate-900 tracking-tight">{stat.value}</span>
+                                    <span className="text-3xl md:text-4xl font-bold text-slate-900 tracking-tight">
+                                        <AnimatedCounter value={stat.value} suffix={stat.suffix} />
+                                    </span>
                                     <span className="text-sm text-slate-500 font-medium">{stat.label}</span>
                                 </div>
                             ))}
@@ -423,21 +278,224 @@ export default function NexMailLandingPage() {
                 </div>
             </section>
 
-            {/* Features — Bento Grid */}
-            <section id="features" className="py-32 bg-slate-950 relative overflow-hidden">
-                <div className="absolute inset-0 z-0 pointer-events-none opacity-[0.04] bg-[radial-gradient(#fff_1px,transparent_1px)] [background-size:32px_32px]" />
-                <div className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-[700px] h-[700px] bg-blue-500/8 rounded-full blur-[140px] pointer-events-none" />
+            <section id="features" className="py-32 bg-slate-50 relative overflow-hidden">
+                <div className="absolute inset-0 z-0 pointer-events-none opacity-[0.03] bg-[radial-gradient(#000_1px,transparent_1px)] [background-size:24px_24px]" />
 
                 <div className="max-w-7xl mx-auto px-6 relative z-10">
                     <FadeIn y={24} duration={0.6}>
-                        <div className="max-w-3xl mx-auto text-center mb-16 md:mb-24">
-                            <span className="text-blue-400 font-mono font-bold tracking-wider uppercase text-sm mb-4 block">the engine</span>
-                            <h2 className="text-3xl md:text-5xl font-bold text-white mb-6">Six stages. <span className="text-transparent bg-clip-text bg-gradient-to-r from-blue-400 to-cyan-400">One pipeline.</span></h2>
-                            <p className="text-xl text-slate-400 font-light">Every email passes through six engineered stages before it reaches an inbox.</p>
+                        <div className="max-w-3xl mx-auto text-center mb-16">
+                            <span className="text-[#2563EB] font-bold tracking-wider uppercase text-sm mb-4 block">Capabilities</span>
+                            <h2 className="text-3xl md:text-5xl font-bold text-slate-900 mb-6">Everything you need to <span className="text-[#2563EB]">land in the inbox.</span></h2>
+                            <p className="text-xl text-slate-600 font-light">Here&apos;s what your NexMail dashboard looks like on day one.</p>
                         </div>
                     </FadeIn>
 
-                    <HoneycombPipeline />
+                    <FadeIn y={40} duration={0.8}>
+                        <div className="bg-white rounded-2xl border border-slate-200 shadow-2xl shadow-slate-300/30 overflow-hidden">
+                            <div className="bg-slate-100 border-b border-slate-200 px-5 py-3 flex items-center gap-3">
+                                <div className="flex gap-1.5">
+                                    <div className="w-3 h-3 rounded-full bg-red-400" />
+                                    <div className="w-3 h-3 rounded-full bg-amber-400" />
+                                    <div className="w-3 h-3 rounded-full bg-emerald-400" />
+                                </div>
+                                <span className="text-xs font-medium text-slate-400 ml-2">NexMail — Campaign Dashboard</span>
+                            </div>
+
+                            <div className="flex">
+                                <div className="hidden md:flex flex-col w-52 border-r border-slate-100 bg-slate-50/60 py-4 px-3 gap-0.5 shrink-0">
+                                    {features.map((f, idx) => {
+                                        const Icon = f.icon;
+                                        return (
+                                            <div key={f.title} className={`flex items-center gap-2.5 px-3 py-2 rounded-lg text-xs font-medium transition-colors ${idx === 0 ? 'bg-blue-50 text-blue-700' : 'text-slate-500 hover:bg-slate-100 hover:text-slate-700'}`}>
+                                                <Icon className="text-sm flex-shrink-0" />
+                                                <span className="truncate">{f.title}</span>
+                                            </div>
+                                        );
+                                    })}
+                                </div>
+
+                                <div className="flex-1 p-5 md:p-8 space-y-6 min-w-0">
+                                    <div className="flex items-center justify-between flex-wrap gap-3">
+                                        <div>
+                                            <h3 className="text-lg font-bold text-slate-900">Campaign Overview</h3>
+                                            <p className="text-xs text-slate-400 mt-0.5">Last 7 days · All campaigns</p>
+                                        </div>
+                                        <div className="flex items-center gap-1.5 px-3 py-1.5 bg-emerald-50 rounded-full border border-emerald-200">
+                                            <div className="w-1.5 h-1.5 rounded-full bg-emerald-500" />
+                                            <span className="text-[10px] font-semibold text-emerald-700">All systems healthy</span>
+                                        </div>
+                                    </div>
+
+                                    <div className="grid grid-cols-2 md:grid-cols-4 gap-4">
+                                        {[
+                                            { label: 'Delivered', value: '4,847', sub: '98.2%', accent: 'text-emerald-600', bg: 'bg-emerald-50' },
+                                            { label: 'Open Rate', value: '61.4%', sub: '+8.2% vs avg', accent: 'text-blue-600', bg: 'bg-blue-50' },
+                                            { label: 'Click Rate', value: '8.7%', sub: '+1.4% vs avg', accent: 'text-indigo-600', bg: 'bg-indigo-50' },
+                                            { label: 'Spam Score', value: '87/100', sub: 'Excellent', accent: 'text-amber-600', bg: 'bg-amber-50' },
+                                        ].map(m => (
+                                            <div key={m.label} className={`${m.bg} rounded-xl p-4 border border-slate-100`}>
+                                                <div className="text-[10px] font-semibold text-slate-500 uppercase tracking-wider mb-1">{m.label}</div>
+                                                <div className={`text-xl font-bold ${m.accent}`}>{m.value}</div>
+                                                <div className="text-[10px] text-slate-400 mt-0.5">{m.sub}</div>
+                                            </div>
+                                        ))}
+                                    </div>
+
+                                    <div className="grid grid-cols-1 lg:grid-cols-5 gap-5">
+                                        <div className="lg:col-span-3 bg-slate-50 rounded-xl border border-slate-100 p-5">
+                                            <div className="flex items-center justify-between mb-4">
+                                                <span className="text-xs font-semibold text-slate-700">Engagement Trend</span>
+                                                <div className="flex items-center gap-3 text-[10px] text-slate-400">
+                                                    <span className="flex items-center gap-1"><span className="w-2 h-0.5 bg-blue-500 rounded" />Opens</span>
+                                                    <span className="flex items-center gap-1"><span className="w-2 h-0.5 bg-emerald-500 rounded" />Clicks</span>
+                                                </div>
+                                            </div>
+                                            <div className="relative h-32">
+                                                <svg viewBox="0 0 300 100" className="w-full h-full" preserveAspectRatio="none">
+                                                    <defs>
+                                                        <linearGradient id="openFill" x1="0" y1="0" x2="0" y2="1">
+                                                            <stop offset="0%" stopColor="#3b82f6" stopOpacity="0.15" />
+                                                            <stop offset="100%" stopColor="#3b82f6" stopOpacity="0" />
+                                                        </linearGradient>
+                                                    </defs>
+                                                    {[0, 25, 50, 75, 100].map(y => (
+                                                        <line key={y} x1="0" y1={y} x2="300" y2={y} stroke="#e2e8f0" strokeWidth="0.5" />
+                                                    ))}
+                                                    <path d="M0,60 L50,52 L100,45 L150,38 L200,30 L250,25 L300,20 L300,100 L0,100 Z" fill="url(#openFill)" />
+                                                    <polyline points="0,60 50,52 100,45 150,38 200,30 250,25 300,20" fill="none" stroke="#3b82f6" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" />
+                                                    <polyline points="0,85 50,80 100,78 150,75 200,72 250,68 300,65" fill="none" stroke="#10b981" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" strokeDasharray="4,3" />
+                                                    {[{x:0,y:60},{x:50,y:52},{x:100,y:45},{x:150,y:38},{x:200,y:30},{x:250,y:25},{x:300,y:20}].map((p,i) => (
+                                                        <circle key={i} cx={p.x} cy={p.y} r="3" fill="#fff" stroke="#3b82f6" strokeWidth="1.5" />
+                                                    ))}
+                                                </svg>
+                                                <div className="absolute bottom-0 left-0 right-0 flex justify-between text-[9px] text-slate-400 pt-1">
+                                                    {['Mon', 'Tue', 'Wed', 'Thu', 'Fri', 'Sat', 'Sun'].map(d => <span key={d}>{d}</span>)}
+                                                </div>
+                                            </div>
+                                        </div>
+
+                                        <div className="lg:col-span-2 bg-slate-50 rounded-xl border border-slate-100 p-5">
+                                            <span className="text-xs font-semibold text-slate-700 block mb-4">SMTP Rotation</span>
+                                            <div className="space-y-3">
+                                                {[
+                                                    { name: 'Amazon SES', rep: 96, weight: 45, color: 'bg-blue-500' },
+                                                    { name: 'Postmark', rep: 91, weight: 35, color: 'bg-indigo-500' },
+                                                    { name: 'Gmail SMTP', rep: 72, weight: 20, color: 'bg-slate-400' },
+                                                ].map(a => (
+                                                    <div key={a.name}>
+                                                        <div className="flex items-center justify-between mb-1">
+                                                            <span className="text-[11px] font-medium text-slate-600">{a.name}</span>
+                                                            <span className="text-[10px] text-slate-400">Rep {a.rep} · {a.weight}%</span>
+                                                        </div>
+                                                        <div className="h-1.5 bg-slate-200 rounded-full overflow-hidden">
+                                                            <div className={`h-full ${a.color} rounded-full`} style={{ width: `${a.weight}%` }} />
+                                                        </div>
+                                                    </div>
+                                                ))}
+                                            </div>
+                                            <div className="flex items-center gap-1.5 mt-4 pt-3 border-t border-slate-200">
+                                                <div className="w-1.5 h-1.5 rounded-full bg-emerald-500" />
+                                                <span className="text-[10px] text-slate-500">Weighted rotation active</span>
+                                            </div>
+                                        </div>
+                                    </div>
+
+                                    <div className="grid grid-cols-1 md:grid-cols-3 gap-5">
+                                        <div className="bg-slate-50 rounded-xl border border-slate-100 p-5">
+                                            <span className="text-xs font-semibold text-slate-700 block mb-3">Domain Throttling</span>
+                                            <div className="space-y-2.5">
+                                                {[
+                                                    { name: 'Gmail', sent: 78, limit: 80 },
+                                                    { name: 'Yahoo', sent: 34, limit: 60 },
+                                                    { name: 'Outlook', sent: 61, limit: 100 },
+                                                ].map(p => (
+                                                    <div key={p.name}>
+                                                        <div className="flex items-center justify-between mb-1">
+                                                            <span className="text-[11px] font-medium text-slate-600">{p.name}</span>
+                                                            <span className="text-[10px] text-slate-400 font-mono">{p.sent}/{p.limit}</span>
+                                                        </div>
+                                                        <div className="h-1.5 bg-slate-200 rounded-full overflow-hidden">
+                                                            <div className={`h-full rounded-full ${(p.sent / p.limit) > 0.9 ? 'bg-amber-500' : 'bg-emerald-500'}`} style={{ width: `${(p.sent / p.limit) * 100}%` }} />
+                                                        </div>
+                                                    </div>
+                                                ))}
+                                            </div>
+                                        </div>
+
+                                        <div className="bg-slate-50 rounded-xl border border-slate-100 p-5">
+                                            <span className="text-xs font-semibold text-slate-700 block mb-3">Automation Flow</span>
+                                            <div className="space-y-2">
+                                                {[
+                                                    { label: 'New subscriber', type: 'trigger', color: 'bg-blue-100 text-blue-700 border-blue-200' },
+                                                    { label: 'Wait 2 days', type: 'delay', color: 'bg-amber-50 text-amber-700 border-amber-200' },
+                                                    { label: 'Send welcome', type: 'action', color: 'bg-emerald-50 text-emerald-700 border-emerald-200' },
+                                                    { label: 'If opened →', type: 'condition', color: 'bg-purple-50 text-purple-700 border-purple-200' },
+                                                    { label: 'Send offer', type: 'action', color: 'bg-emerald-50 text-emerald-700 border-emerald-200' },
+                                                ].map((node, i) => (
+                                                    <div key={i} className="flex items-center gap-2">
+                                                        <div className="w-1 h-1 rounded-full bg-slate-300 flex-shrink-0" />
+                                                        <span className={`text-[10px] font-semibold px-2 py-1 rounded border ${node.color}`}>{node.label}</span>
+                                                    </div>
+                                                ))}
+                                            </div>
+                                        </div>
+
+                                        <div className="bg-slate-50 rounded-xl border border-slate-100 p-5">
+                                            <span className="text-xs font-semibold text-slate-700 block mb-3">Contact Scoring</span>
+                                            <div className="space-y-2.5">
+                                                {[
+                                                    { name: 'Priya S.', score: 92, tag: 'Hot Lead' },
+                                                    { name: 'Rahul M.', score: 67, tag: 'Engaged' },
+                                                    { name: 'Sarah K.', score: 34, tag: 'Cooling' },
+                                                    { name: 'Dev P.', score: 12, tag: 'Inactive' },
+                                                ].map(c => (
+                                                    <div key={c.name} className="flex items-center justify-between">
+                                                        <div className="flex items-center gap-2">
+                                                            <div className="w-6 h-6 rounded-full bg-slate-200 flex items-center justify-center text-[9px] font-bold text-slate-500">{c.name.charAt(0)}</div>
+                                                            <span className="text-[11px] text-slate-600 font-medium">{c.name}</span>
+                                                        </div>
+                                                        <div className="flex items-center gap-2">
+                                                            <span className={`text-[9px] font-semibold px-1.5 py-0.5 rounded ${c.score > 80 ? 'bg-emerald-50 text-emerald-600' : c.score > 50 ? 'bg-blue-50 text-blue-600' : c.score > 25 ? 'bg-amber-50 text-amber-600' : 'bg-slate-100 text-slate-500'}`}>{c.tag}</span>
+                                                            <span className="text-[11px] font-bold text-slate-700 w-6 text-right">{c.score}</span>
+                                                        </div>
+                                                    </div>
+                                                ))}
+                                            </div>
+                                        </div>
+                                    </div>
+
+                                    <div className="flex flex-col sm:flex-row items-center justify-between bg-blue-50 rounded-xl border border-blue-100 px-5 py-4 gap-3">
+                                        <div className="flex items-center gap-3">
+                                            <RiLinksLine className="text-blue-600 text-lg" />
+                                            <div>
+                                                <span className="text-xs font-semibold text-slate-800">NexCRM Integration</span>
+                                                <span className="text-[10px] text-emerald-600 font-medium ml-2">● Connected</span>
+                                            </div>
+                                        </div>
+                                        <div className="flex items-center gap-4 text-[10px] text-slate-500">
+                                            <span>2,341 contacts synced</span>
+                                            <span>Last sync: 3m ago</span>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </FadeIn>
+
+                    <div className="mt-14 grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-5">
+                        {features.map((f, idx) => {
+                            const Icon = f.icon;
+                            return (
+                                <FadeIn key={f.title} y={20} delay={0.04 * idx} className="bg-white rounded-2xl p-6 border border-slate-100 shadow-lg shadow-slate-200/40 hover:translate-y-[-3px] hover:shadow-xl transition-all group">
+                                    <div className={`w-10 h-10 ${f.bg} ${f.color} rounded-xl flex items-center justify-center text-lg mb-4 group-hover:scale-110 transition-transform`}>
+                                        <Icon />
+                                    </div>
+                                    <h3 className="text-sm font-bold text-slate-900 mb-1">{f.title}</h3>
+                                    <p className="text-xs text-slate-500 leading-relaxed">{f.desc}</p>
+                                </FadeIn>
+                            );
+                        })}
+                    </div>
                 </div>
             </section>
 
@@ -634,23 +692,91 @@ export default function NexMailLandingPage() {
                 </div>
             </section>
 
-            {/* Testimonial / Social Proof */}
-            <section className="py-20 bg-slate-50 border-y border-slate-100">
-                <div className="max-w-4xl mx-auto px-6">
+            {/* Testimonials — Carousel */}
+            <section className="py-24 bg-slate-50 border-y border-slate-100 overflow-hidden">
+                <div className="max-w-5xl mx-auto px-6">
                     <FadeIn y={24}>
-                        <div className="flex flex-col md:flex-row items-center gap-10">
-                            <div className="flex-shrink-0">
-                                <img src="https://images.unsplash.com/photo-1560250097-0b93528c311a?ixlib=rb-4.0.3&auto=format&fit=crop&w=200&q=80" alt="Customer" className="w-20 h-20 rounded-2xl object-cover border-4 border-white shadow-lg" loading="lazy" />
-                            </div>
-                            <div>
-                                <RiStarFill className="text-amber-400 text-xl mb-3" />
-                                <blockquote className="text-xl md:text-2xl font-medium text-slate-900 leading-relaxed mb-4">
-                                    &ldquo;We moved from Mailchimp to NexMail and our deliverability jumped from 82% to 96%. The SMTP rotation and domain throttling are game changers.&rdquo;
-                                </blockquote>
-                                <div>
-                                    <p className="font-bold text-slate-900">Rajesh Kumar</p>
-                                    <p className="text-sm text-slate-500">Marketing Director, TechScale Solutions</p>
-                                </div>
+                        <div className="text-center mb-14">
+                            <span className="text-[#2563EB] font-bold tracking-wider uppercase text-sm mb-4 block">Testimonials</span>
+                            <h2 className="text-3xl md:text-4xl font-bold text-slate-900">Trusted by growing teams</h2>
+                        </div>
+                    </FadeIn>
+
+                    <FadeIn y={20} delay={0.1}>
+                        <div className="relative">
+                            <AnimatePresence mode="wait">
+                                {[
+                                    {
+                                        quote: 'We moved from Mailchimp to NexMail and our deliverability jumped from 82% to 96%. The SMTP rotation and domain throttling are game changers.',
+                                        name: 'Rajesh Kumar',
+                                        role: 'Marketing Director',
+                                        company: 'TechScale Solutions',
+                                        avatar: 'https://images.unsplash.com/photo-1560250097-0b93528c311a?ixlib=rb-4.0.3&auto=format&fit=crop&w=200&q=80',
+                                        stars: 5,
+                                        metric: '96% deliverability',
+                                    },
+                                    {
+                                        quote: 'The anti-spam engine caught issues we never noticed. Our open rates went from 28% to 61% in three weeks. NexMail pays for itself.',
+                                        name: 'Anita Sharma',
+                                        role: 'Head of Growth',
+                                        company: 'FinLeap India',
+                                        avatar: 'https://images.unsplash.com/photo-1573496359142-b8d87734a5a2?ixlib=rb-4.0.3&auto=format&fit=crop&w=200&q=80',
+                                        stars: 5,
+                                        metric: '61% open rate',
+                                    },
+                                    {
+                                        quote: 'We send 200K emails monthly across 8 SMTP accounts. NexMail handles rotation, throttling, and analytics flawlessly. Zero downtime in 6 months.',
+                                        name: 'Vikram Patel',
+                                        role: 'CTO',
+                                        company: 'CloudNine Commerce',
+                                        avatar: 'https://images.unsplash.com/photo-1472099645785-5658abf4ff4e?ixlib=rb-4.0.3&auto=format&fit=crop&w=200&q=80',
+                                        stars: 5,
+                                        metric: '200K emails/mo',
+                                    },
+                                ].filter((_, i) => i === activeTestimonial).map(t => (
+                                    <motion.div
+                                        key={t.name}
+                                        initial={{ opacity: 0, x: 40 }}
+                                        animate={{ opacity: 1, x: 0 }}
+                                        exit={{ opacity: 0, x: -40 }}
+                                        transition={{ duration: 0.35, ease: 'easeInOut' }}
+                                        className="bg-white rounded-3xl border border-slate-200 p-8 md:p-12 shadow-xl shadow-slate-200/30"
+                                    >
+                                        <div className="flex flex-col md:flex-row gap-8 items-start">
+                                            <div className="flex-shrink-0">
+                                                <img src={t.avatar} alt={t.name} className="w-20 h-20 rounded-2xl object-cover border-4 border-white shadow-lg" loading="lazy" />
+                                                <div className="mt-3 bg-blue-50 rounded-lg px-3 py-1.5 text-center border border-blue-100">
+                                                    <span className="text-xs font-bold text-blue-700">{t.metric}</span>
+                                                </div>
+                                            </div>
+                                            <div className="flex-1 min-w-0">
+                                                <div className="flex gap-0.5 mb-4">
+                                                    {Array.from({ length: t.stars }).map((_, i) => (
+                                                        <RiStarFill key={i} className="text-amber-400 text-lg" />
+                                                    ))}
+                                                </div>
+                                                <blockquote className="text-xl md:text-2xl font-medium text-slate-900 leading-relaxed mb-6">
+                                                    &ldquo;{t.quote}&rdquo;
+                                                </blockquote>
+                                                <div>
+                                                    <p className="font-bold text-slate-900">{t.name}</p>
+                                                    <p className="text-sm text-slate-500">{t.role}, {t.company}</p>
+                                                </div>
+                                            </div>
+                                        </div>
+                                    </motion.div>
+                                ))}
+                            </AnimatePresence>
+
+                            <div className="flex items-center justify-center gap-2 mt-8">
+                                {[0, 1, 2].map(i => (
+                                    <button
+                                        key={i}
+                                        onClick={() => setActiveTestimonial(i)}
+                                        className={`transition-all duration-300 rounded-full ${activeTestimonial === i ? 'w-8 h-2.5 bg-blue-600' : 'w-2.5 h-2.5 bg-slate-300 hover:bg-slate-400'}`}
+                                        aria-label={`Testimonial ${i + 1}`}
+                                    />
+                                ))}
                             </div>
                         </div>
                     </FadeIn>

@@ -39,12 +39,6 @@ const navItems = [
   { label: 'NexMail', path: '/nexmail', children: [
     { label: 'Overview', path: '/nexmail' },
     { label: 'Pricing', path: '/nexmail#pricing' },
-    { type: 'divider', label: 'Explore' },
-    { label: 'Features', path: '/nexmail#features' },
-    { label: 'How It Works', path: '/nexmail#how-it-works' },
-    { label: 'vs Competitors', path: '/nexmail#comparison' },
-    { label: 'Compare Plans', path: '/nexmail#compare-features' },
-    { label: 'FAQ', path: '/nexmail#faq' },
   ]},
   { label: 'About', path: '/about' },
   { label: 'Portfolio', path: '/portfolio' },
