@@ -185,7 +185,7 @@ class TenantController {
                 }
 
                 if (enableNexMail) {
-                    this._provisionNexMail(tenantId, slug).catch(e =>
+                    this._provisionNexMail(tenantId, slug, null, email, name).catch(e =>
                         console.warn(`[Tenant] NexMail provision failed for ${slug}:`, e.message)
                     );
                 }
@@ -235,7 +235,7 @@ class TenantController {
         }
     }
 
-    async _provisionNexMail(tenantId, slug, planId) {
+    async _provisionNexMail(tenantId, slug, planId, adminEmail, adminName) {
         const [nexmailTool] = await pool.query("SELECT id, internal_api_url FROM tools WHERE slug = 'nexmail' AND status = 'active'");
         if (!nexmailTool.length) return;
 
@@ -265,7 +265,8 @@ class TenantController {
             const axios = require('axios');
             await axios.post(`${nexmailTool[0].internal_api_url}/internal/provision`, {
                 tenant_id: tenantId, plan_id: selectedPlanId,
-                plan_limits: planLimits, plan_features: planFeatures
+                plan_limits: planLimits, plan_features: planFeatures,
+                admin_email: adminEmail, admin_name: adminName
             }, {
                 headers: { 'X-API-Key': process.env.NEXMAIL_API_KEY || process.env.PLATFORM_API_KEY || '' },
                 timeout: 10000
