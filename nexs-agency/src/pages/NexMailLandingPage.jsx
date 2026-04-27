@@ -234,113 +234,197 @@ export default function NexMailLandingPage() {
             </section>
 
             {/* Features — Bento Grid */}
-            <section id="features" className="py-32 bg-slate-50 relative overflow-hidden">
-                <div className="absolute inset-0 z-0 pointer-events-none opacity-[0.03] bg-[radial-gradient(#000_1px,transparent_1px)] [background-size:24px_24px]" />
+            <section id="features" className="py-32 bg-slate-950 relative overflow-hidden">
+                <div className="absolute inset-0 z-0 pointer-events-none opacity-[0.04] bg-[radial-gradient(#fff_1px,transparent_1px)] [background-size:32px_32px]" />
+                <div className="absolute top-0 left-1/2 -translate-x-1/2 w-[600px] h-[600px] bg-blue-500/10 rounded-full blur-[120px] pointer-events-none" />
 
-                <div className="max-w-7xl mx-auto px-6 relative z-10">
+                <div className="max-w-5xl mx-auto px-6 relative z-10">
                     <FadeIn y={24} duration={0.6}>
-                        <div className="max-w-3xl mx-auto text-center mb-24">
-                            <span className="text-[#2563EB] font-bold tracking-wider uppercase text-sm mb-4 block">Capabilities</span>
-                            <h2 className="text-3xl md:text-5xl font-bold text-slate-900 mb-6">Everything you need to <span className="text-[#2563EB]">land in inboxes.</span></h2>
-                            <p className="text-xl text-slate-600 font-light">Not just another email tool. NexMail is an email engine — built from the ground up for deliverability.</p>
+                        <div className="max-w-3xl mx-auto text-center mb-20">
+                            <span className="text-blue-400 font-mono font-bold tracking-wider uppercase text-sm mb-4 block">// email pipeline</span>
+                            <h2 className="text-3xl md:text-5xl font-bold text-white mb-6">Watch your email <span className="text-transparent bg-clip-text bg-gradient-to-r from-blue-400 to-cyan-400">travel through NexMail.</span></h2>
+                            <p className="text-xl text-slate-400 font-light">Every email passes through 6 stages. Each one is engineered to maximize deliverability.</p>
                         </div>
                     </FadeIn>
 
-                    <div className="grid grid-cols-1 md:grid-cols-3 gap-8 auto-rows-[340px]">
-                        {/* Lead card — Email builder with bg image */}
-                        <FadeIn y={30} delay={0} className="md:col-span-2 md:row-span-1 rounded-[2rem] border border-slate-200 shadow-xl shadow-slate-200/50 hover:shadow-2xl transition-all group overflow-hidden relative">
-                            <div className="absolute inset-0 bg-[url('https://images.unsplash.com/photo-1563986768609-322da13575f2?ixlib=rb-4.0.3&auto=format&fit=crop&w=2600&q=80&fm=webp')] bg-cover bg-center transition-transform duration-700 group-hover:scale-105" />
-                            <div className="absolute inset-0 bg-gradient-to-r from-white via-white/90 to-transparent" />
-                            <div className="relative z-10 p-10 h-full flex flex-col justify-center max-w-md">
-                                <div className="w-14 h-14 bg-blue-600 text-white rounded-2xl flex items-center justify-center text-2xl mb-6 shadow-lg"><RiDragDropLine /></div>
-                                <h3 className="text-3xl font-bold text-slate-900 mb-4">Drag & Drop Builder</h3>
-                                <p className="text-slate-600 text-lg leading-relaxed font-medium">18 block types, mobile preview, undo/redo, template versioning. Build beautiful emails without code.</p>
+                    <div className="relative">
+                        {/* Vertical pipeline line */}
+                        <div className="absolute left-8 md:left-12 top-0 bottom-0 w-px bg-gradient-to-b from-blue-500 via-emerald-500 via-amber-500 to-purple-500 opacity-40" />
+
+                        {/* Stage 1 — Compose */}
+                        <FadeIn y={40} delay={0} className="relative pl-20 md:pl-28 pb-16">
+                            <div className="absolute left-5 md:left-9 top-2 w-6 h-6 rounded-full bg-blue-500 border-4 border-slate-950 shadow-[0_0_12px_rgba(59,130,246,0.5)]" />
+                            <div className="bg-slate-900/80 backdrop-blur-sm border border-slate-800 rounded-2xl p-8 hover:border-blue-500/30 transition-colors">
+                                <div className="flex items-center gap-3 mb-4">
+                                    <span className="font-mono text-xs text-blue-400 bg-blue-500/10 px-3 py-1 rounded-full border border-blue-500/20">STAGE 01</span>
+                                    <span className="text-slate-500 font-mono text-xs">compose</span>
+                                </div>
+                                <h3 className="text-2xl font-bold text-white mb-3">Drag & Drop Builder</h3>
+                                <p className="text-slate-400 leading-relaxed mb-5">18 block types, live mobile preview, undo/redo history, template versioning. Build production-grade emails without touching code.</p>
+                                <div className="flex flex-wrap gap-2">
+                                    {['Text', 'Image', 'Button', 'Columns', 'Spacer', 'HTML', 'Social', 'Video'].map(b => (
+                                        <span key={b} className="font-mono text-xs text-slate-500 bg-slate-800 px-2.5 py-1 rounded-md border border-slate-700">{b}</span>
+                                    ))}
+                                    <span className="font-mono text-xs text-slate-600 px-2.5 py-1">+10 more</span>
+                                </div>
                             </div>
                         </FadeIn>
 
-                        {/* Tall dark card — Deliverability engine */}
-                        <FadeIn y={30} delay={0.1} className="md:col-span-1 md:row-span-2 bg-slate-900 rounded-[2rem] p-8 border border-slate-800 text-white hover:shadow-2xl transition-all relative overflow-hidden group flex flex-col">
-                            <div className="relative z-10 mb-8">
-                                <div className="w-14 h-14 bg-white/10 text-white rounded-2xl flex items-center justify-center text-2xl mb-6 backdrop-blur-md border border-white/10"><RiShieldCheckLine /></div>
-                                <h3 className="text-2xl font-bold mb-3">Deliverability Engine</h3>
-                                <p className="text-slate-400 leading-relaxed font-medium">SMTP rotation, domain throttling, warmup mode, and reputation monitoring.</p>
+                        {/* Stage 2 — Spam Check */}
+                        <FadeIn y={40} delay={0.08} className="relative pl-20 md:pl-28 pb-16">
+                            <div className="absolute left-5 md:left-9 top-2 w-6 h-6 rounded-full bg-emerald-500 border-4 border-slate-950 shadow-[0_0_12px_rgba(16,185,129,0.5)]" />
+                            <div className="bg-slate-900/80 backdrop-blur-sm border border-slate-800 rounded-2xl p-8 hover:border-emerald-500/30 transition-colors">
+                                <div className="flex items-center gap-3 mb-4">
+                                    <span className="font-mono text-xs text-emerald-400 bg-emerald-500/10 px-3 py-1 rounded-full border border-emerald-500/20">STAGE 02</span>
+                                    <span className="text-slate-500 font-mono text-xs">spam_check</span>
+                                </div>
+                                <h3 className="text-2xl font-bold text-white mb-3">Anti-Spam Engine</h3>
+                                <p className="text-slate-400 leading-relaxed mb-5">50+ checks run on every email before it leaves. Subject analysis, trigger words, HTML structure, image ratio, CAN-SPAM compliance.</p>
+                                <div className="bg-slate-800/50 rounded-xl p-4 border border-slate-700 font-mono text-sm">
+                                    <div className="flex items-center gap-2 text-emerald-400 mb-2"><RiCheckLine className="flex-shrink-0" /><span>Subject: No spam triggers found</span></div>
+                                    <div className="flex items-center gap-2 text-emerald-400 mb-2"><RiCheckLine className="flex-shrink-0" /><span>HTML: Clean structure, 1:3 image-text ratio</span></div>
+                                    <div className="flex items-center gap-2 text-emerald-400 mb-2"><RiCheckLine className="flex-shrink-0" /><span>Compliance: Unsubscribe link present</span></div>
+                                    <div className="flex items-center gap-2 text-white mt-3 pt-3 border-t border-slate-700"><RiShieldCheckLine className="text-emerald-400 flex-shrink-0" /><span>Score: <span className="text-emerald-400 font-bold">87/100</span> — Safe to send</span></div>
+                                </div>
                             </div>
-                            <div className="flex-1 flex flex-col justify-end gap-3">
-                                {['Gmail: 80/hr limit respected', 'Yahoo: 60/hr limit respected', 'Outlook: 100/hr limit respected', 'Custom domains: No throttle'].map((rule, i) => (
-                                    <div key={i} className="flex items-center gap-3 bg-white/5 border border-white/10 rounded-xl px-4 py-3 backdrop-blur-sm">
-                                        <RiCheckLine className="text-emerald-400 flex-shrink-0" />
-                                        <span className="text-sm text-slate-300 font-medium">{rule}</span>
+                        </FadeIn>
+
+                        {/* Stage 3 — SMTP Selection */}
+                        <FadeIn y={40} delay={0.16} className="relative pl-20 md:pl-28 pb-16">
+                            <div className="absolute left-5 md:left-9 top-2 w-6 h-6 rounded-full bg-indigo-500 border-4 border-slate-950 shadow-[0_0_12px_rgba(99,102,241,0.5)]" />
+                            <div className="bg-slate-900/80 backdrop-blur-sm border border-slate-800 rounded-2xl p-8 hover:border-indigo-500/30 transition-colors">
+                                <div className="flex items-center gap-3 mb-4">
+                                    <span className="font-mono text-xs text-indigo-400 bg-indigo-500/10 px-3 py-1 rounded-full border border-indigo-500/20">STAGE 03</span>
+                                    <span className="text-slate-500 font-mono text-xs">smtp_select</span>
+                                </div>
+                                <h3 className="text-2xl font-bold text-white mb-3">Smart SMTP Rotation</h3>
+                                <p className="text-slate-400 leading-relaxed mb-5">Weighted multi-account rotation. Higher reputation accounts get more sends. Issues auto-detected and accounts disabled instantly.</p>
+                                <div className="grid grid-cols-1 sm:grid-cols-3 gap-3">
+                                    {[
+                                        { name: 'smtp-1 (SES)', rep: 96, weight: '45%', active: true },
+                                        { name: 'smtp-2 (Postmark)', rep: 91, weight: '35%', active: true },
+                                        { name: 'smtp-3 (Gmail)', rep: 72, weight: '20%', active: true },
+                                    ].map(s => (
+                                        <div key={s.name} className="bg-slate-800/50 border border-slate-700 rounded-xl p-3">
+                                            <div className="flex items-center justify-between mb-2">
+                                                <span className="font-mono text-xs text-slate-300">{s.name}</span>
+                                                <span className="w-2 h-2 rounded-full bg-emerald-400" />
+                                            </div>
+                                            <div className="flex items-baseline gap-1">
+                                                <span className="text-lg font-bold text-white">{s.rep}</span>
+                                                <span className="text-xs text-slate-500">/100 rep</span>
+                                            </div>
+                                            <div className="text-xs text-slate-500 mt-1">Weight: {s.weight}</div>
+                                        </div>
+                                    ))}
+                                </div>
+                            </div>
+                        </FadeIn>
+
+                        {/* Stage 4 — Throttle */}
+                        <FadeIn y={40} delay={0.24} className="relative pl-20 md:pl-28 pb-16">
+                            <div className="absolute left-5 md:left-9 top-2 w-6 h-6 rounded-full bg-amber-500 border-4 border-slate-950 shadow-[0_0_12px_rgba(245,158,11,0.5)]" />
+                            <div className="bg-slate-900/80 backdrop-blur-sm border border-slate-800 rounded-2xl p-8 hover:border-amber-500/30 transition-colors">
+                                <div className="flex items-center gap-3 mb-4">
+                                    <span className="font-mono text-xs text-amber-400 bg-amber-500/10 px-3 py-1 rounded-full border border-amber-500/20">STAGE 04</span>
+                                    <span className="text-slate-500 font-mono text-xs">throttle</span>
+                                </div>
+                                <h3 className="text-2xl font-bold text-white mb-3">Domain Throttling</h3>
+                                <p className="text-slate-400 leading-relaxed mb-5">Per-provider sending limits with human-like variable delays. Never trip rate limits. Never look like a bot.</p>
+                                <div className="space-y-3">
+                                    {[
+                                        { domain: 'gmail.com', limit: '80/hr', used: 78, pct: 97 },
+                                        { domain: 'yahoo.com', limit: '60/hr', used: 34, pct: 57 },
+                                        { domain: 'outlook.com', limit: '100/hr', used: 61, pct: 61 },
+                                    ].map(d => (
+                                        <div key={d.domain} className="flex items-center gap-4">
+                                            <span className="font-mono text-xs text-slate-400 w-24">{d.domain}</span>
+                                            <div className="flex-1 h-2 bg-slate-800 rounded-full overflow-hidden">
+                                                <div className={`h-full rounded-full ${d.pct > 90 ? 'bg-amber-500' : 'bg-emerald-500'}`} style={{ width: `${d.pct}%` }} />
+                                            </div>
+                                            <span className="font-mono text-xs text-slate-500 w-16 text-right">{d.used}/{d.limit.split('/')[0]}</span>
+                                        </div>
+                                    ))}
+                                    <div className="text-xs text-amber-400/70 font-mono mt-2">⏱ gmail.com — pausing 42s (approaching hourly limit)</div>
+                                </div>
+                            </div>
+                        </FadeIn>
+
+                        {/* Stage 5 — Deliver */}
+                        <FadeIn y={40} delay={0.32} className="relative pl-20 md:pl-28 pb-16">
+                            <div className="absolute left-5 md:left-9 top-2 w-6 h-6 rounded-full bg-cyan-500 border-4 border-slate-950 shadow-[0_0_12px_rgba(6,182,212,0.5)]" />
+                            <div className="bg-slate-900/80 backdrop-blur-sm border border-slate-800 rounded-2xl p-8 hover:border-cyan-500/30 transition-colors">
+                                <div className="flex items-center gap-3 mb-4">
+                                    <span className="font-mono text-xs text-cyan-400 bg-cyan-500/10 px-3 py-1 rounded-full border border-cyan-500/20">STAGE 05</span>
+                                    <span className="text-slate-500 font-mono text-xs">deliver</span>
+                                </div>
+                                <h3 className="text-2xl font-bold text-white mb-3">Inbox Delivery</h3>
+                                <p className="text-slate-400 leading-relaxed mb-5">SPF/DKIM/DMARC verified. Warmup mode for new domains. Bounce handling and suppression lists keep your reputation pristine.</p>
+                                <div className="grid grid-cols-3 gap-4">
+                                    {[
+                                        { label: 'Delivered', value: '4,847', sub: '98.2%' },
+                                        { label: 'Bounced', value: '12', sub: '0.2%' },
+                                        { label: 'Suppressed', value: '79', sub: '1.6%' },
+                                    ].map(m => (
+                                        <div key={m.label} className="text-center">
+                                            <div className="text-2xl font-bold text-white">{m.value}</div>
+                                            <div className="text-xs text-slate-500 mt-1">{m.label}</div>
+                                            <div className="text-xs text-cyan-400 font-mono">{m.sub}</div>
+                                        </div>
+                                    ))}
+                                </div>
+                            </div>
+                        </FadeIn>
+
+                        {/* Stage 6 — Analyze */}
+                        <FadeIn y={40} delay={0.4} className="relative pl-20 md:pl-28 pb-4">
+                            <div className="absolute left-5 md:left-9 top-2 w-6 h-6 rounded-full bg-purple-500 border-4 border-slate-950 shadow-[0_0_12px_rgba(168,85,247,0.5)]" />
+                            <div className="bg-slate-900/80 backdrop-blur-sm border border-slate-800 rounded-2xl p-8 hover:border-purple-500/30 transition-colors">
+                                <div className="flex items-center gap-3 mb-4">
+                                    <span className="font-mono text-xs text-purple-400 bg-purple-500/10 px-3 py-1 rounded-full border border-purple-500/20">STAGE 06</span>
+                                    <span className="text-slate-500 font-mono text-xs">analyze</span>
+                                </div>
+                                <h3 className="text-2xl font-bold text-white mb-3">Campaign Analytics</h3>
+                                <p className="text-slate-400 leading-relaxed mb-5">Open rates, click maps, delivery funnels, engagement heatmaps, and campaign leaderboards. Every metric you need, nothing you don't.</p>
+                                <div className="grid grid-cols-2 sm:grid-cols-4 gap-3">
+                                    {[
+                                        { label: 'Open Rate', value: '61.4%' },
+                                        { label: 'Click Rate', value: '8.7%' },
+                                        { label: 'Unsub Rate', value: '0.3%' },
+                                        { label: 'Engagement', value: '72/100' },
+                                    ].map(m => (
+                                        <div key={m.label} className="bg-slate-800/50 border border-slate-700 rounded-xl p-3 text-center">
+                                            <div className="text-lg font-bold text-white">{m.value}</div>
+                                            <div className="text-xs text-slate-500 mt-0.5">{m.label}</div>
+                                        </div>
+                                    ))}
+                                </div>
+                            </div>
+                        </FadeIn>
+                    </div>
+
+                    {/* Remaining capabilities — inline at bottom */}
+                    <FadeIn y={30} delay={0.2}>
+                        <div className="mt-20 pt-16 border-t border-slate-800">
+                            <p className="text-center text-sm text-slate-500 font-mono uppercase tracking-wider mb-8">Also included</p>
+                            <div className="grid grid-cols-2 md:grid-cols-4 gap-4">
+                                {[
+                                    { icon: RiFlowChart, label: 'Visual Automations', sub: '9 triggers, 11 actions' },
+                                    { icon: RiUserFollowLine, label: 'Contact Scoring', sub: '0-100 engagement score' },
+                                    { icon: RiLinksLine, label: 'CRM Integration', sub: 'Native NexCRM sync' },
+                                    { icon: RiGroupLine, label: 'List Segmentation', sub: 'Tags, filters, behaviors' },
+                                ].map(item => (
+                                    <div key={item.label} className="flex items-start gap-3 p-4 rounded-xl bg-slate-900/50 border border-slate-800 hover:border-slate-700 transition-colors">
+                                        <item.icon className="text-lg text-slate-500 mt-0.5 flex-shrink-0" />
+                                        <div>
+                                            <div className="text-sm font-semibold text-slate-300">{item.label}</div>
+                                            <div className="text-xs text-slate-500 mt-0.5">{item.sub}</div>
+                                        </div>
                                     </div>
                                 ))}
                             </div>
-                        </FadeIn>
-
-                        {/* Standard card — SMTP Rotation */}
-                        <FadeIn y={30} delay={0.2} className="md:col-span-1 bg-white rounded-[2rem] p-10 border border-slate-100 shadow-xl shadow-slate-200/50 hover:translate-y-[-4px] hover:shadow-2xl transition-all group">
-                            <div className="w-14 h-14 bg-indigo-50 text-indigo-600 rounded-2xl flex items-center justify-center text-2xl mb-6 group-hover:scale-110 transition-transform"><RiServerLine /></div>
-                            <h3 className="text-xl font-bold text-slate-900 mb-3">Smart SMTP Rotation</h3>
-                            <p className="text-slate-600 font-medium leading-relaxed">Weighted multi-account rotation. Better reputation = more sends. Auto-disable on issues.</p>
-                        </FadeIn>
-
-                        {/* Standard card — Anti-Spam */}
-                        <FadeIn y={30} delay={0.3} className="md:col-span-1 bg-white rounded-[2rem] p-10 border border-slate-100 shadow-xl shadow-slate-200/50 hover:translate-y-[-4px] hover:shadow-2xl transition-all group">
-                            <div className="w-14 h-14 bg-emerald-50 text-emerald-600 rounded-2xl flex items-center justify-center text-2xl mb-6 group-hover:scale-110 transition-transform"><RiSpamLine /></div>
-                            <h3 className="text-xl font-bold text-slate-900 mb-3">Anti-Spam Scoring</h3>
-                            <p className="text-slate-600 font-medium leading-relaxed">50+ checks on every email. Score below 20? Sending blocked. Protect your reputation.</p>
-                        </FadeIn>
-
-                        {/* Full-width card — Automation with mockup */}
-                        <FadeIn y={30} delay={0.15} className="md:col-span-3 rounded-[2rem] p-10 border border-slate-200 hover:shadow-lg transition-all flex flex-col md:flex-row items-center gap-10 overflow-hidden relative group">
-                            <div className="absolute inset-0 bg-[url('https://images.unsplash.com/photo-1551434678-e076c223a692?ixlib=rb-4.0.3&auto=format&fit=crop&w=1000&q=80&fm=webp')] bg-cover bg-center opacity-10 group-hover:opacity-20 transition-opacity duration-500" />
-                            <div className="absolute inset-0 bg-gradient-to-r from-white via-white to-transparent" />
-                            <div className="flex-1 relative z-10 pl-4">
-                                <div className="w-14 h-14 bg-purple-50 text-purple-600 rounded-2xl flex items-center justify-center text-2xl mb-6"><RiFlowChart /></div>
-                                <h3 className="text-3xl font-bold text-slate-900 mb-4">Visual Automations</h3>
-                                <p className="text-slate-600 text-lg leading-relaxed font-medium max-w-lg">Node-based flow builder with 9 triggers, 11 actions, conditional branching, and webhook integrations. Set it and forget it.</p>
-                            </div>
-                            <div className="flex-1 w-full max-w-md bg-white rounded-2xl shadow-lg border border-slate-100 p-6 relative z-10 transform translate-y-4 group-hover:translate-y-0 transition-transform duration-500">
-                                <div className="flex items-center gap-3 mb-4 pb-4 border-b border-slate-100">
-                                    <div className="w-3 h-3 rounded-full bg-emerald-400" />
-                                    <span className="text-xs font-bold text-slate-500 uppercase tracking-wider">Automation Running</span>
-                                </div>
-                                <div className="space-y-3">
-                                    <div className="flex items-center gap-3 p-3 bg-blue-50 rounded-xl border border-blue-100">
-                                        <RiMailLine className="text-blue-600" />
-                                        <span className="text-sm font-medium text-slate-700">New subscriber joins</span>
-                                    </div>
-                                    <div className="flex justify-center"><div className="w-px h-4 bg-slate-200" /></div>
-                                    <div className="flex items-center gap-3 p-3 bg-amber-50 rounded-xl border border-amber-100">
-                                        <RiTimeLine className="text-amber-600" />
-                                        <span className="text-sm font-medium text-slate-700">Wait 2 hours</span>
-                                    </div>
-                                    <div className="flex justify-center"><div className="w-px h-4 bg-slate-200" /></div>
-                                    <div className="flex items-center gap-3 p-3 bg-emerald-50 rounded-xl border border-emerald-100">
-                                        <RiSendPlaneLine className="text-emerald-600" />
-                                        <span className="text-sm font-medium text-slate-700">Send welcome email</span>
-                                    </div>
-                                </div>
-                            </div>
-                        </FadeIn>
-                    </div>
-                </div>
-            </section>
-
-            {/* Remaining features — compact grid */}
-            <section className="py-20 bg-white">
-                <div className="max-w-7xl mx-auto px-6">
-                    <div className="grid md:grid-cols-2 lg:grid-cols-4 gap-5">
-                        {features.slice(3).map((f, i) => (
-                            <FadeIn key={f.title} y={20} delay={i * 0.05}>
-                                <div className="p-6 rounded-2xl border border-slate-100 hover:border-slate-200 hover:shadow-lg transition-all duration-300 h-full bg-white group">
-                                    <div className={`w-11 h-11 ${f.bg} rounded-xl flex items-center justify-center mb-4 group-hover:scale-110 transition-transform`}>
-                                        <f.icon className={`text-xl ${f.color}`} />
-                                    </div>
-                                    <h3 className="text-base font-bold mb-2 text-slate-900">{f.title}</h3>
-                                    <p className="text-sm text-slate-500 leading-relaxed">{f.desc}</p>
-                                </div>
-                            </FadeIn>
-                        ))}
-                    </div>
+                        </div>
+                    </FadeIn>
                 </div>
             </section>
 
