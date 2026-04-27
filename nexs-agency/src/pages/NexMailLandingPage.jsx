@@ -345,7 +345,7 @@ export default function NexMailLandingPage() {
             </section>
 
             {/* How It Works */}
-            <section className="py-28 bg-slate-50 relative">
+            <section id="how-it-works" className="py-28 bg-slate-50 relative">
                 <div className="max-w-6xl mx-auto px-6">
                     <FadeIn y={24} duration={0.6}>
                         <div className="text-center mb-20">
@@ -378,7 +378,7 @@ export default function NexMailLandingPage() {
             </section>
 
             {/* Comparison — NexMail vs Others */}
-            <section className="py-28 bg-white">
+            <section id="comparison" className="py-28 bg-white">
                 <div className="max-w-4xl mx-auto px-6">
                     <FadeIn y={24}>
                         <div className="text-center mb-14">
@@ -487,7 +487,7 @@ export default function NexMailLandingPage() {
             </section>
 
             {/* Feature Comparison — Full Accordion */}
-            <section className="py-32 bg-white relative border-t border-slate-100">
+            <section id="compare-features" className="py-32 bg-white relative border-t border-slate-100">
                 <div className="max-w-7xl mx-auto px-6 relative z-10">
                     <FadeIn y={24}>
                         <div className="text-center mb-16">
@@ -561,7 +561,7 @@ export default function NexMailLandingPage() {
             </section>
 
             {/* FAQ */}
-            <section className="py-28 bg-white">
+            <section id="faq" className="py-28 bg-white">
                 <div className="max-w-3xl mx-auto px-6">
                     <FadeIn y={24}>
                         <div className="text-center mb-14">
