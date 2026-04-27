@@ -29,6 +29,7 @@ const PortfolioPage = lazy(() => import('./pages/PortfolioPage'));
 const ContactPage = lazy(() => import('./pages/ContactPage'));
 const BlogPage = lazy(() => import('./pages/BlogPage'));
 const NexCRMLandingPage = lazy(() => import('./pages/NexCRMLandingPage'));
+const NexMailLandingPage = lazy(() => import('./pages/NexMailLandingPage'));
 const CRMPricingPage = lazy(() => import('./pages/CRMPricingPage'));
 const PrivacyPolicy = lazy(() => import('./pages/PrivacyPolicy'));
 const TermsOfService = lazy(() => import('./pages/TermsOfService'));
@@ -156,6 +157,7 @@ function App() {
           <Route path="/nexcrm" element={<NexCRMLandingPage />} />
           <Route path="/nexcrm/pricing" element={<CRMPricingPage />} />
           <Route path="/nexcrm/industries/:industry" element={<IndustryLandingPage />} />
+          <Route path="/nexmail" element={<NexMailLandingPage />} />
           <Route path="/admin/backups" element={<ProtectedRoute><AdminBackupsPage /></ProtectedRoute>} />
           <Route path="/privacy-policy" element={<PrivacyPolicy />} />
           <Route path="/terms" element={<TermsOfService />} />

@@ -223,6 +223,9 @@ app.get('/api/security/banned-ips', (req, res) => {
     });
 });
 
+// Tool Registry
+app.use('/api/tools', require('./routes/tool.routes'));
+
 // Email Campaigns & Marketing
 app.use('/api/campaigns', require('./routes/campaign.routes'));
 app.use('/api/smtp-accounts', require('./routes/smtp.routes'));
