@@ -3,6 +3,9 @@ const router = express.Router();
 const { auth, isAdmin } = require('../middleware/auth');
 const { pool } = require('../config/database');
 const axios = require('axios');
+const TenantModel = require('../models/tenant.model');
+const ServerModel = require('../models/server.model');
+const Provisioner = require('../services/provisioner');
 
 router.use(auth);
 router.use(isAdmin);
@@ -150,6 +153,61 @@ router.get('/tenant/:tenantId/:toolSlug/stats', async (req, res) => {
     } catch (error) {
         console.error('Tool stats error:', error);
         res.status(500).json({ error: 'Failed to fetch stats.' });
+    }
+});
+
+router.post('/tenant/:tenantId/enable-crm', async (req, res) => {
+    try {
+        const tenantId = req.params.tenantId;
+        const { plan_id, server_id } = req.body;
+
+        const tenant = await TenantModel.findById(tenantId);
+        if (!tenant) return res.status(404).json({ error: 'Tenant not found.' });
+
+        if (tenant.process_status === 'running' || tenant.db_name) {
+            return res.status(400).json({ error: 'CRM is already provisioned for this tenant.' });
+        }
+
+        const provisioner = new Provisioner();
+
+        let server;
+        if (server_id) {
+            server = await ServerModel.findById(server_id);
+        } else if (tenant.server_id) {
+            server = await ServerModel.findById(tenant.server_id);
+        } else {
+            server = await ServerModel.getBestServer();
+        }
+
+        if (!server) return res.status(400).json({ error: 'No available servers.' });
+
+        const port = await TenantModel.allocatePort(tenantId, server.id);
+        await TenantModel.update(tenantId, { server_id: server.id });
+
+        const dbName = `nexcrm_${tenant.slug.replace(/-/g, '_')}`;
+        await provisioner.createDatabase(dbName, server.db_host || 'localhost', server.db_user, server.db_password);
+
+        res.json({ success: true, message: 'CRM provisioning started in background.' });
+
+        provisioner.provisionTenant({
+            id: tenantId, name: tenant.name, slug: tenant.slug,
+            email: tenant.email, industry_type: tenant.industry_type || 'general',
+            plan_slug: 'starter'
+        }, server.id, {
+            skipPortAllocation: true, assignedPort: port, skipDbCreation: true
+        }).then(async () => {
+            const [crmTool] = await pool.query("SELECT id FROM tools WHERE slug = 'nexcrm'");
+            if (crmTool.length) {
+                await pool.query(`
+                    INSERT INTO tenant_tools (tenant_id, tool_id, tool_plan_id, status, provisioned_at)
+                    VALUES (?, ?, ?, 'active', NOW())
+                    ON DUPLICATE KEY UPDATE status = 'active'
+                `, [tenantId, crmTool[0].id, plan_id || null]);
+            }
+        }).catch(err => console.error(`[Tools] CRM provision failed for tenant ${tenantId}:`, err.message));
+    } catch (error) {
+        console.error('Enable CRM error:', error);
+        if (!res.headersSent) res.status(500).json({ error: 'Failed to enable CRM.' });
     }
 });
 

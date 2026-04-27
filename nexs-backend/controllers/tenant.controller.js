@@ -7,6 +7,7 @@ const DocumentTemplateModel = require('../models/document-template.model');
 const pdfService = require('../services/pdf.service');
 const emailService = require('../services/email.service');
 const workflowEngine = require('../services/workflowEngine');
+const { pool } = require('../config/database');
 
 class TenantController {
     /**
@@ -91,20 +92,18 @@ class TenantController {
     }
 
     /**
-     * Create new tenant and provision
+     * Create new tenant and provision selected tools
      */
     async createTenant(req, res) {
         try {
-            const { name, slug, email, phone, industry_type, plan_id, server_id } = req.body;
+            const { name, slug, email, phone, industry_type, plan_id, server_id, tools: selectedTools } = req.body;
 
-            // Validation
             if (!name || !slug || !email) {
                 return res.status(400).json({
                     error: 'Name, slug, and email are required'
                 });
             }
 
-            // Check if slug already exists
             const existing = await TenantModel.findBySlug(slug);
             if (existing) {
                 return res.status(400).json({
@@ -112,107 +111,98 @@ class TenantController {
                 });
             }
 
-            // Create tenant record
             const tenantId = await TenantModel.create({
                 name, slug, email, phone, industry_type, plan_id, server_id
             });
 
-            // Get plan details for provisioning
             let plan_slug = 'starter';
             if (plan_id) {
                 const plan = await PlanModel.findById(plan_id);
-                if (plan) {
-                    plan_slug = plan.slug || 'starter';
-                }
+                if (plan) plan_slug = plan.slug || 'starter';
             }
 
-            // Provision the tenant (create DB, start process, configure Cloudflare)
-            // We do this asynchronously to prevent creating a timeout on the frontend
+            const toolsToEnable = Array.isArray(selectedTools) ? selectedTools : [];
+            const enableCRM = toolsToEnable.length === 0 || toolsToEnable.some(t => t.slug === 'nexcrm' || t === 'nexcrm');
+            const enableNexMail = toolsToEnable.some(t => t.slug === 'nexmail' || t === 'nexmail');
+
             try {
-                // Initialize Provisioner service
-                const provisioner = new Provisioner();
+                if (enableCRM) {
+                    const provisioner = new Provisioner();
 
-                // 1. Select Server (Critical Step)
-                let server;
-                if (server_id) {
-                    server = await ServerModel.findById(server_id);
-                } else {
-                    server = await ServerModel.getBestServer();
-                }
-
-                if (!server) {
-                    throw new Error('No available servers for provisioning');
-                }
-
-                // 2. Allocate Port (Critical Step)
-                const port = await TenantModel.allocatePort(tenantId, server.id);
-
-                // 3. Update Tenant with Server ID (Critical Step)
-                await TenantModel.update(tenantId, { server_id: server.id });
-
-                // 4. Create Database (Critical Step - usually fast enough)
-                const dbName = `nexcrm_${slug.replace(/-/g, '_')}`;
-                const dbHost = server.db_host || 'localhost';
-                await provisioner.createDatabase(dbName, dbHost, server.db_user, server.db_password);
-
-                // RESPONSE sent here - preventing timeout
-                res.status(201).json({
-                    success: true,
-                    message: 'Tenant created successfully. Provisioning resources in background.',
-                    data: {
-                        tenantId,
-                        slug,
-                        status: 'provisioning'
+                    let server;
+                    if (server_id) {
+                        server = await ServerModel.findById(server_id);
+                    } else {
+                        server = await ServerModel.getBestServer();
                     }
-                });
 
-                // Fire workflow trigger for tenant creation
-                try {
-                    const plan = plan_id ? await PlanModel.findById(plan_id) : null;
-                    workflowEngine.trigger('tenant_created', 'tenant', tenantId, {
-                        id: tenantId,
-                        name,
-                        slug,
-                        email,
-                        owner_email: email,
-                        owner_name: name,
-                        phone: phone || '',
-                        industry_type: industry_type || 'general',
-                        plan_name: plan?.name || 'Starter',
-                        plan_price: plan?.price ? `${plan.price}` : 'As per agreement',
-                        plan_billing_cycle: plan?.billing_cycle || 'Monthly',
-                        trial_days: plan?.trial_days || 14
+                    if (!server) {
+                        throw new Error('No available servers for provisioning');
+                    }
+
+                    const port = await TenantModel.allocatePort(tenantId, server.id);
+                    await TenantModel.update(tenantId, { server_id: server.id });
+
+                    const dbName = `nexcrm_${slug.replace(/-/g, '_')}`;
+                    const dbHost = server.db_host || 'localhost';
+                    await provisioner.createDatabase(dbName, dbHost, server.db_user, server.db_password);
+
+                    res.status(201).json({
+                        success: true,
+                        message: 'Tenant created. Provisioning selected tools in background.',
+                        data: { tenantId, slug, status: 'provisioning', tools: { crm: enableCRM, nexmail: enableNexMail } }
                     });
-                } catch (triggerErr) {
-                    console.error('[TenantController] Workflow trigger error:', triggerErr.message);
+
+                    try {
+                        const plan = plan_id ? await PlanModel.findById(plan_id) : null;
+                        workflowEngine.trigger('tenant_created', 'tenant', tenantId, {
+                            id: tenantId, name, slug, email, owner_email: email, owner_name: name,
+                            phone: phone || '', industry_type: industry_type || 'general',
+                            plan_name: plan?.name || 'Starter', plan_price: plan?.price ? `${plan.price}` : 'As per agreement',
+                            plan_billing_cycle: plan?.billing_cycle || 'Monthly', trial_days: plan?.trial_days || 14
+                        });
+                    } catch (triggerErr) {
+                        console.error('[TenantController] Workflow trigger error:', triggerErr.message);
+                    }
+
+                    provisioner.provisionTenant({
+                        id: tenantId, name, slug, email,
+                        industry_type: industry_type || 'general', plan_slug
+                    }, server.id, {
+                        skipPortAllocation: true, assignedPort: port, skipDbCreation: true
+                    }).then(() => {
+                        this._recordToolEnabled(tenantId, 'nexcrm', plan_id);
+                    }).catch(async (bgError) => {
+                        console.error(`[Background Provisioning Error] Tenant ${slug}:`, bgError);
+                        await TenantModel.updateProcessStatus(tenantId, 'error');
+                    });
+                } else {
+                    res.status(201).json({
+                        success: true,
+                        message: 'Tenant created. Provisioning selected tools in background.',
+                        data: { tenantId, slug, status: 'created', tools: { crm: false, nexmail: enableNexMail } }
+                    });
                 }
 
-                // 5. Background Provisioning (Heavy Lifting)
-                // We deliberately do NOT await this. We let it run in the background.
-                provisioner.provisionTenant({
-                    id: tenantId,
-                    name,
-                    slug,
-                    email,
-                    industry_type: industry_type || 'general',
-                    plan_slug
-                }, server.id, {
-                    skipPortAllocation: true,
-                    assignedPort: port,
-                    skipDbCreation: true
-                }).catch(async (bgError) => {
-                    console.error(`[Background Provisioning Error] Tenant ${slug}:`, bgError);
-                    await TenantModel.updateProcessStatus(tenantId, 'error');
-                });
+                if (enableNexMail) {
+                    this._provisionNexMail(tenantId, slug).catch(e =>
+                        console.warn(`[Tenant] NexMail provision failed for ${slug}:`, e.message)
+                    );
+                }
+
+                for (const tool of toolsToEnable) {
+                    const toolSlug = typeof tool === 'string' ? tool : tool.slug;
+                    const toolPlanId = typeof tool === 'object' ? tool.plan_id : null;
+                    if (toolSlug !== 'nexcrm' && toolSlug !== 'nexmail') {
+                        this._provisionGenericTool(tenantId, toolSlug, toolPlanId).catch(e =>
+                            console.warn(`[Tenant] Tool ${toolSlug} provision failed:`, e.message)
+                        );
+                    }
+                }
 
             } catch (provisionError) {
-                // If critical setup fails, we DO return an error response (or warning)
                 console.error('Critical provisioning error:', provisionError);
-
-                // Update status to indicate issue
                 await TenantModel.updateProcessStatus(tenantId, 'error');
-
-                // If check prevents double header sending
                 if (!res.headersSent) {
                     res.status(201).json({
                         success: true,
@@ -228,6 +218,95 @@ class TenantController {
                 res.status(500).json({ error: 'Failed to create tenant: ' + error.message });
             }
         }
+    }
+
+    async _recordToolEnabled(tenantId, toolSlug, planId) {
+        try {
+            const [tools] = await pool.query("SELECT id FROM tools WHERE slug = ?", [toolSlug]);
+            if (tools.length) {
+                await pool.query(`
+                    INSERT INTO tenant_tools (tenant_id, tool_id, tool_plan_id, status, provisioned_at)
+                    VALUES (?, ?, ?, 'active', NOW())
+                    ON DUPLICATE KEY UPDATE status = 'active', tool_plan_id = COALESCE(VALUES(tool_plan_id), tool_plan_id)
+                `, [tenantId, tools[0].id, planId || null]);
+            }
+        } catch (e) {
+            console.warn(`[Tenant] Record tool ${toolSlug} failed:`, e.message);
+        }
+    }
+
+    async _provisionNexMail(tenantId, slug, planId) {
+        const [nexmailTool] = await pool.query("SELECT id, internal_api_url FROM tools WHERE slug = 'nexmail' AND status = 'active'");
+        if (!nexmailTool.length) return;
+
+        const toolId = nexmailTool[0].id;
+        let selectedPlanId = planId;
+        let planLimits = null, planFeatures = null;
+
+        if (!selectedPlanId) {
+            const [freePlan] = await pool.query("SELECT id, limits, features FROM tool_plans WHERE tool_id = ? AND is_free = TRUE ORDER BY sort_order LIMIT 1", [toolId]);
+            if (freePlan.length) {
+                selectedPlanId = freePlan[0].id;
+                planLimits = freePlan[0].limits;
+                planFeatures = freePlan[0].features;
+            }
+        } else {
+            const [plan] = await pool.query("SELECT limits, features FROM tool_plans WHERE id = ?", [selectedPlanId]);
+            if (plan.length) { planLimits = plan[0].limits; planFeatures = plan[0].features; }
+        }
+
+        await pool.query(`
+            INSERT INTO tenant_tools (tenant_id, tool_id, tool_plan_id, status, provisioned_at)
+            VALUES (?, ?, ?, 'active', NOW())
+            ON DUPLICATE KEY UPDATE status = 'active', tool_plan_id = VALUES(tool_plan_id)
+        `, [tenantId, toolId, selectedPlanId]);
+
+        if (nexmailTool[0].internal_api_url) {
+            const axios = require('axios');
+            await axios.post(`${nexmailTool[0].internal_api_url}/internal/provision`, {
+                tenant_id: tenantId, plan_id: selectedPlanId,
+                plan_limits: planLimits, plan_features: planFeatures
+            }, {
+                headers: { 'X-API-Key': process.env.NEXMAIL_API_KEY || process.env.PLATFORM_API_KEY || '' },
+                timeout: 10000
+            });
+        }
+        console.log(`[Tenant] NexMail enabled for ${slug || tenantId}`);
+    }
+
+    async _provisionGenericTool(tenantId, toolSlug, planId) {
+        const [tools] = await pool.query("SELECT id, internal_api_url FROM tools WHERE slug = ? AND status = 'active'", [toolSlug]);
+        if (!tools.length) return;
+
+        const toolId = tools[0].id;
+        let selectedPlanId = planId;
+        let planLimits = null, planFeatures = null;
+
+        if (!selectedPlanId) {
+            const [freePlan] = await pool.query("SELECT id, limits, features FROM tool_plans WHERE tool_id = ? AND is_free = TRUE ORDER BY sort_order LIMIT 1", [toolId]);
+            if (freePlan.length) { selectedPlanId = freePlan[0].id; planLimits = freePlan[0].limits; planFeatures = freePlan[0].features; }
+        } else {
+            const [plan] = await pool.query("SELECT limits, features FROM tool_plans WHERE id = ?", [selectedPlanId]);
+            if (plan.length) { planLimits = plan[0].limits; planFeatures = plan[0].features; }
+        }
+
+        await pool.query(`
+            INSERT INTO tenant_tools (tenant_id, tool_id, tool_plan_id, status, provisioned_at)
+            VALUES (?, ?, ?, 'active', NOW())
+            ON DUPLICATE KEY UPDATE status = 'active', tool_plan_id = VALUES(tool_plan_id)
+        `, [tenantId, toolId, selectedPlanId]);
+
+        if (tools[0].internal_api_url) {
+            const axios = require('axios');
+            await axios.post(`${tools[0].internal_api_url}/internal/provision`, {
+                tenant_id: tenantId, plan_id: selectedPlanId,
+                plan_limits: planLimits, plan_features: planFeatures
+            }, {
+                headers: { 'X-API-Key': process.env.NEXMAIL_API_KEY || process.env.PLATFORM_API_KEY || '' },
+                timeout: 10000
+            });
+        }
+        console.log(`[Tenant] Tool ${toolSlug} enabled for tenant ${tenantId}`);
     }
 
     /**
