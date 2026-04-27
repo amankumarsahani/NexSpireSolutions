@@ -1,6 +1,6 @@
 # Nexspire Solutions — Full Reference
 
-> Nexspire Solutions is an India-based software development company building custom web applications, mobile apps, cloud infrastructure, AI/ML solutions, and NexCRM — an industry-specific CRM platform starting at ₹999/month.
+> Nexspire Solutions is an India-based software development company building custom web applications, mobile apps, cloud infrastructure, AI/ML solutions, NexCRM — an industry-specific CRM platform starting at ₹999/month, and NexMail — an email marketing engine with SMTP rotation and anti-spam scoring.
 
 ## Company Overview
 
@@ -21,6 +21,46 @@ Nexspire Solutions is a technology company headquartered in IT Park, Sector 67, 
 - Cloud: AWS, Azure, Google Cloud Platform
 - AI/ML: TensorFlow, PyTorch, OpenAI, custom models
 - Databases: PostgreSQL, MongoDB, Redis, Elasticsearch
+
+---
+
+## NexMail — Email Marketing Engine
+
+NexMail is an email marketing platform built for deliverability. It uses smart SMTP rotation, anti-spam scoring, and per-domain throttling to ensure emails land in inboxes.
+
+### NexMail Pricing Plans
+
+| Plan | Monthly Price | Yearly Price (per month) | Contacts | Emails/Month | Templates | Lists | Automations | SMTP Accounts |
+|---|---|---|---|---|---|---|---|---|
+| Free | ₹0 | ₹0 | 1,000 | 5,000 | 10 | 5 | 2 | 1 |
+| Growth | ₹699 | ₹594 | 5,000 | 25,000 | 25 | 15 | 5 | 2 |
+| Pro | ₹1,999 | ₹1,699 | 25,000 | 100,000 | 100 | Unlimited | Unlimited | 5 |
+| Business | ₹4,999 | ₹4,249 | 100,000 | 500,000 | Unlimited | Unlimited | Unlimited | 10 |
+| Enterprise | Custom | Custom | Unlimited | Unlimited | Unlimited | Unlimited | Unlimited | Unlimited |
+
+### NexMail Key Features
+
+- **Drag & Drop Email Builder**: 18 block types, mobile preview, undo/redo, template versioning, custom HTML editor.
+- **Smart SMTP Rotation**: Weighted multi-account rotation with reputation tracking and auto-disable. Add unlimited SMTP accounts (Gmail, Amazon SES, Postmark, SendGrid, or any SMTP provider).
+- **Anti-Spam Engine**: 50+ spam checks on every email before sending — trigger words, subject analysis, HTML structure, image-to-text ratio, CAN-SPAM/GDPR compliance. Score below 20/100 blocks sending.
+- **Domain Throttling**: Per-provider sending limits (Gmail 80/hr, Yahoo 60/hr, Outlook 100/hr) with human-like variable delays to protect sender reputation.
+- **Visual Automation Builder**: Node-based flow builder with 9 triggers, 11 actions, conditional branching, webhook integrations, and pre-built automation recipes.
+- **Campaign Analytics**: Open rates, click maps, delivery funnels, engagement heatmaps, campaign leaderboards, and CSV export.
+- **Contact Scoring**: Automatic 0-100 engagement scores based on opens, clicks, recency, and bounce history.
+- **NexCRM Integration**: Native sync — contacts auto-imported from NexCRM leads and customers. Segment by CRM source, tags, and custom fields.
+- **Deliverability Tools**: SPF/DKIM/DMARC verification, warmup mode, bounce handling, suppression lists, and reputation monitoring with auto-disable.
+- **A/B Testing**: Subject line, content, and send time testing (Pro plan and above).
+
+### NexMail vs Competitors
+
+NexMail differentiators over Mailchimp and Brevo:
+- Bring Your Own SMTP (BYOS) — no vendor lock-in
+- Smart SMTP account rotation with reputation weighting
+- Built-in spam score checker before sending
+- Domain-level throttling for Gmail, Yahoo, Outlook
+- Adaptive human-like send delays
+- Native NexCRM integration
+- Free tier: 1,000 contacts (vs Mailchimp 500 / Brevo 300 emails/day)
 
 ---
 
