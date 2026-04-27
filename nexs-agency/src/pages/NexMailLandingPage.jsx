@@ -73,6 +73,196 @@ const featureCategoryLabels = {
     support: 'Support',
 };
 
+const pipelineStages = [
+    {
+        id: 'compose', label: 'Compose', num: '01',
+        color: 'blue', icon: RiDragDropLine,
+        title: 'Drag & Drop Builder',
+        desc: '18 block types, live mobile preview, undo/redo history, template versioning. Build production-grade emails without touching code.',
+        detail: ['Text', 'Image', 'Button', 'Columns', 'Spacer', 'HTML', 'Social', 'Video', '+10 more'],
+    },
+    {
+        id: 'check', label: 'Spam Check', num: '02',
+        color: 'emerald', icon: RiShieldCheckLine,
+        title: 'Anti-Spam Engine',
+        desc: '50+ checks on every email. Subject analysis, trigger words, HTML structure, image ratio, CAN-SPAM compliance.',
+        detail: ['Subject: No triggers ✓', 'HTML: Clean ratio ✓', 'Compliance: CAN-SPAM ✓', 'Score: 87/100'],
+    },
+    {
+        id: 'route', label: 'SMTP Route', num: '03',
+        color: 'indigo', icon: RiServerLine,
+        title: 'Smart SMTP Rotation',
+        desc: 'Weighted multi-account rotation. Higher reputation = more sends. Auto-disable on issues.',
+        detail: ['SES: 96 rep → 45%', 'Postmark: 91 rep → 35%', 'Gmail: 72 rep → 20%'],
+    },
+    {
+        id: 'throttle', label: 'Throttle', num: '04',
+        color: 'amber', icon: RiTimeLine,
+        title: 'Domain Throttling',
+        desc: 'Per-provider sending limits with human-like variable delays. Never trip rate limits.',
+        detail: ['Gmail: 78/80 per hr', 'Yahoo: 34/60 per hr', 'Outlook: 61/100 per hr'],
+    },
+    {
+        id: 'deliver', label: 'Deliver', num: '05',
+        color: 'cyan', icon: RiMailCheckLine,
+        title: 'Inbox Delivery',
+        desc: 'SPF/DKIM/DMARC verified. Warmup mode for new domains. Bounce handling keeps reputation pristine.',
+        detail: ['Delivered: 4,847 (98.2%)', 'Bounced: 12 (0.2%)', 'Suppressed: 79 (1.6%)'],
+    },
+    {
+        id: 'analyze', label: 'Analyze', num: '06',
+        color: 'purple', icon: RiBarChartBoxLine,
+        title: 'Campaign Analytics',
+        desc: 'Open rates, click maps, delivery funnels, engagement heatmaps, and campaign leaderboards.',
+        detail: ['Opens: 61.4%', 'Clicks: 8.7%', 'Unsubs: 0.3%', 'Score: 72/100'],
+    },
+];
+
+const hexColors = {
+    blue:    { bg: 'bg-blue-500/10', border: 'border-blue-500/30', text: 'text-blue-400', glow: 'shadow-blue-500/20', activeBg: 'bg-blue-500', ring: 'ring-blue-400/30' },
+    emerald: { bg: 'bg-emerald-500/10', border: 'border-emerald-500/30', text: 'text-emerald-400', glow: 'shadow-emerald-500/20', activeBg: 'bg-emerald-500', ring: 'ring-emerald-400/30' },
+    indigo:  { bg: 'bg-indigo-500/10', border: 'border-indigo-500/30', text: 'text-indigo-400', glow: 'shadow-indigo-500/20', activeBg: 'bg-indigo-500', ring: 'ring-indigo-400/30' },
+    amber:   { bg: 'bg-amber-500/10', border: 'border-amber-500/30', text: 'text-amber-400', glow: 'shadow-amber-500/20', activeBg: 'bg-amber-500', ring: 'ring-amber-400/30' },
+    cyan:    { bg: 'bg-cyan-500/10', border: 'border-cyan-500/30', text: 'text-cyan-400', glow: 'shadow-cyan-500/20', activeBg: 'bg-cyan-500', ring: 'ring-cyan-400/30' },
+    purple:  { bg: 'bg-purple-500/10', border: 'border-purple-500/30', text: 'text-purple-400', glow: 'shadow-purple-500/20', activeBg: 'bg-purple-500', ring: 'ring-purple-400/30' },
+};
+
+function HoneycombPipeline() {
+    const [active, setActive] = useState(0);
+    const stage = pipelineStages[active];
+    const colors = hexColors[stage.color];
+
+    return (
+        <div className="flex flex-col items-center gap-12 lg:gap-0 lg:flex-row lg:items-start lg:justify-center">
+            <div className="hidden lg:block relative flex-shrink-0" style={{ width: 420, height: 460 }}>
+                <svg className="absolute inset-0 w-full h-full pointer-events-none z-0" viewBox="0 0 420 460">
+                    <defs>
+                        <linearGradient id="line-grad" x1="0%" y1="0%" x2="100%" y2="100%">
+                            <stop offset="0%" stopColor="#3b82f6" stopOpacity="0.3" />
+                            <stop offset="100%" stopColor="#a855f7" stopOpacity="0.3" />
+                        </linearGradient>
+                    </defs>
+                    {/* Row 1→2 connections */}
+                    <line x1="145" y1="105" x2="80" y2="190" stroke="url(#line-grad)" strokeWidth="1.5" />
+                    <line x1="275" y1="105" x2="210" y2="190" />
+                    <line x1="275" y1="105" x2="340" y2="190" stroke="url(#line-grad)" strokeWidth="1.5" />
+                    <line x1="145" y1="105" x2="210" y2="190" stroke="url(#line-grad)" strokeWidth="1.5" />
+                    {/* Row 2→3 connections */}
+                    <line x1="80" y1="270" x2="145" y2="355" stroke="url(#line-grad)" strokeWidth="1.5" />
+                    <line x1="210" y1="270" x2="145" y2="355" stroke="url(#line-grad)" strokeWidth="1.5" />
+                    <line x1="210" y1="270" x2="275" y2="355" stroke="url(#line-grad)" strokeWidth="1.5" />
+                    <line x1="340" y1="270" x2="275" y2="355" stroke="url(#line-grad)" strokeWidth="1.5" />
+                </svg>
+
+                {/* Hex nodes: 2-3-1 honeycomb layout, positions are center-points of 100x110 hex cells */}
+                {[
+                    { idx: 0, x: 110, y: 50 },
+                    { idx: 1, x: 240, y: 50 },
+                    { idx: 2, x: 45, y: 185 },
+                    { idx: 3, x: 175, y: 185 },
+                    { idx: 4, x: 305, y: 185 },
+                    { idx: 5, x: 110, y: 320 },
+                ].map(({ idx, x, y }) => {
+                    const s = pipelineStages[idx];
+                    const c = hexColors[s.color];
+                    const isActive = active === idx;
+                    return (
+                        <button
+                            key={s.id}
+                            onClick={() => setActive(idx)}
+                            className={`absolute z-10 w-[100px] h-[110px] flex flex-col items-center justify-center transition-all duration-300 cursor-pointer group ${isActive ? 'scale-110' : 'hover:scale-105'}`}
+                            style={{ left: x, top: y }}
+                        >
+                            <div className={`absolute inset-0 transition-all duration-300 ${isActive ? `${c.bg} ring-2 ${c.ring}` : 'bg-slate-800/60 hover:bg-slate-800'}`}
+                                style={{ clipPath: 'polygon(50% 0%, 100% 25%, 100% 75%, 50% 100%, 0% 75%, 0% 25%)' }} />
+                            <div className="relative z-10 flex flex-col items-center gap-1.5">
+                                <s.icon className={`text-2xl transition-colors duration-300 ${isActive ? c.text : 'text-slate-500 group-hover:text-slate-300'}`} />
+                                <span className={`text-[10px] font-bold uppercase tracking-wider transition-colors duration-300 ${isActive ? c.text : 'text-slate-600 group-hover:text-slate-400'}`}>{s.num}</span>
+                            </div>
+                            {isActive && <div className={`absolute -inset-2 ${c.bg} rounded-full blur-xl opacity-50 -z-10`} />}
+                        </button>
+                    );
+                })}
+
+                <div className="absolute z-0" style={{ left: 240, top: 320 }}>
+                    <div className="w-[100px] h-[110px] bg-slate-800/20" style={{ clipPath: 'polygon(50% 0%, 100% 25%, 100% 75%, 50% 100%, 0% 75%, 0% 25%)' }} />
+                </div>
+            </div>
+
+            <div className="lg:hidden flex gap-2 overflow-x-auto pb-2 px-1 w-full max-w-full scrollbar-hide">
+                {pipelineStages.map((s, idx) => {
+                    const c = hexColors[s.color];
+                    const isActive = active === idx;
+                    return (
+                        <button
+                            key={s.id}
+                            onClick={() => setActive(idx)}
+                            className={`flex-shrink-0 flex items-center gap-2 px-4 py-2.5 rounded-full border transition-all duration-200 ${isActive ? `${c.bg} ${c.border} ${c.text}` : 'bg-slate-900 border-slate-800 text-slate-500 hover:text-slate-300 hover:border-slate-700'}`}
+                        >
+                            <s.icon className="text-base" />
+                            <span className="text-xs font-bold uppercase tracking-wider whitespace-nowrap">{s.label}</span>
+                        </button>
+                    );
+                })}
+            </div>
+
+            <div className="flex-1 lg:pl-8 lg:max-w-lg w-full">
+                <AnimatePresence mode="wait">
+                    <motion.div
+                        key={stage.id}
+                        initial={{ opacity: 0, y: 16 }}
+                        animate={{ opacity: 1, y: 0 }}
+                        exit={{ opacity: 0, y: -12 }}
+                        transition={{ duration: 0.25 }}
+                        className="bg-slate-900/60 backdrop-blur-sm border border-slate-800 rounded-2xl p-8"
+                    >
+                        <div className="flex items-center gap-3 mb-5">
+                            <span className={`font-mono text-xs ${colors.text} ${colors.bg} px-3 py-1 rounded-full border ${colors.border}`}>STAGE {stage.num}</span>
+                            <span className="text-slate-600 font-mono text-xs">{stage.id}</span>
+                        </div>
+
+                        <h3 className="text-2xl font-bold text-white mb-3">{stage.title}</h3>
+                        <p className="text-slate-400 leading-relaxed mb-6">{stage.desc}</p>
+
+                        <div className="bg-slate-800/50 rounded-xl p-4 border border-slate-700 space-y-2">
+                            {stage.detail.map((line, i) => (
+                                <div key={i} className="flex items-center gap-2.5">
+                                    <RiCheckLine className={`flex-shrink-0 text-sm ${colors.text}`} />
+                                    <span className="text-sm text-slate-300 font-mono">{line}</span>
+                                </div>
+                            ))}
+                        </div>
+
+                        <div className="flex items-center gap-2 mt-6">
+                            {pipelineStages.map((_, i) => (
+                                <button
+                                    key={i}
+                                    onClick={() => setActive(i)}
+                                    className={`h-1.5 rounded-full transition-all duration-300 ${active === i ? `w-6 ${hexColors[pipelineStages[i].color].activeBg}` : 'w-1.5 bg-slate-700 hover:bg-slate-600'}`}
+                                />
+                            ))}
+                        </div>
+                    </motion.div>
+                </AnimatePresence>
+
+                <div className="mt-8 grid grid-cols-2 gap-3">
+                    {[
+                        { icon: RiFlowChart, label: 'Visual Automations' },
+                        { icon: RiUserFollowLine, label: 'Contact Scoring' },
+                        { icon: RiLinksLine, label: 'CRM Integration' },
+                        { icon: RiGroupLine, label: 'List Segmentation' },
+                    ].map(item => (
+                        <div key={item.label} className="flex items-center gap-2.5 p-3 rounded-xl bg-slate-900/30 border border-slate-800/50">
+                            <item.icon className="text-base text-slate-600 flex-shrink-0" />
+                            <span className="text-xs font-medium text-slate-500">{item.label}</span>
+                        </div>
+                    ))}
+                </div>
+            </div>
+        </div>
+    );
+}
+
 export default function NexMailLandingPage() {
     const [isYearly, setIsYearly] = useState(false);
     const [showContactModal, setShowContactModal] = useState(false);
@@ -236,195 +426,18 @@ export default function NexMailLandingPage() {
             {/* Features — Bento Grid */}
             <section id="features" className="py-32 bg-slate-950 relative overflow-hidden">
                 <div className="absolute inset-0 z-0 pointer-events-none opacity-[0.04] bg-[radial-gradient(#fff_1px,transparent_1px)] [background-size:32px_32px]" />
-                <div className="absolute top-0 left-1/2 -translate-x-1/2 w-[600px] h-[600px] bg-blue-500/10 rounded-full blur-[120px] pointer-events-none" />
+                <div className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-[700px] h-[700px] bg-blue-500/8 rounded-full blur-[140px] pointer-events-none" />
 
-                <div className="max-w-5xl mx-auto px-6 relative z-10">
+                <div className="max-w-7xl mx-auto px-6 relative z-10">
                     <FadeIn y={24} duration={0.6}>
-                        <div className="max-w-3xl mx-auto text-center mb-20">
-                            <span className="text-blue-400 font-mono font-bold tracking-wider uppercase text-sm mb-4 block">// email pipeline</span>
-                            <h2 className="text-3xl md:text-5xl font-bold text-white mb-6">Watch your email <span className="text-transparent bg-clip-text bg-gradient-to-r from-blue-400 to-cyan-400">travel through NexMail.</span></h2>
-                            <p className="text-xl text-slate-400 font-light">Every email passes through 6 stages. Each one is engineered to maximize deliverability.</p>
+                        <div className="max-w-3xl mx-auto text-center mb-16 md:mb-24">
+                            <span className="text-blue-400 font-mono font-bold tracking-wider uppercase text-sm mb-4 block">the engine</span>
+                            <h2 className="text-3xl md:text-5xl font-bold text-white mb-6">Six stages. <span className="text-transparent bg-clip-text bg-gradient-to-r from-blue-400 to-cyan-400">One pipeline.</span></h2>
+                            <p className="text-xl text-slate-400 font-light">Every email passes through six engineered stages before it reaches an inbox.</p>
                         </div>
                     </FadeIn>
 
-                    <div className="relative">
-                        {/* Vertical pipeline line */}
-                        <div className="absolute left-8 md:left-12 top-0 bottom-0 w-px bg-gradient-to-b from-blue-500 via-emerald-500 via-amber-500 to-purple-500 opacity-40" />
-
-                        {/* Stage 1 — Compose */}
-                        <FadeIn y={40} delay={0} className="relative pl-20 md:pl-28 pb-16">
-                            <div className="absolute left-5 md:left-9 top-2 w-6 h-6 rounded-full bg-blue-500 border-4 border-slate-950 shadow-[0_0_12px_rgba(59,130,246,0.5)]" />
-                            <div className="bg-slate-900/80 backdrop-blur-sm border border-slate-800 rounded-2xl p-8 hover:border-blue-500/30 transition-colors">
-                                <div className="flex items-center gap-3 mb-4">
-                                    <span className="font-mono text-xs text-blue-400 bg-blue-500/10 px-3 py-1 rounded-full border border-blue-500/20">STAGE 01</span>
-                                    <span className="text-slate-500 font-mono text-xs">compose</span>
-                                </div>
-                                <h3 className="text-2xl font-bold text-white mb-3">Drag & Drop Builder</h3>
-                                <p className="text-slate-400 leading-relaxed mb-5">18 block types, live mobile preview, undo/redo history, template versioning. Build production-grade emails without touching code.</p>
-                                <div className="flex flex-wrap gap-2">
-                                    {['Text', 'Image', 'Button', 'Columns', 'Spacer', 'HTML', 'Social', 'Video'].map(b => (
-                                        <span key={b} className="font-mono text-xs text-slate-500 bg-slate-800 px-2.5 py-1 rounded-md border border-slate-700">{b}</span>
-                                    ))}
-                                    <span className="font-mono text-xs text-slate-600 px-2.5 py-1">+10 more</span>
-                                </div>
-                            </div>
-                        </FadeIn>
-
-                        {/* Stage 2 — Spam Check */}
-                        <FadeIn y={40} delay={0.08} className="relative pl-20 md:pl-28 pb-16">
-                            <div className="absolute left-5 md:left-9 top-2 w-6 h-6 rounded-full bg-emerald-500 border-4 border-slate-950 shadow-[0_0_12px_rgba(16,185,129,0.5)]" />
-                            <div className="bg-slate-900/80 backdrop-blur-sm border border-slate-800 rounded-2xl p-8 hover:border-emerald-500/30 transition-colors">
-                                <div className="flex items-center gap-3 mb-4">
-                                    <span className="font-mono text-xs text-emerald-400 bg-emerald-500/10 px-3 py-1 rounded-full border border-emerald-500/20">STAGE 02</span>
-                                    <span className="text-slate-500 font-mono text-xs">spam_check</span>
-                                </div>
-                                <h3 className="text-2xl font-bold text-white mb-3">Anti-Spam Engine</h3>
-                                <p className="text-slate-400 leading-relaxed mb-5">50+ checks run on every email before it leaves. Subject analysis, trigger words, HTML structure, image ratio, CAN-SPAM compliance.</p>
-                                <div className="bg-slate-800/50 rounded-xl p-4 border border-slate-700 font-mono text-sm">
-                                    <div className="flex items-center gap-2 text-emerald-400 mb-2"><RiCheckLine className="flex-shrink-0" /><span>Subject: No spam triggers found</span></div>
-                                    <div className="flex items-center gap-2 text-emerald-400 mb-2"><RiCheckLine className="flex-shrink-0" /><span>HTML: Clean structure, 1:3 image-text ratio</span></div>
-                                    <div className="flex items-center gap-2 text-emerald-400 mb-2"><RiCheckLine className="flex-shrink-0" /><span>Compliance: Unsubscribe link present</span></div>
-                                    <div className="flex items-center gap-2 text-white mt-3 pt-3 border-t border-slate-700"><RiShieldCheckLine className="text-emerald-400 flex-shrink-0" /><span>Score: <span className="text-emerald-400 font-bold">87/100</span> — Safe to send</span></div>
-                                </div>
-                            </div>
-                        </FadeIn>
-
-                        {/* Stage 3 — SMTP Selection */}
-                        <FadeIn y={40} delay={0.16} className="relative pl-20 md:pl-28 pb-16">
-                            <div className="absolute left-5 md:left-9 top-2 w-6 h-6 rounded-full bg-indigo-500 border-4 border-slate-950 shadow-[0_0_12px_rgba(99,102,241,0.5)]" />
-                            <div className="bg-slate-900/80 backdrop-blur-sm border border-slate-800 rounded-2xl p-8 hover:border-indigo-500/30 transition-colors">
-                                <div className="flex items-center gap-3 mb-4">
-                                    <span className="font-mono text-xs text-indigo-400 bg-indigo-500/10 px-3 py-1 rounded-full border border-indigo-500/20">STAGE 03</span>
-                                    <span className="text-slate-500 font-mono text-xs">smtp_select</span>
-                                </div>
-                                <h3 className="text-2xl font-bold text-white mb-3">Smart SMTP Rotation</h3>
-                                <p className="text-slate-400 leading-relaxed mb-5">Weighted multi-account rotation. Higher reputation accounts get more sends. Issues auto-detected and accounts disabled instantly.</p>
-                                <div className="grid grid-cols-1 sm:grid-cols-3 gap-3">
-                                    {[
-                                        { name: 'smtp-1 (SES)', rep: 96, weight: '45%', active: true },
-                                        { name: 'smtp-2 (Postmark)', rep: 91, weight: '35%', active: true },
-                                        { name: 'smtp-3 (Gmail)', rep: 72, weight: '20%', active: true },
-                                    ].map(s => (
-                                        <div key={s.name} className="bg-slate-800/50 border border-slate-700 rounded-xl p-3">
-                                            <div className="flex items-center justify-between mb-2">
-                                                <span className="font-mono text-xs text-slate-300">{s.name}</span>
-                                                <span className="w-2 h-2 rounded-full bg-emerald-400" />
-                                            </div>
-                                            <div className="flex items-baseline gap-1">
-                                                <span className="text-lg font-bold text-white">{s.rep}</span>
-                                                <span className="text-xs text-slate-500">/100 rep</span>
-                                            </div>
-                                            <div className="text-xs text-slate-500 mt-1">Weight: {s.weight}</div>
-                                        </div>
-                                    ))}
-                                </div>
-                            </div>
-                        </FadeIn>
-
-                        {/* Stage 4 — Throttle */}
-                        <FadeIn y={40} delay={0.24} className="relative pl-20 md:pl-28 pb-16">
-                            <div className="absolute left-5 md:left-9 top-2 w-6 h-6 rounded-full bg-amber-500 border-4 border-slate-950 shadow-[0_0_12px_rgba(245,158,11,0.5)]" />
-                            <div className="bg-slate-900/80 backdrop-blur-sm border border-slate-800 rounded-2xl p-8 hover:border-amber-500/30 transition-colors">
-                                <div className="flex items-center gap-3 mb-4">
-                                    <span className="font-mono text-xs text-amber-400 bg-amber-500/10 px-3 py-1 rounded-full border border-amber-500/20">STAGE 04</span>
-                                    <span className="text-slate-500 font-mono text-xs">throttle</span>
-                                </div>
-                                <h3 className="text-2xl font-bold text-white mb-3">Domain Throttling</h3>
-                                <p className="text-slate-400 leading-relaxed mb-5">Per-provider sending limits with human-like variable delays. Never trip rate limits. Never look like a bot.</p>
-                                <div className="space-y-3">
-                                    {[
-                                        { domain: 'gmail.com', limit: '80/hr', used: 78, pct: 97 },
-                                        { domain: 'yahoo.com', limit: '60/hr', used: 34, pct: 57 },
-                                        { domain: 'outlook.com', limit: '100/hr', used: 61, pct: 61 },
-                                    ].map(d => (
-                                        <div key={d.domain} className="flex items-center gap-4">
-                                            <span className="font-mono text-xs text-slate-400 w-24">{d.domain}</span>
-                                            <div className="flex-1 h-2 bg-slate-800 rounded-full overflow-hidden">
-                                                <div className={`h-full rounded-full ${d.pct > 90 ? 'bg-amber-500' : 'bg-emerald-500'}`} style={{ width: `${d.pct}%` }} />
-                                            </div>
-                                            <span className="font-mono text-xs text-slate-500 w-16 text-right">{d.used}/{d.limit.split('/')[0]}</span>
-                                        </div>
-                                    ))}
-                                    <div className="text-xs text-amber-400/70 font-mono mt-2">⏱ gmail.com — pausing 42s (approaching hourly limit)</div>
-                                </div>
-                            </div>
-                        </FadeIn>
-
-                        {/* Stage 5 — Deliver */}
-                        <FadeIn y={40} delay={0.32} className="relative pl-20 md:pl-28 pb-16">
-                            <div className="absolute left-5 md:left-9 top-2 w-6 h-6 rounded-full bg-cyan-500 border-4 border-slate-950 shadow-[0_0_12px_rgba(6,182,212,0.5)]" />
-                            <div className="bg-slate-900/80 backdrop-blur-sm border border-slate-800 rounded-2xl p-8 hover:border-cyan-500/30 transition-colors">
-                                <div className="flex items-center gap-3 mb-4">
-                                    <span className="font-mono text-xs text-cyan-400 bg-cyan-500/10 px-3 py-1 rounded-full border border-cyan-500/20">STAGE 05</span>
-                                    <span className="text-slate-500 font-mono text-xs">deliver</span>
-                                </div>
-                                <h3 className="text-2xl font-bold text-white mb-3">Inbox Delivery</h3>
-                                <p className="text-slate-400 leading-relaxed mb-5">SPF/DKIM/DMARC verified. Warmup mode for new domains. Bounce handling and suppression lists keep your reputation pristine.</p>
-                                <div className="grid grid-cols-3 gap-4">
-                                    {[
-                                        { label: 'Delivered', value: '4,847', sub: '98.2%' },
-                                        { label: 'Bounced', value: '12', sub: '0.2%' },
-                                        { label: 'Suppressed', value: '79', sub: '1.6%' },
-                                    ].map(m => (
-                                        <div key={m.label} className="text-center">
-                                            <div className="text-2xl font-bold text-white">{m.value}</div>
-                                            <div className="text-xs text-slate-500 mt-1">{m.label}</div>
-                                            <div className="text-xs text-cyan-400 font-mono">{m.sub}</div>
-                                        </div>
-                                    ))}
-                                </div>
-                            </div>
-                        </FadeIn>
-
-                        {/* Stage 6 — Analyze */}
-                        <FadeIn y={40} delay={0.4} className="relative pl-20 md:pl-28 pb-4">
-                            <div className="absolute left-5 md:left-9 top-2 w-6 h-6 rounded-full bg-purple-500 border-4 border-slate-950 shadow-[0_0_12px_rgba(168,85,247,0.5)]" />
-                            <div className="bg-slate-900/80 backdrop-blur-sm border border-slate-800 rounded-2xl p-8 hover:border-purple-500/30 transition-colors">
-                                <div className="flex items-center gap-3 mb-4">
-                                    <span className="font-mono text-xs text-purple-400 bg-purple-500/10 px-3 py-1 rounded-full border border-purple-500/20">STAGE 06</span>
-                                    <span className="text-slate-500 font-mono text-xs">analyze</span>
-                                </div>
-                                <h3 className="text-2xl font-bold text-white mb-3">Campaign Analytics</h3>
-                                <p className="text-slate-400 leading-relaxed mb-5">Open rates, click maps, delivery funnels, engagement heatmaps, and campaign leaderboards. Every metric you need, nothing you don't.</p>
-                                <div className="grid grid-cols-2 sm:grid-cols-4 gap-3">
-                                    {[
-                                        { label: 'Open Rate', value: '61.4%' },
-                                        { label: 'Click Rate', value: '8.7%' },
-                                        { label: 'Unsub Rate', value: '0.3%' },
-                                        { label: 'Engagement', value: '72/100' },
-                                    ].map(m => (
-                                        <div key={m.label} className="bg-slate-800/50 border border-slate-700 rounded-xl p-3 text-center">
-                                            <div className="text-lg font-bold text-white">{m.value}</div>
-                                            <div className="text-xs text-slate-500 mt-0.5">{m.label}</div>
-                                        </div>
-                                    ))}
-                                </div>
-                            </div>
-                        </FadeIn>
-                    </div>
-
-                    {/* Remaining capabilities — inline at bottom */}
-                    <FadeIn y={30} delay={0.2}>
-                        <div className="mt-20 pt-16 border-t border-slate-800">
-                            <p className="text-center text-sm text-slate-500 font-mono uppercase tracking-wider mb-8">Also included</p>
-                            <div className="grid grid-cols-2 md:grid-cols-4 gap-4">
-                                {[
-                                    { icon: RiFlowChart, label: 'Visual Automations', sub: '9 triggers, 11 actions' },
-                                    { icon: RiUserFollowLine, label: 'Contact Scoring', sub: '0-100 engagement score' },
-                                    { icon: RiLinksLine, label: 'CRM Integration', sub: 'Native NexCRM sync' },
-                                    { icon: RiGroupLine, label: 'List Segmentation', sub: 'Tags, filters, behaviors' },
-                                ].map(item => (
-                                    <div key={item.label} className="flex items-start gap-3 p-4 rounded-xl bg-slate-900/50 border border-slate-800 hover:border-slate-700 transition-colors">
-                                        <item.icon className="text-lg text-slate-500 mt-0.5 flex-shrink-0" />
-                                        <div>
-                                            <div className="text-sm font-semibold text-slate-300">{item.label}</div>
-                                            <div className="text-xs text-slate-500 mt-0.5">{item.sub}</div>
-                                        </div>
-                                    </div>
-                                ))}
-                            </div>
-                        </div>
-                    </FadeIn>
+                    <HoneycombPipeline />
                 </div>
             </section>
 
