@@ -739,6 +739,125 @@ class WebhookController {
             console.error('[Webhook] WhatsApp Meta processing error:', error);
         }
     }
+
+    /**
+     * Meta Lead Ads — one-time subscription verification handshake.
+     * Shares META_WEBHOOK_VERIFY_TOKEN with the WhatsApp webhook (same Meta App,
+     * separate callback URL configured against the `page` object → `leadgen`).
+     */
+    verifyMetaLeadsWebhook(req, res) {
+        const mode = req.query['hub.mode'];
+        const token = req.query['hub.verify_token'];
+        const challenge = req.query['hub.challenge'];
+
+        if (mode === 'subscribe' && token && token === process.env.META_WEBHOOK_VERIFY_TOKEN) {
+            return res.status(200).send(challenge);
+        }
+        return res.sendStatus(403);
+    }
+
+    /**
+     * Meta Lead Ads — inbound lead delivery.
+     * A `leadgen` change carries only ids (leadgen_id, page_id, form_id); the
+     * actual field data must be pulled from the Graph API with the Page token,
+     * which lives (encrypted) in meta_page_registry. We resolve page_id → tenant,
+     * fetch the lead, normalise its field_data, and forward to that tenant's own
+     * nexcrm-backend so the lead lands in the tenant's DB. Ack fast (Meta retries
+     * aggressively) and process after.
+     */
+    async handleMetaLeadsWebhook(req, res) {
+        res.status(200).json({ received: true });
+
+        try {
+            const rawBody = req.body; // Buffer (express.raw)
+            const appSecret = process.env.META_APP_SECRET;
+
+            if (appSecret) {
+                const signature = req.headers['x-hub-signature-256'] || '';
+                const expected = 'sha256=' + crypto.createHmac('sha256', appSecret).update(rawBody).digest('hex');
+                const sigBuf = Buffer.from(signature);
+                const expBuf = Buffer.from(expected);
+                if (sigBuf.length !== expBuf.length || !crypto.timingSafeEqual(sigBuf, expBuf)) {
+                    console.error('[Webhook] Meta Leads: signature mismatch, dropping payload');
+                    return;
+                }
+            } else {
+                console.warn('[Webhook] Meta Leads: META_APP_SECRET not set, skipping signature verification');
+            }
+
+            const { decryptSecret } = require('../services/secretStore');
+            const payload = JSON.parse(rawBody.toString('utf8'));
+
+            for (const entry of payload.entry || []) {
+                for (const change of entry.changes || []) {
+                    if (change.field !== 'leadgen') continue;
+                    const value = change.value || {};
+                    const pageId = value.page_id || entry.id;
+                    const leadgenId = value.leadgen_id;
+                    if (!pageId || !leadgenId) continue;
+
+                    const [regRows] = await pool.query(
+                        `SELECT tenant_slug, tenant_api_url, page_token_encrypted
+                         FROM meta_page_registry WHERE page_id = ? AND status = 'active'`,
+                        [String(pageId)]
+                    );
+                    if (!regRows.length) {
+                        console.warn(`[Webhook] Meta Leads: no tenant registered for page_id ${pageId}`);
+                        continue;
+                    }
+                    const reg = regRows[0];
+                    const pageToken = decryptSecret(reg.page_token_encrypted);
+                    if (!pageToken) {
+                        console.error(`[Webhook] Meta Leads: missing page token for page_id ${pageId}`);
+                        continue;
+                    }
+
+                    // Fetch the lead's actual field data from the Graph API.
+                    let lead;
+                    try {
+                        const { data } = await axios.get(`https://graph.facebook.com/v21.0/${leadgenId}`, {
+                            params: { access_token: pageToken, fields: 'field_data,form_id,ad_id,campaign_name,created_time' },
+                            timeout: 10000
+                        });
+                        lead = data;
+                    } catch (err) {
+                        console.error(`[Webhook] Meta Leads: fetch lead ${leadgenId} failed:`, err.response?.data?.error?.message || err.message);
+                        continue;
+                    }
+
+                    // field_data: [{ name: 'email', values: ['a@b.com'] }, ...]
+                    const fields = {};
+                    for (const f of lead.field_data || []) {
+                        fields[f.name] = Array.isArray(f.values) ? f.values[0] : f.values;
+                    }
+
+                    try {
+                        await axios.post(`${reg.tenant_api_url}/api/meta-leads/incoming`, {
+                            leadgenId,
+                            pageId: String(pageId),
+                            formId: value.form_id || lead.form_id || null,
+                            adId: lead.ad_id || null,
+                            campaignName: lead.campaign_name || null,
+                            createdTime: lead.created_time || null,
+                            fields
+                        }, {
+                            headers: { 'X-Internal-Key': process.env.INTERNAL_OAUTH_KEY },
+                            timeout: 10000
+                        });
+
+                        await pool.query(
+                            `UPDATE meta_page_registry SET last_lead_at = NOW() WHERE page_id = ?`,
+                            [String(pageId)]
+                        );
+                    } catch (err) {
+                        console.error(`[Webhook] Meta Leads: forward to tenant ${reg.tenant_api_url} failed:`, err.message);
+                    }
+                }
+            }
+        } catch (error) {
+            console.error('[Webhook] Meta Leads processing error:', error);
+        }
+    }
 }
 
 

@@ -244,6 +244,148 @@ router.get('/microsoft/callback', async (req, res) => {
  * right after the code exchange and read the RefreshToken entry.
  */
 /* ------------------------------------------------------------------ */
+/* Facebook / Meta Lead Ads — capture leads from FB & Instagram forms   */
+/* ------------------------------------------------------------------ */
+
+/**
+ * Lead Ads uses the SAME shared Meta App as WhatsApp (META_APP_ID /
+ * META_APP_SECRET), so a single App Review covers both and every tenant's
+ * inbound leads land on one central webhook (see webhook.controller
+ * handleMetaLeadsWebhook), routed to the owning tenant via meta_page_registry.
+ *
+ * The consent grants us Page access tokens. We subscribe our app to each
+ * Page's `leadgen` field and store the (encrypted) Page token centrally — the
+ * webhook needs it to fetch the actual lead from the Graph API. The tenant
+ * never sees the token; it only receives resolved leads.
+ *
+ * `leads_retrieval` is an Advanced-Access scope: until the app clears App
+ * Review + Business Verification, only app admins/testers can complete this.
+ */
+const FB_GRAPH = 'v21.0';
+const FB_LEADS_REDIRECT_URI = process.env.FACEBOOK_LEADS_REDIRECT_URI
+    || `${process.env.API_URL || 'https://api.napnix.in'}/oauth/facebook/leads/callback`;
+const FB_LEADS_SCOPES = [
+    'pages_show_list',
+    'pages_read_engagement',
+    'pages_manage_metadata',
+    'leads_retrieval',
+    'business_management'
+];
+
+// GET /oauth/facebook/leads/start?state=<jwt>&tenant_api_url=<url>&return_to=<url>
+router.get('/facebook/leads/start', (req, res) => {
+    const appId = process.env.META_APP_ID || process.env.FACEBOOK_APP_ID;
+    if (!appId || !(process.env.META_APP_SECRET || process.env.FACEBOOK_APP_SECRET)) {
+        return res.status(503).send('Meta Lead Ads is not configured on this server (META_APP_ID / META_APP_SECRET)');
+    }
+
+    const { state, tenant_api_url, return_to } = req.query;
+    if (!state || !tenant_api_url) return res.status(400).send('Missing state or tenant_api_url');
+
+    try { jwt.verify(state, process.env.JWT_SECRET); }
+    catch { return res.status(400).send('Invalid or expired state'); }
+
+    const { exp, iat, ...decoded } = jwt.decode(state) || {};
+    const embeddedState = jwt.sign(
+        { ...decoded, tenant_api_url, return_to: return_to || tenant_api_url },
+        process.env.JWT_SECRET,
+        { expiresIn: '10m' }
+    );
+
+    const params = new URLSearchParams({
+        client_id: appId,
+        redirect_uri: FB_LEADS_REDIRECT_URI,
+        response_type: 'code',
+        scope: FB_LEADS_SCOPES.join(','),
+        state: embeddedState
+    });
+    res.redirect(`https://www.facebook.com/${FB_GRAPH}/dialog/oauth?${params}`);
+});
+
+// GET /oauth/facebook/leads/callback?code=...&state=...
+router.get('/facebook/leads/callback', async (req, res) => {
+    const { code, state, error } = req.query;
+    const { pool } = require('../config/database');
+    const { encryptSecret } = require('../services/secretStore');
+
+    let payload;
+    try { payload = jwt.verify(state, process.env.JWT_SECRET); }
+    catch { return res.status(400).send('Invalid or expired OAuth state'); }
+
+    const { tenant, connectorKey, tenant_api_url, return_to } = payload;
+    const failRedirect = `${return_to || tenant_api_url}?connector_connect=failed`;
+    if (error || !code) return res.redirect(failRedirect);
+
+    const appId = process.env.META_APP_ID || process.env.FACEBOOK_APP_ID;
+    const appSecret = process.env.META_APP_SECRET || process.env.FACEBOOK_APP_SECRET;
+
+    try {
+        // 1. code → short-lived user token
+        const { data: shortTok } = await axios.get(`https://graph.facebook.com/${FB_GRAPH}/oauth/access_token`, {
+            params: { client_id: appId, client_secret: appSecret, redirect_uri: FB_LEADS_REDIRECT_URI, code },
+            timeout: 15000
+        });
+
+        // 2. short → long-lived user token (~60 days)
+        const { data: longTok } = await axios.get(`https://graph.facebook.com/${FB_GRAPH}/oauth/access_token`, {
+            params: { grant_type: 'fb_exchange_token', client_id: appId, client_secret: appSecret, fb_exchange_token: shortTok.access_token },
+            timeout: 15000
+        });
+        const userToken = longTok.access_token;
+
+        // 3. list Pages the user manages — each carries its own (long-lived) Page token
+        const { data: pagesRes } = await axios.get(`https://graph.facebook.com/${FB_GRAPH}/me/accounts`, {
+            params: { access_token: userToken, fields: 'id,name,access_token', limit: 100 },
+            timeout: 15000
+        });
+        const pages = pagesRes.data || [];
+        if (!pages.length) return res.redirect(`${failRedirect}&reason=no_pages`);
+
+        let registered = 0;
+        for (const page of pages) {
+            try {
+                // 4. subscribe OUR app to this page's leadgen webhook field
+                await axios.post(
+                    `https://graph.facebook.com/${FB_GRAPH}/${page.id}/subscribed_apps`,
+                    null,
+                    { params: { subscribed_fields: 'leadgen', access_token: page.access_token }, timeout: 15000 }
+                );
+
+                // 5. register page → tenant centrally (page token encrypted; webhook uses it)
+                await pool.query(
+                    `INSERT INTO meta_page_registry (page_id, page_name, tenant_slug, tenant_api_url, page_token_encrypted, status)
+                     VALUES (?, ?, ?, ?, ?, 'active')
+                     ON DUPLICATE KEY UPDATE
+                       page_name = VALUES(page_name),
+                       tenant_slug = VALUES(tenant_slug),
+                       tenant_api_url = VALUES(tenant_api_url),
+                       page_token_encrypted = VALUES(page_token_encrypted),
+                       status = 'active'`,
+                    [page.id, page.name || null, tenant, tenant_api_url, encryptSecret(page.access_token)]
+                );
+
+                // 6. create the tenant-visible connection record in its own hub
+                await axios.post(
+                    `${tenant_api_url}/api/meta-leads/register`,
+                    { connectorKey: connectorKey || 'meta_lead_ads', pageId: page.id, pageName: page.name || 'Facebook Page' },
+                    { headers: { 'X-Internal-Key': INTERNAL_OAUTH_KEY }, timeout: 30000 }
+                ).catch(e => console.error('[oauth] meta-leads tenant register failed:', e.message));
+
+                registered++;
+            } catch (e) {
+                console.error(`[oauth] facebook page ${page.id} subscribe failed:`, e.response?.data?.error?.message || e.message);
+            }
+        }
+
+        if (!registered) return res.redirect(`${failRedirect}&reason=subscribe_failed`);
+        res.redirect(`${return_to || tenant_api_url}?connector_connect=success`);
+    } catch (err) {
+        console.error('[oauth] Facebook Lead Ads callback failed:', err.response?.data || err.message);
+        res.redirect(failRedirect);
+    }
+});
+
+/* ------------------------------------------------------------------ */
 /* Generic OAuth2 — everything that isn't Google or Microsoft           */
 /* ------------------------------------------------------------------ */
 

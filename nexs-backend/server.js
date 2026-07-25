@@ -234,6 +234,9 @@ app.use('/api/plans', require('./routes/plan.routes'));
 // WhatsApp (admin + internal proxy for tenant sessions)
 app.use('/api/admin/whatsapp', require('./routes/whatsapp.routes'));
 
+// Meta Lead Ads (internal teardown endpoints called by tenant backends)
+app.use('/api/admin/meta-leads', require('./routes/metaLeads.routes'));
+
 // Security Monitoring
 app.get('/api/security/banned-ips', (req, res) => {
     const { getBannedIPs } = require('./middleware/security');

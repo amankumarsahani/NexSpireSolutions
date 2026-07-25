@@ -16,4 +16,10 @@ router.post('/razorpay', express.json(), webhookController.handleWebhook);
 router.get('/whatsapp-meta', webhookController.verifyWhatsAppMetaWebhook);
 router.post('/whatsapp-meta', express.raw({ type: 'application/json' }), webhookController.handleWhatsAppMetaWebhook);
 
+// Meta Lead Ads — single webhook for every tenant's Facebook Pages.
+// GET = Meta's subscription verification handshake.
+// POST = new lead delivery, routed to the owning tenant via meta_page_registry.
+router.get('/meta-leads', webhookController.verifyMetaLeadsWebhook);
+router.post('/meta-leads', express.raw({ type: 'application/json' }), webhookController.handleMetaLeadsWebhook);
+
 module.exports = router;
