@@ -1,4 +1,5 @@
 const rateLimit = require('express-rate-limit');
+const { ipKeyGenerator } = rateLimit;
 
 /**
  * Rate limiter for inquiry/contact form submissions
@@ -62,7 +63,7 @@ const supportIngestRateLimit = rateLimit({
     message: { error: 'Too many support requests. Please slow down.', retryAfter: 15 },
     standardHeaders: true,
     legacyHeaders: false,
-    keyGenerator: (req) => req.verifiedSlug || req.headers['x-tenant-slug'] || req.ip,
+    keyGenerator: (req) => req.verifiedSlug || ipKeyGenerator(req.ip),
     validate: { xForwardedForHeader: false, default: true }
 });
 

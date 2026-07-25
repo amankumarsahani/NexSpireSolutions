@@ -231,7 +231,7 @@ class TenantController {
                 }
 
                 if (enableNexMail) {
-                    this._provisionNexMail(tenantId, slug, null, email, name).catch(e =>
+                    module.exports._provisionNexMail(tenantId, slug, null, email, name).catch(e =>
                         console.warn(`[Tenant] NapMail provision failed for ${slug}:`, e.message)
                     );
                 }
@@ -240,7 +240,7 @@ class TenantController {
                     const toolSlug = typeof tool === 'string' ? tool : tool.slug;
                     const toolPlanId = typeof tool === 'object' ? tool.plan_id : null;
                     if (toolSlug !== 'nexcrm' && toolSlug !== 'napcrm' && toolSlug !== 'napmail') {
-                        this._provisionGenericTool(tenantId, toolSlug, toolPlanId).catch(e =>
+                        module.exports._provisionGenericTool(tenantId, toolSlug, toolPlanId).catch(e =>
                             console.warn(`[Tenant] Tool ${toolSlug} provision failed:`, e.message)
                         );
                     }
@@ -354,7 +354,7 @@ class TenantController {
     async _triggerTenantCreatedWorkflow(tenant) {
         try {
             const plan = tenant.plan_id ? await PlanModel.findById(tenant.plan_id) : null;
-            workflowEngine.trigger('tenant_created', 'tenant', tenant.id, {
+            await workflowEngine.trigger('tenant_created', 'tenant', tenant.id, {
                 id: tenant.id,
                 name: tenant.name,
                 slug: tenant.slug,
@@ -480,9 +480,9 @@ class TenantController {
                 const refreshedTenant = await TenantModel.findById(id);
 
                 if (payload.status === 'active' || payload.status === 'trial') {
-                    await this._startTenantIfProvisioned(refreshedTenant);
+                    await module.exports._startTenantIfProvisioned(refreshedTenant);
                 } else if (payload.status === 'suspended' || payload.status === 'cancelled') {
-                    await this._stopTenantIfRunning(refreshedTenant);
+                    await module.exports._stopTenantIfRunning(refreshedTenant);
                 }
             }
 
@@ -512,7 +512,7 @@ class TenantController {
                         || freshTenant.plan_slug !== tenant.plan_slug
                     );
                     if (industryChanged || planChanged) {
-                        this._relaunchTenantForConfigChange(freshTenant).catch(err => {
+                        module.exports._relaunchTenantForConfigChange(freshTenant).catch(err => {
                             console.error(`[Update Tenant] Process relaunch failed: ${err.message}`);
                         });
                     }
@@ -662,10 +662,10 @@ class TenantController {
 
             const provisioner = new Provisioner();
             const result = await provisioner.provisionTenant(tenant);
-            await this._recordToolEnabled(id, 'nexcrm', tenant.plan_id);
+            await module.exports._recordToolEnabled(id, 'nexcrm', tenant.plan_id);
 
             if (!tenant.provisioning_completed_at) {
-                await this._triggerTenantCreatedWorkflow(tenant);
+                await module.exports._triggerTenantCreatedWorkflow(tenant);
             }
 
             res.json({
@@ -1461,7 +1461,7 @@ class TenantController {
             });
 
             const refreshedTenant = await TenantModel.findById(tenant.id);
-            await this._startTenantIfProvisioned(refreshedTenant);
+            await module.exports._startTenantIfProvisioned(refreshedTenant);
 
             const [subscriptions] = await pool.query(`
                 SELECT s.*, p.name as plan_name
