@@ -519,6 +519,13 @@ class TenantController {
                 }
             }
 
+            // Re-sync the full nap-load routing map — status/slug changes
+            // affect which domains should be routable, so any update is
+            // worth a re-push (full table, not just this one tenant).
+            require('../services/napLoadClient').syncRoutes().catch(err => {
+                console.warn(`[Update Tenant] nap-load route sync failed (non-fatal): ${err.message}`);
+            });
+
             res.json({
                 success: true,
                 message: 'Tenant updated successfully',
@@ -720,6 +727,12 @@ class TenantController {
 
             // Soft delete
             await TenantModel.delete(id);
+
+            // Cancelled tenants are excluded from the routes query, so this
+            // push naturally removes them from nap-load's routing table.
+            require('../services/napLoadClient').syncRoutes().catch(err => {
+                console.warn(`[Delete Tenant] nap-load route sync failed (non-fatal): ${err.message}`);
+            });
 
             res.json({
                 success: true,
@@ -952,6 +965,11 @@ class TenantController {
                 } catch (dbError) {
                     console.error(`[Background Delete] Failed to hard delete tenant ${id} from DB:`, dbError);
                 }
+
+                // Row is gone, so the next routes query naturally excludes it.
+                require('../services/napLoadClient').syncRoutes().catch(err => {
+                    console.warn(`[Background Delete] nap-load route sync failed (non-fatal): ${err.message}`);
+                });
             })();
         } catch (error) {
             console.error('Full delete tenant error:', error);
