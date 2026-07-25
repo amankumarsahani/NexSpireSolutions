@@ -16,9 +16,9 @@ class AIService {
         // Model configurations
         this.models = {
             openai: 'gpt-4o-mini',
-            gemini: 'gemini-2.0-flash',
-            groq: 'llama-3.3-70b-versatile',
-            grok: 'grok-beta'
+            gemini: 'gemini-3.6-flash',
+            groq: 'openai/gpt-oss-120b',
+            grok: 'grok-4.5'
         };
 
     }
@@ -29,7 +29,11 @@ class AIService {
     async getApiConfig() {
         try {
             const [settings] = await db.query(
-                "SELECT setting_key, setting_value FROM settings WHERE setting_key IN ('openai_api_key', 'gemini_api_key', 'groq_api_key', 'grok_api_key')"
+                `SELECT setting_key, setting_value FROM settings
+                 WHERE setting_key IN (
+                    'openai_api_key', 'gemini_api_key', 'groq_api_key', 'grok_api_key',
+                    'ai_preferred_provider', 'ai_preferred_model'
+                 )`
             );
 
             const settingsMap = {};
@@ -49,6 +53,8 @@ class AIService {
             assignKey('gemini', 'gemini_api_key');
             assignKey('groq', 'groq_api_key');
             assignKey('grok', 'grok_api_key');
+            config.preferredProvider = settingsMap.ai_preferred_provider || null;
+            config.preferredModel = settingsMap.ai_preferred_model || null;
 
             if (process.env.OPENAI_API_KEY && !config.openai) {
                 config.openai = process.env.OPENAI_API_KEY;
@@ -64,7 +70,7 @@ class AIService {
             }
 
             // Fallback for primary/legacy logic if only environment keys exist
-            if (Object.keys(config).length === 0 && this.envApiKey) {
+            if (!['openai', 'gemini', 'groq', 'grok'].some(provider => config[provider]) && this.envApiKey) {
                 config[this.envApiType] = this.envApiKey;
             }
 
@@ -83,6 +89,7 @@ class AIService {
      */
     _detectProvider(model) {
         if (!model) return null;
+        if (model.startsWith('openai/gpt-oss-') || model.startsWith('qwen/')) return 'groq';
         if (model.startsWith('gpt-') || model.startsWith('o1-')) return 'openai';
         if (model.startsWith('gemini-'))                          return 'gemini';
         if (model.includes('llama') || model.includes('mixtral')) return 'groq';
@@ -97,10 +104,14 @@ class AIService {
      * (Groq leads fallbacks — most generous free tier, no rate limit issues)
      */
     _buildQueue(config, requestedModel) {
-        const primary = this._detectProvider(requestedModel);
-
         // Fallback preference when a provider is rate-limited or unavailable
         const fallbackOrder = ['groq', 'openai', 'grok', 'gemini'];
+        const preferredProvider = fallbackOrder.includes(config.preferredProvider)
+            ? config.preferredProvider
+            : null;
+        const effectiveModel = requestedModel || config.preferredModel || null;
+        const detectedProvider = this._detectProvider(effectiveModel);
+        const primary = detectedProvider || preferredProvider;
 
         const queue = [];
 
@@ -108,7 +119,7 @@ class AIService {
         if (primary && config[primary]) {
             queue.push({
                 provider: primary,
-                model:    requestedModel || this.models[primary],
+                model:    detectedProvider === primary ? effectiveModel : this.models[primary],
                 key:      config[primary],
             });
         }
@@ -156,7 +167,7 @@ class AIService {
     async generateContent(prompt, systemMessage = 'You are a helpful CRM assistant.', model = null) {
         const config = await this.getApiConfig();
 
-        if (Object.keys(config).length === 0) {
+        if (!['openai', 'gemini', 'groq', 'grok'].some(provider => config[provider])) {
             throw new Error('No AI provider configured. Please add an API key in Settings > AI Integration.');
         }
 
@@ -259,7 +270,7 @@ class AIService {
             if (error.response) {
                 console.error(`[AIService] Gemini API Error ${error.response.status}:`, JSON.stringify(error.response.data));
                 if (error.response.status === 404) {
-                    throw new Error(`Model '${modelId}' not found. Try 'gemini-2.0-flash' or 'gemini-1.5-pro'.`);
+                    throw new Error(`Model '${modelId}' not found. Try 'gemini-3.6-flash'.`);
                 }
             }
             throw error;

@@ -1,11 +1,43 @@
 const express = require('express');
 const router = express.Router();
+const crypto = require('crypto');
 const { pool } = require('../config/database');
 const { auth, isAdmin } = require('../middleware/auth');
 const waSvc = require('../services/whatsapp.service');
 
-// All routes require admin auth
-router.use(auth, isAdmin);
+function hasValidInternalKey(req) {
+    const expected = process.env.INTERNAL_OAUTH_KEY;
+    const supplied = req.get('x-internal-key');
+    if (!expected || !supplied) return false;
+
+    const expectedBuffer = Buffer.from(expected);
+    const suppliedBuffer = Buffer.from(supplied);
+    return expectedBuffer.length === suppliedBuffer.length
+        && crypto.timingSafeEqual(expectedBuffer, suppliedBuffer);
+}
+
+function hasValidWhatsAppServiceKey(req) {
+    const expected = process.env.WHATSAPP_SERVICE_KEY;
+    const supplied = req.get('x-service-key');
+    if (!expected || !supplied) return false;
+
+    const expectedBuffer = Buffer.from(expected);
+    const suppliedBuffer = Buffer.from(supplied);
+    return expectedBuffer.length === suppliedBuffer.length
+        && crypto.timingSafeEqual(expectedBuffer, suppliedBuffer);
+}
+
+// Browser/admin calls use normal authentication. Tenant-to-central proxy calls
+// use the shared internal key and are only allowed below /internal.
+router.use((req, res, next) => {
+    if (req.path.startsWith('/internal/') && hasValidInternalKey(req)) {
+        return next();
+    }
+    if (req.path === '/incoming' && hasValidWhatsAppServiceKey(req)) {
+        return next();
+    }
+    return auth(req, res, () => isAdmin(req, res, next));
+});
 
 // ── Account CRUD ──────────────────────────────────────────
 
@@ -245,8 +277,7 @@ router.post('/send/text', async (req, res) => {
         } else if (account.channel === 'evolution') {
             result = await waSvc.evolutionSendText(account.evolution_api_url, account.evolution_api_key, account.session_id, to, message);
         } else {
-            const plain = waSvc.decryptToken(account.meta_token);
-            result = await waSvc.sendMetaText(plain, account.meta_phone_id, to, message);
+            result = await waSvc.sendMetaText(account.meta_token, account.meta_phone_id, to, message);
         }
         res.json({ success: true, result });
     } catch (err) {
@@ -264,8 +295,7 @@ router.post('/send/template', async (req, res) => {
         if (!rows.length) return res.status(404).json({ error: 'Meta account not found' });
         const account = rows[0];
 
-        const plain = waSvc.decryptToken(account.meta_token);
-        const result = await waSvc.sendMetaTemplate(plain, account.meta_phone_id, to, templateName, languageCode, components);
+        const result = await waSvc.sendMetaTemplate(account.meta_token, account.meta_phone_id, to, templateName, languageCode, components);
         res.json({ success: true, result });
     } catch (err) {
         res.status(500).json({ error: err.message });
@@ -282,8 +312,7 @@ router.get('/templates', async (req, res) => {
         if (!rows.length) return res.status(404).json({ error: 'Meta account not found' });
         const account = rows[0];
 
-        const plain = waSvc.decryptToken(account.meta_token);
-        const result = await waSvc.getMetaTemplates(plain, account.meta_waba_id);
+        const result = await waSvc.getMetaTemplates(account.meta_token, account.meta_waba_id);
         res.json(result);
     } catch (err) {
         res.status(500).json({ error: err.message });
@@ -444,8 +473,7 @@ router.post('/conversations/:id/messages', async (req, res) => {
             const [accs] = await pool.query(`SELECT evolution_api_url, evolution_api_key FROM whatsapp_accounts WHERE id = ?`, [conv.account_id]);
             await waSvc.evolutionSendText(accs[0].evolution_api_url, accs[0].evolution_api_key, conv.session_id, conv.contact_jid.replace('@s.whatsapp.net', ''), message);
         } else {
-            const plain = waSvc.decryptToken(conv.meta_token);
-            await waSvc.sendMetaText(plain, conv.meta_phone_id, conv.contact_jid.replace('@s.whatsapp.net', ''), message);
+            await waSvc.sendMetaText(conv.meta_token, conv.meta_phone_id, conv.contact_jid.replace('@s.whatsapp.net', ''), message);
         }
 
         const [msgResult] = await pool.query(

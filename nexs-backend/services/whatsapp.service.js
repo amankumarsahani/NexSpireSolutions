@@ -3,7 +3,12 @@ const crypto = require('crypto');
 
 const WA_SERVICE_URL = process.env.WHATSAPP_SERVICE_URL || 'http://localhost:5100';
 const WA_SERVICE_KEY = process.env.WHATSAPP_SERVICE_KEY;
-const ENCRYPT_SECRET = process.env.META_TOKEN_SECRET || process.env.JWT_SECRET;
+// Tenant and central must derive the same key because central validates/encrypts
+// and the tenant sends/decrypts. INTERNAL_OAUTH_KEY is already shared by the
+// provisioning contract, so it is the safe compatibility fallback.
+const ENCRYPT_SECRET = process.env.META_TOKEN_SECRET
+    || process.env.INTERNAL_OAUTH_KEY
+    || process.env.JWT_SECRET;
 
 const waClient = axios.create({
     baseURL: WA_SERVICE_URL,
@@ -85,8 +90,27 @@ async function getMetaTemplates(token, wabaId) {
 }
 
 async function testMetaCredentials(token, phoneNumberId) {
-    const { data } = await waClient.post('/meta/test', { token, phoneNumberId });
-    return data;
+    const version = process.env.META_GRAPH_VERSION || 'v21.0';
+    try {
+        const { data } = await axios.get(
+            `https://graph.facebook.com/${version}/${encodeURIComponent(phoneNumberId)}`,
+            {
+                params: { fields: 'display_phone_number,verified_name' },
+                headers: { Authorization: `Bearer ${token}` },
+                timeout: 15000
+            }
+        );
+        return {
+            valid: true,
+            phone: data.display_phone_number || null,
+            name: data.verified_name || null
+        };
+    } catch (err) {
+        return {
+            valid: false,
+            error: err.response?.data?.error?.message || err.message || 'Meta credential validation failed'
+        };
+    }
 }
 
 // ── Evolution API proxy calls ─────────────────────────────

@@ -674,17 +674,22 @@ class WebhookController {
             const rawBody = req.body; // Buffer (express.raw)
             const appSecret = process.env.META_APP_SECRET;
 
-            if (appSecret) {
-                const signature = req.headers['x-hub-signature-256'] || '';
-                const expected = 'sha256=' + crypto.createHmac('sha256', appSecret).update(rawBody).digest('hex');
-                const sigBuf = Buffer.from(signature);
-                const expBuf = Buffer.from(expected);
-                if (sigBuf.length !== expBuf.length || !crypto.timingSafeEqual(sigBuf, expBuf)) {
-                    console.error('[Webhook] WhatsApp Meta: signature mismatch, dropping payload');
-                    return;
-                }
-            } else {
-                console.warn('[Webhook] WhatsApp Meta: META_APP_SECRET not set, skipping signature verification');
+            if (!appSecret) {
+                console.error('[Webhook] WhatsApp Meta: META_APP_SECRET is not set, dropping unsigned payload');
+                return;
+            }
+            if (!process.env.INTERNAL_OAUTH_KEY) {
+                console.error('[Webhook] WhatsApp Meta: INTERNAL_OAUTH_KEY is not set, cannot deliver payload');
+                return;
+            }
+
+            const signature = req.headers['x-hub-signature-256'] || '';
+            const expected = 'sha256=' + crypto.createHmac('sha256', appSecret).update(rawBody).digest('hex');
+            const sigBuf = Buffer.from(signature);
+            const expBuf = Buffer.from(expected);
+            if (sigBuf.length !== expBuf.length || !crypto.timingSafeEqual(sigBuf, expBuf)) {
+                console.error('[Webhook] WhatsApp Meta: signature mismatch, dropping payload');
+                return;
             }
 
             const payload = JSON.parse(rawBody.toString('utf8'));
@@ -728,7 +733,10 @@ class WebhookController {
                                 mediaType,
                                 messageId: msg.id,
                                 timestamp: Number(msg.timestamp) || Math.floor(Date.now() / 1000)
-                            }, { timeout: 10000 });
+                            }, {
+                                timeout: 10000,
+                                headers: { 'X-Internal-Key': process.env.INTERNAL_OAUTH_KEY }
+                            });
                         } catch (err) {
                             console.error(`[Webhook] Failed to forward WhatsApp message to tenant ${tenantApiUrl}:`, err.message);
                         }

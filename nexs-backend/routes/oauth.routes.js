@@ -16,9 +16,9 @@
 
 const express = require('express');
 const router = express.Router();
-const jwt = require('jsonwebtoken');
 const axios = require('axios');
 const { google } = require('googleapis');
+const oauthState = require('../services/oauthState');
 
 const REDIRECT_URI = process.env.GOOGLE_OAUTH_REDIRECT_URI || `${process.env.API_URL || 'https://api.napnix.in'}/oauth/google/callback`;
 
@@ -42,10 +42,22 @@ const GMAIL_SCOPES = [
     'https://www.googleapis.com/auth/userinfo.email'
 ];
 
+const GOOGLE_CALENDAR_SCOPES = [
+    'https://www.googleapis.com/auth/calendar.events',
+    'https://www.googleapis.com/auth/userinfo.email'
+];
+
 // Which tenant endpoint receives the refresh token, per flow.
 const TOKEN_PATHS = {
     sheets: '/api/lead-sources/google/token',
-    mailbox_gmail: '/api/mailbox/oauth/token'
+    mailbox_gmail: '/api/mailbox/oauth/token',
+    calendar_google: '/api/calendar/google/token'
+};
+
+const GOOGLE_FLOWS = {
+    sheets: { scopes: SHEETS_SCOPES, successKey: 'google_connect' },
+    mailbox_gmail: { scopes: GMAIL_SCOPES, successKey: 'mailbox_connect' },
+    calendar_google: { scopes: GOOGLE_CALENDAR_SCOPES, successKey: 'calendar_connect' }
 };
 
 const INTERNAL_OAUTH_KEY = process.env.INTERNAL_OAUTH_KEY;
@@ -66,7 +78,7 @@ router.get('/google/start', (req, res) => {
     }
 
     try {
-        jwt.verify(state, process.env.JWT_SECRET);
+        oauthState.verify(state);
     } catch {
         return res.status(400).send('Invalid or expired state');
     }
@@ -75,19 +87,20 @@ router.get('/google/start', (req, res) => {
     // Default to the sheets flow for backward compatibility with lead-sources.
     // Strip exp/iat from the decoded claims — the incoming state was signed with
     // its own expiry, and re-signing with expiresIn while exp is present throws.
-    const { exp, iat, ...decoded } = jwt.decode(state) || {};
-    const isMailbox = decoded.flow === 'mailbox_gmail';
+    const { exp, iat, ...decoded } = oauthState.decode(state) || {};
+    const flow = decoded.flow || 'sheets';
+    const flowConfig = GOOGLE_FLOWS[flow];
+    if (!flowConfig) return res.status(400).send('Unsupported Google OAuth flow');
 
     const client = buildOAuthClient();
     const url = client.generateAuthUrl({
         access_type: 'offline',
         prompt: 'consent', // force refresh_token on every connect, not just the first
-        scope: isMailbox ? GMAIL_SCOPES : SHEETS_SCOPES,
+        scope: flowConfig.scopes,
         // tenant_api_url/return_to travel inside state's signature scope by being
         // re-embedded here rather than trusted from query params at callback time.
-        state: jwt.sign(
+        state: oauthState.sign(
             { ...decoded, tenant_api_url, return_to: return_to || tenant_api_url },
-            process.env.JWT_SECRET,
             { expiresIn: '10m' }
         )
     });
@@ -101,14 +114,16 @@ router.get('/google/callback', async (req, res) => {
 
     let payload;
     try {
-        payload = jwt.verify(state, process.env.JWT_SECRET);
+        payload = oauthState.verify(state);
     } catch {
         return res.status(400).send('Invalid or expired OAuth state');
     }
 
-    const { connectionId, tenant_api_url, return_to, flow } = payload;
-    const isMailbox = flow === 'mailbox_gmail';
-    const successKey = isMailbox ? 'mailbox_connect' : 'google_connect';
+    const { connectionId, tenant_api_url, return_to } = payload;
+    const flow = payload.flow || 'sheets';
+    const flowConfig = GOOGLE_FLOWS[flow];
+    if (!flowConfig) return res.status(400).send('Unsupported Google OAuth flow');
+    const successKey = flowConfig.successKey;
     const failRedirect = `${return_to || tenant_api_url}?${successKey}=failed`;
 
     if (error || !code) {
@@ -130,8 +145,8 @@ router.get('/google/callback', async (req, res) => {
         const oauth2 = google.oauth2({ version: 'v2', auth: client });
         const { data: profile } = await oauth2.userinfo.get();
 
-        const tokenPath = isMailbox ? TOKEN_PATHS.mailbox_gmail : TOKEN_PATHS.sheets;
-        const tokenBody = isMailbox
+        const tokenPath = TOKEN_PATHS[flow];
+        const tokenBody = flow === 'mailbox_gmail'
             ? { connectionId, provider: 'gmail', refreshToken: tokens.refresh_token, email: profile.email, displayName: profile.name }
             : { connectionId, refreshToken: tokens.refresh_token, email: profile.email };
 
@@ -155,7 +170,26 @@ router.get('/google/callback', async (req, res) => {
 const { ConfidentialClientApplication } = require('@azure/msal-node');
 
 const MS_REDIRECT_URI = process.env.MS_OAUTH_REDIRECT_URI || `${process.env.API_URL || 'https://api.napnix.in'}/oauth/microsoft/callback`;
-const MS_SCOPES = ['offline_access', 'https://graph.microsoft.com/Mail.ReadWrite', 'https://graph.microsoft.com/Mail.Send', 'https://graph.microsoft.com/User.Read'];
+const MS_MAIL_SCOPES = ['offline_access', 'https://graph.microsoft.com/Mail.ReadWrite', 'https://graph.microsoft.com/Mail.Send', 'https://graph.microsoft.com/User.Read'];
+const MS_CALENDAR_SCOPES = ['offline_access', 'https://graph.microsoft.com/Calendars.ReadWrite', 'https://graph.microsoft.com/User.Read'];
+
+function microsoftFlow(flow) {
+    if (flow === 'calendar_microsoft') {
+        return {
+            scopes: MS_CALENDAR_SCOPES,
+            tokenPath: '/api/calendar/microsoft/token',
+            successKey: 'calendar_connect'
+        };
+    }
+    if (!flow || flow === 'mailbox_microsoft') {
+        return {
+            scopes: MS_MAIL_SCOPES,
+            tokenPath: '/api/mailbox/oauth/token',
+            successKey: 'mailbox_connect'
+        };
+    }
+    return null;
+}
 
 function msalApp() {
     return new ConfidentialClientApplication({
@@ -172,18 +206,19 @@ router.get('/microsoft/start', async (req, res) => {
     const { state, tenant_api_url, return_to } = req.query;
     if (!state || !tenant_api_url) return res.status(400).send('Missing state or tenant_api_url');
 
-    try { jwt.verify(state, process.env.JWT_SECRET); }
+    try { oauthState.verify(state); }
     catch { return res.status(400).send('Invalid or expired state'); }
 
     try {
-        const { exp, iat, ...decoded } = jwt.decode(state) || {};
-        const embeddedState = jwt.sign(
+        const { exp, iat, ...decoded } = oauthState.decode(state) || {};
+        const flowConfig = microsoftFlow(decoded.flow);
+        if (!flowConfig) return res.status(400).send('Unsupported Microsoft OAuth flow');
+        const embeddedState = oauthState.sign(
             { ...decoded, tenant_api_url, return_to: return_to || tenant_api_url },
-            process.env.JWT_SECRET,
             { expiresIn: '10m' }
         );
         const url = await msalApp().getAuthCodeUrl({
-            scopes: MS_SCOPES,
+            scopes: flowConfig.scopes,
             redirectUri: MS_REDIRECT_URI,
             state: embeddedState,
             prompt: 'consent'
@@ -200,11 +235,13 @@ router.get('/microsoft/callback', async (req, res) => {
     const { code, state, error } = req.query;
 
     let payload;
-    try { payload = jwt.verify(state, process.env.JWT_SECRET); }
+    try { payload = oauthState.verify(state); }
     catch { return res.status(400).send('Invalid or expired OAuth state'); }
 
-    const { connectionId, tenant_api_url, return_to } = payload;
-    const failRedirect = `${return_to || tenant_api_url}?mailbox_connect=failed`;
+    const { connectionId, tenant_api_url, return_to, flow } = payload;
+    const flowConfig = microsoftFlow(flow);
+    if (!flowConfig) return res.status(400).send('Unsupported Microsoft OAuth flow');
+    const failRedirect = `${return_to || tenant_api_url}?${flowConfig.successKey}=failed`;
     if (error || !code) return res.redirect(failRedirect);
 
     try {
@@ -212,7 +249,7 @@ router.get('/microsoft/callback', async (req, res) => {
         const app = msalApp();
         const result = await app.acquireTokenByCode({
             code,
-            scopes: MS_SCOPES,
+            scopes: flowConfig.scopes,
             redirectUri: MS_REDIRECT_URI
         });
 
@@ -225,12 +262,14 @@ router.get('/microsoft/callback', async (req, res) => {
         const displayName = result.account?.name || null;
 
         await axios.post(
-            `${tenant_api_url}/api/mailbox/oauth/token`,
-            { connectionId, provider: 'microsoft', refreshToken, email, displayName },
+            `${tenant_api_url}${flowConfig.tokenPath}`,
+            flow === 'calendar_microsoft'
+                ? { connectionId, refreshToken, email }
+                : { connectionId, provider: 'microsoft', refreshToken, email, displayName },
             { headers: { 'X-Internal-Key': INTERNAL_OAUTH_KEY }, timeout: 30000 }
         );
 
-        res.redirect(`${return_to || tenant_api_url}?mailbox_connect=success`);
+        res.redirect(`${return_to || tenant_api_url}?${flowConfig.successKey}=success`);
     } catch (err) {
         console.error('[oauth] Microsoft callback failed:', err.response?.data || err.message);
         res.redirect(failRedirect);
@@ -282,13 +321,12 @@ router.get('/facebook/leads/start', (req, res) => {
     const { state, tenant_api_url, return_to } = req.query;
     if (!state || !tenant_api_url) return res.status(400).send('Missing state or tenant_api_url');
 
-    try { jwt.verify(state, process.env.JWT_SECRET); }
+    try { oauthState.verify(state); }
     catch { return res.status(400).send('Invalid or expired state'); }
 
-    const { exp, iat, ...decoded } = jwt.decode(state) || {};
-    const embeddedState = jwt.sign(
+    const { exp, iat, ...decoded } = oauthState.decode(state) || {};
+    const embeddedState = oauthState.sign(
         { ...decoded, tenant_api_url, return_to: return_to || tenant_api_url },
-        process.env.JWT_SECRET,
         { expiresIn: '10m' }
     );
 
@@ -309,7 +347,7 @@ router.get('/facebook/leads/callback', async (req, res) => {
     const { encryptSecret } = require('../services/secretStore');
 
     let payload;
-    try { payload = jwt.verify(state, process.env.JWT_SECRET); }
+    try { payload = oauthState.verify(state); }
     catch { return res.status(400).send('Invalid or expired OAuth state'); }
 
     const { tenant, connectorKey, tenant_api_url, return_to } = payload;
@@ -413,18 +451,21 @@ const OAUTH2_PROVIDERS = {
         tokenUrl: 'https://oauth.platform.intuit.com/oauth2/v1/tokens/bearer',
         scopes: ['com.intuit.quickbooks.accounting'],
         clientIdEnv: 'QUICKBOOKS_CLIENT_ID',
-        clientSecretEnv: 'QUICKBOOKS_CLIENT_SECRET'
+        clientSecretEnv: 'QUICKBOOKS_CLIENT_SECRET',
+        basicTokenAuth: true
     },
     zoho_books: {
         name: 'Zoho Books',
-        authUrl: 'https://accounts.zoho.in/oauth/v2/auth',
-        tokenUrl: 'https://accounts.zoho.in/oauth/v2/token',
-        scopes: ['ZohoBooks.fullaccess.all'],
+        authUrl: () => `${process.env.ZOHO_ACCOUNTS_URL || 'https://accounts.zoho.in'}/oauth/v2/auth`,
+        tokenUrl: () => `${process.env.ZOHO_ACCOUNTS_URL || 'https://accounts.zoho.in'}/oauth/v2/token`,
+        scopes: ['ZohoBooks.contacts.ALL', 'ZohoBooks.invoices.ALL', 'ZohoBooks.settings.READ'],
         clientIdEnv: 'ZOHO_CLIENT_ID',
         clientSecretEnv: 'ZOHO_CLIENT_SECRET',
-        extraAuthParams: { access_type: 'offline' }
+        extraAuthParams: { access_type: 'offline', prompt: 'consent' }
     }
 };
+
+const resolveOAuthValue = value => typeof value === 'function' ? value() : value;
 
 function oauth2RedirectUri(provider) {
     const base = process.env.API_URL || 'https://api.napnix.in';
@@ -444,13 +485,12 @@ router.get('/oauth2/:provider/start', (req, res) => {
     const { state, tenant_api_url, return_to } = req.query;
     if (!state || !tenant_api_url) return res.status(400).send('Missing state or tenant_api_url');
 
-    try { jwt.verify(state, process.env.JWT_SECRET); }
+    try { oauthState.verify(state); }
     catch { return res.status(400).send('Invalid or expired state'); }
 
-    const { exp, iat, ...decoded } = jwt.decode(state) || {};
-    const embeddedState = jwt.sign(
+    const { exp, iat, ...decoded } = oauthState.decode(state) || {};
+    const embeddedState = oauthState.sign(
         { ...decoded, provider: req.params.provider, tenant_api_url, return_to: return_to || tenant_api_url },
-        process.env.JWT_SECRET,
         { expiresIn: '10m' }
     );
 
@@ -463,7 +503,7 @@ router.get('/oauth2/:provider/start', (req, res) => {
         ...(cfg.extraAuthParams || {})
     });
 
-    res.redirect(`${cfg.authUrl}?${params}`);
+    res.redirect(`${resolveOAuthValue(cfg.authUrl)}?${params}`);
 });
 
 // GET /oauth/oauth2/:provider/callback?code=...&state=...
@@ -474,7 +514,7 @@ router.get('/oauth2/:provider/callback', async (req, res) => {
     const { code, state, error } = req.query;
 
     let payload;
-    try { payload = jwt.verify(state, process.env.JWT_SECRET); }
+    try { payload = oauthState.verify(state); }
     catch { return res.status(400).send('Invalid or expired OAuth state'); }
 
     const { connectorKey, tenant_api_url, return_to } = payload;
@@ -485,13 +525,24 @@ router.get('/oauth2/:provider/callback', async (req, res) => {
         const body = new URLSearchParams({
             grant_type: 'authorization_code',
             code,
-            redirect_uri: oauth2RedirectUri(req.params.provider),
-            client_id: process.env[cfg.clientIdEnv],
-            client_secret: process.env[cfg.clientSecretEnv]
+            redirect_uri: oauth2RedirectUri(req.params.provider)
         });
+        const tokenHeaders = {
+            'Content-Type': 'application/x-www-form-urlencoded',
+            Accept: 'application/json'
+        };
 
-        const tokenRes = await axios.post(cfg.tokenUrl, body.toString(), {
-            headers: { 'Content-Type': 'application/x-www-form-urlencoded', Accept: 'application/json' },
+        if (cfg.basicTokenAuth) {
+            tokenHeaders.Authorization = `Basic ${Buffer.from(
+                `${process.env[cfg.clientIdEnv]}:${process.env[cfg.clientSecretEnv]}`
+            ).toString('base64')}`;
+        } else {
+            body.set('client_id', process.env[cfg.clientIdEnv]);
+            body.set('client_secret', process.env[cfg.clientSecretEnv]);
+        }
+
+        const tokenRes = await axios.post(resolveOAuthValue(cfg.tokenUrl), body.toString(), {
+            headers: tokenHeaders,
             timeout: 15000
         });
 
@@ -504,18 +555,24 @@ router.get('/oauth2/:provider/callback', async (req, res) => {
         const d = tokenRes.data || {};
         const accessToken = d.access_token || d.authed_user?.access_token;
         if (!accessToken) return res.redirect(`${failRedirect}&reason=no_access_token`);
+        const config = { ...(payload.config || {}) };
+        if (req.params.provider === 'quickbooks' && req.query.realmId) {
+            config.realm_id = String(req.query.realmId);
+        }
 
         await axios.post(
             `${tenant_api_url}/api/connectors/oauth/token`,
             {
                 connectorKey,
-                label: cfg.name,
+                label: payload.label || cfg.name,
                 tokens: {
                     access_token: accessToken,
                     refresh_token: d.refresh_token || null,
-                    expires_at: d.expires_in ? new Date(Date.now() + d.expires_in * 1000).toISOString() : null,
+                    expires_in: Number(d.expires_in) || 3600,
+                    api_domain: d.api_domain || null,
                     account: d.team?.name || d.account || null
-                }
+                },
+                config
             },
             { headers: { 'X-Internal-Key': INTERNAL_OAUTH_KEY }, timeout: 30000 }
         );

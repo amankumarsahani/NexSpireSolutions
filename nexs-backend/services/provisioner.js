@@ -177,6 +177,19 @@ class Provisioner {
                 // authenticating with its own derived secret (never a shared key).
                 NEXS_BACKEND_URL: process.env.NEXS_BACKEND_URL || process.env.API_URL || 'http://localhost:5000',
                 SUPPORT_TENANT_SECRET: supportSecret,
+                INTERNAL_OAUTH_KEY: process.env.INTERNAL_OAUTH_KEY || '',
+                OAUTH_STATE_SECRET: process.env.OAUTH_STATE_SECRET || process.env.INTERNAL_OAUTH_KEY || '',
+                META_TOKEN_SECRET: process.env.META_TOKEN_SECRET || '',
+                GOOGLE_OAUTH_CLIENT_ID: process.env.GOOGLE_OAUTH_CLIENT_ID || '',
+                GOOGLE_OAUTH_CLIENT_SECRET: process.env.GOOGLE_OAUTH_CLIENT_SECRET || '',
+                MS_OAUTH_CLIENT_ID: process.env.MS_OAUTH_CLIENT_ID || '',
+                MS_OAUTH_CLIENT_SECRET: process.env.MS_OAUTH_CLIENT_SECRET || '',
+                MS_OAUTH_TENANT: process.env.MS_OAUTH_TENANT || 'common',
+                ZOHO_CLIENT_ID: process.env.ZOHO_CLIENT_ID || '',
+                ZOHO_CLIENT_SECRET: process.env.ZOHO_CLIENT_SECRET || '',
+                ZOHO_ACCOUNTS_URL: process.env.ZOHO_ACCOUNTS_URL || 'https://accounts.zoho.in',
+                QUICKBOOKS_CLIENT_ID: process.env.QUICKBOOKS_CLIENT_ID || '',
+                QUICKBOOKS_CLIENT_SECRET: process.env.QUICKBOOKS_CLIENT_SECRET || '',
                 ...(academicMode ? { ACADEMIC_MODE: academicMode } : {})
             }
         };
@@ -1379,7 +1392,17 @@ EOFNODE`;
                 // centralized Google OAuth flow without per-tenant setup.
                 GOOGLE_OAUTH_CLIENT_ID: process.env.GOOGLE_OAUTH_CLIENT_ID || '',
                 GOOGLE_OAUTH_CLIENT_SECRET: process.env.GOOGLE_OAUTH_CLIENT_SECRET || '',
-                INTERNAL_OAUTH_KEY: process.env.INTERNAL_OAUTH_KEY || ''
+                MS_OAUTH_CLIENT_ID: process.env.MS_OAUTH_CLIENT_ID || '',
+                MS_OAUTH_CLIENT_SECRET: process.env.MS_OAUTH_CLIENT_SECRET || '',
+                MS_OAUTH_TENANT: process.env.MS_OAUTH_TENANT || 'common',
+                ZOHO_CLIENT_ID: process.env.ZOHO_CLIENT_ID || '',
+                ZOHO_CLIENT_SECRET: process.env.ZOHO_CLIENT_SECRET || '',
+                ZOHO_ACCOUNTS_URL: process.env.ZOHO_ACCOUNTS_URL || 'https://accounts.zoho.in',
+                QUICKBOOKS_CLIENT_ID: process.env.QUICKBOOKS_CLIENT_ID || '',
+                QUICKBOOKS_CLIENT_SECRET: process.env.QUICKBOOKS_CLIENT_SECRET || '',
+                INTERNAL_OAUTH_KEY: process.env.INTERNAL_OAUTH_KEY || '',
+                OAUTH_STATE_SECRET: process.env.OAUTH_STATE_SECRET || process.env.INTERNAL_OAUTH_KEY || '',
+                META_TOKEN_SECRET: process.env.META_TOKEN_SECRET || ''
             };
 
             // Write a temporary PM2 JSON config to inject env block reliably

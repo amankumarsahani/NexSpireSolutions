@@ -55,7 +55,7 @@ const TOPIC_ANGLES = [
 class AIBlogService {
     constructor() {
         this.unsplashAccessKey = process.env.UNSPLASH_ACCESS_KEY || null;
-        this.defaultModel = 'llama-3.3-70b-versatile';
+        this.defaultModel = 'openai/gpt-oss-120b';
         this._usedFallbackIndex = 0;
     }
 
