@@ -1019,6 +1019,15 @@ EOFNODE`;
                 console.log(`[Provisioner] DNS record created: ${customDomain}`);
             }
 
+            const active = await this.waitForPagesDomainActive(
+                this.cfAccountId,
+                this.cfPagesProject,
+                customDomain
+            );
+            if (!active) {
+                console.warn(`[Provisioner] Frontend DNS exists, but Pages is still pending: ${customDomain}`);
+            }
+
             return dnsRecordId;
 
         } catch (error) {
@@ -1048,23 +1057,14 @@ EOFNODE`;
 
             if (data.success) {
                 console.log(`[Provisioner] Domain attached to Pages: ${domain}`);
-                const active = await this.waitForPagesDomainActive(this.cfAccountId, this.cfPagesProject, domain);
-                if (!active) {
-                    console.warn(`[Provisioner] Pages domain ${domain} did not reach active state — DNS creation skipped`);
-                    return false;
-                }
                 return true;
             }
 
-            // Treat "already added" (code 8000018) as success — still wait for active
+            // Treat "already added" (code 8000018) as success. DNS must be
+            // created before Pages can move this domain from pending to active.
             const alreadyExists = data.errors?.some(e => e.code === 8000018);
             if (alreadyExists) {
                 console.log(`[Provisioner] Pages domain ${domain} already attached to ${this.cfPagesProject}`);
-                const active = await this.waitForPagesDomainActive(this.cfAccountId, this.cfPagesProject, domain);
-                if (!active) {
-                    console.warn(`[Provisioner] Pages domain ${domain} is attached but not active yet — DNS creation skipped`);
-                    return false;
-                }
                 return true;
             }
 
@@ -1140,6 +1140,15 @@ EOFNODE`;
             } else {
                 dnsRecordId = dnsData.result?.id || null;
                 console.log(`[Provisioner] Storefront DNS created: ${storefrontDomain}`);
+            }
+
+            const active = await this.waitForPagesDomainActive(
+                this.cfAccountId,
+                storefrontProject,
+                storefrontDomain
+            );
+            if (!active) {
+                console.warn(`[Provisioner] Storefront DNS exists, but Pages is still pending: ${storefrontDomain}`);
             }
 
             return dnsRecordId;
@@ -1243,26 +1252,14 @@ EOFNODE`;
             );
             const data = await response.json();
             if (data.success) {
-                // Wait for CF to activate the domain before DNS is created.
-                // Without this, DNS CNAME created immediately after POST causes Error 1014
-                // (CNAME Cross-User Banned) because CF edge hasn't propagated ownership yet.
-                const active = await this.waitForPagesDomainActive(accountId, projectName, domain);
-                if (!active) {
-                    console.warn(`[Provisioner] Pages domain ${domain} did not reach active state — DNS creation skipped`);
-                    return false;
-                }
                 return true;
             }
 
-            // Treat "already added" (code 8000018) as success — still wait for active
+            // Treat "already added" (code 8000018) as success. The caller
+            // creates DNS next; Pages cannot activate before that record exists.
             const alreadyExists = data.errors?.some(e => e.code === 8000018);
             if (alreadyExists) {
                 console.log(`[Provisioner] Pages domain ${domain} already attached to ${projectName}`);
-                const active = await this.waitForPagesDomainActive(accountId, projectName, domain);
-                if (!active) {
-                    console.warn(`[Provisioner] Pages domain ${domain} is attached but not active yet — DNS creation skipped`);
-                    return false;
-                }
                 return true;
             }
 
@@ -1276,8 +1273,8 @@ EOFNODE`;
 
     /**
      * Poll until Pages reports the custom domain as active.
-     * CF Pages API returns success immediately but propagation takes 5-30s.
-     * Creating a CNAME DNS record before the domain is active causes Error 1014.
+     * The domain must already be attached and its CNAME record must exist.
+     * Cloudflare then normally activates it within 5-30 seconds.
      */
     async waitForPagesDomainActive(accountId, projectName, domain, maxWaitMs = 60000) {
         const interval = 4000;
