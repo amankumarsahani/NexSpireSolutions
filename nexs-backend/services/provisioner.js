@@ -58,7 +58,7 @@ class Provisioner {
         this.cfApiToken = process.env.CLOUDFLARE_API_TOKEN;
         this.cfZoneId = process.env.CLOUDFLARE_ZONE_ID;
         this.cfDomain = process.env.NEXCRM_DOMAIN || 'napnix.in';
-        this.cfPagesUrl = process.env.NEXCRM_PAGES_URL || 'napcrm-frontend.pages.dev';
+        this.cfPagesUrl = process.env.NEXCRM_PAGES_URL || 'nexcrm-frontend.pages.dev';
         this.cfAccountId = process.env.CLOUDFLARE_ACCOUNT_ID;
         this.cfPagesProject = process.env.NEXCRM_PAGES_PROJECT || 'napcrm-frontend';
 
@@ -959,6 +959,75 @@ EOFNODE`;
         }
     }
 
+    async getPagesProjectSubdomain(accountId, projectName, fallback) {
+        try {
+            const response = await fetch(
+                `https://api.cloudflare.com/client/v4/accounts/${accountId}/pages/projects/${projectName}`,
+                { headers: { 'Authorization': `Bearer ${this.cfApiToken}` } }
+            );
+            const data = await response.json();
+            if (data.success && data.result?.subdomain) {
+                return data.result.subdomain;
+            }
+            console.warn(`[Provisioner] Could not resolve Pages subdomain for ${projectName}; using configured fallback`);
+        } catch (error) {
+            console.warn(`[Provisioner] Pages project lookup failed for ${projectName}: ${error.message}`);
+        }
+
+        return String(fallback || '')
+            .replace(/^https?:\/\//i, '')
+            .replace(/\/.*$/, '');
+    }
+
+    async ensureProxiedCname(name, content, label) {
+        const headers = {
+            'Authorization': `Bearer ${this.cfApiToken}`,
+            'Content-Type': 'application/json'
+        };
+        const record = { type: 'CNAME', name, content, proxied: true, ttl: 1 };
+        const lookupResponse = await fetch(
+            `https://api.cloudflare.com/client/v4/zones/${this.cfZoneId}/dns_records?name=${encodeURIComponent(name)}`,
+            { headers }
+        );
+        const lookupData = await lookupResponse.json();
+        if (!lookupData.success) {
+            throw new Error(`${label} DNS lookup failed: ${JSON.stringify(lookupData.errors || [])}`);
+        }
+
+        const existing = lookupData.result?.[0];
+        if (existing) {
+            const isCorrect = existing.type === 'CNAME'
+                && String(existing.content).toLowerCase() === String(content).toLowerCase()
+                && existing.proxied === true;
+            if (isCorrect) {
+                console.log(`[Provisioner] ${label} DNS already correct: ${name}`);
+                return existing.id;
+            }
+
+            const updateResponse = await fetch(
+                `https://api.cloudflare.com/client/v4/zones/${this.cfZoneId}/dns_records/${existing.id}`,
+                { method: 'PUT', headers, body: JSON.stringify(record) }
+            );
+            const updateData = await updateResponse.json();
+            if (!updateData.success) {
+                throw new Error(`${label} DNS update failed: ${JSON.stringify(updateData.errors || [])}`);
+            }
+            console.log(`[Provisioner] ${label} DNS updated: ${name} -> ${content}`);
+            return updateData.result?.id || existing.id;
+        }
+
+        const createResponse = await fetch(
+            `https://api.cloudflare.com/client/v4/zones/${this.cfZoneId}/dns_records`,
+            { method: 'POST', headers, body: JSON.stringify(record) }
+        );
+        const createData = await createResponse.json();
+        if (!createData.success) {
+            throw new Error(`${label} DNS creation failed: ${JSON.stringify(createData.errors || [])}`);
+        }
+        console.log(`[Provisioner] ${label} DNS created: ${name} -> ${content}`);
+        return createData.result?.id || null;
+    }
+
     /**
      * Add Cloudflare DNS record for frontend (tenant-crm.domain -> Pages)
      * AND attach the custom domain to Pages project
@@ -985,39 +1054,14 @@ EOFNODE`;
                 return null;
             }
 
-            // Step 2: Create DNS CNAME record after Pages owns the hostname.
-            const dnsResponse = await fetch(
-                `https://api.cloudflare.com/client/v4/zones/${this.cfZoneId}/dns_records`,
-                {
-                    method: 'POST',
-                    headers: {
-                        'Authorization': `Bearer ${this.cfApiToken}`,
-                        'Content-Type': 'application/json'
-                    },
-                    body: JSON.stringify({
-                        type: 'CNAME',
-                        name: customDomain,
-                        content: this.cfPagesUrl,
-                        proxied: true,
-                        ttl: 1
-                    })
-                }
+            // Step 2: Resolve the canonical *.pages.dev target from Cloudflare.
+            // Environment values drifted when the projects were renamed.
+            const pagesTarget = await this.getPagesProjectSubdomain(
+                this.cfAccountId,
+                this.cfPagesProject,
+                this.cfPagesUrl
             );
-
-            const dnsData = await dnsResponse.json();
-
-            if (!dnsData.success) {
-                const alreadyExists = dnsData.errors?.some(e => e.code === 81053);
-                if (alreadyExists) {
-                    console.log(`[Provisioner] Frontend DNS already exists: ${customDomain}`);
-                } else {
-                    console.error('[Provisioner] Frontend DNS error:', dnsData.errors);
-                    return null;
-                }
-            } else {
-                dnsRecordId = dnsData.result?.id || null;
-                console.log(`[Provisioner] DNS record created: ${customDomain}`);
-            }
+            dnsRecordId = await this.ensureProxiedCname(customDomain, pagesTarget, 'Frontend');
 
             const active = await this.waitForPagesDomainActive(
                 this.cfAccountId,
@@ -1087,7 +1131,7 @@ EOFNODE`;
         }
 
         const storefrontDomain = `${slug}.${this.cfDomain}`;
-        const storefrontPagesUrl = process.env.NEXCRM_STOREFRONT_PAGES_URL || 'napcrm-storefront.pages.dev';
+        const storefrontPagesUrl = process.env.NEXCRM_STOREFRONT_PAGES_URL || 'nexcrm-storefront.pages.dev';
         const storefrontProject = process.env.NEXCRM_STOREFRONT_PROJECT || 'napcrm-storefront';
         let dnsRecordId = null;
 
@@ -1108,39 +1152,12 @@ EOFNODE`;
                 return null;
             }
 
-            // Create DNS CNAME record for storefront after Pages owns the hostname.
-            const dnsResponse = await fetch(
-                `https://api.cloudflare.com/client/v4/zones/${this.cfZoneId}/dns_records`,
-                {
-                    method: 'POST',
-                    headers: {
-                        'Authorization': `Bearer ${this.cfApiToken}`,
-                        'Content-Type': 'application/json'
-                    },
-                    body: JSON.stringify({
-                        type: 'CNAME',
-                        name: storefrontDomain,
-                        content: storefrontPagesUrl,
-                        proxied: true,
-                        ttl: 1
-                    })
-                }
+            const pagesTarget = await this.getPagesProjectSubdomain(
+                this.cfAccountId,
+                storefrontProject,
+                storefrontPagesUrl
             );
-
-            const dnsData = await dnsResponse.json();
-
-            if (!dnsData.success) {
-                const alreadyExists = dnsData.errors?.some(e => e.code === 81053);
-                if (alreadyExists) {
-                    console.log(`[Provisioner] Storefront DNS already exists: ${storefrontDomain}`);
-                } else {
-                    console.error('[Provisioner] Storefront DNS error:', dnsData.errors);
-                    return null;
-                }
-            } else {
-                dnsRecordId = dnsData.result?.id || null;
-                console.log(`[Provisioner] Storefront DNS created: ${storefrontDomain}`);
-            }
+            dnsRecordId = await this.ensureProxiedCname(storefrontDomain, pagesTarget, 'Storefront');
 
             const active = await this.waitForPagesDomainActive(
                 this.cfAccountId,
