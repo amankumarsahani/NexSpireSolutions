@@ -104,6 +104,7 @@ class TenantController {
                 email,
                 phone,
                 industry_type,
+                academic_mode,
                 plan_id,
                 server_id,
                 custom_domain,
@@ -132,6 +133,7 @@ class TenantController {
                 email,
                 phone,
                 industry_type,
+                academic_mode,
                 plan_id: plan_id ? Number(plan_id) : undefined,
                 server_id: server_id ? Number(server_id) : undefined,
                 custom_domain: custom_domain || null,
@@ -147,7 +149,10 @@ class TenantController {
             }
 
             const toolsToEnable = Array.isArray(selectedTools) ? selectedTools : [];
-            const enableCRM = toolsToEnable.length === 0 || toolsToEnable.some(t => t.slug === 'napcrm' || t === 'napcrm');
+            const enableCRM = toolsToEnable.length === 0 || toolsToEnable.some(t => {
+                const toolSlug = typeof t === 'string' ? t : t.slug;
+                return toolSlug === 'nexcrm' || toolSlug === 'napcrm';
+            });
             const enableNexMail = toolsToEnable.some(t => t.slug === 'napmail' || t === 'napmail');
 
             try {
@@ -170,41 +175,58 @@ class TenantController {
 
                     const dbName = `nexcrm_${slug.replace(/-/g, '_')}`;
                     await provisioner.createDatabase(dbName, server);
+                    await TenantModel.updateProcessInfo(tenantId, {
+                        assigned_port: port,
+                        db_name: dbName,
+                        process_name: `tenant-${slug}`,
+                        process_status: 'starting'
+                    });
+                    await TenantModel.update(tenantId, {
+                        provision_step: 'migrations',
+                        provision_error: null,
+                        provisioning_started_at: new Date(),
+                        provisioning_completed_at: null
+                    });
 
                     res.status(201).json({
                         success: true,
                         message: 'Tenant created. Provisioning selected tools in background.',
-                        data: { tenantId, slug, status: 'provisioning', tools: { napcrm: enableCRM, napmail: enableNexMail } }
+                        data: { tenantId, slug, status: 'provisioning', tools: { nexcrm: enableCRM, napmail: enableNexMail } }
                     });
-
-                    try {
-                        const plan = plan_id ? await PlanModel.findById(plan_id) : null;
-                        workflowEngine.trigger('tenant_created', 'tenant', tenantId, {
-                            id: tenantId, name, slug, email, owner_email: email, owner_name: name,
-                            phone: phone || '', industry_type: industry_type || 'general',
-                            plan_name: plan?.name || 'Starter', plan_price: plan?.price ? `${plan.price}` : 'As per agreement',
-                            plan_billing_cycle: plan?.billing_cycle || 'Monthly', trial_days: plan?.trial_days || 14
-                        });
-                    } catch (triggerErr) {
-                        console.error('[TenantController] Workflow trigger error:', triggerErr.message);
-                    }
 
                     provisioner.provisionTenant({
                         id: tenantId, name, slug, email,
-                        industry_type: industry_type || 'general', plan_slug
+                        industry_type: industry_type || 'general',
+                        academic_mode: industry_type === 'school' ? (academic_mode || 'school') : null,
+                        custom_domain: custom_domain || null,
+                        plan_slug
                     }, server.id, {
                         skipPortAllocation: true, assignedPort: port, skipDbCreation: true
-                    }).then(() => {
-                        module.exports._recordToolEnabled(tenantId, 'napcrm', plan_id);
+                    }).then(async () => {
+                        await module.exports._recordToolEnabled(tenantId, 'nexcrm', plan_id);
+
+                        await module.exports._triggerTenantCreatedWorkflow({
+                            id: tenantId,
+                            name,
+                            slug,
+                            email,
+                            phone,
+                            industry_type: industry_type || 'general',
+                            plan_id
+                        });
                     }).catch(async (bgError) => {
                         console.error(`[Background Provisioning Error] Tenant ${slug}:`, bgError);
-                        await TenantModel.updateProcessStatus(tenantId, 'error');
+                        await TenantModel.update(tenantId, {
+                            process_status: 'error',
+                            provision_error: bgError.message,
+                            provisioning_completed_at: null
+                        });
                     });
                 } else {
                     res.status(201).json({
                         success: true,
                         message: 'Tenant created. Provisioning selected tools in background.',
-                        data: { tenantId, slug, status: 'created', tools: { napcrm: false, napmail: enableNexMail } }
+                        data: { tenantId, slug, status: 'created', tools: { nexcrm: false, napmail: enableNexMail } }
                     });
                 }
 
@@ -217,7 +239,7 @@ class TenantController {
                 for (const tool of toolsToEnable) {
                     const toolSlug = typeof tool === 'string' ? tool : tool.slug;
                     const toolPlanId = typeof tool === 'object' ? tool.plan_id : null;
-                    if (toolSlug !== 'napcrm' && toolSlug !== 'napmail') {
+                    if (toolSlug !== 'nexcrm' && toolSlug !== 'napcrm' && toolSlug !== 'napmail') {
                         this._provisionGenericTool(tenantId, toolSlug, toolPlanId).catch(e =>
                             console.warn(`[Tenant] Tool ${toolSlug} provision failed:`, e.message)
                         );
@@ -226,7 +248,12 @@ class TenantController {
 
             } catch (provisionError) {
                 console.error('Critical provisioning error:', provisionError);
-                await TenantModel.updateProcessStatus(tenantId, 'error');
+                await TenantModel.update(tenantId, {
+                    process_status: 'error',
+                    provision_step: 'initialization',
+                    provision_error: provisionError.message,
+                    provisioning_completed_at: null
+                });
                 if (!res.headersSent) {
                     res.status(201).json({
                         success: true,
@@ -245,7 +272,15 @@ class TenantController {
     }
 
     async _startTenantIfProvisioned(tenant) {
-        if (!tenant || tenant.process_status === 'running' || !tenant.assigned_port || !tenant.db_name) {
+        if (
+            !tenant
+            || tenant.process_status === 'running'
+            || tenant.process_status === 'starting'
+            || tenant.process_status === 'error'
+            || tenant.provision_error
+            || !tenant.assigned_port
+            || !tenant.db_name
+        ) {
             return false;
         }
 
@@ -313,6 +348,28 @@ class TenantController {
             }
         } catch (e) {
             console.warn(`[Tenant] Record tool ${toolSlug} failed:`, e.message);
+        }
+    }
+
+    async _triggerTenantCreatedWorkflow(tenant) {
+        try {
+            const plan = tenant.plan_id ? await PlanModel.findById(tenant.plan_id) : null;
+            workflowEngine.trigger('tenant_created', 'tenant', tenant.id, {
+                id: tenant.id,
+                name: tenant.name,
+                slug: tenant.slug,
+                email: tenant.email,
+                owner_email: tenant.email,
+                owner_name: tenant.name,
+                phone: tenant.phone || '',
+                industry_type: tenant.industry_type || 'general',
+                plan_name: plan?.name || tenant.plan_name || 'Starter',
+                plan_price: plan?.price ? `${plan.price}` : 'As per agreement',
+                plan_billing_cycle: plan?.billing_cycle || 'Monthly',
+                trial_days: plan?.trial_days || 14
+            });
+        } catch (triggerErr) {
+            console.error('[TenantController] Workflow trigger error:', triggerErr.message);
         }
     }
 
@@ -485,6 +542,19 @@ class TenantController {
                 return res.status(404).json({ error: 'Tenant not found' });
             }
 
+            if (tenant.process_status === 'starting') {
+                return res.status(409).json({
+                    error: `Tenant provisioning is still running${tenant.provision_step ? ` (${tenant.provision_step})` : ''}.`
+                });
+            }
+
+            if (tenant.process_status === 'error' || tenant.provision_error) {
+                return res.status(409).json({
+                    error: `Provisioning failed${tenant.provision_step ? ` at ${tenant.provision_step}` : ''}. Retry provisioning before starting the tenant.`,
+                    provisionError: tenant.provision_error || null
+                });
+            }
+
             if (!tenant.assigned_port || !tenant.db_name) {
                 return res.status(400).json({
                     error: 'Tenant not provisioned. Please provision first.'
@@ -584,8 +654,19 @@ class TenantController {
                 });
             }
 
+            if (tenant.process_status === 'starting') {
+                return res.status(409).json({
+                    error: `Tenant provisioning is already running${tenant.provision_step ? ` (${tenant.provision_step})` : ''}.`
+                });
+            }
+
             const provisioner = new Provisioner();
             const result = await provisioner.provisionTenant(tenant);
+            await this._recordToolEnabled(id, 'nexcrm', tenant.plan_id);
+
+            if (!tenant.provisioning_completed_at) {
+                await this._triggerTenantCreatedWorkflow(tenant);
+            }
 
             res.json({
                 success: true,
@@ -594,7 +675,7 @@ class TenantController {
             });
         } catch (error) {
             console.error('Provision tenant error:', error);
-            res.status(500).json({ error: 'Failed to provision tenant' });
+            res.status(500).json({ error: `Failed to provision tenant: ${error.message}` });
         }
     }
 
@@ -799,8 +880,13 @@ class TenantController {
 
             const scriptPath = path.join(nexcrmPath, 'scripts', 'migrate_tenants.js');
 
+            const migrationArgs = [scriptPath, `--tenant=${tenant.slug}`];
+            if (tenant.industry_type && tenant.industry_type !== 'general') {
+                migrationArgs.push(`--industry=${tenant.industry_type}`);
+            }
+
             await new Promise((resolve, reject) => {
-                execFile('node', [scriptPath, `--tenant=${tenant.slug}`], {
+                execFile('node', migrationArgs, {
                     env: { ...process.env },
                     cwd: nexcrmPath,
                     timeout: 120000

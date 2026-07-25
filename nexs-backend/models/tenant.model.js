@@ -151,6 +151,8 @@ class TenantModel {
             'custom_domain', 'custom_domain_crm', 'custom_domain_storefront',
             'custom_domain_api', 'custom_domain_verified', 'custom_domain_dns_record_id',
             'process_name', 'process_status', 'assigned_port', 'db_name',
+            'provision_step', 'provision_error', 'provisioning_started_at',
+            'provisioning_completed_at',
             'trial_ends_at'
         ];
         const updates = [];
@@ -202,26 +204,62 @@ class TenantModel {
      * Allocate next available port
      */
     static async allocatePort(tenantId, serverId = 1) {
-        const [result] = await pool.query(`
-            SELECT port FROM port_allocation 
-            WHERE tenant_id IS NULL AND server_id = ?
-            ORDER BY port ASC 
-            LIMIT 1
-        `, [serverId]);
+        const connection = await pool.getConnection();
 
-        if (!result.length) {
-            throw new Error(`No available ports on server ${serverId}`);
+        try {
+            await connection.beginTransaction();
+
+            const [existing] = await connection.query(`
+                SELECT port, server_id
+                FROM port_allocation
+                WHERE tenant_id = ?
+                LIMIT 1
+                FOR UPDATE
+            `, [tenantId]);
+
+            if (existing.length) {
+                if (Number(existing[0].server_id) !== Number(serverId)) {
+                    throw new Error(
+                        `Tenant ${tenantId} already has port ${existing[0].port} on server ${existing[0].server_id}`
+                    );
+                }
+
+                await connection.commit();
+                return existing[0].port;
+            }
+
+            const [available] = await connection.query(`
+                SELECT port
+                FROM port_allocation
+                WHERE tenant_id IS NULL AND server_id = ?
+                ORDER BY port ASC
+                LIMIT 1
+                FOR UPDATE
+            `, [serverId]);
+
+            if (!available.length) {
+                throw new Error(`No available ports on server ${serverId}`);
+            }
+
+            const port = available[0].port;
+            const [allocation] = await connection.query(`
+                UPDATE port_allocation
+                SET tenant_id = ?, allocated_at = NOW()
+                WHERE port = ? AND server_id = ? AND tenant_id IS NULL
+            `, [tenantId, port, serverId]);
+
+            if (allocation.affectedRows !== 1) {
+                throw new Error(`Port ${port} was allocated concurrently; retry provisioning`);
+            }
+
+            await connection.commit();
+            return port;
+        } catch (error) {
+            await connection.rollback();
+            throw error;
+        } finally {
+            connection.release();
         }
-
-        const port = result[0].port;
-
-        await pool.query(`
-            UPDATE port_allocation 
-            SET tenant_id = ?, allocated_at = NOW() 
-            WHERE port = ? AND server_id = ?
-        `, [tenantId, port, serverId]);
-
-        return port;
     }
 
     /**

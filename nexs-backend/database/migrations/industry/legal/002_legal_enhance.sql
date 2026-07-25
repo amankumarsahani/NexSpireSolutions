@@ -430,7 +430,7 @@ CREATE TABLE IF NOT EXISTS legal_document_templates (
     name VARCHAR(255) NOT NULL,
     template_name VARCHAR(255) AS (name) STORED,
     template_code VARCHAR(50) UNIQUE,
-    category ENUM('pleading','motion','contract','letter','affidavit','notice','agreement','other') DEFAULT 'other',
+    category VARCHAR(64) DEFAULT 'other',
     practice_area VARCHAR(100),
     description TEXT,
     content LONGTEXT,

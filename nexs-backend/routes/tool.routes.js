@@ -187,17 +187,28 @@ router.post('/tenant/:tenantId/enable-crm', async (req, res) => {
         const tenant = await TenantModel.findById(tenantId);
         if (!tenant) return res.status(404).json({ error: 'Tenant not found.' });
 
-        if (tenant.process_status === 'running' || tenant.db_name) {
+        if (tenant.process_status === 'running' || (tenant.db_name && !tenant.provision_error)) {
             return res.status(400).json({ error: 'CRM is already provisioned for this tenant.' });
         }
 
+        if (tenant.process_status === 'starting') {
+            return res.status(409).json({
+                error: `CRM provisioning is already running${tenant.provision_step ? ` (${tenant.provision_step})` : ''}.`
+            });
+        }
+
+        if (plan_id && Number(plan_id) !== Number(tenant.plan_id)) {
+            await TenantModel.update(tenantId, { plan_id: Number(plan_id) });
+        }
+
+        const provisioningTenant = await TenantModel.findById(tenantId);
         const provisioner = new Provisioner();
 
         let server;
         if (server_id) {
             server = await ServerModel.findById(server_id);
-        } else if (tenant.server_id) {
-            server = await ServerModel.findById(tenant.server_id);
+        } else if (provisioningTenant.server_id) {
+            server = await ServerModel.findById(provisioningTenant.server_id);
         } else {
             server = await ServerModel.getBestServer();
         }
@@ -207,15 +218,32 @@ router.post('/tenant/:tenantId/enable-crm', async (req, res) => {
         const port = await TenantModel.allocatePort(tenantId, server.id);
         await TenantModel.update(tenantId, { server_id: server.id });
 
-        const dbName = `nexcrm_${tenant.slug.replace(/-/g, '_')}`;
+        const dbName = `nexcrm_${provisioningTenant.slug.replace(/-/g, '_')}`;
         await provisioner.createDatabase(dbName, server);
+        await TenantModel.updateProcessInfo(tenantId, {
+            assigned_port: port,
+            db_name: dbName,
+            process_name: `tenant-${provisioningTenant.slug}`,
+            process_status: 'starting'
+        });
+        await TenantModel.update(tenantId, {
+            provision_step: 'migrations',
+            provision_error: null,
+            provisioning_started_at: new Date(),
+            provisioning_completed_at: null
+        });
 
         res.json({ success: true, message: 'CRM provisioning started in background.' });
 
         provisioner.provisionTenant({
-            id: tenantId, name: tenant.name, slug: tenant.slug,
-            email: tenant.email, industry_type: tenant.industry_type || 'general',
-            plan_slug: 'starter'
+            id: tenantId,
+            name: provisioningTenant.name,
+            slug: provisioningTenant.slug,
+            email: provisioningTenant.email,
+            industry_type: provisioningTenant.industry_type || 'general',
+            academic_mode: provisioningTenant.academic_mode || null,
+            custom_domain: provisioningTenant.custom_domain || null,
+            plan_slug: provisioningTenant.plan_slug || 'starter'
         }, server.id, {
             skipPortAllocation: true, assignedPort: port, skipDbCreation: true
         }).then(async () => {
@@ -224,10 +252,20 @@ router.post('/tenant/:tenantId/enable-crm', async (req, res) => {
                 await pool.query(`
                     INSERT INTO tenant_tools (tenant_id, tool_id, tool_plan_id, status, provisioned_at)
                     VALUES (?, ?, ?, 'active', NOW())
-                    ON DUPLICATE KEY UPDATE status = 'active'
-                `, [tenantId, crmTool[0].id, plan_id || null]);
+                    ON DUPLICATE KEY UPDATE
+                        tool_plan_id = VALUES(tool_plan_id),
+                        status = 'active',
+                        provisioned_at = VALUES(provisioned_at)
+                `, [tenantId, crmTool[0].id, plan_id || provisioningTenant.plan_id || null]);
             }
-        }).catch(err => console.error(`[Tools] CRM provision failed for tenant ${tenantId}:`, err.message));
+        }).catch(async (err) => {
+            console.error(`[Tools] CRM provision failed for tenant ${tenantId}:`, err.message);
+            await TenantModel.update(tenantId, {
+                process_status: 'error',
+                provision_error: err.message,
+                provisioning_completed_at: null
+            });
+        });
     } catch (error) {
         console.error('Enable CRM error:', error);
         if (!res.headersSent) res.status(500).json({ error: 'Failed to enable CRM.' });

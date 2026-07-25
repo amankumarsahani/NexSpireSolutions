@@ -234,10 +234,25 @@ EOFNODE`;
      */
     async provisionTenant(tenant, preferredServerId = null, options = {}) {
         const { id, name, slug, email, industry_type, plan_slug } = tenant;
+        let currentStep = 'select_server';
+        const setStep = async (step, extra = {}) => {
+            currentStep = step;
+            await TenantModel.update(id, {
+                provision_step: step,
+                provision_error: null,
+                ...extra
+            });
+        };
 
         console.log(`[Provisioner] Starting provisioning for: ${slug}`);
 
         try {
+            await setStep('select_server', {
+                process_status: 'starting',
+                provisioning_started_at: new Date(),
+                provisioning_completed_at: null
+            });
+
             // 0. Select Server
             let server;
             if (preferredServerId) {
@@ -253,6 +268,7 @@ EOFNODE`;
             console.log(`[Provisioner] Provisioning tenant "${tenant.name}" on server "${server.name}"`);
 
             // 1. Allocate port
+            await setStep('allocate_port');
             let port;
             if (options.skipPortAllocation && options.assignedPort) {
                 port = options.assignedPort;
@@ -267,7 +283,9 @@ EOFNODE`;
 
             // 2. Create database
             const dbName = `nexcrm_${slug.replace(/-/g, '_')}`;
+            const processName = `tenant-${slug}`;
 
+            await setStep('create_database');
             if (!options.skipDbCreation) {
                 await this.createDatabase(dbName, server);
                 console.log(`[Provisioner] Created database: ${dbName}`);
@@ -275,47 +293,62 @@ EOFNODE`;
                 console.log(`[Provisioner] Database creation skipped (assumed pre-created): ${dbName}`);
             }
 
+            // Persist recoverable infrastructure immediately. Later failures must not
+            // hide the already-created database or cause a retry to allocate a new port.
+            await TenantModel.updateProcessInfo(id, {
+                assigned_port: port,
+                db_name: dbName,
+                process_name: processName,
+                process_status: 'starting'
+            });
+
             // 3. Run migrations on new database (base + industry-specific)
+            await setStep('migrations');
             await this.runMigrations(dbName, industry_type, server);
             console.log(`[Provisioner] Migrations complete (industry: ${industry_type})`);
 
             // 3b. Seed industry master data. A school with no academic session cannot have a
             // class, so it cannot have a student, so every screen is an empty state. Seeding
             // is what makes the tenant usable on day one.
+            await setStep('industry_seed');
             await this.seedIndustryMasters(dbName, industry_type, tenant.academic_mode, server);
 
             // 4. Create admin user in tenant DB
+            await setStep('tenant_admin');
             const adminPassword = await this.createTenantAdmin(dbName, email, name, server);
             console.log(`[Provisioner] Admin user created`);
 
             // 4b. Create Napnix super admin in tenant DB (for support access)
+            await setStep('support_admin');
             await this.createNapnixSuperAdmin(dbName, server);
             console.log(`[Provisioner] Napnix super admin added`);
 
             // 4c. Seed initial settings (company
             // 5. Seed settings
+            await setStep('settings');
             await this.seedInitialSettings(dbName, tenant, server);
             console.log(`[Provisioner] Initial settings seeded`);
 
             // 5b. Provision default SES-backed mailbox addresses (support@/sales@/notifications@
             // <slug>.mail.napnix.in). No per-tenant AWS/DNS work needed — the parent mail
             // domain is verified once in SES, so any address under it just works.
+            await setStep('mailboxes');
             await this.createDefaultEmailAddresses(dbName, slug, server);
             console.log(`[Provisioner] Default email addresses created`);
 
             // 5. Update tenant record with process info and admin password
-            const processName = `tenant-${slug}`;
             await TenantModel.updateProcessInfo(id, {
                 assigned_port: port,
                 db_name: dbName,
                 process_name: processName,
-                process_status: 'stopped'
+                process_status: 'starting'
             });
 
             // Store admin password for later retrieval
             await this.storeAdminPassword(id, adminPassword);
 
             // 6. Add Cloudflare DNS routes (API + Frontend)
+            await setStep('dns');
             let cfRouteId = null;
             if (this.cfApiToken && this.cfZoneId) {
                 // API subdomain (tenant-crm-api.domain -> tunnel)
@@ -335,6 +368,7 @@ EOFNODE`;
             }
 
             // 7. Start PM2 process (with industry and plan for feature config)
+            await setStep('start_process');
             await this.startProcess(tenant, port, server);
             await TenantModel.updateProcessStatus(id, 'running');
             console.log(`[Provisioner] PM2 process started`);
@@ -343,6 +377,7 @@ EOFNODE`;
             // No duplicate call needed here
 
             // 8. Register with registry service (for mobile app lookup)
+            await setStep('registry');
             const apiSubdomain = `${slug}-crm-api.${this.cfDomain}`;
             await this.registerWithRegistry({
                 email,
@@ -354,6 +389,7 @@ EOFNODE`;
             console.log(`[Provisioner] Registered with registry service`);
 
             // 9. Add storefront DNS (slug.domain -> Cloudflare Pages for storefront)
+            await setStep('storefront_dns');
             if (this.cfApiToken && this.cfZoneId) {
                 await this.addStorefrontRoute(slug);
                 console.log(`[Provisioner] Cloudflare storefront route added`);
@@ -373,6 +409,34 @@ EOFNODE`;
                 console.warn(`[Provisioner] Could not send welcome email:`, emailError.message);
             }
 
+            const completedAt = new Date();
+            const completedTenant = await TenantModel.findById(id);
+            const completionUpdate = {
+                process_status: 'running',
+                provision_step: 'ready',
+                provision_error: null,
+                provisioning_completed_at: completedAt
+            };
+
+            // A trial starts when the tenant first becomes usable, not when its
+            // master row is created. Preserve the originally requested duration,
+            // and never extend it on a later re-provision.
+            if (
+                completedTenant
+                && !completedTenant.provisioning_completed_at
+                && completedTenant.status === 'trial'
+            ) {
+                const originalStart = new Date(completedTenant.created_at).getTime();
+                const originalEnd = new Date(completedTenant.trial_ends_at).getTime();
+                const requestedDuration = originalEnd - originalStart;
+                const trialDuration = Number.isFinite(requestedDuration) && requestedDuration > 0
+                    ? requestedDuration
+                    : 14 * 24 * 60 * 60 * 1000;
+                completionUpdate.trial_ends_at = new Date(completedAt.getTime() + trialDuration);
+            }
+
+            await TenantModel.update(id, completionUpdate);
+
             return {
                 port,
                 dbName,
@@ -384,7 +448,12 @@ EOFNODE`;
 
         } catch (error) {
             console.error(`[Provisioner] Error:`, error);
-            await TenantModel.updateProcessStatus(id, 'error');
+            await TenantModel.update(id, {
+                process_status: 'error',
+                provision_step: currentStep,
+                provision_error: error.message,
+                provisioning_completed_at: null
+            });
             throw error;
         }
     }
@@ -1260,6 +1329,10 @@ EOFNODE`;
             const dbName = `nexcrm_${slug.replace(/-/g, '_')}`;
             const tenantJwtSecret = deriveTenantJwtSecret(process.env.JWT_SECRET, slug);
             const supportSecret = deriveSupportSecret(slug);
+            const academicMode = tenant.industry_type === 'school'
+                ? (tenant.academic_mode || 'school')
+                : null;
+            const academicArg = academicMode ? ` --academic-mode ${academicMode}` : '';
 
             // Build env block — passed via PM2 JSON config so credentials are reliable
             // regardless of what .env file exists in nexcrm-backend directory
@@ -1272,9 +1345,11 @@ EOFNODE`;
                 DB_PASSWORD: dbPass,
                 JWT_SECRET: tenantJwtSecret,
                 TENANT_JWT_SECRET: tenantJwtSecret,
+                TENANT_ID: tenant.id,
                 TENANT_SLUG: slug,
                 INDUSTRY_TYPE: tenant.industry_type || 'general',
                 PLAN_SLUG: tenant.plan_slug || 'starter',
+                ...(academicMode ? { ACADEMIC_MODE: academicMode } : {}),
                 NODE_ENV: process.env.NODE_ENV || 'production',
                 SMTP_HOST: process.env.SMTP_HOST || '',
                 SMTP_PORT: process.env.SMTP_PORT || '',
@@ -1301,7 +1376,7 @@ EOFNODE`;
                     name: processName,
                     cwd: backendPath,
                     script: 'server.js',
-                    args: `--port ${port} --db ${dbName} --slug ${slug} --industry ${tenant.industry_type || 'general'} --plan ${tenant.plan_slug || 'starter'}`,
+                    args: `--port ${port} --db ${dbName} --slug ${slug} --industry ${tenant.industry_type || 'general'} --plan ${tenant.plan_slug || 'starter'}${academicArg}`,
                     env: envBlock,
                     max_memory_restart: '300M',
                     restart_delay: 3000,

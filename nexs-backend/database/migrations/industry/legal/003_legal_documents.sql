@@ -6,7 +6,7 @@ CREATE TABLE IF NOT EXISTS legal_document_templates (
     id INT PRIMARY KEY AUTO_INCREMENT,
     name VARCHAR(255) NOT NULL,
     description TEXT,
-    category ENUM('agreement', 'notice', 'petition', 'affidavit', 'power_of_attorney', 'letter', 'court_filing', 'deed', 'will', 'other') DEFAULT 'other',
+    category VARCHAR(64) DEFAULT 'other',
     content LONGTEXT NOT NULL,
     variables JSON COMMENT 'List of variables used in template',
     header TEXT COMMENT 'Header HTML/text for printed documents',
@@ -19,6 +19,12 @@ CREATE TABLE IF NOT EXISTS legal_document_templates (
     INDEX idx_category (category),
     INDEX idx_active (is_active)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
+
+-- 002_legal_enhance may already have created this table with a narrower ENUM.
+-- VARCHAR keeps the API's category catalog extensible and makes this migration
+-- safe for both fresh and partially provisioned tenants.
+ALTER TABLE legal_document_templates
+    MODIFY COLUMN category VARCHAR(64) DEFAULT 'other';
 
 -- 2. Generated Legal Documents table
 CREATE TABLE IF NOT EXISTS generated_legal_documents (
@@ -41,9 +47,9 @@ CREATE TABLE IF NOT EXISTS generated_legal_documents (
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
 
 -- 3. Insert sample legal document templates
-INSERT INTO legal_document_templates (name, description, category, content, variables) VALUES
+INSERT INTO legal_document_templates (name, description, category, content, variables)
+SELECT 'Legal Notice', 'General legal notice template', 'notice',
 
-('Legal Notice', 'General legal notice template', 'notice', 
 '<div style="font-family: Georgia, serif; padding: 40px;">
 <h1 style="text-align: center; text-decoration: underline;">LEGAL NOTICE</h1>
 
@@ -74,9 +80,13 @@ Advocate<br>
 On behalf of {{client_name}}
 </p>
 </div>',
-'["recipient_name", "recipient_address", "subject", "client_name", "client_address", "notice_content", "demand_action", "days_to_respond", "lawyer_name"]'),
+'["recipient_name", "recipient_address", "subject", "client_name", "client_address", "notice_content", "demand_action", "days_to_respond", "lawyer_name"]'
+WHERE NOT EXISTS (
+    SELECT 1 FROM legal_document_templates WHERE name = 'Legal Notice'
+);
 
-('Power of Attorney', 'General Power of Attorney template', 'power_of_attorney',
+INSERT INTO legal_document_templates (name, description, category, content, variables)
+SELECT 'Power of Attorney', 'General Power of Attorney template', 'power_of_attorney',
 '<div style="font-family: Georgia, serif; padding: 40px;">
 <h1 style="text-align: center; text-decoration: underline;">GENERAL POWER OF ATTORNEY</h1>
 
@@ -109,9 +119,13 @@ PRINCIPAL<br>
 </div>
 </div>
 </div>',
-'["principal_name", "principal_age", "principal_parent", "principal_address", "attorney_name", "attorney_age", "attorney_parent", "attorney_address", "powers_list"]'),
+'["principal_name", "principal_age", "principal_parent", "principal_address", "attorney_name", "attorney_age", "attorney_parent", "attorney_address", "powers_list"]'
+WHERE NOT EXISTS (
+    SELECT 1 FROM legal_document_templates WHERE name = 'Power of Attorney'
+);
 
-('Affidavit', 'General Affidavit template', 'affidavit',
+INSERT INTO legal_document_templates (name, description, category, content, variables)
+SELECT 'Affidavit', 'General Affidavit template', 'affidavit',
 '<div style="font-family: Georgia, serif; padding: 40px;">
 <h1 style="text-align: center; text-decoration: underline;">AFFIDAVIT</h1>
 
@@ -139,9 +153,13 @@ _________________________<br>
 DEPONENT
 </p>
 </div>',
-'["deponent_name", "deponent_age", "deponent_parent", "deponent_occupation", "deponent_address", "affidavit_statements", "verification_place"]'),
+'["deponent_name", "deponent_age", "deponent_parent", "deponent_occupation", "deponent_address", "affidavit_statements", "verification_place"]'
+WHERE NOT EXISTS (
+    SELECT 1 FROM legal_document_templates WHERE name = 'Affidavit'
+);
 
-('Client Engagement Letter', 'Letter of engagement for new clients', 'letter',
+INSERT INTO legal_document_templates (name, description, category, content, variables)
+SELECT 'Client Engagement Letter', 'Letter of engagement for new clients', 'letter',
 '<div style="font-family: Georgia, serif; padding: 40px;">
 <p style="text-align: right;">Date: {{current_date}}</p>
 
@@ -189,4 +207,7 @@ Date: _________________
 </p>
 </div>
 </div>',
-'["client_name", "client_address", "case_title", "scope_of_services", "fee_structure", "additional_fee_terms", "payment_terms", "lawyer_name"]');
+'["client_name", "client_address", "case_title", "scope_of_services", "fee_structure", "additional_fee_terms", "payment_terms", "lawyer_name"]'
+WHERE NOT EXISTS (
+    SELECT 1 FROM legal_document_templates WHERE name = 'Client Engagement Letter'
+);
