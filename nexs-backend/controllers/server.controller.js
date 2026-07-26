@@ -1,7 +1,16 @@
 const ServerModel = require('../models/server.model');
-const { exec } = require('child_process');
+const { execFile } = require('child_process');
 const { promisify } = require('util');
-const execAsync = promisify(exec);
+const execFileAsync = promisify(execFile);
+
+const sanitizeServer = (server) => {
+    if (!server) return server;
+    const { db_password, ...safeServer } = server;
+    return {
+        ...safeServer,
+        has_db_password: Boolean(db_password)
+    };
+};
 
 class ServerController {
     /**
@@ -25,7 +34,7 @@ class ServerController {
             if (!server) {
                 return res.status(404).json({ success: false, message: 'Server not found' });
             }
-            res.json({ success: true, data: server });
+            res.json({ success: true, data: sanitizeServer(server) });
         } catch (error) {
             res.status(500).json({ success: false, message: error.message });
         }
@@ -36,9 +45,19 @@ class ServerController {
      */
     async createServer(req, res) {
         try {
+            if (!req.body.name || !req.body.hostname) {
+                return res.status(400).json({
+                    success: false,
+                    message: 'Server name and hostname are required'
+                });
+            }
+
             const serverId = await ServerModel.create(req.body);
             const server = await ServerModel.findById(serverId);
-            res.status(201).json({ success: true, data: server });
+            res.status(201).json({
+                success: true,
+                data: sanitizeServer(server)
+            });
         } catch (error) {
             res.status(500).json({ success: false, message: error.message });
         }
@@ -53,7 +72,10 @@ class ServerController {
             if (!server) {
                 return res.status(404).json({ success: false, message: 'Server not found' });
             }
-            res.json({ success: true, data: server });
+            res.json({
+                success: true,
+                data: sanitizeServer(server)
+            });
         } catch (error) {
             res.status(500).json({ success: false, message: error.message });
         }
@@ -79,7 +101,6 @@ class ServerController {
                 : `${server.ssh_user}@${server.hostname}`;
             const backendPath = server.nexcrm_backend_path || process.env.NEXCRM_BACKEND_PATH || '/var/www/html/napcrm-backend';
             const ecosystemPath = server.ecosystem_config_path || '/var/www/html/ecosystem.config.js';
-            const tunnelPath = server.cloudflare_config_path || '/etc/cloudflared/config.yml';
             const dbHost = server.db_host || 'localhost';
             const dbPort = Number(server.db_port || process.env.DB_PORT || 3306);
             const dbUser = server.db_user || process.env.DB_USER || 'root';
@@ -89,12 +110,18 @@ class ServerController {
                 'pm2 -v',
                 `test -d ${quoteShellArg(backendPath)}`,
                 `test -f ${quoteShellArg(ecosystemPath)}`,
-                `sudo test -f ${quoteShellArg(tunnelPath)}`,
+                'command -v cloudflared >/dev/null',
+                `((command -v rc-service >/dev/null 2>&1 && rc-service cloudflared status >/dev/null 2>&1) || `
+                    + `(command -v systemctl >/dev/null 2>&1 && systemctl is-active --quiet cloudflared))`,
                 `MYSQL_PWD=${quoteShellArg(dbPassword)} mysql -h ${quoteShellArg(dbHost)} -P ${quoteShellArg(dbPort)} -u ${quoteShellArg(dbUser)} -e ${quoteShellArg('SELECT 1')}`
             ].join(' && ');
 
-            const testCmd = `ssh -o BatchMode=yes -o ConnectTimeout=5 ${sshTarget} \"${remoteChecks.replace(/\"/g, '\\\\"')}\"`;
-            const { stdout } = await execAsync(testCmd);
+            const { stdout } = await execFileAsync('ssh', [
+                '-o', 'BatchMode=yes',
+                '-o', 'ConnectTimeout=5',
+                sshTarget,
+                remoteChecks
+            ]);
             const pm2Version = stdout.split(/\r?\n/).map(line => line.trim()).find(Boolean) || 'unknown';
 
             res.json({
@@ -105,16 +132,18 @@ class ServerController {
                     pm2: true,
                     backendPath,
                     ecosystemPath,
-                    tunnelPath,
+                    cloudflared: true,
                     database: `${dbHost}:${dbPort}`
                 },
                 version: pm2Version
             });
         } catch (error) {
+            const safeError = String(error.stderr || '').trim()
+                || 'One or more SSH, PM2, cloudflared, path, or database checks failed';
             res.status(500).json({
                 success: false,
                 message: 'Connection failed',
-                error: error.message
+                error: safeError
             });
         }
     }

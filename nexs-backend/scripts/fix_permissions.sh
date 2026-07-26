@@ -1,26 +1,37 @@
-#!/bin/bash
+#!/bin/sh
 
-# This script configures sudo privileges required for the NexCRM Provisioner
-# It allows the 'admin' user to run specific commands (pm2, cloudflared, systemctl) without a password.
+# Configure the narrow passwordless sudo surface used by the NexCRM provisioner.
+# Works on systemd distributions and Alpine/OpenRC by resolving installed paths.
 
-# DETECT USER
-CURRENT_USER=$(whoami)
-echo "Detected user: $CURRENT_USER"
+set -eu
 
-# Create the config content
-CONFIG="$CURRENT_USER ALL=(ALL) NOPASSWD: /usr/bin/systemctl, /usr/bin/mv, /usr/bin/rm, /usr/bin/cp, /usr/bin/echo, /usr/bin/cat, /usr/bin/tee, /usr/local/bin/pm2, /usr/bin/pm2, /usr/bin/cloudflared"
+CURRENT_USER=$(id -un)
+SUDOERS_FILE="/etc/sudoers.d/napnix-provisioner"
+ALLOWED_COMMANDS=""
 
-# Write to a separate file in /etc/sudoers.d/ (cleaner than editing /etc/sudoers)
-echo "$CONFIG" | sudo tee /etc/sudoers.d/napnix-admin > /dev/null
+add_command() {
+    command_path=$(command -v "$1" 2>/dev/null || true)
+    if [ -n "$command_path" ]; then
+        if [ -n "$ALLOWED_COMMANDS" ]; then
+            ALLOWED_COMMANDS="$ALLOWED_COMMANDS, "
+        fi
+        ALLOWED_COMMANDS="${ALLOWED_COMMANDS}${command_path}"
+    fi
+}
 
-# Set correct permissions (sudoers files must be 0440)
-sudo chmod 0440 /etc/sudoers.d/napnix-admin
+for command_name in test cat cp mv rm tee pm2 cloudflared rc-service systemctl; do
+    add_command "$command_name"
+done
 
-echo "Configuration applied to /etc/sudoers.d/napnix-admin"
-echo ""
-echo "Verifying..."
-if sudo -l -U $CURRENT_USER | grep -q "NOPASSWD"; then
-    echo "✅ Success! $CURRENT_USER can now run these commands without a password."
-else
-    echo "❌ Something went wrong. Please check 'sudo visudo'."
+if [ -z "$ALLOWED_COMMANDS" ]; then
+    echo "No provisioner commands were found in PATH." >&2
+    exit 1
 fi
+
+echo "Detected user: $CURRENT_USER"
+echo "$CURRENT_USER ALL=(root) NOPASSWD: $ALLOWED_COMMANDS" \
+    | sudo tee "$SUDOERS_FILE" >/dev/null
+sudo chmod 0440 "$SUDOERS_FILE"
+sudo visudo -cf "$SUDOERS_FILE"
+
+echo "Provisioner sudo policy installed at $SUDOERS_FILE"

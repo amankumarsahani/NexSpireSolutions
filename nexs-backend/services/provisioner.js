@@ -7,10 +7,11 @@
  * - Registry service registration (for mobile app lookup)
  */
 
-const { exec } = require('child_process');
+const { exec, execFile, spawn } = require('child_process');
 const { promisify } = require('util');
 const crypto = require('crypto');
 const execAsync = promisify(exec);
+const execFileAsync = promisify(execFile);
 const fs = require('fs').promises; // Keep fs.promises for async operations
 const path = require('path');
 const axios = require('axios'); // Added axios
@@ -78,16 +79,83 @@ class Provisioner {
      */
     async executeOnServer(server, command) {
         if (server.is_primary) {
-            console.log(`[Provisioner] Executing locally: ${command}`);
+            console.log('[Provisioner] Executing command locally');
             return execAsync(command);
         } else {
             const sshTarget = this.getServerSshTarget(server);
             // Use SSH over Cloudflare Tunnel if no public IP
             // Assumes ~/.ssh/config is set up to use cloudflared for this hostname
-            const sshCmd = `ssh -o BatchMode=yes ${sshTarget} \"${command.replace(/\"/g, '\\\\"')}\"`;
-            console.log(`[Provisioner] Executing remotely on ${server.name}: ${sshCmd}`);
-            return execAsync(sshCmd);
+            console.log(`[Provisioner] Executing command remotely on ${server.name}`);
+            return execFileAsync('ssh', [
+                '-o', 'BatchMode=yes',
+                sshTarget,
+                command
+            ]);
         }
+    }
+
+    /**
+     * Execute a command while streaming data to stdin.
+     *
+     * Remote provisioning must use the control plane's checked-in migration
+     * files as the source of truth. Streaming avoids copying schema files into
+     * every tenant node and avoids shell command-length limits.
+     */
+    async executeOnServerWithInput(server, command, input) {
+        return new Promise((resolve, reject) => {
+            const isRemote = !server.is_primary;
+            const child = isRemote
+                ? spawn('ssh', ['-o', 'BatchMode=yes', this.getServerSshTarget(server), command])
+                : spawn(command, { shell: true });
+            let stdout = '';
+            let stderr = '';
+
+            child.stdout.on('data', data => {
+                stdout += data.toString();
+            });
+            child.stderr.on('data', data => {
+                stderr += data.toString();
+            });
+            child.stdin.on('error', error => {
+                // A failed remote command can close stdin before the SQL stream
+                // ends. The close handler reports the useful remote error.
+                if (error.code !== 'EPIPE') {
+                    reject(error);
+                }
+            });
+            child.on('error', reject);
+            child.on('close', code => {
+                if (code === 0) {
+                    resolve({ stdout, stderr });
+                    return;
+                }
+
+                const error = new Error(
+                    `Command failed on ${isRemote ? server.name : 'primary server'} (${code}): `
+                    + (stderr.trim() || stdout.trim() || 'no command output')
+                );
+                error.code = code;
+                error.stdout = stdout;
+                error.stderr = stderr;
+                reject(error);
+            });
+
+            child.stdin.end(input);
+        });
+    }
+
+    async restartCloudflared(server) {
+        const command = [
+            'if command -v rc-service >/dev/null 2>&1; then',
+            'sudo rc-service cloudflared restart;',
+            'elif command -v systemctl >/dev/null 2>&1; then',
+            'sudo systemctl restart cloudflared;',
+            'else',
+            'echo "No supported service manager found for cloudflared" >&2; exit 1;',
+            'fi'
+        ].join(' ');
+
+        await this.executeOnServer(server, command);
     }
 
     getServerSshTarget(server = {}) {
@@ -167,6 +235,7 @@ class Provisioner {
                 DB_NAME: `nexcrm_${dbSlug}`,
                 DB_USER: server.db_user || this.dbUser,
                 DB_PASSWORD: dbPass,
+                DB_SSL: process.env.DB_SSL || 'false',
                 TENANT_ID: tenant.id,
                 TENANT_SLUG: tenant.slug,
                 JWT_SECRET: tenantJwtSecret,
@@ -269,7 +338,7 @@ EOFNODE`;
             // 0. Select Server
             let server;
             if (preferredServerId) {
-                server = await ServerModel.findById(preferredServerId);
+                server = await ServerModel.findAvailableById(preferredServerId);
             } else {
                 server = await ServerModel.getBestServer();
             }
@@ -516,11 +585,9 @@ EOFNODE`;
      * Legacy (every pre-existing industry): nexs-backend/database/migrations/industry/<industry>/*.sql
      * kept as a fallback so nothing regresses. New industries should not add files there.
      */
-    getIndustrySqlDirs(industryType, server) {
-        const backendPath = this.getServerBackendPath(server);
-
+    getIndustrySqlDirs(industryType) {
         return [
-            path.join(backendPath, 'database', 'migrations', industryType, 'sql'),
+            path.join(this.nexcrmBackendPath, 'database', 'migrations', industryType, 'sql'),
             path.join(this.migrationsPath, 'industry', industryType)
         ];
     }
@@ -549,7 +616,7 @@ EOFNODE`;
                 if (hasIndustry) {
                     // First directory that actually has .sql files wins. Never both — running
                     // canonical and legacy DDL over the same DB is how schemas drift.
-                    for (const dir of this.getIndustrySqlDirs(industryType, server)) {
+                    for (const dir of this.getIndustrySqlDirs(industryType)) {
                         let sqlFiles = [];
                         try {
                             const files = await fs.readdir(dir);
@@ -572,32 +639,37 @@ EOFNODE`;
                 await tenantPool.end();
             }
         } else {
-            const remotePath = this.getServerBackendPath(server);
             const mysqlPrefix = this.buildMysqlCliPrefix(server);
-
-            // Base schema is read from the remote box's own checkout, as before.
-            const remoteMigrations = path.join(remotePath, 'database/migrations');
-            const baseSchema = path.join(remoteMigrations, 'nexcrm_base_schema.sql');
-            const cmd = `${mysqlPrefix} ${this.quoteShellArg(dbName)} < ${this.quoteShellArg(baseSchema)}`;
-            await this.executeOnServer(server, cmd);
+            const baseSql = await fs.readFile(schemaFile, 'utf8');
+            await this.executeOnServerWithInput(
+                server,
+                `${mysqlPrefix} ${this.quoteShellArg(dbName)}`,
+                baseSql
+            );
 
             if (hasIndustry) {
-                // Same precedence as the primary path, resolved shell-side: canonical dir on the
-                // remote nexcrm-backend checkout, else the legacy industry dir.
-                const canonicalDir = path.posix.join(
-                    remotePath.replace(/\\/g, '/'), 'database', 'migrations', industryType, 'sql'
-                );
-                const legacyDir = path.posix.join(
-                    remotePath.replace(/\\/g, '/'), 'database', 'migrations', 'industry', industryType
-                );
+                for (const dir of this.getIndustrySqlDirs(industryType)) {
+                    let sqlFiles = [];
+                    try {
+                        const files = await fs.readdir(dir);
+                        sqlFiles = files.filter(file => file.endsWith('.sql')).sort();
+                    } catch (_error) {
+                        continue;
+                    }
 
-                const industryCmd =
-                    `DIR=""; ` +
-                    `if ls ${canonicalDir}/*.sql >/dev/null 2>&1; then DIR=${canonicalDir}; ` +
-                    `elif ls ${legacyDir}/*.sql >/dev/null 2>&1; then DIR=${legacyDir}; fi; ` +
-                    `if [ -n "$DIR" ]; then for f in $DIR/*.sql; do ${mysqlPrefix} ${this.quoteShellArg(dbName)} < "$f"; done; fi`;
+                    if (sqlFiles.length === 0) continue;
 
-                await this.executeOnServer(server, industryCmd);
+                    console.log(`[Provisioner] Remote industry DDL source: ${dir} (${sqlFiles.length} files)`);
+                    for (const file of sqlFiles) {
+                        const industrySql = await fs.readFile(path.join(dir, file), 'utf8');
+                        await this.executeOnServerWithInput(
+                            server,
+                            `${mysqlPrefix} ${this.quoteShellArg(dbName)}`,
+                            industrySql
+                        );
+                    }
+                    break;
+                }
             }
         }
     }
@@ -1370,6 +1442,7 @@ EOFNODE`;
                 DB_NAME: dbName,
                 DB_USER: dbUser,
                 DB_PASSWORD: dbPass,
+                DB_SSL: process.env.DB_SSL || 'false',
                 JWT_SECRET: tenantJwtSecret,
                 TENANT_JWT_SECRET: tenantJwtSecret,
                 TENANT_ID: tenant.id,
@@ -1790,11 +1863,29 @@ EOFNODE`;
      * Remove from tunnel config
      */
     async removeFromTunnelConfig(slug, server, customDomain = null) {
+        const hostname = customDomain || `${slug}-crm-api.${this.cfDomain}`;
+        const tunnelId = server.cloudflare_tunnel_id || process.env.CLOUDFLARE_TUNNEL_ID;
+
+        if (this.cfAccountId && tunnelId) {
+            try {
+                await this.removeRemoteTunnelIngress(tunnelId, hostname);
+                console.log(`[Provisioner] Removed ${hostname} from remote tunnel`);
+                return true;
+            } catch (error) {
+                console.warn(
+                    `[Provisioner] Remote tunnel removal failed (${error.message}); `
+                    + 'falling back to local config'
+                );
+            }
+        }
+
         try {
             const tunnelConfigPath = this.getServerTunnelConfigPath(server);
-            const hostname = customDomain || `${slug}-crm-api.${this.cfDomain}`;
 
-            const { stdout: config } = await this.executeOnServer(server, `cat ${tunnelConfigPath}`);
+            const { stdout: config } = await this.executeOnServer(
+                server,
+                `sudo cat ${this.quoteShellArg(tunnelConfigPath)}`
+            );
             const lines = config.split('\n');
             const newLines = [];
             let skipNext = false;
@@ -1813,8 +1904,12 @@ EOFNODE`;
 
             const updatedConfig = newLines.join('\n');
             const tmpFile = `/tmp/tunnel_rm_${slug}.yml`;
-            await this.executeOnServer(server, `echo "${updatedConfig.replace(/"/g, '\\"')}" > ${tmpFile} && sudo mv ${tmpFile} ${tunnelConfigPath}`);
-            await this.executeOnServer(server, 'sudo systemctl restart cloudflared');
+            await this.executeOnServer(
+                server,
+                `echo "${updatedConfig.replace(/"/g, '\\"')}" > ${this.quoteShellArg(tmpFile)} `
+                    + `&& sudo mv ${this.quoteShellArg(tmpFile)} ${this.quoteShellArg(tunnelConfigPath)}`
+            );
+            await this.restartCloudflared(server);
 
             console.log(`[Provisioner] Removed ${hostname} from tunnel config on ${server.name}`);
             return true;
@@ -1902,6 +1997,41 @@ EOFNODE`;
         }
     }
 
+    async removeRemoteTunnelIngress(tunnelId, hostname) {
+        if (!this.cfAccountId) throw new Error('CLOUDFLARE_ACCOUNT_ID is not configured');
+        const base = `https://api.cloudflare.com/client/v4/accounts/${this.cfAccountId}/cfd_tunnel/${tunnelId}/configurations`;
+        const headers = {
+            'Authorization': `Bearer ${this.cfApiToken}`,
+            'Content-Type': 'application/json'
+        };
+
+        const getRes = await fetch(base, { headers });
+        const getData = await getRes.json();
+        if (!getData.success) {
+            const msg = getData.errors?.[0]?.message || 'unknown error';
+            throw new Error(`fetch tunnel config failed: ${msg}`);
+        }
+
+        const config = (getData.result && getData.result.config) || {};
+        const ingress = Array.isArray(config.ingress) ? config.ingress : [];
+        const nextIngress = ingress.filter(rule => rule.hostname !== hostname);
+        if (nextIngress.length === ingress.length) {
+            console.log(`[Provisioner] Remote tunnel has no route for ${hostname}`);
+            return;
+        }
+
+        const putRes = await fetch(base, {
+            method: 'PUT',
+            headers,
+            body: JSON.stringify({ config: { ...config, ingress: nextIngress } })
+        });
+        const putData = await putRes.json();
+        if (!putData.success) {
+            const msg = putData.errors?.[0]?.message || 'unknown error';
+            throw new Error(`publish tunnel config failed: ${msg}`);
+        }
+    }
+
     /**
      * Update Cloudflare tunnel config.
      *
@@ -1930,7 +2060,10 @@ EOFNODE`;
             const configPath = this.getServerTunnelConfigPath(server);
 
             // Read current config from target server
-            const { stdout: currentConfig } = await this.executeOnServer(server, `cat ${configPath}`);
+            const { stdout: currentConfig } = await this.executeOnServer(
+                server,
+                `sudo cat ${this.quoteShellArg(configPath)}`
+            );
 
             // Check if this hostname already exists in the config — skip if so
             if (currentConfig.includes(`hostname: ${hostname}`)) {
@@ -1962,17 +2095,21 @@ EOFNODE`;
                 const updatedConfig = lines.join('\n');
 
                 // Write back to target server (needs sudo)
-                const echoCmd = `echo "${updatedConfig.replace(/"/g, '\\"')}" | sudo tee ${configPath} > /dev/null`;
+                const echoCmd = `echo "${updatedConfig.replace(/"/g, '\\"')}" `
+                    + `| sudo tee ${this.quoteShellArg(configPath)} > /dev/null`;
                 await this.executeOnServer(server, echoCmd);
 
                 // VERIFICATION: Read it back to ensure it stuck (permissions check)
-                const { stdout: verifyConfig } = await this.executeOnServer(server, `cat ${configPath}`);
+                const { stdout: verifyConfig } = await this.executeOnServer(
+                    server,
+                    `sudo cat ${this.quoteShellArg(configPath)}`
+                );
                 if (!verifyConfig.includes(hostname)) {
                     console.error(`[Provisioner] CRITICAL: Tunnel config verification failed! Written config did not contain ${hostname}. Check SUDO permissions.`);
                 } else {
                     console.log(`[Provisioner] Verified tunnel config contains ${hostname}`);
                     // Restart cloudflared on target server
-                    await this.executeOnServer(server, 'sudo systemctl restart cloudflared');
+                    await this.restartCloudflared(server);
                     console.log(`[Provisioner] Cloudflare Tunnel config updated and valid on server ${server.name} for ${hostname}`);
                 }
             } else {

@@ -232,7 +232,9 @@ async function main() {
     }
     console.log('  - service: http_status:404');
     console.log('');
-    console.log('Then run: sudo systemctl restart cloudflared');
+    console.log('Then restart cloudflared:');
+    console.log('  systemd: sudo systemctl restart cloudflared');
+    console.log('  Alpine:  sudo rc-service cloudflared restart');
 }
 
 main().catch(err => {

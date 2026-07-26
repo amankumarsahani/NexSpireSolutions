@@ -161,7 +161,7 @@ class TenantController {
 
                     let server;
                     if (server_id) {
-                        server = await ServerModel.findById(server_id);
+                        server = await ServerModel.findAvailableById(server_id);
                     } else {
                         server = await ServerModel.getBestServer();
                     }
