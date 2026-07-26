@@ -30,9 +30,14 @@ module.exports = {
                     AFTER port_start
         `);
 
-        const [primaryKeyRows] = await connection.query(
-            "SHOW INDEX FROM port_allocation WHERE Key_name = 'PRIMARY' ORDER BY Seq_in_index"
+        // MariaDB SHOW INDEX does not accept a trailing ORDER BY on every
+        // supported version. Filter and order the metadata in JavaScript.
+        const [indexRows] = await connection.query(
+            'SHOW INDEX FROM port_allocation'
         );
+        const primaryKeyRows = indexRows
+            .filter(row => row.Key_name === 'PRIMARY')
+            .sort((left, right) => Number(left.Seq_in_index) - Number(right.Seq_in_index));
         const primaryColumns = primaryKeyRows.map(row => row.Column_name);
         if (primaryColumns.length === 1 && primaryColumns[0] === 'port') {
             await connection.query(`
