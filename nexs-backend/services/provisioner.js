@@ -449,6 +449,15 @@ EOFNODE`;
                 console.log(`[Provisioner] Custom domain setup for ${tenant.custom_domain}`);
             }
 
+            // 6.2 Register this tenant's domain->service route with nap-load
+            // (full-table push, not just this one tenant — see napLoadClient.js).
+            // Domain/port are finalized at this point; the process isn't live
+            // yet, but that's fine — nap-load just won't find a healthy
+            // machine for it until the process actually starts reporting in.
+            require('./napLoadClient').syncRoutes().catch(err => {
+                console.warn(`[Provisioner] nap-load route sync failed (non-fatal): ${err.message}`);
+            });
+
             // 7. Start PM2 process (with industry and plan for feature config)
             await setStep('start_process');
             await this.startProcess(tenant, port, server);
