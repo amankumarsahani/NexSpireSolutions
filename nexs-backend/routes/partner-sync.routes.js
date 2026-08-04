@@ -45,6 +45,20 @@ const asInt = (v) => {
     return Number.isFinite(n) ? n : 0;
 };
 
+/**
+ * Usage counters only. Absent stays NULL rather than becoming 0.
+ *
+ * The instance deliberately omits a counter it could not measure - an unreachable
+ * tenant database, a missing table - so coercing that to 0 here would manufacture
+ * a measurement that reaches an invoice. NULL means unknown, and the billing
+ * rollup must refuse to bill rather than charge for it.
+ */
+const asUsage = (v) => {
+    if (v === null || v === undefined) return null;
+    const n = Number.parseInt(v, 10);
+    return Number.isFinite(n) ? n : null;
+};
+
 /** MySQL DATETIME. Returns null for anything unparseable rather than throwing. */
 const asDateTime = (v) => {
     if (!v) return null;
@@ -94,16 +108,17 @@ router.post('/report', rawJson, attachRawBody, verifyInstanceSignature, async (r
             await connection.query(
                 `INSERT INTO partner_tenant_mirror
                     (instance_id, tenant_slug, name, status, plan_slug, industry_type,
-                     users, storage_mb, emails_sent_30d, api_calls_30d,
+                     users, storage_mb, emails_sent_30d, api_calls_30d, usage_collected_at,
                      custom_domain_crm, process_status, tenant_created_at, last_active_at,
                      last_synced_at, is_stale)
-                 VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, NOW(), 0)
+                 VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, NOW(), 0)
                  ON DUPLICATE KEY UPDATE
                     name = VALUES(name), status = VALUES(status),
                     plan_slug = VALUES(plan_slug), industry_type = VALUES(industry_type),
                     users = VALUES(users), storage_mb = VALUES(storage_mb),
                     emails_sent_30d = VALUES(emails_sent_30d),
                     api_calls_30d = VALUES(api_calls_30d),
+                    usage_collected_at = VALUES(usage_collected_at),
                     custom_domain_crm = VALUES(custom_domain_crm),
                     process_status = VALUES(process_status),
                     tenant_created_at = VALUES(tenant_created_at),
@@ -116,10 +131,11 @@ router.post('/report', rawJson, attachRawBody, verifyInstanceSignature, async (r
                     asText(t.status, 30),
                     asText(t.plan, 50),
                     asText(t.industry, 50),
-                    asInt(t.users),
-                    asInt(t.storage_mb),
-                    asInt(t.emails_sent_30d),
-                    asInt(t.api_calls_30d),
+                    asUsage(t.users),
+                    asUsage(t.storage_mb),
+                    asUsage(t.emails_sent_30d),
+                    asUsage(t.api_calls_30d),
+                    asDateTime(t.usage_collected_at),
                     asText(t.custom_domain_crm, 255),
                     asText(t.process_status, 30),
                     asDateTime(t.created_at),

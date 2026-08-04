@@ -34,6 +34,22 @@ against the same database.
 **Point it at a throwaway database.** It writes to `partner_instances`,
 `partner_tenant_mirror`, `partner_commands` and `partner_sync_log`.
 
+## Partner billing
+
+`partner-billing.test.js` — the data-quality gate on the billing rollup. Same
+database requirements, plus migration 065.
+
+```bash
+DB_HOST=127.0.0.1 DB_PORT=13306 DB_USER=root DB_PASSWORD=verifypass \
+DB_NAME=napnix_verify npm run test:billing
+```
+
+Most of these cases assert a *refusal*. That is the point: under-billing is
+recoverable by rerunning the rollup, and charging a partner for usage that was
+never measured is not. A stale instance, an unmeasured user count, a missing
+price and an unsuspended-but-inactive instance each block the invoice with a
+reason rather than producing a confident zero.
+
 ### Confirming the suite still bites
 
 A passing suite is only evidence if it can fail. These three mutations were each
@@ -44,5 +60,14 @@ verified to turn exactly one test red:
 | remove the nonce replay check in `verifyInstanceSignature.js` | a replayed nonce is rejected |
 | remove the timestamp skew window | a stale timestamp is rejected |
 | disable the delete-missing-tenants sweep in `partner-sync.routes.js` | a tenant dropped from a snapshot is removed from the mirror |
+| coerce usage through `asInt` instead of `asUsage` (the original bug) | an unmeasured usage counter is stored NULL, not zero |
+| remove the unmeasured-usage refusal in `partnerBilling.service.js` | an unmeasured user count blocks billing |
+| remove the stale-instance refusal | a stale instance is NOT billed |
 
-Worth repeating after any significant change to the sync path.
+Worth repeating after any significant change to the sync or billing path.
+
+One caution learned here: an "obvious" mutation can be behaviourally equivalent
+and prove nothing. Deleting the `null`/`undefined` early return from `asUsage`
+looked like a real mutation but changed no behaviour, because `parseInt(undefined)`
+is already `NaN`. Check that a mutation actually turns a test red before trusting
+it as evidence.

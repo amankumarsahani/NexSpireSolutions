@@ -4,6 +4,7 @@ const crypto = require('crypto');
 const { pool } = require('../config/database');
 const { auth, isAdmin } = require('../middleware/auth');
 const { encryptSecret } = require('../services/secretStore');
+const { buildStatement } = require('../services/partnerBilling.service');
 
 /**
  * Partner administration (P1-04, P1-05).
@@ -206,6 +207,23 @@ router.post('/:id/commands', async (req, res) => {
     } catch (error) {
         console.error('Queue command error:', error);
         res.status(500).json({ error: 'Failed to queue command' });
+    }
+});
+
+// GET /api/partners/:id/billing - statement for the current period
+router.get('/:id/billing', async (req, res) => {
+    try {
+        const statement = await buildStatement(req.params.id, {
+            periodStart: req.query.start || null,
+            periodEnd: req.query.end || null,
+        });
+        // A statement that cannot be billed is still a 200: it is a valid answer,
+        // and the caller must read `billable` and `refusals` rather than treating
+        // the absence of an error as permission to invoice.
+        res.json({ success: true, data: statement });
+    } catch (error) {
+        console.error('Partner billing error:', error);
+        res.status(500).json({ error: 'Failed to build billing statement' });
     }
 });
 

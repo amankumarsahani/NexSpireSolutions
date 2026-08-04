@@ -20,11 +20,17 @@ const { execSync } = require('child_process');
 const { pool } = require('../config/database');
 const brand = require('../config/brand');
 const { edition } = require('../config/edition');
+const tenantUsage = require('../services/tenantUsage.service');
 
 const SPOOL_DIR = path.join(__dirname, '..', '.sync-spool');
 // Bound the spool. A master that has been down for days must not fill the disk;
 // old snapshots are worthless anyway once a newer one exists.
 const SPOOL_MAX_FILES = 200;
+
+// A usage sweep touches every tenant database, so it runs hourly rather than on
+// every heartbeat. Between sweeps the last measurement is re-sent with the
+// timestamp it was taken at.
+const USAGE_MAX_AGE_MS = 60 * 60 * 1000;
 
 class PartnerSyncWorker {
     constructor() {
@@ -32,6 +38,8 @@ class PartnerSyncWorker {
         this.isRunning = false;
         this.consecutiveFailures = 0;
         this.gitSha = null;
+        this.usageCache = null;
+        this.usageCollectedAt = 0;
     }
 
     get enabled() {
@@ -51,6 +59,27 @@ class PartnerSyncWorker {
         return this.gitSha;
     }
 
+    /**
+     * Usage requires querying every tenant database, so it runs on its own slow
+     * cadence rather than on every heartbeat. Between sweeps the last known
+     * figures are re-sent, which is honest: they are a measurement with a
+     * timestamp, not a live reading.
+     */
+    async getUsage() {
+        const age = Date.now() - this.usageCollectedAt;
+        if (this.usageCache && age < USAGE_MAX_AGE_MS) return this.usageCache;
+
+        try {
+            this.usageCache = await tenantUsage.collectAll();
+            this.usageCollectedAt = Date.now();
+        } catch (error) {
+            console.error('[PartnerSync] Usage sweep failed:', error.message);
+            // Keep serving the previous sweep rather than downgrading to nothing.
+            if (!this.usageCache) this.usageCache = {};
+        }
+        return this.usageCache;
+    }
+
     async collectTenants() {
         try {
             const [rows] = await pool.query(`
@@ -59,20 +88,33 @@ class PartnerSyncWorker {
                   FROM tenants t
                   LEFT JOIN plans p ON p.id = t.plan_id
             `);
-            return rows.map((r) => ({
-                slug: r.slug,
-                name: r.name,
-                status: r.status,
-                plan: r.plan_slug,
-                industry: r.industry_type,
-                process_status: r.process_status,
-                custom_domain_crm: r.custom_domain_crm,
-                created_at: r.created_at,
-                // Per-tenant usage lives in each tenant's own database. Populating
-                // these means querying every tenant DB, which is a separate job
-                // (P4-01 needs them for billing); reporting zero would look like
-                // real data, so they are omitted until then.
-            }));
+
+            const usage = await this.getUsage();
+
+            return rows.map((r) => {
+                // Absent rather than zero when unknown. A zero here would reach an
+                // invoice as a real measurement; an absent field cannot.
+                const u = usage[r.slug] || {};
+                const tenant = {
+                    slug: r.slug,
+                    name: r.name,
+                    status: r.status,
+                    plan: r.plan_slug,
+                    industry: r.industry_type,
+                    process_status: r.process_status,
+                    custom_domain_crm: r.custom_domain_crm,
+                    created_at: r.created_at,
+                };
+                if (u.users !== null && u.users !== undefined) tenant.users = u.users;
+                if (u.storage_mb !== null && u.storage_mb !== undefined) tenant.storage_mb = u.storage_mb;
+                if (u.emails_sent_30d !== null && u.emails_sent_30d !== undefined) {
+                    tenant.emails_sent_30d = u.emails_sent_30d;
+                }
+                tenant.usage_collected_at = this.usageCollectedAt
+                    ? new Date(this.usageCollectedAt).toISOString()
+                    : null;
+                return tenant;
+            });
         } catch (error) {
             console.error('[PartnerSync] Failed to collect tenants:', error.message);
             return [];

@@ -264,6 +264,41 @@ async function teardown() {
         assert.ok(bad.n > 0, 'rejections should be logged for audit');
     });
 
+    await test('an unmeasured usage counter is stored NULL, not zero', async () => {
+        // The whole point of P4-01's null handling. A tenant whose database was
+        // unreachable during the usage sweep must not arrive as "0 users, 0 emails"
+        // and get billed as though that were measured.
+        const res = await post(snapshot([
+            { slug: 'alpha', name: 'Alpha', status: 'active', users: 9 },   // measured
+            { slug: 'gamma', name: 'Gamma', status: 'active' },             // unmeasured
+        ]));
+        assert.strictEqual(res.status, 200);
+
+        const [rows] = await pool.query(
+            'SELECT tenant_slug, users, storage_mb, emails_sent_30d FROM partner_tenant_mirror WHERE instance_id = ? ORDER BY tenant_slug',
+            [instanceId]
+        );
+        const alpha = rows.find((r) => r.tenant_slug === 'alpha');
+        const gamma = rows.find((r) => r.tenant_slug === 'gamma');
+
+        assert.strictEqual(alpha.users, 9, 'a measured count is stored');
+        assert.strictEqual(gamma.users, null, 'an omitted count must stay NULL');
+        assert.strictEqual(gamma.storage_mb, null);
+        assert.strictEqual(gamma.emails_sent_30d, null);
+    });
+
+    await test('a genuine zero is preserved as zero, not confused with unknown', async () => {
+        const res = await post(snapshot([
+            { slug: 'alpha', name: 'Alpha', status: 'active', users: 9, emails_sent_30d: 0 },
+        ]));
+        assert.strictEqual(res.status, 200);
+        const [[row]] = await pool.query(
+            "SELECT emails_sent_30d FROM partner_tenant_mirror WHERE instance_id = ? AND tenant_slug = 'alpha'",
+            [instanceId]
+        );
+        assert.strictEqual(row.emails_sent_30d, 0, 'a real zero must survive as 0');
+    });
+
     await test('the stale sweep marks a silent instance\'s tenants stale', async () => {
         // The mirror is eventually consistent. Without this an instance that died
         // hours ago still shows its last tenant counts as if they were current,
