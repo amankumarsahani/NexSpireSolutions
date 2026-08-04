@@ -94,6 +94,12 @@ app.use('/api/webhooks', webhookRoutes);
 // so it must live on this stable domain), not an authenticated API call.
 app.use('/oauth', require('./routes/oauth.routes'));
 
+// Partner sync must be mounted before the global JSON parser: it verifies an HMAC
+// over the raw request bytes, and express.json() would consume the stream and
+// leave only a re-serialisable object. Authenticated by signature, not JWT, so it
+// sits outside the auth chain by design.
+app.use('/api/partner-sync', require('./routes/partner-sync.routes'));
+
 app.use(express.json({ limit: '100mb' })); // Parse JSON bodies with increased limit
 app.use(express.urlencoded({ limit: '100mb', extended: true })); // Parse URL-encoded bodies with increased limit
 
@@ -301,6 +307,12 @@ if (features.napmail) {
     app.use('/api/track', require('./routes/tracking.routes'));
 }
 
+// Whitelabel partner fleet. Only the master holds a mirror, so a partner
+// instance has no partners of its own to administer.
+if (isFull) {
+    app.use('/api/partners', require('./routes/partner.routes'));
+}
+
 // Agency operations: our internal tooling, our website telemetry, our marketing
 // site content, and our money. None of this belongs on a partner instance.
 if (isFull) {
@@ -323,6 +335,16 @@ workflowWorker.start(60000); // Check every 60 seconds
 // Start backup worker
 const backupWorker = require('./workers/backupWorker');
 backupWorker.start(60000); // Check every minute
+
+// Report this instance up to the master. No-ops unless PARTNER_SYNC_* is set, so
+// it stays inert on the master itself.
+const partnerSyncWorker = require('./workers/partnerSyncWorker');
+partnerSyncWorker.start(15 * 60 * 1000); // Full snapshot every 15 minutes
+
+// Mark mirrored data stale when an instance stops reporting, so the panel greys
+// the rows instead of presenting old numbers as current.
+const partnerStaleWorker = require('./workers/partnerStaleWorker');
+partnerStaleWorker.start(5 * 60 * 1000);
 
 // 404 Handler
 app.use((req, res) => {

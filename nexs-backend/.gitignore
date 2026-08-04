@@ -22,3 +22,6 @@ coverage/
 ecosystem.config.js
 *.sql.gz
 *.sql.bak
+
+# Partner sync spool - undelivered reports awaiting retry
+.sync-spool/
