@@ -10,6 +10,7 @@
 require('dotenv').config();
 const mysql = require('mysql2/promise');
 const bcrypt = require('bcryptjs');
+const brand = require('../config/brand');
 
 const DB_CONFIG = {
     host: process.env.DB_HOST || 'localhost',
@@ -59,7 +60,7 @@ async function setupTenantAdmin(tenantSlug, resetPassword = false) {
         });
 
         // Add Napnix super admin
-        const superAdminEmail = process.env.NAPNIX_ADMIN_EMAIL || 'admin@napnix.in';
+        const superAdminEmail = brand.platformAdminEmail;
         const superAdminPassword = process.env.NAPNIX_ADMIN_PASSWORD || 'Napnix@2024!';
         const superAdminHash = await bcrypt.hash(superAdminPassword, 10);
 

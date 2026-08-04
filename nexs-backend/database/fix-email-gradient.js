@@ -63,12 +63,12 @@ async function fix() {
 <body>
     <div class="container">
         <div class="header">
-            <h1>Napnix</h1>
+            <h1>{{brand_name}}</h1>
             <p>Service Agreement</p>
         </div>
         <div class="content">
             <p>Dear <strong>{{tenant_name}}</strong>,</p>
-            <p>Thank you for choosing <strong>Napnix</strong> as your CRM partner. We are delighted to welcome you on board.</p>
+            <p>Thank you for choosing <strong>{{brand_name}}</strong> as your CRM partner. We are delighted to welcome you on board.</p>
             <p>Please find attached your <strong>Service Agreement</strong> for the <strong>{{plan_name}}</strong> plan.</p>
             <div class="plan-box">
                 <h3>Plan Summary</h3>
@@ -82,11 +82,11 @@ async function fix() {
                 <p><strong>Agreement attached as PDF.</strong> Please review and keep a copy for your records.</p>
             </div>
             <p>If you have any questions about the agreement, please do not hesitate to contact us.</p>
-            <p>Best regards,<br><strong>Napnix Team</strong></p>
+            <p>Best regards,<br><strong>{{brand_name}} Team</strong></p>
         </div>
         <div class="footer">
-            <p>${new Date().getFullYear()} Napnix. All rights reserved.</p>
-            <p><a href="https://napnix.in">napnix.in</a></p>
+            <p>${new Date().getFullYear()} {{brand_name}}. All rights reserved.</p>
+            <p><a href="{{brand_website}}">{{brand_base_domain}}</a></p>
             <p style="margin-top: 8px;">This email was sent to {{tenant_email}}</p>
         </div>
     </div>

@@ -9,13 +9,14 @@
 const axios = require('axios');
 const crypto = require('crypto');
 const { pool } = require('../config/database');
+const brand = require('../config/brand');
 
 const NAP_LOAD_ADDRESSES = (process.env.NAP_LOAD_ADDRESSES || '')
     .split(',')
     .map(s => s.trim())
     .filter(Boolean);
 
-const NEXCRM_DOMAIN = process.env.NEXCRM_DOMAIN || 'napnix.in';
+const NEXCRM_DOMAIN = brand.baseDomain;
 
 // Must match nap-load's own hashRoutes() (Go, routes.go) exactly — sorted
 // domain keys, "domain=service;" concatenation, SHA256 hex — so the

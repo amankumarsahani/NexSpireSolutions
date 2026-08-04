@@ -4,6 +4,7 @@ const multer = require('multer');
 const ServerController = require('../controllers/server.controller');
 const BackupAccountController = require('../controllers/backup-account.controller');
 const { auth, isAdmin } = require('../middleware/auth');
+const { isFull } = require('../config/edition');
 
 const upload = multer({
     storage: multer.memoryStorage(),
@@ -23,7 +24,11 @@ const parseRegistryResponse = async (response) => {
 router.use(auth);
 router.use(isAdmin);
 
-router.use('/site-analytics', require('./site-analytics.routes'));
+// Visitor intelligence for our own marketing site. Never mounted on a partner
+// instance - it is our business data, not theirs.
+if (isFull) {
+    router.use('/site-analytics', require('./site-analytics.routes'));
+}
 
 // Server routes
 router.get('/servers', ServerController.getAllServers);

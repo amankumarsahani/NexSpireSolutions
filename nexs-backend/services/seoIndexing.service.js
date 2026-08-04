@@ -1,5 +1,6 @@
 const crypto = require('crypto');
 const db = require('../config/database');
+const brand = require('../config/brand');
 
 const SEO_SETTINGS_KEYS = [
     'seo_auto_index',
@@ -50,12 +51,12 @@ class SEOIndexingService {
 
     async getSiteUrl() {
         const s = await this._getSettings();
-        return s.website_url || process.env.WEBSITE_URL || process.env.FRONTEND_URL || 'https://napnix.in';
+        return s.website_url || process.env.WEBSITE_URL || process.env.FRONTEND_URL || brand.websiteUrl;
     }
 
     async getSiteHost() {
         const url = await this.getSiteUrl();
-        try { return new URL(url).hostname; } catch { return 'napnix.in'; }
+        try { return new URL(url).hostname; } catch { return brand.baseDomain; }
     }
 
     async getIndexNowKey() {

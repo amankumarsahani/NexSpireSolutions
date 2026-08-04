@@ -9,15 +9,16 @@
  */
 
 const emailService = require('./email.service');
+const brand = require('../config/brand');
 
 // Agency recipients: the shared NOTIFICATION_EMAILS list (comma-separated), falling back
 // to a single support/admin address. Sent via the existing (Zoho) email.service transport.
 const AGENCY_EMAIL = () => {
     const list = emailService.getNotificationRecipients?.() || [];
     if (list.length) return list;
-    return process.env.SUPPORT_NOTIFY_EMAIL || process.env.NAPNIX_ADMIN_EMAIL || 'admin@napnix.in';
+    return process.env.SUPPORT_NOTIFY_EMAIL || brand.platformAdminEmail;
 };
-const ADMIN_URL = () => (process.env.ADMIN_PANEL_URL || 'https://admin.napnix.in').replace(/\/+$/, '');
+const ADMIN_URL = () => (brand.adminUrl).replace(/\/+$/, '');
 
 const esc = (s) => String(s ?? '')
     .replace(/&/g, '&amp;').replace(/</g, '&lt;').replace(/>/g, '&gt;');

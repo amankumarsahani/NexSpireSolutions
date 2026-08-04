@@ -8,6 +8,7 @@ const pdfService = require('../services/pdf.service');
 const emailService = require('../services/email.service');
 const workflowEngine = require('../services/workflowEngine');
 const { pool } = require('../config/database');
+const brand = require('../config/brand');
 const { execFile } = require('child_process');
 const path = require('path');
 
@@ -84,7 +85,7 @@ class TenantController {
                     slug: tenant.slug,
                     subdomain: tenant.subdomain,
                     status: tenant.status,
-                    apiUrl: `https://${tenant.slug}-crm-api.napnix.in`
+                    apiUrl: brand.tenantApiUrl(tenant.slug)
                 }
             });
         } catch (error) {
@@ -1022,7 +1023,7 @@ class TenantController {
             let paymentLinkUrl = '';
             try {
                 // Point users back to their own CRM instance
-                const baseDomain = process.env.VITE_APP_BASE_DOMAIN || 'napnix.in';
+                const baseDomain = process.env.VITE_APP_BASE_DOMAIN || brand.baseDomain;
                 const tenantDomain = tenant.custom_domain || `${tenant.slug}-crm.${baseDomain}`;
                 const tenantUrl = tenantDomain.startsWith('http') ? tenantDomain : `https://${tenantDomain}`;
 
@@ -1113,7 +1114,7 @@ class TenantController {
             let paymentLinkUrl = '';
             try {
                 // Point users back to their own CRM instance
-                const baseDomain = process.env.VITE_APP_BASE_DOMAIN || 'napnix.in';
+                const baseDomain = process.env.VITE_APP_BASE_DOMAIN || brand.baseDomain;
                 const tenantDomain = tenant.custom_domain || `${tenant.slug}-crm.${baseDomain}`;
                 const tenantUrl = tenantDomain.startsWith('http') ? tenantDomain : `https://${tenantDomain}`;
 
@@ -1231,7 +1232,7 @@ class TenantController {
 
             const invoiceNumber = `INV-T${tenant.id}-${billingMonthValue.replace('-', '')}-${Date.now().toString().slice(-6)}`;
 
-            const baseDomain = process.env.VITE_APP_BASE_DOMAIN || 'napnix.in';
+            const baseDomain = process.env.VITE_APP_BASE_DOMAIN || brand.baseDomain;
             const tenantDomain = tenant.custom_domain || `${tenant.slug}-crm.${baseDomain}`;
             const tenantUrl = tenantDomain.startsWith('http') ? tenantDomain : `https://${tenantDomain}`;
 
@@ -1307,7 +1308,7 @@ class TenantController {
                 invoice_date: invoiceDateLabel,
                 due_date: dueDateLabel,
                 our_address: 'Napnix, India',
-                our_email: process.env.SMTP_FROM_EMAIL || process.env.ZOHO_FROM_EMAIL || process.env.SMTP_USER || 'support@napnix.in',
+                our_email: process.env.SMTP_FROM_EMAIL || process.env.ZOHO_FROM_EMAIL || process.env.SMTP_USER || brand.supportEmail,
                 contact_name: tenant.owner_name || tenant.name,
                 company_name: tenant.business_name || tenant.name,
                 client_email: tenant.owner_email || tenant.email,

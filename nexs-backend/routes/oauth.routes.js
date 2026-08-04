@@ -3,7 +3,7 @@
  * (Sheets today, Gmail later — same consent app, different scopes).
  *
  * Google OAuth redirect URIs are exact-match, so a per-tenant subdomain
- * (`<slug>-crm-api.napnix.in`) can't each register their own callback. This
+ * (`<slug>-crm-api.<baseDomain>`) can't each register their own callback. This
  * app registration and callback live here instead, on nexs-backend's stable
  * domain. After exchanging the code for tokens, the refresh token is handed
  * off server-to-server to the originating tenant's nexcrm-backend instance —
@@ -20,7 +20,7 @@ const axios = require('axios');
 const { google } = require('googleapis');
 const oauthState = require('../services/oauthState');
 
-const REDIRECT_URI = process.env.GOOGLE_OAUTH_REDIRECT_URI || `${process.env.API_URL || 'https://api.napnix.in'}/oauth/google/callback`;
+const REDIRECT_URI = process.env.GOOGLE_OAUTH_REDIRECT_URI || `${brand.apiUrl}/oauth/google/callback`;
 
 // Lead-sources (Sheets/Drive) flow scopes.
 const SHEETS_SCOPES = [
@@ -168,8 +168,9 @@ router.get('/google/callback', async (req, res) => {
 /* ------------------------------------------------------------------ */
 
 const { ConfidentialClientApplication } = require('@azure/msal-node');
+const brand = require('../config/brand');
 
-const MS_REDIRECT_URI = process.env.MS_OAUTH_REDIRECT_URI || `${process.env.API_URL || 'https://api.napnix.in'}/oauth/microsoft/callback`;
+const MS_REDIRECT_URI = process.env.MS_OAUTH_REDIRECT_URI || `${brand.apiUrl}/oauth/microsoft/callback`;
 const MS_MAIL_SCOPES = ['offline_access', 'https://graph.microsoft.com/Mail.ReadWrite', 'https://graph.microsoft.com/Mail.Send', 'https://graph.microsoft.com/User.Read'];
 const MS_CALENDAR_SCOPES = ['offline_access', 'https://graph.microsoft.com/Calendars.ReadWrite', 'https://graph.microsoft.com/User.Read'];
 
@@ -302,7 +303,7 @@ router.get('/microsoft/callback', async (req, res) => {
  */
 const FB_GRAPH = 'v21.0';
 const FB_LEADS_REDIRECT_URI = process.env.FACEBOOK_LEADS_REDIRECT_URI
-    || `${process.env.API_URL || 'https://api.napnix.in'}/oauth/facebook/leads/callback`;
+    || `${brand.apiUrl}/oauth/facebook/leads/callback`;
 const FB_LEADS_SCOPES = [
     'pages_show_list',
     'pages_read_engagement',
@@ -468,7 +469,7 @@ const OAUTH2_PROVIDERS = {
 const resolveOAuthValue = value => typeof value === 'function' ? value() : value;
 
 function oauth2RedirectUri(provider) {
-    const base = process.env.API_URL || 'https://api.napnix.in';
+    const base = brand.apiUrl;
     return `${base}/oauth/oauth2/${provider}/callback`;
 }
 

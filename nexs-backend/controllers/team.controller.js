@@ -1,5 +1,6 @@
 const TeamModel = require('../models/team.model');
 const UserModel = require('../models/user.model');
+const brand = require('../config/brand');
 
 const TeamController = {
     // Get all team members
@@ -133,7 +134,7 @@ const TeamController = {
             if (isNewUser) {
                 try {
                     const EmailService = require('../services/email.service');
-                    const loginUrl = process.env.ADMIN_URL || 'https://admin.napnix.in';
+                    const loginUrl = process.env.ADMIN_URL || brand.adminUrl;
 
                     await EmailService.sendEmail({
                         to: email,

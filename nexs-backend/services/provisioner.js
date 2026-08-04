@@ -58,7 +58,7 @@ class Provisioner {
         // Cloudflare config
         this.cfApiToken = process.env.CLOUDFLARE_API_TOKEN;
         this.cfZoneId = process.env.CLOUDFLARE_ZONE_ID;
-        this.cfDomain = process.env.NEXCRM_DOMAIN || 'napnix.in';
+        this.cfDomain = brand.baseDomain;
         this.cfPagesUrl = process.env.NEXCRM_PAGES_URL || 'nexcrm-frontend.pages.dev';
         this.cfAccountId = process.env.CLOUDFLARE_ACCOUNT_ID;
         this.cfPagesProject = process.env.NEXCRM_PAGES_PROJECT || 'napcrm-frontend';
@@ -272,6 +272,7 @@ const fs = require('fs');
 const os = require('os');
 const path = require('path');
 const vm = require('vm');
+const brand = require('../config/brand');
 
 const ecosystemPath = process.argv[2];
 const operation = process.argv[3];
@@ -412,7 +413,7 @@ EOFNODE`;
             console.log(`[Provisioner] Initial settings seeded`);
 
             // 5b. Provision default SES-backed mailbox addresses (support@/sales@/notifications@
-            // <slug>.mail.napnix.in). No per-tenant AWS/DNS work needed — the parent mail
+            // <slug>.mail.<baseDomain>). No per-tenant AWS/DNS work needed — the parent mail
             // domain is verified once in SES, so any address under it just works.
             await setStep('mailboxes');
             await this.createDefaultEmailAddresses(dbName, slug, server);
@@ -443,10 +444,30 @@ EOFNODE`;
                 console.log(`[Provisioner] Cloudflare frontend route added`);
             }
 
-            // 6.1 Handle Custom Domain if present
-            if (tenant.custom_domain) {
-                await this.setupCustomDomain(tenant, server.cloudflare_tunnel_id);
-                console.log(`[Provisioner] Custom domain setup for ${tenant.custom_domain}`);
+            // 6.1 Handle Custom Domain if present.
+            //
+            // setupCustomDomain takes a { crm, storefront } object, not a tunnel
+            // id — passing the id made `domains.crm` undefined, so both branches
+            // skipped and this step silently did nothing on every provision.
+            //
+            // Columns: migration 034 split the original single `custom_domain`
+            // into per-surface columns; the legacy column is still read as a
+            // fallback for tenants created before that split.
+            const customDomains = {
+                crm: tenant.custom_domain_crm || tenant.custom_domain || null,
+                storefront: tenant.custom_domain_storefront || null
+            };
+            if (customDomains.crm || customDomains.storefront) {
+                // Non-fatal: DNS/Pages attachment can be retried from the tenant
+                // settings page, and a domain failure must not abort a
+                // provision that has already created the DB and PM2 process.
+                try {
+                    const domainResult = await this.setupCustomDomain(tenant, customDomains);
+                    await TenantModel.update(id, { custom_domain_verified: domainResult.success });
+                    console.log(`[Provisioner] Custom domain setup for ${customDomains.crm || customDomains.storefront}`);
+                } catch (domainError) {
+                    console.warn(`[Provisioner] Custom domain setup failed (non-fatal): ${domainError.message}`);
+                }
             }
 
             // 6.2 Register this tenant's domain->service route with nap-load
@@ -783,7 +804,7 @@ EOFNODE`;
      */
     async createNapnixSuperAdmin(dbName, server = { is_primary: true }) {
         const bcrypt = require('bcryptjs');
-        const superAdminEmail = process.env.NAPNIX_ADMIN_EMAIL || 'admin@napnix.in';
+        const superAdminEmail = brand.platformAdminEmail;
         const superAdminPassword = process.env.NAPNIX_ADMIN_PASSWORD || 'Napnix@2024!';
         const hash = await bcrypt.hash(superAdminPassword, 10);
 
@@ -818,7 +839,7 @@ EOFNODE`;
      */
     async seedInitialSettings(dbName, tenantData, server = { is_primary: true }) {
         const slug = tenantData.slug || dbName.replace('nexcrm_', '');
-        const domain = this.cfDomain || 'napnix.in';
+        const domain = this.cfDomain || brand.baseDomain;
 
         const settings = [
             { key: 'company_name', value: tenantData.name },
@@ -894,7 +915,7 @@ EOFNODE`;
      * and PM2 process.
      */
     async createDefaultEmailAddresses(dbName, slug, server = { is_primary: true }) {
-        const mailDomain = process.env.SES_MAIL_DOMAIN || 'mail.napnix.in';
+        const mailDomain = process.env.SES_MAIL_DOMAIN || `mail.${brand.baseDomain}`;
         const addresses = [
             { address: `support@${slug}.${mailDomain}`, type: 'support', label: 'Support' },
             { address: `sales@${slug}.${mailDomain}`, type: 'sales', label: 'Sales' },
@@ -1300,9 +1321,9 @@ EOFNODE`;
     }
 
     /**
-     * Setup Custom Domains for a tenant (CRM, Storefront, API)
+     * Setup Custom Domains for a tenant (CRM + Storefront only — see below).
      * @param {Object} tenant - Tenant object with id, slug, assigned_port, server_id
-     * @param {Object} domains - { crm: string, storefront: string, api: string }
+     * @param {Object} domains - { crm: string, storefront: string }
      */
     async setupCustomDomain(tenant, domains) {
         console.log(`[Provisioner] Setting up custom domains for tenant ${tenant.slug}...`, domains);
@@ -1334,8 +1355,16 @@ EOFNODE`;
                 results.storefront.cnameTarget = `${storefrontProject}.pages.dev`;
             }
 
-            // API always stays on {slug}-crm-api.napnix.in (managed via Cloudflare Tunnel)
-            // No custom API domain support — Tunnel requires Cloudflare-proxied DNS which external domains don't have
+            // API always stays on {slug}-crm-api.<baseDomain> (managed via Cloudflare Tunnel)
+            // No custom API domain support — Tunnel requires Cloudflare-proxied DNS which external domains don't have.
+            //
+            // This is why the `custom_domain_api` column (migration 034) is
+            // written but never acted on. Supporting it means Cloudflare for SaaS
+            // (Custom Hostnames), which terminates a customer-owned hostname on
+            // our zone without them delegating nameservers. Until that exists,
+            // white-label tenants still expose a *.<baseDomain> API host — which
+            // matters for anything customer-facing, e.g. the Zapier connection
+            // form (see nexcrm-agents/shared/zapier-integration-plan-2026-08-01.md).
 
             return {
                 success: results.crm.success || results.storefront.success,
@@ -1466,7 +1495,7 @@ EOFNODE`;
                 SMTP_PASS: process.env.SMTP_PASS || '',
                 SMTP_FROM: process.env.SMTP_FROM || '',
                 FRONTEND_URL: process.env.NEXCRM_FRONTEND_URL || '',
-                STOREFRONT_URL: `https://${slug}.${this.cfDomain || 'napnix.in'}`,
+                STOREFRONT_URL: `https://${slug}.${this.cfDomain || brand.baseDomain}`,
                 NEXS_BACKEND_URL: process.env.NEXS_BACKEND_URL || process.env.API_URL || 'http://localhost:5000',
                 SUPPORT_TENANT_SECRET: supportSecret,
                 // Lead Sources (Google Sheets) — same OAuth app + handoff secret

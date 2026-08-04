@@ -5,6 +5,7 @@
 
 const db = require('../config/database');
 const nodemailer = require('nodemailer');
+const brand = require('../config/brand');
 
 class EmailQueueWorker {
     constructor() {
@@ -129,7 +130,7 @@ class EmailQueueWorker {
      * Generate tracking pixel HTML
      */
     generateTrackingPixel(trackingId) {
-        const baseUrl = process.env.API_URL || 'https://api.napnix.in';
+        const baseUrl = brand.apiUrl;
         return `<img src="${baseUrl}/api/track/open/${trackingId}" width="1" height="1" style="display:none" alt="" />`;
     }
 
@@ -137,7 +138,7 @@ class EmailQueueWorker {
      * Wrap links with click tracking
      */
     wrapLinksWithTracking(html, trackingId) {
-        const baseUrl = process.env.API_URL || 'https://api.napnix.in';
+        const baseUrl = brand.apiUrl;
         // Improved regex to handle both single and double quotes, and avoid wrapping internal anchors or already tracked links
         return html.replace(
             /href=["'](https?:\/\/(?!api\.napnix\.in\/api\/track\/)[^"']+)["']/g,
@@ -152,7 +153,7 @@ class EmailQueueWorker {
      * Add unsubscribe link to email
      */
     addUnsubscribeLink(html, email, campaignId) {
-        const baseUrl = process.env.API_URL || 'https://api.napnix.in';
+        const baseUrl = brand.apiUrl;
         const unsubUrl = `${baseUrl}/api/track/unsubscribe?email=${encodeURIComponent(email)}&campaign=${campaignId}`;
 
         const unsubscribeHtml = `

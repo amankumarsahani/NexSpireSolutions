@@ -1,5 +1,6 @@
 const nodemailer = require('nodemailer');
 const templateLoader = require('./template.loader');
+const brand = require('../config/brand');
 
 /**
  * Email Service - Reusable email sending functionality
@@ -321,7 +322,7 @@ class EmailService {
     async sendTenantWelcomeEmail(tenant) {
         const { name, email, password, slug, industry } = tenant;
 
-        const domain = process.env.NEXCRM_DOMAIN || 'napnix.in';
+        const domain = brand.baseDomain;
         const crmUrl = `https://${slug}-crm.${domain}`;
         const storefrontUrl = `https://${slug}.${domain}`;
         const apiUrl = `https://${slug}-crm-api.${domain}`;

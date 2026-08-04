@@ -4,10 +4,11 @@ const BlogController = require('../controllers/blog.controller');
 const BlogModel = require('../models/blog.model');
 const { auth, optionalAuth } = require('../middleware/auth');
 const db = require('../config/database');
+const brand = require('../config/brand');
 
 router.get('/sitemap.xml', async (req, res) => {
     try {
-        const siteUrl = process.env.WEBSITE_URL || process.env.FRONTEND_URL || 'https://napnix.in';
+        const siteUrl = process.env.WEBSITE_URL || process.env.FRONTEND_URL || brand.websiteUrl;
 
         const [blogs] = await db.query(
             `SELECT slug, updated_at FROM blogs WHERE status = 'published' ORDER BY updated_at DESC`

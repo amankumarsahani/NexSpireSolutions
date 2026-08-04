@@ -46,7 +46,7 @@ const templates = [
     
     <hr style="border: none; border-top: 1px solid #e2e8f0; margin: 30px 0;">
     <p style="color: #64748b; font-size: 12px; text-align: center;">
-        Prepared by Napnix | {{date}}
+        Prepared by {{brand_name}} | {{date}}
     </p>
 </div>`,
         variables: ["contact_name", "email", "phone", "company_name", "date", "discussion_points", "pain_points", "requirements", "budget", "timeline", "next_steps"]
@@ -100,7 +100,7 @@ const templates = [
     
     <hr style="border: none; border-top: 1px solid #e2e8f0; margin: 40px 0 20px;">
     <p style="color: #94a3b8; font-size: 12px; text-align: center;">
-        Napnix | Proposal Valid Until: {{valid_until}}
+        {{brand_name}} | Proposal Valid Until: {{valid_until}}
     </p>
 </div>`,
         variables: ["contact_name", "company_name", "executive_summary", "project_scope", "deliverables", "total_cost", "payment_terms", "project_timeline", "why_us", "our_email", "valid_until"]
@@ -118,7 +118,7 @@ const templates = [
     
     <div style="margin-bottom: 30px;">
         <h2 style="color: #1e293b;">Getting Started</h2>
-        <p style="color: #475569; line-height: 1.8;">Welcome to Napnix! We're excited to begin our partnership with {{company_name}}. This document will guide you through our onboarding process.</p>
+        <p style="color: #475569; line-height: 1.8;">Welcome to {{brand_name}}! We're excited to begin our partnership with {{company_name}}. This document will guide you through our onboarding process.</p>
     </div>
     
     <div style="background: #f8fafc; padding: 25px; border-radius: 12px; margin-bottom: 30px;">
@@ -153,7 +153,7 @@ const templates = [
     
     <hr style="border: none; border-top: 1px solid #e2e8f0; margin: 40px 0 20px;">
     <p style="color: #94a3b8; font-size: 12px; text-align: center;">
-        Napnix | Let's build something amazing together!
+        {{brand_name}} | Let's build something amazing together!
     </p>
 </div>`,
         variables: ["contact_name", "company_name", "project_name", "start_date", "account_manager", "manager_email", "requirements_from_client", "next_steps", "communication_channels", "support_email"]
@@ -174,7 +174,7 @@ const templates = [
     </p>
     
     <div style="background: #f8fafc; padding: 20px; border-radius: 8px; margin: 20px 0;">
-        <p style="margin: 0;"><strong>Disclosing Party:</strong> Napnix</p>
+        <p style="margin: 0;"><strong>Disclosing Party:</strong> {{brand_name}}</p>
         <p style="margin: 10px 0 0;"><strong>Receiving Party:</strong> {{company_name}} ("{{contact_name}}")</p>
     </div>
     
@@ -204,7 +204,7 @@ const templates = [
     <div style="margin-top: 50px;">
         <div style="display: inline-block; width: 45%;">
             <p style="border-top: 1px solid #1e293b; padding-top: 10px; margin-top: 60px;">
-                <strong>Napnix</strong><br>
+                <strong>{{brand_name}}</strong><br>
                 <span style="color: #64748b;">Date: {{effective_date}}</span>
             </p>
         </div>
@@ -232,7 +232,7 @@ const templates = [
             <p style="color: #64748b; margin: 5px 0;">Due Date: {{due_date}}</p>
         </div>
         <div style="float: right; text-align: right;">
-            <h2 style="color: #1e293b; margin: 0;">Napnix</h2>
+            <h2 style="color: #1e293b; margin: 0;">{{brand_name}}</h2>
             <p style="color: #64748b; margin: 5px 0;">{{our_address}}</p>
             <p style="color: #64748b; margin: 5px 0;">{{our_email}}</p>
         </div>
@@ -289,7 +289,7 @@ const templates = [
     
     <hr style="border: none; border-top: 1px solid #e2e8f0; margin: 40px 0 20px;">
     <p style="color: #94a3b8; font-size: 12px; text-align: center;">
-        Thank you for your business! | Napnix
+        Thank you for your business! | {{brand_name}}
     </p>
 </div>`,
         variables: ["invoice_number", "invoice_date", "due_date", "our_address", "our_email", "contact_name", "company_name", "client_email", "item_description", "quantity", "rate", "amount", "subtotal", "tax_rate", "tax_amount", "total_amount", "payment_instructions"]
@@ -307,7 +307,7 @@ const templates = [
     
     <div style="margin-bottom: 30px;">
         <h2 style="color: #1e293b;">Project Summary</h2>
-        <p style="color: #475569; line-height: 1.8;">We are pleased to inform you that your project with Napnix has been successfully completed.</p>
+        <p style="color: #475569; line-height: 1.8;">We are pleased to inform you that your project with {{brand_name}} has been successfully completed.</p>
     </div>
     
     <div style="background: #f8fafc; padding: 25px; border-radius: 12px; margin-bottom: 30px;">
@@ -346,7 +346,7 @@ const templates = [
     </div>
     
     <div style="background: #ecfdf5; padding: 25px; border-radius: 12px; text-align: center;">
-        <h3 style="color: #059669; margin-top: 0;">Thank You for Choosing Napnix!</h3>
+        <h3 style="color: #059669; margin-top: 0;">Thank You for Choosing {{brand_name}}!</h3>
         <p style="color: #047857; margin-bottom: 0;">We hope to work with you again in the future. Contact us anytime at {{support_email}}</p>
     </div>
 </div>`,
@@ -355,7 +355,7 @@ const templates = [
     {
         name: 'Tenant Service Agreement',
         slug: 'tenant-agreement',
-        description: 'Service agreement for Napnix SaaS tenants',
+        description: 'Service agreement for {{brand_name}} SaaS tenants',
         category: 'legal',
         isDefault: true,
         content: `<div style="font-family: 'Times New Roman', Times, serif; max-width: 820px; margin: 0 auto; padding: 56px 52px; color: #111827; line-height: 1.6; font-size: 14px;">
@@ -369,9 +369,9 @@ const templates = [
         <tr>
             <td style="width: 50%; vertical-align: top; border: 1px solid #111827; padding: 12px;">
                 <div style="font-weight: 700; text-transform: uppercase; margin-bottom: 8px;">Provider</div>
-                <div><strong>Napnix Pvt. Ltd.</strong></div>
+                <div><strong>{{brand_legal_name}}</strong></div>
                 <div>{{business_address}}</div>
-                <div>support@napnix.in</div>
+                <div>{{brand_support_email}}</div>
             </td>
             <td style="width: 50%; vertical-align: top; border: 1px solid #111827; padding: 12px;">
                 <div style="font-weight: 700; text-transform: uppercase; margin-bottom: 8px;">Client</div>
@@ -385,7 +385,7 @@ const templates = [
 
     <p style="text-align: justify; margin-bottom: 16px;">
         This Service Agreement ("Agreement") is made and executed on <strong>{{agreement_date}}</strong> by and between
-        <strong>Napnix Pvt. Ltd.</strong>, hereinafter referred to as the "Provider", and <strong>{{tenant_company}}</strong>,
+        <strong>{{brand_legal_name}}</strong>, hereinafter referred to as the "Provider", and <strong>{{tenant_company}}</strong>,
         acting through its authorized representative <strong>{{tenant_name}}</strong>, hereinafter referred to as the "Client".
         The Provider and the Client are individually referred to as a "Party" and collectively as the "Parties".
     </p>
@@ -399,7 +399,7 @@ const templates = [
 
     <div style="margin-bottom: 18px;">
         <div style="font-weight: 700; text-transform: uppercase; border-bottom: 1px solid #111827; padding-bottom: 4px; margin-bottom: 8px;">1. Definitions</div>
-        <p style="text-align: justify; margin: 0 0 8px;"><strong>1.1 "Services"</strong> means access to the Napnix hosted SaaS platform and allied services made available under the selected plan.</p>
+        <p style="text-align: justify; margin: 0 0 8px;"><strong>1.1 "Services"</strong> means access to the {{brand_name}} hosted SaaS platform and allied services made available under the selected plan.</p>
         <p style="text-align: justify; margin: 0 0 8px;"><strong>1.2 "Platform"</strong> means the software environment, administrative dashboard, storefront, APIs, hosting stack, and supporting infrastructure maintained by the Provider.</p>
         <p style="text-align: justify; margin: 0;"><strong>1.3 "Client Data"</strong> means all records, files, customer information, business information, and other materials submitted to or generated within the Platform by or on behalf of the Client.</p>
     </div>
@@ -533,7 +533,7 @@ const templates = [
     <table style="width: 100%; border-collapse: collapse; margin-top: 24px;">
         <tr>
             <td style="width: 48%; vertical-align: top; border: 1px solid #111827; padding: 14px;">
-                <div style="font-weight: 700; margin-bottom: 38px;">For Napnix Pvt. Ltd.</div>
+                <div style="font-weight: 700; margin-bottom: 38px;">For {{brand_legal_name}}</div>
                 <div style="border-bottom: 1px solid #111827; height: 42px; margin-bottom: 6px;"></div>
                 <div>Name: __________________________</div>
                 <div>Designation: Authorized Signatory</div>
@@ -571,7 +571,7 @@ const templates = [
     </table>
 
     <div style="margin-top: 24px; border-top: 1px solid #111827; padding-top: 10px; text-align: center; font-size: 12px;">
-        <div>Napnix Pvt. Ltd. | {{business_address}} | support@napnix.in | napnix.in</div>
+        <div>{{brand_legal_name}} | {{business_address}} | {{brand_support_email}} | {{brand_base_domain}}</div>
         <div style="margin-top: 4px;">This is a formal commercial agreement intended to be retained for legal and business records.</div>
     </div>
 </div>`,

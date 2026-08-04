@@ -6,9 +6,16 @@ require('dotenv').config();
 
 const { testConnection } = require('./config/database');
 const { validateEnv } = require('./config/validateEnv');
+const brand = require('./config/brand');
+const { edition, isFull, features } = require('./config/edition');
 
 // Validate environment variables
 validateEnv();
+
+// Matches any HTTPS subdomain of this instance's base domain.
+const platformSubdomainRe = new RegExp(
+    `^https://[a-z0-9-]+\\.${brand.baseDomain.replace(/[.*+?^${}()|[\]\\]/g, '\\$&')}$`
+);
 
 const app = express();
 const PORT = process.env.PORT || 5000;
@@ -35,12 +42,12 @@ const corsOptions = {
             'http://localhost:3000',
             'http://localhost:5173',
             'http://localhost:5174',
-            'https://napnix.in',
-            'https://admin.napnix.in'
+            brand.websiteUrl,
+            brand.adminUrl
         ];
 
-        // Allow any subdomain of napnix.in
-        const isNapnixSubdomain = origin && /https:\/\/[a-z0-9-]+\.napnix\.in$/.test(origin);
+        // Allow any subdomain of this instance's base domain
+        const isPlatformSubdomain = origin && platformSubdomainRe.test(origin);
 
         // Allow any HTTPS origin (for custom domain storefronts calling /api/resolve-domain)
         // The resolve-domain endpoint returns public, non-sensitive data.
@@ -48,7 +55,7 @@ const corsOptions = {
         const isHttps = origin && /^https:\/\/.+/.test(origin);
 
         // Allow requests with no origin (mobile apps, Postman, etc.)
-        if (!origin || allowedOrigins.indexOf(origin) !== -1 || isNapnixSubdomain || isHttps) {
+        if (!origin || allowedOrigins.indexOf(origin) !== -1 || isPlatformSubdomain || isHttps) {
             callback(null, true);
         } else {
             callback(new Error('Not allowed by CORS'));
@@ -104,7 +111,7 @@ app.get('/indexnow-key.txt', async (req, res) => {
 app.get('/health', (req, res) => {
     res.json({
         status: 'OK',
-        message: 'Napnix API is running',
+        message: `${brand.name} API is running`,
         timestamp: new Date().toISOString(),
         environment: process.env.NODE_ENV
     });
@@ -113,7 +120,7 @@ app.get('/health', (req, res) => {
 // API Routes will be added here
 app.get('/api', (req, res) => {
     res.json({
-        message: 'Napnix API v1.0',
+        message: `${brand.name} API v1.0`,
         endpoints: {
             health: '/health',
             auth: '/api/auth/*',
@@ -125,6 +132,20 @@ app.get('/api', (req, res) => {
             messages: '/api/messages/*',
             inquiries: '/api/inquiries/*'
         }
+    });
+});
+
+// Which product this instance is running as. Public and unauthenticated: the admin
+// panel calls it on boot to check its own build matches the server, so a
+// whitelabel bundle pointed at a full-edition API (or the reverse) fails loudly instead
+// of rendering half a UI whose endpoints 404.
+app.get('/api/edition', (req, res) => {
+    res.json({
+        edition,
+        brand: brand.slug,
+        productName: brand.name,
+        baseDomain: brand.baseDomain,
+        features
     });
 });
 
@@ -144,18 +165,23 @@ const adminRoutes = require('./routes/admin.routes'); // Added
 
 // Use routes
 app.use('/api/auth', authRoutes);
-app.use('/api/clients', clientRoutes);
-app.use('/api/projects', projectRoutes);
-app.use('/api/leads', leadRoutes);
 app.use('/api/teams', teamRoutes);
-app.use('/api/documents', documentRoutes);
-app.use('/api/messages', messageRoutes);
-app.use('/api/inquiries', inquiryRoutes);
 app.use('/api/email-templates', emailTemplateRoutes);
 app.use('/api/document-templates', require('./routes/document-template.routes'));
 app.use('/api/activities', require('./routes/activity.routes'));
 app.use('/api/dashboard', require('./routes/dashboard.routes'));
 app.use('/api/settings', settingsRoutes);
+
+// Our own agency CRM. A partner instance runs the control plane only, so these
+// are not mounted at all rather than hidden behind a role check.
+if (isFull) {
+    app.use('/api/clients', clientRoutes);
+    app.use('/api/projects', projectRoutes);
+    app.use('/api/leads', leadRoutes);
+    app.use('/api/documents', documentRoutes);
+    app.use('/api/messages', messageRoutes);
+    app.use('/api/inquiries', inquiryRoutes);
+}
 
 // Public: Resolve custom domain → tenant info (no auth required)
 // Used by storefront to discover which tenant a custom domain belongs to
@@ -168,9 +194,9 @@ app.get('/api/resolve-domain', async (req, res) => {
 
         const normalizedDomain = domain.toLowerCase().trim();
         const { pool: adminPool } = require('./config/database');
-        const baseDomain = process.env.NEXCRM_DOMAIN || 'napnix.in';
+        const baseDomain = brand.baseDomain;
 
-        // Match custom domains OR default {slug}.napnix.in / {slug}-crm.napnix.in / {slug}-crm-api.napnix.in
+        // Match custom domains OR default {slug}.<baseDomain> / {slug}-crm.<baseDomain> / {slug}-crm-api.<baseDomain>
         const [rows] = await adminPool.query(
             `SELECT slug, name, industry_type, assigned_port, status,
                     custom_domain_crm, custom_domain_storefront, custom_domain_api,
@@ -207,7 +233,7 @@ app.get('/api/resolve-domain', async (req, res) => {
                 slug: tenant.slug,
                 name: tenant.name,
                 industry: tenant.industry_type,
-                // API always stays on napnix.in (Cloudflare Tunnel)
+                // API always stays on the platform base domain (Cloudflare Tunnel)
                 // Custom domains are only for CRM and Storefront (Cloudflare Pages)
                 api_url: `https://${tenant.slug}-crm-api.${baseDomain}`,
                 storefront_url: tenant.custom_domain_storefront
@@ -225,17 +251,25 @@ app.get('/api/resolve-domain', async (req, res) => {
     }
 });
 
-// NexCRM Master Routes (Tenant Management)
+// NexCRM Master Routes (Tenant Management) - the control plane, both editions
 app.use('/api/tenants', require('./routes/tenant.routes'));
 app.use('/api/admin', require('./routes/admin.routes'));
-app.use('/api/cms', require('./routes/cms.routes')); // Added CMS Routes
 app.use('/api/plans', require('./routes/plan.routes'));
 
+// Our marketing-site CMS
+if (isFull) {
+    app.use('/api/cms', require('./routes/cms.routes'));
+}
+
 // WhatsApp (admin + internal proxy for tenant sessions)
-app.use('/api/admin/whatsapp', require('./routes/whatsapp.routes'));
+if (features.whatsapp) {
+    app.use('/api/admin/whatsapp', require('./routes/whatsapp.routes'));
+}
 
 // Meta Lead Ads (internal teardown endpoints called by tenant backends)
-app.use('/api/admin/meta-leads', require('./routes/metaLeads.routes'));
+if (features.naplead) {
+    app.use('/api/admin/meta-leads', require('./routes/metaLeads.routes'));
+}
 
 // Security Monitoring
 app.get('/api/security/banned-ips', (req, res) => {
@@ -247,14 +281,8 @@ app.get('/api/security/banned-ips', (req, res) => {
     });
 });
 
-// Tool Registry
-app.use('/api/tools', require('./routes/tool.routes'));
-
-// Email Campaigns & Marketing
-app.use('/api/campaigns', require('./routes/campaign.routes'));
+// SMTP accounts back tenant transactional mail, so both editions need them.
 app.use('/api/smtp-accounts', require('./routes/smtp.routes'));
-app.use('/api/track', require('./routes/tracking.routes'));
-app.use('/api/telemetry', require('./routes/telemetry.routes'));
 
 // Automation Workflows
 app.use('/api/workflows', require('./routes/workflow.routes'));
@@ -263,21 +291,26 @@ app.use('/api/workflows', require('./routes/workflow.routes'));
 app.use('/api/billing', require('./routes/billing.routes'));
 // Webhooks moved to top of file
 
-
-// Blog
-app.use('/api/blogs', require('./routes/blog.routes'));
-
-// Portfolio
-app.use('/api/portfolio', require('./routes/portfolio.routes'));
-
-// Case Studies
-app.use('/api/case-studies', require('./routes/caseStudy.routes'));
-
-// Expenses
-app.use('/api/expenses', require('./routes/expense.routes'));
-
 // Support desk (tenant ingest + agency inbox)
 app.use('/api/support', require('./routes/support.routes'));
+
+// Email campaigns. Sold to partners as an add-on (decision D4), so this is a
+// feature flag rather than a straight edition check.
+if (features.napmail) {
+    app.use('/api/campaigns', require('./routes/campaign.routes'));
+    app.use('/api/track', require('./routes/tracking.routes'));
+}
+
+// Agency operations: our internal tooling, our website telemetry, our marketing
+// site content, and our money. None of this belongs on a partner instance.
+if (isFull) {
+    app.use('/api/tools', require('./routes/tool.routes'));
+    app.use('/api/telemetry', require('./routes/telemetry.routes'));
+    app.use('/api/blogs', require('./routes/blog.routes'));
+    app.use('/api/portfolio', require('./routes/portfolio.routes'));
+    app.use('/api/case-studies', require('./routes/caseStudy.routes'));
+    app.use('/api/expenses', require('./routes/expense.routes'));
+}
 
 // Start email worker (after routes are set up)
 const emailWorker = require('./workers/emailWorker');

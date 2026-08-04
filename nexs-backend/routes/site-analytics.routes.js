@@ -2,6 +2,7 @@ const express = require('express');
 const router = express.Router();
 const { query } = require('../config/database');
 const aiService = require('../services/ai.service');
+const brand = require('../config/brand');
 
 const dateClause = (range) => {
     const map = {
@@ -457,7 +458,7 @@ Keep recommendations specific, prioritized, and tied to real observations from t
             .map(e => `  - "${e.text || e.element}" on ${e.path} → ${e.count} clicks${e.href ? ` (→ ${e.href})` : ''}`)
             .join('\n');
 
-        const prompt = `Analyze this website telemetry data for napnix.in and provide insights:
+        const prompt = `Analyze this website telemetry data for ${brand.baseDomain} and provide insights:
 
 ## OVERVIEW (last ${analytics.range || '30'} days)
 - Page Views: ${analytics.overview?.pageViews || 0}

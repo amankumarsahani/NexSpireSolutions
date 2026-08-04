@@ -1,5 +1,6 @@
 const fs = require('fs');
 const path = require('path');
+const brand = require('../config/brand');
 
 /**
  * Template Loader - Loads and renders email templates
@@ -89,13 +90,21 @@ class TemplateLoader {
     substituteVariables(template, variables) {
         let result = template;
 
-        for (const [key, value] of Object.entries(variables)) {
+        // Brand tokens are merged in for every template so no caller has to
+        // remember them. Caller-supplied values win, so a template can still
+        // override e.g. brand_support_email for a specific send.
+        const merged = { ...brand.templateTokens(), ...variables };
+
+        for (const [key, value] of Object.entries(merged)) {
             const regex = new RegExp(`{{\\s*${key}\\s*}}`, 'g');
             result = result.replace(regex, value ?? '');
         }
 
-        // Remove any remaining unsubstituted variables
-        result = result.replace(/{{\\s*\\w+\\s*}}/g, '');
+        // Remove any remaining unsubstituted variables. The previous pattern used
+        // escaped \\s and \\w inside a regex literal, so it matched a literal
+        // backslash and never fired - leftover {{placeholders}} were being mailed
+        // out verbatim.
+        result = result.replace(/{{\s*\w+\s*}}/g, '');
 
         return result;
     }
