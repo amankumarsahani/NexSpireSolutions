@@ -74,6 +74,14 @@ const ACCEPTED_RESIDUALS = [
         match: /slug\s*[=:]{1,3}\s*"nexcrm"|\["nexcrm"\]/,
         why: 'product SKU slug in the tool registry; the backend already accepts napcrm as an alias, but the stored value is still nexcrm',
     },
+    {
+        match: /nexcrm_tenant|nexcrm_domain_|nexcrm_crm_domain_|nexcrm_custom_api_url|nexcrm_android_release_seen_at/,
+        why: 'load-bearing localStorage/sessionStorage keys carrying tenant identity and the resolved-domain cache; renaming them would sign existing users out and break tenant resolution mid-session',
+    },
+    {
+        match: /"nexcrm store"|'nexcrm store'/,
+        why: 'legacy seeded store names matched to detect a placeholder name; it matches stored data, never displayed',
+    },
 ];
 
 const accepted = [];
