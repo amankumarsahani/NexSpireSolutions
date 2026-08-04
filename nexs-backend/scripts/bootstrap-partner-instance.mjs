@@ -198,6 +198,10 @@ NEXCRM_BACKEND_PATH=/var/www/html/${slug}-backend
     console.log(`  Nexspire-admin/brands/${slug}.json`);
     console.log(`  nexcrm-frontend/brands/${slug}.json   (+ public/brand/${slug}/ assets)`);
     console.log(`  nexcrm-storefront/brands/${slug}.json\n`);
+    console.log('Set the price book before onboarding any customer:');
+    console.log('  The plans table is seeded with OUR prices. Until the partner sets');
+    console.log('  their own in Admin > Plans, they would be selling at ours.');
+    console.log('  The Plans page flags every plan still carrying a default.\n');
     console.log('Verify before go-live:');
     console.log(`  node scripts/bootstrap-partner-instance.mjs check --env ${out}`);
     console.log(`  node scripts/brand-leak-audit.mjs --base-domain ${baseDomain} --dist ...\n`);

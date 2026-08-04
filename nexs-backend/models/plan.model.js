@@ -47,16 +47,20 @@ class PlanModel {
             max_projects,
             max_email_templates,
             max_document_templates,
-            features
+            features,
+            currency,
+            currency_symbol
         } = planData;
 
         const [result] = await pool.query(`
-            INSERT INTO plans (name, slug, description, price_monthly, price_yearly, 
+            INSERT INTO plans (name, slug, description, price_monthly, price_yearly,
+                              currency, currency_symbol, price_is_default,
                               max_users, max_leads, max_clients, max_projects,
                               max_email_templates, max_document_templates, features)
-            VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)
+            VALUES (?, ?, ?, ?, ?, ?, ?, 0, ?, ?, ?, ?, ?, ?, ?)
         `, [
             name, slug, description, price_monthly, price_yearly || price_monthly * 10,
+            currency || 'INR', currency_symbol || '₹',
             max_users, max_leads, max_clients, max_projects,
             max_email_templates, max_document_templates,
             JSON.stringify(features || {})
@@ -71,6 +75,7 @@ class PlanModel {
     static async update(id, planData) {
         const allowedFields = [
             'name', 'description', 'price_monthly', 'price_yearly',
+            'currency', 'currency_symbol',
             'max_users', 'max_leads', 'max_clients', 'max_projects',
             'max_email_templates', 'max_document_templates', 'features', 'is_active'
         ];
@@ -84,6 +89,13 @@ class PlanModel {
                 values.push(field === 'features' ? JSON.stringify(planData[field]) : planData[field]);
             }
         });
+
+        // Saving a price is the act of choosing one, so the plan is no longer
+        // carrying a seeded default. Set here rather than in the controller so it
+        // cannot be forgotten by a future caller.
+        if (planData.price_monthly !== undefined || planData.price_yearly !== undefined) {
+            updates.push('price_is_default = 0');
+        }
 
         if (updates.length === 0) {
             throw new Error('No valid fields to update');

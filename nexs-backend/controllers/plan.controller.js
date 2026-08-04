@@ -48,6 +48,7 @@ class PlanController {
         try {
             const {
                 name, slug, description, price_monthly, price_yearly,
+                currency, currency_symbol,
                 max_users, max_leads, max_clients, max_projects,
                 max_email_templates, max_document_templates, features
             } = req.body;
@@ -60,6 +61,7 @@ class PlanController {
 
             const planId = await PlanModel.create({
                 name, slug, description, price_monthly, price_yearly,
+                currency, currency_symbol,
                 max_users, max_leads, max_clients, max_projects,
                 max_email_templates, max_document_templates, features
             });
