@@ -18,6 +18,7 @@ const router = express.Router();
 const { query, pool } = require('../config/database');
 const { auth, isSalesOperator } = require('../middleware/auth');
 const { supportIngestRateLimit } = require('../middleware/rateLimit');
+const { isFull } = require('../config/edition');
 const { normalizeSlug, deriveSupportSecret, safeEqual } = require('../utils/supportSecret');
 const notifier = require('../services/supportNotifier');
 
@@ -314,13 +315,100 @@ router.post('/admin/tickets/:id/messages', async (req, res) => {
                 `UPDATE support_tickets SET last_message_at = NOW(), last_message_by = 'agency', status = ? WHERE id = ?`,
                 [nextStatus, ticket.id]
             );
-            // Notify the customer who opened the ticket (internal notes never leave the agency).
-            notifier.notifyAgencyReply({ ...ticket, status: nextStatus }, message.trim());
+
+            if (ticket.origin === 'partner_escalation' && ticket.partner_instance_id) {
+                // An escalated ticket belongs to the partner's customer, not ours.
+                // We must not email them directly - that would put our identity in
+                // front of a customer who has only ever dealt with the partner, and
+                // undo the whitelabel at the worst possible moment. Instead the reply
+                // is queued for the partner instance to post under its own identity.
+                await query(
+                    `INSERT INTO partner_commands (instance_id, command, args, created_by)
+                     VALUES (?, 'deliver_support_reply', ?, ?)`,
+                    [
+                        ticket.partner_instance_id,
+                        JSON.stringify({
+                            partner_ticket_id: ticket.partner_ticket_id,
+                            message: message.trim(),
+                            resolve: false,
+                        }),
+                        req.user.id || null,
+                    ]
+                );
+            } else {
+                // Our own tenant: notify them directly as before.
+                notifier.notifyAgencyReply({ ...ticket, status: nextStatus }, message.trim());
+            }
         }
         res.status(201).json({ success: true });
     } catch (error) {
         console.error('[Support] admin reply error:', error);
         res.status(500).json({ error: 'Failed to post reply' });
+    }
+});
+
+/**
+ * POST /api/support/admin/tickets/:id/escalate
+ *
+ * Partner-instance only. Hands a ticket up to the platform: it is queued here and
+ * travels on the next sync heartbeat, because a partner server has no public
+ * inbound for us to call into.
+ *
+ * The customer is told nothing and sees no change. When a platform reply comes
+ * back it is posted into this same thread under the partner's own identity.
+ */
+router.post('/admin/tickets/:id/escalate', async (req, res) => {
+    const { reason } = req.body || {};
+    try {
+        if (isFull) {
+            return res.status(400).json({
+                error: 'This instance is the platform - there is nowhere to escalate to.'
+            });
+        }
+
+        const [[ticket]] = await query('SELECT * FROM support_tickets WHERE id = ?', [req.params.id]);
+        if (!ticket) return res.status(404).json({ error: 'Ticket not found' });
+
+        if (['pending', 'sent'].includes(ticket.escalation_state)) {
+            return res.status(400).json({ error: 'Already escalated and awaiting a platform reply' });
+        }
+
+        await query(
+            `UPDATE support_tickets
+                SET escalation_state = 'pending', escalated_at = NOW(), escalation_reason = ?
+              WHERE id = ?`,
+            [reason ? String(reason).slice(0, 2000) : null, ticket.id]
+        );
+
+        res.json({
+            success: true,
+            message: 'Queued. It travels on the next sync heartbeat, within 15 minutes.'
+        });
+    } catch (error) {
+        console.error('[Support] escalate error:', error);
+        res.status(500).json({ error: 'Failed to escalate ticket' });
+    }
+});
+
+/**
+ * POST /api/support/admin/tickets/:id/withdraw-escalation
+ * Partner changed their mind, or resolved it themselves before we picked it up.
+ */
+router.post('/admin/tickets/:id/withdraw-escalation', async (req, res) => {
+    try {
+        const [result] = await query(
+            `UPDATE support_tickets SET escalation_state = 'withdrawn'
+              WHERE id = ? AND escalation_state = 'pending'`,
+            [req.params.id]
+        );
+        if (!result.affectedRows) {
+            // 'sent' cannot be withdrawn here: we may already be working on it.
+            return res.status(400).json({ error: 'Only a pending escalation can be withdrawn' });
+        }
+        res.json({ success: true });
+    } catch (error) {
+        console.error('[Support] withdraw escalation error:', error);
+        res.status(500).json({ error: 'Failed to withdraw escalation' });
     }
 });
 

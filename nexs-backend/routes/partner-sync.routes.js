@@ -2,6 +2,7 @@ const express = require('express');
 const router = express.Router();
 const { pool } = require('../config/database');
 const { verifyInstanceSignature } = require('../middleware/verifyInstanceSignature');
+const supportEscalation = require('../services/supportEscalation.service');
 
 /**
  * Partner sync receiver (P1-02).
@@ -173,6 +174,12 @@ router.post('/report', rawJson, attachRawBody, verifyInstanceSignature, async (r
             );
         }
 
+        // Support escalations ride the heartbeat rather than a second authenticated
+        // endpoint - the partner server has no public inbound for us to call.
+        const escalated = await supportEscalation.receiveEscalations(
+            connection, instance, body.escalations
+        );
+
         await connection.query(
             `INSERT INTO partner_sync_log
                 (instance_id, instance_slug, kind, ok, tenants_count, payload_bytes, remote_ip)
@@ -201,6 +208,8 @@ router.post('/report', rawJson, attachRawBody, verifyInstanceSignature, async (r
 
         res.json({
             ok: true,
+            // Acknowledged escalations, so the instance can stop resending them.
+            escalations_received: escalated,
             commands: commands.map((c) => ({
                 id: c.id,
                 command: c.command,

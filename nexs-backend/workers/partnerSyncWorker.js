@@ -21,6 +21,7 @@ const { pool } = require('../config/database');
 const brand = require('../config/brand');
 const { edition } = require('../config/edition');
 const tenantUsage = require('../services/tenantUsage.service');
+const supportEscalation = require('../services/supportEscalation.service');
 
 const SPOOL_DIR = path.join(__dirname, '..', '.sync-spool');
 // Bound the spool. A master that has been down for days must not fill the disk;
@@ -121,6 +122,18 @@ class PartnerSyncWorker {
         }
     }
 
+    /** Tickets the partner has handed up to the platform (P4-03). */
+    async collectEscalations() {
+        try {
+            return await supportEscalation.collectPending();
+        } catch (error) {
+            // An escalation backlog must never stop the heartbeat: the fleet health
+            // signal matters more than the support hand-off being a cycle late.
+            console.error('[PartnerSync] Failed to collect escalations:', error.message);
+            return [];
+        }
+    }
+
     async collectHealth() {
         const health = {
             uptime_s: Math.round(process.uptime()),
@@ -158,6 +171,7 @@ class PartnerSyncWorker {
                 reported_at: new Date().toISOString(),
             },
             health: await this.collectHealth(),
+            escalations: await this.collectEscalations(),
             tenants,
             totals: {
                 tenants_active: tenants.filter((t) => t.status === 'active').length,
@@ -266,6 +280,11 @@ class PartnerSyncWorker {
                 return `${args.tenant_slug} -> ${status}`;
             }
 
+            case 'deliver_support_reply':
+                // A platform reply, posted into the partner's own ticket thread
+                // under the partner's identity. The customer never sees us.
+                return await supportEscalation.applyPlatformReply(args);
+
             case 'set_quota':
                 // Quota is enforced by the master at provision time; nothing to do
                 // locally, but acking keeps the queue moving.
@@ -293,6 +312,10 @@ class PartnerSyncWorker {
             payload = await this.buildPayload(kind, extra);
             const response = await this.send(payload);
             this.consecutiveFailures = 0;
+
+            if (response && Array.isArray(response.escalations_received) && response.escalations_received.length > 0) {
+                await supportEscalation.markSent(response.escalations_received);
+            }
 
             if (response && Array.isArray(response.commands) && response.commands.length > 0) {
                 const acks = await this.runCommands(response.commands);

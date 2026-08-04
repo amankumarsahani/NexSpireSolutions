@@ -50,6 +50,22 @@ never measured is not. A stale instance, an unmeasured user count, a missing
 price and an unsuspended-but-inactive instance each block the invoice with a
 reason rather than producing a confident zero.
 
+## Support escalation
+
+`support-escalation.test.js` — the partner-to-platform hand-off. Requires
+migrations 058, 064, 065 and 066.
+
+```bash
+DB_HOST=127.0.0.1 DB_PORT=13306 DB_USER=root DB_PASSWORD=verifypass \
+DB_NAME=napnix_verify npm run test:escalation
+```
+
+The property worth protecting: the end customer belongs to the *partner*. A
+platform reply must arrive in the partner's own ticket thread under the partner's
+identity, never as an email from us, and the partner's internal notes must stay
+with the partner. Redelivery after a lost ack must not open a second ticket for
+the same problem.
+
 ### Confirming the suite still bites
 
 A passing suite is only evidence if it can fail. These three mutations were each
@@ -63,6 +79,8 @@ verified to turn exactly one test red:
 | coerce usage through `asInt` instead of `asUsage` (the original bug) | an unmeasured usage counter is stored NULL, not zero |
 | remove the unmeasured-usage refusal in `partnerBilling.service.js` | an unmeasured user count blocks billing |
 | remove the stale-instance refusal | a stale instance is NOT billed |
+| ship internal notes in `supportEscalation.collectPending` | internal notes are not shipped to the platform |
+| re-copy the thread on every redelivery (`if (n === 0)` → always) | a redelivered escalation does not duplicate the ticket |
 
 Worth repeating after any significant change to the sync or billing path.
 

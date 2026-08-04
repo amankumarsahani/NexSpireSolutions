@@ -10,7 +10,8 @@
     "migrate": "node database/migrate.js",
     "test:sync": "node tests/partner-sync-signature.test.js",
     "test:sync:integration": "node tests/partner-sync-integration.test.js",
-    "test:billing": "node tests/partner-billing.test.js"
+    "test:billing": "node tests/partner-billing.test.js",
+    "test:escalation": "node tests/support-escalation.test.js"
   },
   "keywords": [
     "express",
