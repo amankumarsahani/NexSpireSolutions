@@ -62,6 +62,29 @@ const GOOGLE_FLOWS = {
 
 const INTERNAL_OAUTH_KEY = process.env.INTERNAL_OAUTH_KEY;
 
+/**
+ * Verify an incoming state JWT, replying with a message that distinguishes a
+ * genuinely stale link (user waited past the 10m expiry) from a secret mismatch
+ * between this process and the tenant that signed it — both used to surface as
+ * the same opaque "Invalid or expired state".
+ * Returns true when handled (response already sent).
+ */
+function rejectBadState(state, res) {
+    try {
+        oauthState.verify(state);
+        return false;
+    } catch (err) {
+        if (err.name === 'TokenExpiredError') {
+            res.status(400).send('This connect link has expired. Go back to your CRM and start the connection again.');
+        } else {
+            console.error('[oauth] state verification failed:', err.name, err.message,
+                '— check OAUTH_STATE_SECRET matches between nexs-backend and the tenant backend');
+            res.status(400).send('Could not verify this connect link (OAuth state secret mismatch between servers). Contact support.');
+        }
+        return true;
+    }
+}
+
 function buildOAuthClient() {
     return new google.auth.OAuth2(
         process.env.GOOGLE_OAUTH_CLIENT_ID,
@@ -77,11 +100,7 @@ router.get('/google/start', (req, res) => {
         return res.status(400).send('Missing state or tenant_api_url');
     }
 
-    try {
-        oauthState.verify(state);
-    } catch {
-        return res.status(400).send('Invalid or expired state');
-    }
+    if (rejectBadState(state, res)) return;
 
     // flow travels inside the signed state (set by the tenant connect-url builder).
     // Default to the sheets flow for backward compatibility with lead-sources.
@@ -206,8 +225,7 @@ router.get('/microsoft/start', async (req, res) => {
     const { state, tenant_api_url, return_to } = req.query;
     if (!state || !tenant_api_url) return res.status(400).send('Missing state or tenant_api_url');
 
-    try { oauthState.verify(state); }
-    catch { return res.status(400).send('Invalid or expired state'); }
+    if (rejectBadState(state, res)) return;
 
     try {
         const { exp, iat, ...decoded } = oauthState.decode(state) || {};
@@ -321,8 +339,7 @@ router.get('/facebook/leads/start', (req, res) => {
     const { state, tenant_api_url, return_to } = req.query;
     if (!state || !tenant_api_url) return res.status(400).send('Missing state or tenant_api_url');
 
-    try { oauthState.verify(state); }
-    catch { return res.status(400).send('Invalid or expired state'); }
+    if (rejectBadState(state, res)) return;
 
     const { exp, iat, ...decoded } = oauthState.decode(state) || {};
     const embeddedState = oauthState.sign(
@@ -485,8 +502,7 @@ router.get('/oauth2/:provider/start', (req, res) => {
     const { state, tenant_api_url, return_to } = req.query;
     if (!state || !tenant_api_url) return res.status(400).send('Missing state or tenant_api_url');
 
-    try { oauthState.verify(state); }
-    catch { return res.status(400).send('Invalid or expired state'); }
+    if (rejectBadState(state, res)) return;
 
     const { exp, iat, ...decoded } = oauthState.decode(state) || {};
     const embeddedState = oauthState.sign(
