@@ -23,6 +23,10 @@ router.delete('/:id', tenantController.deleteTenant);
 // PM2 Logs
 router.get('/:id/logs', tenantController.getLogs);
 
+// AI consumption and rating feedback for one tenant. Admin-side because the
+// spend is ours until AI is billed — a tenant has no use for it.
+router.get('/:id/ai-usage', tenantController.getAiUsage);
+
 // Full Delete (removes all resources)
 router.delete('/:id/full-delete', tenantController.fullDeleteTenant);
 

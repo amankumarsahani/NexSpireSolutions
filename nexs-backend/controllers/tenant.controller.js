@@ -8,6 +8,7 @@ const pdfService = require('../services/pdf.service');
 const emailService = require('../services/email.service');
 const workflowEngine = require('../services/workflowEngine');
 const { pool } = require('../config/database');
+const mysql = require('mysql2/promise');
 const { execFile } = require('child_process');
 const path = require('path');
 
@@ -1709,6 +1710,124 @@ class TenantController {
         } catch (error) {
             console.error('Send agreement error:', error);
             res.status(500).json({ error: 'Failed to send agreement: ' + error.message });
+        }
+    }
+
+    /**
+     * AI consumption for one tenant — calls, tokens, cost, and how the tenant
+     * rated what NapMind produced.
+     *
+     * Lives here rather than in the tenant API on purpose: AI is provided by us
+     * and not yet billed, so spend is our unit economics, not something a
+     * customer should be reading. The tenant CRM still collects the ratings; the
+     * aggregate view of them belongs with whoever tunes the detectors.
+     */
+    async getAiUsage(req, res) {
+        let tenantPool = null;
+        try {
+            const tenant = await TenantModel.findById(req.params.id);
+            if (!tenant) return res.status(404).json({ error: 'Tenant not found' });
+            if (!tenant.db_name) return res.status(400).json({ error: 'Tenant has no database provisioned' });
+
+            const days = Math.min(Math.max(parseInt(req.query.days, 10) || 30, 1), 365);
+            const server = tenant.server_id ? await ServerModel.findById(tenant.server_id) : null;
+
+            tenantPool = mysql.createPool({
+                host: server?.db_host || process.env.DB_HOST || 'localhost',
+                port: server?.db_port || process.env.DB_PORT || 3306,
+                user: server?.db_user || process.env.DB_USER,
+                password: server?.db_password || process.env.DB_PASSWORD,
+                database: tenant.db_name,
+                connectionLimit: 2
+            });
+
+            // A tenant that has not run migration 119 has no cost column yet, and
+            // one that predates NapMind has no ai_usage at all. Neither is an
+            // error — report what exists rather than failing the whole panel.
+            const [[usageTable]] = await tenantPool.query(
+                `SELECT COUNT(*) AS n FROM information_schema.tables
+                  WHERE table_schema = ? AND table_name = 'ai_usage'`, [tenant.db_name]
+            );
+            if (!usageTable.n) {
+                return res.json({ success: true, data: { available: false, reason: 'NapMind not initialized on this tenant' } });
+            }
+
+            const [[costColumn]] = await tenantPool.query(
+                `SELECT COUNT(*) AS n FROM information_schema.columns
+                  WHERE table_schema = ? AND table_name = 'ai_usage' AND column_name = 'cost_micros'`, [tenant.db_name]
+            );
+            const costExpr = costColumn.n ? 'COALESCE(SUM(cost_micros), 0)' : '0';
+
+            const [daily] = await tenantPool.query(
+                `SELECT usage_date, SUM(calls) AS calls, SUM(tokens_in) AS tokens_in,
+                        SUM(tokens_out) AS tokens_out, ${costExpr} AS cost_micros
+                   FROM ai_usage
+                  WHERE usage_date >= DATE_SUB(CURDATE(), INTERVAL ? DAY)
+                  GROUP BY usage_date ORDER BY usage_date DESC`, [days]
+            );
+
+            const [byPurpose] = await tenantPool.query(
+                `SELECT purpose, SUM(calls) AS calls, ${costExpr} AS cost_micros
+                   FROM ai_usage
+                  WHERE usage_date >= DATE_SUB(CURDATE(), INTERVAL ? DAY)
+                  GROUP BY purpose ORDER BY calls DESC`, [days]
+            );
+
+            let feedback = [];
+            const [[feedbackTable]] = await tenantPool.query(
+                `SELECT COUNT(*) AS n FROM information_schema.tables
+                  WHERE table_schema = ? AND table_name = 'ai_feedback'`, [tenant.db_name]
+            );
+            if (feedbackTable.n) {
+                const [rows] = await tenantPool.query(
+                    `SELECT subject_key, SUM(rating = 'useful') AS useful,
+                            SUM(rating = 'not_useful') AS not_useful, COUNT(*) AS total
+                       FROM ai_feedback WHERE subject_key IS NOT NULL
+                      GROUP BY subject_key ORDER BY total DESC LIMIT 50`
+                );
+                feedback = rows.map(r => ({
+                    subjectKey: r.subject_key,
+                    useful: Number(r.useful || 0),
+                    notUseful: Number(r.not_useful || 0),
+                    total: Number(r.total || 0)
+                }));
+            }
+
+            const toUsd = (micros) => Number(micros || 0) / 1_000_000;
+            const totals = daily.reduce((acc, r) => ({
+                calls: acc.calls + Number(r.calls || 0),
+                tokensIn: acc.tokensIn + Number(r.tokens_in || 0),
+                tokensOut: acc.tokensOut + Number(r.tokens_out || 0),
+                costUsd: acc.costUsd + toUsd(r.cost_micros)
+            }), { calls: 0, tokensIn: 0, tokensOut: 0, costUsd: 0 });
+
+            res.json({
+                success: true,
+                data: {
+                    available: true,
+                    costTracked: Boolean(costColumn.n),
+                    days,
+                    totals,
+                    daily: daily.map(r => ({
+                        date: r.usage_date,
+                        calls: Number(r.calls || 0),
+                        tokensIn: Number(r.tokens_in || 0),
+                        tokensOut: Number(r.tokens_out || 0),
+                        costUsd: toUsd(r.cost_micros)
+                    })),
+                    byPurpose: byPurpose.map(r => ({
+                        purpose: r.purpose,
+                        calls: Number(r.calls || 0),
+                        costUsd: toUsd(r.cost_micros)
+                    })),
+                    feedback
+                }
+            });
+        } catch (error) {
+            console.error('Get AI usage error:', error);
+            res.status(500).json({ error: 'Failed to fetch AI usage: ' + error.message });
+        } finally {
+            if (tenantPool) await tenantPool.end().catch(() => {});
         }
     }
 }
