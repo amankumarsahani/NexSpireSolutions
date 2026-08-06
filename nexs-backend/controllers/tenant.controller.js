@@ -1780,17 +1780,37 @@ class TenantController {
             );
             if (feedbackTable.n) {
                 const [rows] = await tenantPool.query(
-                    `SELECT subject_key, SUM(rating = 'useful') AS useful,
-                            SUM(rating = 'not_useful') AS not_useful, COUNT(*) AS total
+                    // user_id NULL means we rated it from here; a real id means
+                    // someone in the tenant did. Blending them hides the case
+                    // worth acting on: a detector the customer finds useless but
+                    // we consider correct is a different problem from one both
+                    // sides agree is noise.
+                    `SELECT subject_key,
+                            SUM(rating = 'useful'     AND user_id IS NOT NULL) AS tenant_useful,
+                            SUM(rating = 'not_useful' AND user_id IS NOT NULL) AS tenant_not_useful,
+                            SUM(rating = 'useful'     AND user_id IS NULL)     AS operator_useful,
+                            SUM(rating = 'not_useful' AND user_id IS NULL)     AS operator_not_useful,
+                            COUNT(*) AS total
                        FROM ai_feedback WHERE subject_key IS NOT NULL
                       GROUP BY subject_key ORDER BY total DESC LIMIT 50`
                 );
-                feedback = rows.map(r => ({
-                    subjectKey: r.subject_key,
-                    useful: Number(r.useful || 0),
-                    notUseful: Number(r.not_useful || 0),
-                    total: Number(r.total || 0)
-                }));
+                feedback = rows.map(r => {
+                    const tenant = { useful: Number(r.tenant_useful || 0), notUseful: Number(r.tenant_not_useful || 0) };
+                    const operator = { useful: Number(r.operator_useful || 0), notUseful: Number(r.operator_not_useful || 0) };
+                    const tenantTotal = tenant.useful + tenant.notUseful;
+                    const operatorTotal = operator.useful + operator.notUseful;
+                    return {
+                        subjectKey: r.subject_key,
+                        tenant: { ...tenant, total: tenantTotal },
+                        operator: { ...operator, total: operatorTotal },
+                        total: Number(r.total || 0),
+                        // The signal worth surfacing: both sides have judged it and
+                        // reached opposite conclusions. That is a detector to look
+                        // at, not one to quietly average away.
+                        disputed: tenantTotal > 0 && operatorTotal > 0
+                            && (tenant.useful > tenant.notUseful) !== (operator.useful > operator.notUseful)
+                    };
+                });
             }
 
             const toUsd = (micros) => Number(micros || 0) / 1_000_000;
@@ -1862,16 +1882,22 @@ class TenantController {
                   WHERE table_schema = ? AND table_name = 'ai_feedback'`, [tenant.db_name]
             );
 
-            // LEFT JOIN so an unrated insight still appears — those are exactly
-            // the ones needing a verdict.
+            // Two separate verdicts, not "whichever row comes first". Selecting
+            // any rating meant the thumbs here could light up showing a tenant
+            // user's opinion as though it were ours — and clicking would then
+            // silently overwrite nothing, because the two are different rows.
             const ratingSelect = feedbackTable.n
                 ? `(SELECT rating FROM ai_feedback f
-                     WHERE f.subject_type = 'insight' AND f.subject_id = CAST(i.id AS CHAR) LIMIT 1)`
-                : 'NULL';
+                     WHERE f.subject_type = 'insight' AND f.subject_id = CAST(i.id AS CHAR)
+                       AND f.user_id IS NULL LIMIT 1) AS rating,
+                   (SELECT rating FROM ai_feedback f
+                     WHERE f.subject_type = 'insight' AND f.subject_id = CAST(i.id AS CHAR)
+                       AND f.user_id IS NOT NULL ORDER BY f.created_at DESC LIMIT 1) AS tenant_rating`
+                : 'NULL AS rating, NULL AS tenant_rating';
 
             const [rows] = await tenantPool.query(
                 `SELECT i.id, i.insight_key, i.agent, i.severity, i.title, i.narrative,
-                        i.status, i.created_at, ${ratingSelect} AS rating
+                        i.status, i.created_at, ${ratingSelect}
                    FROM ai_insights i
                   ORDER BY FIELD(i.severity,'critical','high','medium','low','info'), i.created_at DESC
                   LIMIT ?`, [limit]
@@ -1891,7 +1917,8 @@ class TenantController {
                         narrative: r.narrative,
                         status: r.status,
                         createdAt: r.created_at,
-                        rating: r.rating || null
+                        rating: r.rating || null,
+                        tenantRating: r.tenant_rating || null
                     }))
                 }
             });
