@@ -1830,6 +1830,133 @@ class TenantController {
             if (tenantPool) await tenantPool.end().catch(() => {});
         }
     }
+
+    /**
+     * Recent NapMind insights for a tenant, with whatever verdict we have
+     * already recorded against each one.
+     *
+     * Judging detector quality is our job, not the customer's: they see the
+     * insight and act on it, we decide whether it should have fired at all.
+     * That is why the rating lives here rather than in the tenant CRM.
+     */
+    async getAiInsights(req, res) {
+        let tenantPool = null;
+        try {
+            const tenant = await TenantModel.findById(req.params.id);
+            if (!tenant) return res.status(404).json({ error: 'Tenant not found' });
+            if (!tenant.db_name) return res.status(400).json({ error: 'Tenant has no database provisioned' });
+
+            tenantPool = await module.exports._tenantPool(tenant);
+            const limit = Math.min(Math.max(parseInt(req.query.limit, 10) || 25, 1), 100);
+
+            const [[insightsTable]] = await tenantPool.query(
+                `SELECT COUNT(*) AS n FROM information_schema.tables
+                  WHERE table_schema = ? AND table_name = 'ai_insights'`, [tenant.db_name]
+            );
+            if (!insightsTable.n) {
+                return res.json({ success: true, data: { available: false, insights: [] } });
+            }
+
+            const [[feedbackTable]] = await tenantPool.query(
+                `SELECT COUNT(*) AS n FROM information_schema.tables
+                  WHERE table_schema = ? AND table_name = 'ai_feedback'`, [tenant.db_name]
+            );
+
+            // LEFT JOIN so an unrated insight still appears — those are exactly
+            // the ones needing a verdict.
+            const ratingSelect = feedbackTable.n
+                ? `(SELECT rating FROM ai_feedback f
+                     WHERE f.subject_type = 'insight' AND f.subject_id = CAST(i.id AS CHAR) LIMIT 1)`
+                : 'NULL';
+
+            const [rows] = await tenantPool.query(
+                `SELECT i.id, i.insight_key, i.agent, i.severity, i.title, i.narrative,
+                        i.status, i.created_at, ${ratingSelect} AS rating
+                   FROM ai_insights i
+                  ORDER BY FIELD(i.severity,'critical','high','medium','low','info'), i.created_at DESC
+                  LIMIT ?`, [limit]
+            );
+
+            res.json({
+                success: true,
+                data: {
+                    available: true,
+                    ratingsEnabled: Boolean(feedbackTable.n),
+                    insights: rows.map(r => ({
+                        id: r.id,
+                        insightKey: r.insight_key,
+                        agent: r.agent,
+                        severity: r.severity,
+                        title: r.title,
+                        narrative: r.narrative,
+                        status: r.status,
+                        createdAt: r.created_at,
+                        rating: r.rating || null
+                    }))
+                }
+            });
+        } catch (error) {
+            console.error('Get AI insights error:', error);
+            res.status(500).json({ error: 'Failed to fetch AI insights: ' + error.message });
+        } finally {
+            if (tenantPool) await tenantPool.end().catch(() => {});
+        }
+    }
+
+    /** Record our verdict on one of a tenant's insights. */
+    async rateAiInsight(req, res) {
+        let tenantPool = null;
+        try {
+            const { rating, reason, insightKey } = req.body || {};
+            if (!['useful', 'not_useful'].includes(rating)) {
+                return res.status(400).json({ error: 'rating must be useful or not_useful' });
+            }
+
+            const tenant = await TenantModel.findById(req.params.id);
+            if (!tenant) return res.status(404).json({ error: 'Tenant not found' });
+            if (!tenant.db_name) return res.status(400).json({ error: 'Tenant has no database provisioned' });
+
+            tenantPool = await module.exports._tenantPool(tenant);
+            const [[feedbackTable]] = await tenantPool.query(
+                `SELECT COUNT(*) AS n FROM information_schema.tables
+                  WHERE table_schema = ? AND table_name = 'ai_feedback'`, [tenant.db_name]
+            );
+            if (!feedbackTable.n) {
+                return res.status(503).json({ error: 'Run migration 119 on this tenant before rating insights' });
+            }
+
+            // user_id stays NULL: the rater is an operator in the master database,
+            // and that id means nothing in the tenant's users table. Writing it
+            // would point at whichever tenant user happened to share the number.
+            await tenantPool.query(
+                `INSERT INTO ai_feedback (subject_type, subject_id, subject_key, rating, reason, user_id)
+                 VALUES ('insight', ?, ?, ?, ?, NULL)
+                 ON DUPLICATE KEY UPDATE rating = VALUES(rating), reason = VALUES(reason),
+                                         created_at = CURRENT_TIMESTAMP`,
+                [String(req.params.insightId), insightKey || null, rating, reason ? String(reason).slice(0, 500) : null]
+            );
+
+            res.json({ success: true });
+        } catch (error) {
+            console.error('Rate AI insight error:', error);
+            res.status(500).json({ error: 'Failed to record rating: ' + error.message });
+        } finally {
+            if (tenantPool) await tenantPool.end().catch(() => {});
+        }
+    }
+
+    /** Pool onto a tenant's own database, using its server's credentials. */
+    async _tenantPool(tenant) {
+        const server = tenant.server_id ? await ServerModel.findById(tenant.server_id) : null;
+        return mysql.createPool({
+            host: server?.db_host || process.env.DB_HOST || 'localhost',
+            port: server?.db_port || process.env.DB_PORT || 3306,
+            user: server?.db_user || process.env.DB_USER,
+            password: server?.db_password || process.env.DB_PASSWORD,
+            database: tenant.db_name,
+            connectionLimit: 2
+        });
+    }
 }
 
 module.exports = new TenantController();
