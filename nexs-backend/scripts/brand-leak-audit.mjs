@@ -79,10 +79,33 @@ const ACCEPTED_RESIDUALS = [
         why: 'load-bearing localStorage/sessionStorage keys carrying tenant identity and the resolved-domain cache; renaming them would sign existing users out and break tenant resolution mid-session',
     },
     {
+        match: /nexcrm_device_fp|nexcrm::fp::/,
+        why: 'device-fingerprint storage keys and hash salt; changing the salt invalidates every stored device hash and re-prompts every returning user',
+    },
+    {
+        match: /meta\[name="nexcrm-api-url"\]|nexcrm-api-url/,
+        why: 'meta tag name read from already-deployed HTML; renaming it breaks existing custom-domain deploys until every one is rebuilt',
+    },
+    {
+        match: /nexcrm:(services|manufacturing):/,
+        why: 'per-industry invoice-defaults storage keys; renaming them orphans the terms, bank details and transport modes a tenant has already saved',
+    },
+    {
+        match: /NEXCRM_BLOCKS/,
+        why: 'marker embedded in saved email-template HTML; renaming it orphans every template already stored in a tenant DB',
+    },
+    {
+        match: /"nexcrm",\s*\w+\s*=\s*"napmail"|SKU_CRM|SKU_MAIL/,
+        why: 'product SKU constants from src/config/products.js; the backend compares these exact stored values',
+    },
+    {
         match: /"nexcrm store"|'nexcrm store'/,
         why: 'legacy seeded store names matched to detect a placeholder name; it matches stored data, never displayed',
     },
 ];
+
+/** Cap per file so one minified bundle cannot bury the rest of the report. */
+const MAX_FINDINGS_PER_FILE = 5;
 
 const accepted = [];
 
@@ -131,25 +154,53 @@ function auditDist(dist) {
 
     for (const file of walk(dist)) {
         const content = readFileSync(file, 'utf8');
+        const rel = relative(dist, file);
+
+        /**
+         * Every occurrence is judged on its own context.
+         *
+         * The previous version took only the first match per pattern and then broke
+         * out of the whole file when that match was an accepted residual. A bundle
+         * is one file, so a single whitelisted storage key near the top hid every
+         * real leak below it - that is exactly how `name@napnix.com`, a hardcoded
+         * `napnix.in` host regex and a `napcrm-` download filename all survived an
+         * audit that reported one finding.
+         */
+        const seen = new Set();
+        const excused = new Set();
+        let recorded = 0;
+        let suppressed = 0;
+
         for (const pattern of PLATFORM_PATTERNS) {
-            const match = content.match(pattern);
-            if (!match) continue;
+            const flags = pattern.flags.includes('g') ? pattern.flags : `${pattern.flags}g`;
+            for (const match of content.matchAll(new RegExp(pattern.source, flags))) {
+                const context = content
+                    .slice(Math.max(0, match.index - 80), match.index + 80)
+                    .replace(/\s+/g, ' ');
 
-            const idx = content.indexOf(match[0]);
-            const context = content.slice(Math.max(0, idx - 80), idx + 80);
+                const excuse = ACCEPTED_RESIDUALS.find((r) => r.match.test(context));
+                if (excuse) {
+                    excused.add(excuse.why);
+                    continue;
+                }
 
-            const excuse = ACCEPTED_RESIDUALS.find((r) => r.match.test(context));
-            if (excuse) {
-                accepted.push(`${relative(dist, file)}: ${excuse.why}`);
-                break;
+                // Minified bundles repeat the same string; report each distinct site once.
+                const key = `${match[0].toLowerCase()}::${context}`;
+                if (seen.has(key)) continue;
+                seen.add(key);
+
+                if (recorded >= MAX_FINDINGS_PER_FILE) {
+                    suppressed += 1;
+                    continue;
+                }
+                record('bundle', `${rel} contains "${match[0]}"`, context);
+                recorded += 1;
             }
+        }
 
-            record(
-                'bundle',
-                `${relative(dist, file)} contains "${match[0]}"`,
-                context.replace(/\s+/g, ' ')
-            );
-            break; // one finding per file is enough to fail it
+        for (const why of excused) accepted.push(`${rel}: ${why}`);
+        if (suppressed > 0) {
+            record('bundle', `${rel} has ${suppressed} further occurrence(s) beyond the first ${MAX_FINDINGS_PER_FILE}`, '');
         }
     }
 }
