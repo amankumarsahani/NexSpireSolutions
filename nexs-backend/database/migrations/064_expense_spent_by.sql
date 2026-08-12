@@ -1,0 +1,13 @@
+CREATE TABLE IF NOT EXISTS expense_people (
+    id INT AUTO_INCREMENT PRIMARY KEY,
+    name VARCHAR(150) NOT NULL,
+    is_active TINYINT(1) NOT NULL DEFAULT 1,
+    created_by INT DEFAULT NULL,
+    created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+    updated_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
+    UNIQUE KEY uniq_expense_person_name (name)
+);
+
+ALTER TABLE expenses
+    ADD COLUMN IF NOT EXISTS spent_by VARCHAR(150) DEFAULT NULL AFTER vendor,
+    ADD INDEX IF NOT EXISTS idx_spent_by (spent_by);

@@ -7,7 +7,7 @@ class ExpenseController {
                 page = 1, limit = 50,
                 type, date_from, date_to,
                 category, payment_method,
-                search, is_recurring
+                search, is_recurring, spent_by
             } = req.query;
 
             const offset = (parseInt(page) - 1) * parseInt(limit);
@@ -19,14 +19,15 @@ class ExpenseController {
             if (date_to)       { conditions.push('date <= ?');           params.push(date_to); }
             if (category)      { conditions.push('category = ?');        params.push(category); }
             if (payment_method){ conditions.push('payment_method = ?');  params.push(payment_method); }
+            if (spent_by)      { conditions.push('spent_by = ?');        params.push(spent_by); }
             if (is_recurring !== undefined && is_recurring !== '') {
                 conditions.push('is_recurring = ?');
                 params.push(is_recurring === 'true' || is_recurring === '1' ? 1 : 0);
             }
             if (search) {
-                conditions.push('(vendor LIKE ? OR description LIKE ? OR notes LIKE ? OR reference LIKE ?)');
+                conditions.push('(vendor LIKE ? OR description LIKE ? OR notes LIKE ? OR reference LIKE ? OR spent_by LIKE ?)');
                 const like = `%${search}%`;
-                params.push(like, like, like, like);
+                params.push(like, like, like, like, like);
             }
 
             const where = conditions.length ? 'WHERE ' + conditions.join(' AND ') : '';
@@ -114,6 +115,14 @@ class ExpenseController {
                  FROM expenses WHERE is_recurring = 1 AND type = 'expense'`
             );
 
+            // Spend per person (expenses only, this year)
+            const [bySpender] = await pool.query(
+                `SELECT spent_by, COALESCE(SUM(amount),0) as total, COUNT(*) as count
+                 FROM expenses
+                 WHERE type = 'expense' AND spent_by IS NOT NULL AND spent_by <> '' AND date >= ?
+                 GROUP BY spent_by ORDER BY total DESC`, [yearStart]
+            );
+
             const [allCategories] = await pool.query(
                 'SELECT DISTINCT category, type FROM expenses ORDER BY type, category'
             );
@@ -142,6 +151,7 @@ class ExpenseController {
                         ytd: depYtd - expYtd,
                     },
                     monthlyTrend: trend,
+                    bySpender: bySpender.map(r => ({ ...r, total: parseFloat(r.total) })),
                     allExpenseCategories: allCategories.filter(r => r.type === 'expense').map(r => r.category),
                     allDepositCategories: allCategories.filter(r => r.type === 'deposit').map(r => r.category),
                 }
@@ -149,6 +159,73 @@ class ExpenseController {
         } catch (err) {
             console.error('Expenses getStats error:', err);
             res.status(500).json({ error: 'Failed to fetch stats' });
+        }
+    }
+
+    // ─── People (who spent the money) ───────────────────────────────────────
+    // Names are denormalised onto expenses.spent_by, so deleting a person
+    // never rewrites history — it only removes them from the dropdown.
+
+    async listPeople(req, res) {
+        try {
+            const [rows] = await pool.query(
+                'SELECT id, name, is_active FROM expense_people WHERE is_active = 1 ORDER BY name ASC'
+            );
+            // Legacy names typed before this table existed still show up.
+            const [used] = await pool.query(
+                'SELECT DISTINCT spent_by FROM expenses WHERE spent_by IS NOT NULL AND spent_by <> ""'
+            );
+            const known = new Set(rows.map(r => r.name));
+            const orphans = used
+                .map(r => r.spent_by)
+                .filter(n => !known.has(n))
+                .map(n => ({ id: null, name: n, is_active: 1 }));
+
+            res.json({ success: true, data: [...rows, ...orphans].sort((a, b) => a.name.localeCompare(b.name)) });
+        } catch (err) {
+            console.error('Expense people list error:', err);
+            res.status(500).json({ error: 'Failed to fetch people' });
+        }
+    }
+
+    async createPerson(req, res) {
+        try {
+            const name = (req.body.name || '').trim();
+            if (!name) return res.status(400).json({ error: 'name is required' });
+            if (name.length > 150) return res.status(400).json({ error: 'name is too long' });
+
+            const [[existing]] = await pool.query('SELECT * FROM expense_people WHERE name = ?', [name]);
+            if (existing) {
+                if (!existing.is_active) {
+                    await pool.query('UPDATE expense_people SET is_active = 1 WHERE id = ?', [existing.id]);
+                    return res.status(200).json({ success: true, data: { ...existing, is_active: 1 } });
+                }
+                return res.status(409).json({ error: 'Person already exists' });
+            }
+
+            const [result] = await pool.query(
+                'INSERT INTO expense_people (name, created_by) VALUES (?, ?)',
+                [name, req.user?.id || null]
+            );
+            const [[created]] = await pool.query('SELECT * FROM expense_people WHERE id = ?', [result.insertId]);
+            res.status(201).json({ success: true, data: created });
+        } catch (err) {
+            console.error('Expense person create error:', err);
+            res.status(500).json({ error: 'Failed to add person' });
+        }
+    }
+
+    async deletePerson(req, res) {
+        try {
+            // Soft delete — past records keep the name they were saved with.
+            const [result] = await pool.query(
+                'UPDATE expense_people SET is_active = 0 WHERE id = ?', [req.params.id]
+            );
+            if (result.affectedRows === 0) return res.status(404).json({ error: 'Person not found' });
+            res.json({ success: true });
+        } catch (err) {
+            console.error('Expense person delete error:', err);
+            res.status(500).json({ error: 'Failed to remove person' });
         }
     }
 
@@ -167,7 +244,7 @@ class ExpenseController {
             const {
                 type = 'expense',
                 date, amount, category = 'Other', description,
-                vendor, payment_method = 'card',
+                vendor, spent_by, payment_method = 'card',
                 is_recurring = 0, recurring_interval, notes, reference
             } = req.body;
 
@@ -176,12 +253,12 @@ class ExpenseController {
             }
 
             const [result] = await pool.query(
-                `INSERT INTO expenses (type, date, amount, category, description, vendor, payment_method,
+                `INSERT INTO expenses (type, date, amount, category, description, vendor, spent_by, payment_method,
                  is_recurring, recurring_interval, notes, reference, created_by)
-                 VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)`,
+                 VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)`,
                 [
                     type, date, parseFloat(amount), category,
-                    description || null, vendor || null, payment_method,
+                    description || null, vendor || null, spent_by || null, payment_method,
                     is_recurring ? 1 : 0,
                     is_recurring && recurring_interval ? recurring_interval : null,
                     notes || null, reference || null,
@@ -202,7 +279,7 @@ class ExpenseController {
             const { id } = req.params;
             const {
                 type, date, amount, category, description,
-                vendor, payment_method, is_recurring, recurring_interval,
+                vendor, spent_by, payment_method, is_recurring, recurring_interval,
                 notes, reference
             } = req.body;
 
@@ -215,6 +292,7 @@ class ExpenseController {
             if (category !== undefined)          { fields.push('category = ?');           params.push(category); }
             if (description !== undefined)       { fields.push('description = ?');        params.push(description || null); }
             if (vendor !== undefined)            { fields.push('vendor = ?');             params.push(vendor || null); }
+            if (spent_by !== undefined)          { fields.push('spent_by = ?');           params.push(spent_by || null); }
             if (payment_method !== undefined)    { fields.push('payment_method = ?');     params.push(payment_method); }
             if (is_recurring !== undefined) {
                 const rec = is_recurring ? 1 : 0;
