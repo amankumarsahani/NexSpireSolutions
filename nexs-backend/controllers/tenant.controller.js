@@ -11,21 +11,37 @@ const { pool } = require('../config/database');
 const mysql = require('mysql2/promise');
 const { execFile } = require('child_process');
 
+const INR = (n) => `INR ${Number(n).toLocaleString('en-IN', { maximumFractionDigits: 0 })}`;
+
 /**
- * Published subscription rates (INR), mirroring the public pricing page.
- * `yearly` is the per-month rate when billed annually, matching how the site
- * presents it.
+ * Build the Annexure A rate-card rows for the service agreement.
  *
- * Source of truth: NexSpireSolutions/nexs-agency/src/constants/crmPricing.js.
- * Used only as a fallback when the plans table carries no price — update both
- * together, or an agreement could quote a figure the website contradicts.
- * Enterprise is intentionally absent: it is quoted on request.
+ * Deliberately reads the same `plans` rows that Clause 3 draws the client's own
+ * subscription fee from. An earlier version hardcoded the figures published on
+ * the marketing site, which meant a single executed contract could state one
+ * price in Clause 3 and a different one in the Annexure whenever the two drifted
+ * apart — which they had.
+ *
+ * Returns HTML table rows, or a single explanatory row if no active plans exist,
+ * so the annexure never renders as an empty table.
  */
-const PUBLISHED_RATES = {
-    starter: { monthly: 4165, yearly: 3570 },
-    growth: { monthly: 6715, yearly: 5695 },
-    business: { monthly: 8415, yearly: 7140 },
-};
+async function buildRateCardRows() {
+    const cell = 'border: 1px solid #14110d; padding: 7px 9px;';
+    try {
+        const [rows] = await pool.query(
+            'SELECT name, price_monthly, price_yearly FROM plans WHERE is_active = 1 ORDER BY price_monthly ASC'
+        );
+        if (!rows.length) throw new Error('no active plans');
+        return rows.map((p) => {
+            const monthly = Number(p.price_monthly) > 0 ? INR(p.price_monthly) : 'On request';
+            const yearly = Number(p.price_yearly) > 0 ? INR(p.price_yearly) : 'On request';
+            return `<tr><td style="${cell}">${p.name}</td><td style="${cell}">${monthly}</td><td style="${cell}">${yearly}</td></tr>`;
+        }).join('\n            ');
+    } catch (err) {
+        console.warn('[Agreement] Could not load rate card:', err.message);
+        return `<tr><td style="${cell}" colspan="3">Quoted on request, based on scope and volume.</td></tr>`;
+    }
+}
 const path = require('path');
 
 class TenantController {
@@ -1562,13 +1578,9 @@ class TenantController {
                     );
                     const billingCycle = subscriptions[0]?.billing_cycle || 'monthly';
                     const price = billingCycle === 'yearly' ? plans[0].price_yearly : plans[0].price_monthly;
-                    const listed = PUBLISHED_RATES[String(planName).trim().toLowerCase()];
-                    // Prefer the tenant's contracted price. Fall back to the rate
-                    // published on the website rather than vague wording, so the
-                    // agreement never quotes a figure the public page contradicts.
-                    planPrice = price
-                        ? `INR ${price}`
-                        : (listed ? `INR ${listed[billingCycle === 'yearly' ? 'yearly' : 'monthly'].toLocaleString('en-IN')}` : planPrice);
+                    // Same plans row as Annexure A, so Clause 3 and the rate card
+                    // can never state different figures for the same plan.
+                    planPrice = Number(price) > 0 ? INR(price) : planPrice;
                     planBillingCycle = billingCycle === 'yearly' ? 'Yearly' : 'Monthly';
                 }
             }
@@ -1591,6 +1603,7 @@ class TenantController {
                 plan_billing_cycle: planBillingCycle,
                 start_date: startDate,
                 agreement_date: agreementDate,
+                rate_card_rows: await buildRateCardRows(),
                 business_address: 'Napnix, India',
                 custom_terms: 'No additional terms apply unless mutually agreed upon in writing by both parties.'
             };

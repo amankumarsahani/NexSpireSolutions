@@ -602,43 +602,26 @@ const templates = [
         </tr>
     </table>
 
-    <!-- Annexure A: published rate card.
-         Figures mirror the public pricing page. Source of truth:
-         NexSpireSolutions/nexs-agency/src/constants/crmPricing.js — update both
-         together, or the agreement will quote a rate the website contradicts. -->
+    <!-- Annexure A: subscription rate card.
+         Rows are rendered from the SAME plans rows that produce Clause 3 (see
+         buildRateCardRows in tenant.controller.js). Do not hardcode figures here:
+         a second source of truth is how the annexure ends up contradicting the
+         subscription fee inside one executed contract. -->
     <div style="margin-top: 30px; border-top: 2px solid #14110d; padding-top: 16px;">
         <div style="text-align: center; font-weight: 700; text-transform: uppercase; letter-spacing: 3px; font-size: 13px; margin-bottom: 4px;">Annexure A</div>
-        <div style="text-align: center; font-size: 11px; letter-spacing: 2px; text-transform: uppercase; color: #6b6157; margin-bottom: 14px;">Published Subscription Rate Card</div>
+        <div style="text-align: center; font-size: 11px; letter-spacing: 2px; text-transform: uppercase; color: #6b6157; margin-bottom: 14px;">Subscription Rate Card</div>
 
         <table style="width: 100%; border-collapse: collapse; font-size: 12.5px;">
             <tr>
                 <td style="border: 1px solid #14110d; padding: 7px 9px; font-weight: 700; background: #f2ede2;">Plan</td>
                 <td style="border: 1px solid #14110d; padding: 7px 9px; font-weight: 700; background: #f2ede2;">Monthly Billing</td>
-                <td style="border: 1px solid #14110d; padding: 7px 9px; font-weight: 700; background: #f2ede2;">Annual Billing (per month)</td>
+                <td style="border: 1px solid #14110d; padding: 7px 9px; font-weight: 700; background: #f2ede2;">Annual Billing (total)</td>
             </tr>
-            <tr>
-                <td style="border: 1px solid #14110d; padding: 7px 9px;">Starter</td>
-                <td style="border: 1px solid #14110d; padding: 7px 9px;">INR 4,165</td>
-                <td style="border: 1px solid #14110d; padding: 7px 9px;">INR 3,570</td>
-            </tr>
-            <tr>
-                <td style="border: 1px solid #14110d; padding: 7px 9px;">Growth</td>
-                <td style="border: 1px solid #14110d; padding: 7px 9px;">INR 6,715</td>
-                <td style="border: 1px solid #14110d; padding: 7px 9px;">INR 5,695</td>
-            </tr>
-            <tr>
-                <td style="border: 1px solid #14110d; padding: 7px 9px;">Business</td>
-                <td style="border: 1px solid #14110d; padding: 7px 9px;">INR 8,415</td>
-                <td style="border: 1px solid #14110d; padding: 7px 9px;">INR 7,140</td>
-            </tr>
-            <tr>
-                <td style="border: 1px solid #14110d; padding: 7px 9px;">Enterprise</td>
-                <td style="border: 1px solid #14110d; padding: 7px 9px;" colspan="2">Quoted on request, based on scope and volume</td>
-            </tr>
+            {{rate_card_rows}}
         </table>
 
         <p style="text-align: justify; margin: 12px 0 0; font-size: 12px;">
-            A.1 The rates above are the Provider's published subscription rates as listed at napnix.in, exclusive of Goods and Services Tax and any other applicable statutory levies.
+            A.1 The rates above are the Provider's subscription rates as at the date of execution, exclusive of Goods and Services Tax and any other applicable statutory levies.
         </p>
         <p style="text-align: justify; margin: 6px 0 0; font-size: 12px;">
             A.2 The rate applicable to the Client is the plan recorded in Clause 3. Where the Client is billed at a rate agreed in writing that differs from this card, the rate in Clause 3 shall prevail over this Annexure.
@@ -671,7 +654,7 @@ const templates = [
 
   </div>
 </div>`,
-        variables: ["tenant_name", "tenant_email", "tenant_phone", "tenant_company", "tenant_slug", "plan_name", "plan_price", "plan_billing_cycle", "start_date", "agreement_date", "business_address", "custom_terms"]
+        variables: ["tenant_name", "tenant_email", "tenant_phone", "tenant_company", "tenant_slug", "plan_name", "plan_price", "plan_billing_cycle", "start_date", "agreement_date", "rate_card_rows", "business_address", "custom_terms"]
     }
 ];
 
