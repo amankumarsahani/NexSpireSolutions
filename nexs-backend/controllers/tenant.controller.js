@@ -10,6 +10,22 @@ const workflowEngine = require('../services/workflowEngine');
 const { pool } = require('../config/database');
 const mysql = require('mysql2/promise');
 const { execFile } = require('child_process');
+
+/**
+ * Published subscription rates (INR), mirroring the public pricing page.
+ * `yearly` is the per-month rate when billed annually, matching how the site
+ * presents it.
+ *
+ * Source of truth: NexSpireSolutions/nexs-agency/src/constants/crmPricing.js.
+ * Used only as a fallback when the plans table carries no price — update both
+ * together, or an agreement could quote a figure the website contradicts.
+ * Enterprise is intentionally absent: it is quoted on request.
+ */
+const PUBLISHED_RATES = {
+    starter: { monthly: 4165, yearly: 3570 },
+    growth: { monthly: 6715, yearly: 5695 },
+    business: { monthly: 8415, yearly: 7140 },
+};
 const path = require('path');
 
 class TenantController {
@@ -1546,7 +1562,13 @@ class TenantController {
                     );
                     const billingCycle = subscriptions[0]?.billing_cycle || 'monthly';
                     const price = billingCycle === 'yearly' ? plans[0].price_yearly : plans[0].price_monthly;
-                    planPrice = price ? `INR ${price}` : planPrice;
+                    const listed = PUBLISHED_RATES[String(planName).trim().toLowerCase()];
+                    // Prefer the tenant's contracted price. Fall back to the rate
+                    // published on the website rather than vague wording, so the
+                    // agreement never quotes a figure the public page contradicts.
+                    planPrice = price
+                        ? `INR ${price}`
+                        : (listed ? `INR ${listed[billingCycle === 'yearly' ? 'yearly' : 'monthly'].toLocaleString('en-IN')}` : planPrice);
                     planBillingCycle = billingCycle === 'yearly' ? 'Yearly' : 'Monthly';
                 }
             }
@@ -1569,7 +1591,6 @@ class TenantController {
                 plan_billing_cycle: planBillingCycle,
                 start_date: startDate,
                 agreement_date: agreementDate,
-                trial_period: tenant.trial_days ? `${tenant.trial_days} days` : '14 days',
                 business_address: 'Napnix, India',
                 custom_terms: 'No additional terms apply unless mutually agreed upon in writing by both parties.'
             };

@@ -336,7 +336,6 @@ const templates = [
                 <div class="plan-row"><span class="plan-label">Price</span><span class="plan-value">{{plan_price}}</span></div>
                 <div class="plan-row"><span class="plan-label">Billing</span><span class="plan-value">{{plan_billing_cycle}}</span></div>
                 <div class="plan-row"><span class="plan-label">Start Date</span><span class="plan-value">{{start_date}}</span></div>
-                <div class="plan-row"><span class="plan-label">Trial Period</span><span class="plan-value">{{trial_period}}</span></div>
             </div>
 
             <div class="attachment-note">
@@ -366,7 +365,7 @@ const templates = [
 </body>
 </html>`,
         description: 'Professional email for sending tenant service agreement with PDF attachment. Used by the tenant onboarding workflow.',
-        variables: JSON.stringify(['tenant_name', 'tenant_email', 'tenant_slug', 'plan_name', 'plan_price', 'plan_billing_cycle', 'start_date', 'trial_period']),
+        variables: JSON.stringify(['tenant_name', 'tenant_email', 'tenant_slug', 'plan_name', 'plan_price', 'plan_billing_cycle', 'start_date']),
         category: 'transactional'
     }
 ];

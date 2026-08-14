@@ -358,22 +358,58 @@ const templates = [
         description: 'Service agreement for Napnix SaaS tenants',
         category: 'legal',
         isDefault: true,
-        content: `<div style="font-family: 'Times New Roman', Times, serif; max-width: 820px; margin: 0 auto; padding: 56px 52px; color: #111827; line-height: 1.6; font-size: 14px;">
-    <div style="text-align: center; border: 2px solid #111827; padding: 18px 20px; margin-bottom: 28px;">
-        <div style="font-size: 26px; font-weight: 700; letter-spacing: 1px; text-transform: uppercase;">Service Agreement</div>
-        <div style="margin-top: 8px; font-size: 13px;">Agreement No.: AGR-{{tenant_slug}}-{{agreement_date}}</div>
-        <div style="margin-top: 4px; font-size: 13px;">Executed on: {{agreement_date}}</div>
+        content: `<div style="font-family: 'Times New Roman', Times, serif; margin: 0 auto; color: #14110d; line-height: 1.62; font-size: 13.5px; background: #fdfbf5; border: 3px double #14110d; padding: 0;">
+  <div style="border-left: 2px solid #8a1c1c; margin-left: 26px; padding: 34px 40px 30px 26px;">
+
+    <!-- Letterhead -->
+    <table style="width: 100%; border-collapse: collapse; margin-bottom: 6px;">
+        <tr>
+            <td style="vertical-align: top; padding: 0;">
+                <div style="font-size: 21px; font-weight: 700; letter-spacing: 3px; text-transform: uppercase;">Napnix</div>
+                <div style="font-size: 11.5px; letter-spacing: 1.4px; text-transform: uppercase; color: #4a423a; margin-top: 3px;">{{business_address}}</div>
+                <div style="font-size: 11.5px; letter-spacing: 1.4px; text-transform: uppercase; color: #4a423a;">support@napnix.in &nbsp;&middot;&nbsp; napnix.in</div>
+            </td>
+            <td style="vertical-align: top; width: 120px; padding: 0;">
+                <!-- Engraved company seal ring. Deliberately NOT the State Emblem
+                     of India or the Ashoka Chakra: their use by a private entity is
+                     restricted under the State Emblem of India (Prohibition of
+                     Improper Use) Act, 2005 and the Emblems and Names (Prevention
+                     of Improper Use) Act, 1950. -->
+                <div style="width: 104px; height: 104px; border: 2px solid #8a1c1c; border-radius: 50%; margin-left: auto; position: relative;">
+                    <div style="position: absolute; top: 6px; left: 6px; right: 6px; bottom: 6px; border: 1px solid #8a1c1c; border-radius: 50%;"></div>
+                    <div style="position: absolute; top: 0; left: 0; right: 0; bottom: 0; text-align: center; padding-top: 34px; color: #8a1c1c;">
+                        <div style="font-size: 13px; font-weight: 700; letter-spacing: 2.4px; text-transform: uppercase;">Napnix</div>
+                        <div style="font-size: 7.5px; letter-spacing: 1.6px; text-transform: uppercase; margin-top: 3px;">Common Seal</div>
+                        <div style="font-size: 7px; letter-spacing: 1.2px; text-transform: uppercase; margin-top: 1px;">India</div>
+                    </div>
+                </div>
+            </td>
+        </tr>
+    </table>
+
+    <div style="border-top: 2px solid #14110d; border-bottom: 1px solid #14110d; height: 4px; margin: 12px 0 22px;"></div>
+
+    <!-- Instrument title -->
+    <div style="text-align: center; margin-bottom: 24px;">
+        <div style="font-size: 27px; font-weight: 700; letter-spacing: 6px; text-transform: uppercase;">Service Agreement</div>
+        <div style="font-size: 11px; letter-spacing: 3px; text-transform: uppercase; color: #6b6157; margin-top: 6px;">Executed under the laws of India</div>
+        <table style="width: 100%; border-collapse: collapse; margin-top: 14px; font-size: 12px;">
+            <tr>
+                <td style="border: 1px solid #14110d; padding: 6px 10px; text-align: left; width: 50%;"><strong>Agreement No.:</strong> AGR-{{tenant_slug}}-{{agreement_date}}</td>
+                <td style="border: 1px solid #14110d; padding: 6px 10px; text-align: left;"><strong>Date of Execution:</strong> {{agreement_date}}</td>
+            </tr>
+        </table>
     </div>
 
     <table style="width: 100%; border-collapse: collapse; margin-bottom: 26px;">
         <tr>
-            <td style="width: 50%; vertical-align: top; border: 1px solid #111827; padding: 12px;">
+            <td style="width: 50%; vertical-align: top; border: 1px solid #14110d; padding: 12px;">
                 <div style="font-weight: 700; text-transform: uppercase; margin-bottom: 8px;">Provider</div>
-                <div><strong>Napnix Pvt. Ltd.</strong></div>
+                <div><strong>Napnix</strong></div>
                 <div>{{business_address}}</div>
                 <div>support@napnix.in</div>
             </td>
-            <td style="width: 50%; vertical-align: top; border: 1px solid #111827; padding: 12px;">
+            <td style="width: 50%; vertical-align: top; border: 1px solid #14110d; padding: 12px;">
                 <div style="font-weight: 700; text-transform: uppercase; margin-bottom: 8px;">Client</div>
                 <div><strong>{{tenant_company}}</strong></div>
                 <div>Authorized Representative: {{tenant_name}}</div>
@@ -385,7 +421,7 @@ const templates = [
 
     <p style="text-align: justify; margin-bottom: 16px;">
         This Service Agreement ("Agreement") is made and executed on <strong>{{agreement_date}}</strong> by and between
-        <strong>Napnix Pvt. Ltd.</strong>, hereinafter referred to as the "Provider", and <strong>{{tenant_company}}</strong>,
+        <strong>Napnix</strong>, hereinafter referred to as the "Provider", and <strong>{{tenant_company}}</strong>,
         acting through its authorized representative <strong>{{tenant_name}}</strong>, hereinafter referred to as the "Client".
         The Provider and the Client are individually referred to as a "Party" and collectively as the "Parties".
     </p>
@@ -398,14 +434,14 @@ const templates = [
     </div>
 
     <div style="margin-bottom: 18px;">
-        <div style="font-weight: 700; text-transform: uppercase; border-bottom: 1px solid #111827; padding-bottom: 4px; margin-bottom: 8px;">1. Definitions</div>
+        <div style="font-weight: 700; text-transform: uppercase; letter-spacing: 2px; font-size: 12.5px; border-bottom: 1px solid #14110d; padding-bottom: 5px; margin-bottom: 10px;">1. Definitions</div>
         <p style="text-align: justify; margin: 0 0 8px;"><strong>1.1 "Services"</strong> means access to the Napnix hosted SaaS platform and allied services made available under the selected plan.</p>
         <p style="text-align: justify; margin: 0 0 8px;"><strong>1.2 "Platform"</strong> means the software environment, administrative dashboard, storefront, APIs, hosting stack, and supporting infrastructure maintained by the Provider.</p>
         <p style="text-align: justify; margin: 0;"><strong>1.3 "Client Data"</strong> means all records, files, customer information, business information, and other materials submitted to or generated within the Platform by or on behalf of the Client.</p>
     </div>
 
     <div style="margin-bottom: 18px;">
-        <div style="font-weight: 700; text-transform: uppercase; border-bottom: 1px solid #111827; padding-bottom: 4px; margin-bottom: 8px;">2. Engagement and Scope of Services</div>
+        <div style="font-weight: 700; text-transform: uppercase; letter-spacing: 2px; font-size: 12.5px; border-bottom: 1px solid #14110d; padding-bottom: 5px; margin-bottom: 10px;">2. Engagement and Scope of Services</div>
         <p style="text-align: justify; margin: 0 0 8px;">The Provider hereby agrees to grant the Client a limited, non-exclusive, non-transferable, and revocable right to access and use the Platform during the subsistence of this Agreement, strictly in accordance with the selected subscription plan and the lawful business purposes of the Client.</p>
         <p style="text-align: justify; margin: 0 0 8px;">The Services under this Agreement include, to the extent applicable to the subscribed plan:</p>
         <ol style="margin: 0; padding-left: 22px;">
@@ -418,50 +454,46 @@ const templates = [
     </div>
 
     <div style="margin-bottom: 18px;">
-        <div style="font-weight: 700; text-transform: uppercase; border-bottom: 1px solid #111827; padding-bottom: 4px; margin-bottom: 8px;">3. Commercial Terms</div>
+        <div style="font-weight: 700; text-transform: uppercase; letter-spacing: 2px; font-size: 12.5px; border-bottom: 1px solid #14110d; padding-bottom: 5px; margin-bottom: 10px;">3. Commercial Terms</div>
         <table style="width: 100%; border-collapse: collapse;">
             <tr>
-                <td style="border: 1px solid #111827; padding: 8px; font-weight: 700; width: 38%;">Plan Name</td>
-                <td style="border: 1px solid #111827; padding: 8px;">{{plan_name}}</td>
+                <td style="border: 1px solid #14110d; padding: 8px; font-weight: 700; width: 38%;">Plan Name</td>
+                <td style="border: 1px solid #14110d; padding: 8px;">{{plan_name}}</td>
             </tr>
             <tr>
-                <td style="border: 1px solid #111827; padding: 8px; font-weight: 700;">Subscription Fee</td>
-                <td style="border: 1px solid #111827; padding: 8px;">{{plan_price}}</td>
+                <td style="border: 1px solid #14110d; padding: 8px; font-weight: 700;">Subscription Fee</td>
+                <td style="border: 1px solid #14110d; padding: 8px;">{{plan_price}}</td>
             </tr>
             <tr>
-                <td style="border: 1px solid #111827; padding: 8px; font-weight: 700;">Billing Cycle</td>
-                <td style="border: 1px solid #111827; padding: 8px;">{{plan_billing_cycle}}</td>
+                <td style="border: 1px solid #14110d; padding: 8px; font-weight: 700;">Billing Cycle</td>
+                <td style="border: 1px solid #14110d; padding: 8px;">{{plan_billing_cycle}}</td>
             </tr>
             <tr>
-                <td style="border: 1px solid #111827; padding: 8px; font-weight: 700;">Effective Start Date</td>
-                <td style="border: 1px solid #111827; padding: 8px;">{{start_date}}</td>
+                <td style="border: 1px solid #14110d; padding: 8px; font-weight: 700;">Effective Start Date</td>
+                <td style="border: 1px solid #14110d; padding: 8px;">{{start_date}}</td>
             </tr>
             <tr>
-                <td style="border: 1px solid #111827; padding: 8px; font-weight: 700;">Trial Period</td>
-                <td style="border: 1px solid #111827; padding: 8px;">{{trial_period}}</td>
-            </tr>
-            <tr>
-                <td style="border: 1px solid #111827; padding: 8px; font-weight: 700;">Tenant Identifier</td>
-                <td style="border: 1px solid #111827; padding: 8px;">{{tenant_slug}}</td>
+                <td style="border: 1px solid #14110d; padding: 8px; font-weight: 700;">Tenant Identifier</td>
+                <td style="border: 1px solid #14110d; padding: 8px;">{{tenant_slug}}</td>
             </tr>
         </table>
     </div>
 
     <div style="margin-bottom: 18px;">
-        <div style="font-weight: 700; text-transform: uppercase; border-bottom: 1px solid #111827; padding-bottom: 4px; margin-bottom: 8px;">4. Term and Renewal</div>
+        <div style="font-weight: 700; text-transform: uppercase; letter-spacing: 2px; font-size: 12.5px; border-bottom: 1px solid #14110d; padding-bottom: 5px; margin-bottom: 10px;">4. Term and Renewal</div>
         <p style="text-align: justify; margin: 0 0 8px;">This Agreement shall commence on <strong>{{start_date}}</strong> and shall remain in force unless terminated in accordance with this Agreement.</p>
-        <p style="text-align: justify; margin: 0;">Upon expiry of any trial period or initial billing term, this Agreement shall automatically renew for successive billing cycles of <strong>{{plan_billing_cycle}}</strong>, unless either Party gives prior written notice of non-renewal at least fifteen (15) days before the end of the then-current term.</p>
+        <p style="text-align: justify; margin: 0;">Upon expiry of the initial billing term, this Agreement shall automatically renew for successive billing cycles of <strong>{{plan_billing_cycle}}</strong>, unless either Party gives prior written notice of non-renewal at least fifteen (15) days before the end of the then-current term.</p>
     </div>
 
     <div style="margin-bottom: 18px;">
-        <div style="font-weight: 700; text-transform: uppercase; border-bottom: 1px solid #111827; padding-bottom: 4px; margin-bottom: 8px;">5. Payment Obligations</div>
+        <div style="font-weight: 700; text-transform: uppercase; letter-spacing: 2px; font-size: 12.5px; border-bottom: 1px solid #14110d; padding-bottom: 5px; margin-bottom: 10px;">5. Payment Obligations</div>
         <p style="text-align: justify; margin: 0 0 8px;">The Client shall pay the subscription consideration of <strong>{{plan_price}}</strong> on a <strong>{{plan_billing_cycle}}</strong> basis, together with any applicable taxes, duties, levies, or governmental charges, if any.</p>
         <p style="text-align: justify; margin: 0 0 8px;">Invoices raised by the Provider shall be payable within seven (7) days from the date of issuance unless otherwise agreed in writing.</p>
         <p style="text-align: justify; margin: 0;">In the event of delayed payment, the Provider shall be entitled, upon reasonable notice, to suspend or restrict access to the Services until the outstanding dues are cleared.</p>
     </div>
 
     <div style="margin-bottom: 18px;">
-        <div style="font-weight: 700; text-transform: uppercase; border-bottom: 1px solid #111827; padding-bottom: 4px; margin-bottom: 8px;">6. Obligations of the Provider</div>
+        <div style="font-weight: 700; text-transform: uppercase; letter-spacing: 2px; font-size: 12.5px; border-bottom: 1px solid #14110d; padding-bottom: 5px; margin-bottom: 10px;">6. Obligations of the Provider</div>
         <ol style="margin: 0; padding-left: 22px;">
             <li style="margin-bottom: 6px;">Maintain the Platform with commercially reasonable care and skill.</li>
             <li style="margin-bottom: 6px;">Implement reasonable technical and organizational safeguards for the protection of Client Data.</li>
@@ -470,7 +502,7 @@ const templates = [
     </div>
 
     <div style="margin-bottom: 18px;">
-        <div style="font-weight: 700; text-transform: uppercase; border-bottom: 1px solid #111827; padding-bottom: 4px; margin-bottom: 8px;">7. Obligations of the Client</div>
+        <div style="font-weight: 700; text-transform: uppercase; letter-spacing: 2px; font-size: 12.5px; border-bottom: 1px solid #14110d; padding-bottom: 5px; margin-bottom: 10px;">7. Obligations of the Client</div>
         <ol style="margin: 0; padding-left: 22px;">
             <li style="margin-bottom: 6px;">Use the Services strictly for lawful business purposes and in compliance with applicable laws.</li>
             <li style="margin-bottom: 6px;">Maintain the confidentiality of usernames, passwords, administrative access, and other credentials.</li>
@@ -480,45 +512,45 @@ const templates = [
     </div>
 
     <div style="margin-bottom: 18px;">
-        <div style="font-weight: 700; text-transform: uppercase; border-bottom: 1px solid #111827; padding-bottom: 4px; margin-bottom: 8px;">8. Data Ownership, Privacy, and Confidentiality</div>
+        <div style="font-weight: 700; text-transform: uppercase; letter-spacing: 2px; font-size: 12.5px; border-bottom: 1px solid #14110d; padding-bottom: 5px; margin-bottom: 10px;">8. Data Ownership, Privacy, and Confidentiality</div>
         <p style="text-align: justify; margin: 0 0 8px;">All Client Data shall remain the sole property of the Client. The Provider shall not claim ownership over such data by virtue of hosting, processing, or storing it on the Platform.</p>
         <p style="text-align: justify; margin: 0 0 8px;">The Provider may process Client Data solely for the purposes of performing this Agreement, platform administration, support, backup, security, analytics, and compliance.</p>
         <p style="text-align: justify; margin: 0;">Each Party shall keep confidential all proprietary, commercial, technical, and business information received from the other Party and shall not disclose the same except as required by law, regulatory authority, or court order.</p>
     </div>
 
     <div style="margin-bottom: 18px;">
-        <div style="font-weight: 700; text-transform: uppercase; border-bottom: 1px solid #111827; padding-bottom: 4px; margin-bottom: 8px;">9. Suspension and Termination</div>
+        <div style="font-weight: 700; text-transform: uppercase; letter-spacing: 2px; font-size: 12.5px; border-bottom: 1px solid #14110d; padding-bottom: 5px; margin-bottom: 10px;">9. Suspension and Termination</div>
         <p style="text-align: justify; margin: 0 0 8px;">Either Party may terminate this Agreement by giving written notice in accordance with Clause 4, or immediately in the event of material breach by the other Party which remains uncured for ten (10) days after written notice.</p>
         <p style="text-align: justify; margin: 0 0 8px;">The Provider may suspend the Services with or without prior notice in case of illegal activity, misuse of the Platform, security threats, or persistent payment default by the Client.</p>
         <p style="text-align: justify; margin: 0;">Upon termination, access to the Platform may be withdrawn, and the Provider may retain Client Data for a limited operational retention period before deletion, subject to applicable law and operational policy.</p>
     </div>
 
     <div style="margin-bottom: 18px;">
-        <div style="font-weight: 700; text-transform: uppercase; border-bottom: 1px solid #111827; padding-bottom: 4px; margin-bottom: 8px;">10. Representation, Warranty, and Limitation of Liability</div>
+        <div style="font-weight: 700; text-transform: uppercase; letter-spacing: 2px; font-size: 12.5px; border-bottom: 1px solid #14110d; padding-bottom: 5px; margin-bottom: 10px;">10. Representation, Warranty, and Limitation of Liability</div>
         <p style="text-align: justify; margin: 0 0 8px;">The Provider represents that it has the authority to enter into this Agreement and to provide the Services described herein. Except as expressly stated, the Services are provided on an "as available" and "as applicable" basis, subject to maintenance windows, third-party infrastructure, and network dependencies.</p>
         <p style="text-align: justify; margin: 0 0 8px;">To the maximum extent permitted by law, the aggregate liability of the Provider arising out of or in connection with this Agreement shall not exceed the total subscription fees paid by the Client for the three (3) months immediately preceding the event giving rise to the claim.</p>
         <p style="text-align: justify; margin: 0;">In no event shall the Provider be liable for indirect, incidental, special, punitive, or consequential damages, including loss of profits, business interruption, or loss of goodwill.</p>
     </div>
 
     <div style="margin-bottom: 18px;">
-        <div style="font-weight: 700; text-transform: uppercase; border-bottom: 1px solid #111827; padding-bottom: 4px; margin-bottom: 8px;">11. Force Majeure</div>
+        <div style="font-weight: 700; text-transform: uppercase; letter-spacing: 2px; font-size: 12.5px; border-bottom: 1px solid #14110d; padding-bottom: 5px; margin-bottom: 10px;">11. Force Majeure</div>
         <p style="text-align: justify; margin: 0;">Neither Party shall be held liable for failure or delay in performance caused by events beyond its reasonable control, including natural calamities, acts of government, war, cyberattacks of extraordinary nature, labour disruption, power failure, internet backbone failure, or failure of third-party infrastructure providers.</p>
     </div>
 
     <div style="margin-bottom: 18px;">
-        <div style="font-weight: 700; text-transform: uppercase; border-bottom: 1px solid #111827; padding-bottom: 4px; margin-bottom: 8px;">12. Governing Law and Jurisdiction</div>
+        <div style="font-weight: 700; text-transform: uppercase; letter-spacing: 2px; font-size: 12.5px; border-bottom: 1px solid #14110d; padding-bottom: 5px; margin-bottom: 10px;">12. Governing Law and Jurisdiction</div>
         <p style="text-align: justify; margin: 0 0 8px;">This Agreement shall be governed by and construed in accordance with the laws of India.</p>
         <p style="text-align: justify; margin: 0;">Subject to the dispute resolution clause below, the courts having territorial jurisdiction over the Provider's registered place of business shall have exclusive jurisdiction in all matters arising out of or relating to this Agreement.</p>
     </div>
 
     <div style="margin-bottom: 18px;">
-        <div style="font-weight: 700; text-transform: uppercase; border-bottom: 1px solid #111827; padding-bottom: 4px; margin-bottom: 8px;">13. Dispute Resolution</div>
+        <div style="font-weight: 700; text-transform: uppercase; letter-spacing: 2px; font-size: 12.5px; border-bottom: 1px solid #14110d; padding-bottom: 5px; margin-bottom: 10px;">13. Dispute Resolution</div>
         <p style="text-align: justify; margin: 0 0 8px;">The Parties shall first attempt to resolve any dispute, controversy, or claim arising out of this Agreement through good-faith discussions.</p>
         <p style="text-align: justify; margin: 0;">If the dispute remains unresolved within thirty (30) days, either Party may pursue legal remedies before the competent courts referred to in Clause 12.</p>
     </div>
 
     <div style="margin-bottom: 18px;">
-        <div style="font-weight: 700; text-transform: uppercase; border-bottom: 1px solid #111827; padding-bottom: 4px; margin-bottom: 8px;">14. Miscellaneous</div>
+        <div style="font-weight: 700; text-transform: uppercase; letter-spacing: 2px; font-size: 12.5px; border-bottom: 1px solid #14110d; padding-bottom: 5px; margin-bottom: 10px;">14. Miscellaneous</div>
         <p style="text-align: justify; margin: 0 0 8px;"><strong>14.1 Entire Agreement:</strong> This Agreement constitutes the complete understanding between the Parties concerning its subject matter and supersedes prior discussions, proposals, or communications.</p>
         <p style="text-align: justify; margin: 0 0 8px;"><strong>14.2 Amendment:</strong> No amendment to this Agreement shall be valid unless made in writing and accepted by both Parties.</p>
         <p style="text-align: justify; margin: 0 0 8px;"><strong>14.3 Severability:</strong> If any provision is held unenforceable, the remainder of the Agreement shall continue in full force and effect.</p>
@@ -532,18 +564,18 @@ const templates = [
 
     <table style="width: 100%; border-collapse: collapse; margin-top: 24px;">
         <tr>
-            <td style="width: 48%; vertical-align: top; border: 1px solid #111827; padding: 14px;">
-                <div style="font-weight: 700; margin-bottom: 38px;">For Napnix Pvt. Ltd.</div>
-                <div style="border-bottom: 1px solid #111827; height: 42px; margin-bottom: 6px;"></div>
+            <td style="width: 48%; vertical-align: top; border: 1px solid #14110d; padding: 14px;">
+                <div style="font-weight: 700; margin-bottom: 38px;">For Napnix</div>
+                <div style="border-bottom: 1px solid #14110d; height: 42px; margin-bottom: 6px;"></div>
                 <div>Name: __________________________</div>
                 <div>Designation: Authorized Signatory</div>
                 <div>Date: {{agreement_date}}</div>
                 <div>Place: _________________________</div>
             </td>
             <td style="width: 4%;"></td>
-            <td style="width: 48%; vertical-align: top; border: 1px solid #111827; padding: 14px;">
+            <td style="width: 48%; vertical-align: top; border: 1px solid #14110d; padding: 14px;">
                 <div style="font-weight: 700; margin-bottom: 38px;">For {{tenant_company}}</div>
-                <div style="border-bottom: 1px solid #111827; height: 42px; margin-bottom: 6px;"></div>
+                <div style="border-bottom: 1px solid #14110d; height: 42px; margin-bottom: 6px;"></div>
                 <div>Name: {{tenant_name}}</div>
                 <div>Designation: Authorized Representative</div>
                 <div>Date: _________________________</div>
@@ -554,28 +586,92 @@ const templates = [
 
     <table style="width: 100%; border-collapse: collapse; margin-top: 18px;">
         <tr>
-            <td style="width: 48%; vertical-align: top; border: 1px solid #111827; padding: 14px;">
+            <td style="width: 48%; vertical-align: top; border: 1px solid #14110d; padding: 14px;">
                 <div style="font-weight: 700; margin-bottom: 38px;">Witness 1</div>
-                <div style="border-bottom: 1px solid #111827; height: 32px; margin-bottom: 6px;"></div>
+                <div style="border-bottom: 1px solid #14110d; height: 32px; margin-bottom: 6px;"></div>
                 <div>Name: __________________________</div>
                 <div>Address: ________________________</div>
             </td>
             <td style="width: 4%;"></td>
-            <td style="width: 48%; vertical-align: top; border: 1px solid #111827; padding: 14px;">
+            <td style="width: 48%; vertical-align: top; border: 1px solid #14110d; padding: 14px;">
                 <div style="font-weight: 700; margin-bottom: 38px;">Witness 2</div>
-                <div style="border-bottom: 1px solid #111827; height: 32px; margin-bottom: 6px;"></div>
+                <div style="border-bottom: 1px solid #14110d; height: 32px; margin-bottom: 6px;"></div>
                 <div>Name: __________________________</div>
                 <div>Address: ________________________</div>
             </td>
         </tr>
     </table>
 
-    <div style="margin-top: 24px; border-top: 1px solid #111827; padding-top: 10px; text-align: center; font-size: 12px;">
-        <div>Napnix Pvt. Ltd. | {{business_address}} | support@napnix.in | napnix.in</div>
-        <div style="margin-top: 4px;">This is a formal commercial agreement intended to be retained for legal and business records.</div>
+    <!-- Annexure A: published rate card.
+         Figures mirror the public pricing page. Source of truth:
+         NexSpireSolutions/nexs-agency/src/constants/crmPricing.js — update both
+         together, or the agreement will quote a rate the website contradicts. -->
+    <div style="margin-top: 30px; border-top: 2px solid #14110d; padding-top: 16px;">
+        <div style="text-align: center; font-weight: 700; text-transform: uppercase; letter-spacing: 3px; font-size: 13px; margin-bottom: 4px;">Annexure A</div>
+        <div style="text-align: center; font-size: 11px; letter-spacing: 2px; text-transform: uppercase; color: #6b6157; margin-bottom: 14px;">Published Subscription Rate Card</div>
+
+        <table style="width: 100%; border-collapse: collapse; font-size: 12.5px;">
+            <tr>
+                <td style="border: 1px solid #14110d; padding: 7px 9px; font-weight: 700; background: #f2ede2;">Plan</td>
+                <td style="border: 1px solid #14110d; padding: 7px 9px; font-weight: 700; background: #f2ede2;">Monthly Billing</td>
+                <td style="border: 1px solid #14110d; padding: 7px 9px; font-weight: 700; background: #f2ede2;">Annual Billing (per month)</td>
+            </tr>
+            <tr>
+                <td style="border: 1px solid #14110d; padding: 7px 9px;">Starter</td>
+                <td style="border: 1px solid #14110d; padding: 7px 9px;">INR 4,165</td>
+                <td style="border: 1px solid #14110d; padding: 7px 9px;">INR 3,570</td>
+            </tr>
+            <tr>
+                <td style="border: 1px solid #14110d; padding: 7px 9px;">Growth</td>
+                <td style="border: 1px solid #14110d; padding: 7px 9px;">INR 6,715</td>
+                <td style="border: 1px solid #14110d; padding: 7px 9px;">INR 5,695</td>
+            </tr>
+            <tr>
+                <td style="border: 1px solid #14110d; padding: 7px 9px;">Business</td>
+                <td style="border: 1px solid #14110d; padding: 7px 9px;">INR 8,415</td>
+                <td style="border: 1px solid #14110d; padding: 7px 9px;">INR 7,140</td>
+            </tr>
+            <tr>
+                <td style="border: 1px solid #14110d; padding: 7px 9px;">Enterprise</td>
+                <td style="border: 1px solid #14110d; padding: 7px 9px;" colspan="2">Quoted on request, based on scope and volume</td>
+            </tr>
+        </table>
+
+        <p style="text-align: justify; margin: 12px 0 0; font-size: 12px;">
+            A.1 The rates above are the Provider's published subscription rates as listed at napnix.in, exclusive of Goods and Services Tax and any other applicable statutory levies.
+        </p>
+        <p style="text-align: justify; margin: 6px 0 0; font-size: 12px;">
+            A.2 The rate applicable to the Client is the plan recorded in Clause 3. Where the Client is billed at a rate agreed in writing that differs from this card, the rate in Clause 3 shall prevail over this Annexure.
+        </p>
+        <p style="text-align: justify; margin: 6px 0 0; font-size: 12px;">
+            A.3 Published rates may be revised by the Provider on thirty (30) days' prior written notice. Any revision shall take effect from the Client's next renewal date and shall not apply retrospectively to a billing cycle already paid for.
+        </p>
     </div>
+
+    <!-- Initials strip: each Party initials the instrument -->
+    <table style="width: 100%; border-collapse: collapse; margin-top: 22px; font-size: 11px;">
+        <tr>
+            <td style="padding: 0; width: 50%; color: #6b6157; letter-spacing: 1.2px; text-transform: uppercase;">
+                Initials — Provider: <span style="display: inline-block; border-bottom: 1px solid #14110d; width: 90px;">&nbsp;</span>
+            </td>
+            <td style="padding: 0; text-align: right; color: #6b6157; letter-spacing: 1.2px; text-transform: uppercase;">
+                Initials — Client: <span style="display: inline-block; border-bottom: 1px solid #14110d; width: 90px;">&nbsp;</span>
+            </td>
+        </tr>
+    </table>
+
+    <div style="margin-top: 18px; border-top: 2px solid #14110d; border-bottom: 1px solid #14110d; height: 4px;"></div>
+
+    <div style="margin-top: 12px; text-align: center; font-size: 10.5px; letter-spacing: 1.1px; color: #4a423a; text-transform: uppercase;">
+        <div>Napnix &nbsp;&middot;&nbsp; {{business_address}} &nbsp;&middot;&nbsp; support@napnix.in</div>
+        <div style="margin-top: 5px; text-transform: none; letter-spacing: 0; font-size: 11px; font-style: italic; color: #6b6157;">
+            This instrument is executed in duplicate, each Party retaining one original of equal force and effect.
+        </div>
+    </div>
+
+  </div>
 </div>`,
-        variables: ["tenant_name", "tenant_email", "tenant_phone", "tenant_company", "tenant_slug", "plan_name", "plan_price", "plan_billing_cycle", "start_date", "agreement_date", "trial_period", "business_address", "custom_terms"]
+        variables: ["tenant_name", "tenant_email", "tenant_phone", "tenant_company", "tenant_slug", "plan_name", "plan_price", "plan_billing_cycle", "start_date", "agreement_date", "business_address", "custom_terms"]
     }
 ];
 

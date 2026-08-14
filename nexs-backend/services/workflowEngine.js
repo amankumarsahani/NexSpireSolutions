@@ -472,7 +472,6 @@ class WorkflowEngine {
                     docVars.plan_name = docVars.plan_name || config.plan_name || 'Standard';
                     docVars.plan_price = docVars.plan_price || config.plan_price || 'As per agreement';
                     docVars.plan_billing_cycle = docVars.plan_billing_cycle || config.billing_cycle || 'Monthly';
-                    docVars.trial_period = docVars.trial_period || (contextData.trial_days ? `${contextData.trial_days} days` : '14 days');
                     docVars.business_address = docVars.business_address || config.business_address || 'Napnix, India';
                     docVars.custom_terms = docVars.custom_terms || config.custom_terms || 'No additional terms apply unless mutually agreed upon in writing by both parties.';
 
