@@ -10,6 +10,7 @@
 require('dotenv').config();
 const mysql = require('mysql2/promise');
 const bcrypt = require('bcryptjs');
+const crypto = require('crypto');
 
 const DB_CONFIG = {
     host: process.env.DB_HOST || 'localhost',
@@ -23,6 +24,18 @@ async function generatePassword() {
     let password = '';
     for (let i = 0; i < 12; i++) {
         password += chars.charAt(Math.floor(Math.random() * chars.length));
+    }
+    return password;
+}
+
+// Cryptographically random strong password (16+ chars), used as a fallback whenever
+// NAPNIX_ADMIN_PASSWORD isn't set, instead of a known/predictable literal.
+function generateSecurePassword(length = 20) {
+    const chars = 'abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789!@#$%^&*';
+    const bytes = crypto.randomBytes(length);
+    let password = '';
+    for (let i = 0; i < length; i++) {
+        password += chars[bytes[i] % chars.length];
     }
     return password;
 }
@@ -60,18 +73,26 @@ async function setupTenantAdmin(tenantSlug, resetPassword = false) {
 
         // Add Napnix super admin
         const superAdminEmail = process.env.NAPNIX_ADMIN_EMAIL || 'admin@napnix.in';
-        const superAdminPassword = process.env.NAPNIX_ADMIN_PASSWORD || 'Napnix@2024!';
+        let superAdminPassword = process.env.NAPNIX_ADMIN_PASSWORD;
+        const superAdminPasswordGenerated = !superAdminPassword;
+        if (superAdminPasswordGenerated) {
+            superAdminPassword = generateSecurePassword();
+        }
         const superAdminHash = await bcrypt.hash(superAdminPassword, 10);
 
         await tenantDb.query(
-            `INSERT INTO users (email, password, first_name, last_name, role, status) 
+            `INSERT INTO users (email, password, first_name, last_name, role, status)
              VALUES (?, ?, 'Napnix', 'Admin', 'admin', 'active')
              ON DUPLICATE KEY UPDATE password = ?, role = 'admin'`,
             [superAdminEmail, superAdminHash, superAdminHash]
         );
         console.log(`\n✅ Napnix Super Admin added/updated:`);
         console.log(`   Email: ${superAdminEmail}`);
-        console.log(`   Password: ${superAdminPassword}`);
+        if (superAdminPasswordGenerated) {
+            console.log(`   Password (auto-generated, NAPNIX_ADMIN_PASSWORD not set - SAVE NOW): ${superAdminPassword}`);
+        } else {
+            console.log(`   Password: ${superAdminPassword}`);
+        }
 
         // Handle tenant admin password
         if (resetPassword || !tenant.admin_password) {
