@@ -9,7 +9,40 @@ const emailService = require('../services/email.service');
 const workflowEngine = require('../services/workflowEngine');
 const { pool } = require('../config/database');
 const brand = require('../config/brand');
+const mysql = require('mysql2/promise');
 const { execFile } = require('child_process');
+
+const INR = (n) => `INR ${Number(n).toLocaleString('en-IN', { maximumFractionDigits: 0 })}`;
+
+/**
+ * Build the Annexure A rate-card rows for the service agreement.
+ *
+ * Deliberately reads the same `plans` rows that Clause 3 draws the client's own
+ * subscription fee from. An earlier version hardcoded the figures published on
+ * the marketing site, which meant a single executed contract could state one
+ * price in Clause 3 and a different one in the Annexure whenever the two drifted
+ * apart — which they had.
+ *
+ * Returns HTML table rows, or a single explanatory row if no active plans exist,
+ * so the annexure never renders as an empty table.
+ */
+async function buildRateCardRows() {
+    const cell = 'border: 1px solid #14110d; padding: 7px 9px;';
+    try {
+        const [rows] = await pool.query(
+            'SELECT name, price_monthly, price_yearly FROM plans WHERE is_active = 1 ORDER BY price_monthly ASC'
+        );
+        if (!rows.length) throw new Error('no active plans');
+        return rows.map((p) => {
+            const monthly = Number(p.price_monthly) > 0 ? INR(p.price_monthly) : 'On request';
+            const yearly = Number(p.price_yearly) > 0 ? INR(p.price_yearly) : 'On request';
+            return `<tr><td style="${cell}">${p.name}</td><td style="${cell}">${monthly}</td><td style="${cell}">${yearly}</td></tr>`;
+        }).join('\n            ');
+    } catch (err) {
+        console.warn('[Agreement] Could not load rate card:', err.message);
+        return `<tr><td style="${cell}" colspan="3">Quoted on request, based on scope and volume.</td></tr>`;
+    }
+}
 const path = require('path');
 
 class TenantController {
@@ -1546,7 +1579,9 @@ class TenantController {
                     );
                     const billingCycle = subscriptions[0]?.billing_cycle || 'monthly';
                     const price = billingCycle === 'yearly' ? plans[0].price_yearly : plans[0].price_monthly;
-                    planPrice = price ? `INR ${price}` : planPrice;
+                    // Same plans row as Annexure A, so Clause 3 and the rate card
+                    // can never state different figures for the same plan.
+                    planPrice = Number(price) > 0 ? INR(price) : planPrice;
                     planBillingCycle = billingCycle === 'yearly' ? 'Yearly' : 'Monthly';
                 }
             }
@@ -1569,7 +1604,7 @@ class TenantController {
                 plan_billing_cycle: planBillingCycle,
                 start_date: startDate,
                 agreement_date: agreementDate,
-                trial_period: tenant.trial_days ? `${tenant.trial_days} days` : '14 days',
+                rate_card_rows: await buildRateCardRows(),
                 business_address: 'Napnix, India',
                 custom_terms: 'No additional terms apply unless mutually agreed upon in writing by both parties.'
             };
@@ -1711,6 +1746,278 @@ class TenantController {
             console.error('Send agreement error:', error);
             res.status(500).json({ error: 'Failed to send agreement: ' + error.message });
         }
+    }
+
+    /**
+     * AI consumption for one tenant — calls, tokens, cost, and how the tenant
+     * rated what NapMind produced.
+     *
+     * Lives here rather than in the tenant API on purpose: AI is provided by us
+     * and not yet billed, so spend is our unit economics, not something a
+     * customer should be reading. The tenant CRM still collects the ratings; the
+     * aggregate view of them belongs with whoever tunes the detectors.
+     */
+    async getAiUsage(req, res) {
+        let tenantPool = null;
+        try {
+            const tenant = await TenantModel.findById(req.params.id);
+            if (!tenant) return res.status(404).json({ error: 'Tenant not found' });
+            if (!tenant.db_name) return res.status(400).json({ error: 'Tenant has no database provisioned' });
+
+            const days = Math.min(Math.max(parseInt(req.query.days, 10) || 30, 1), 365);
+            const server = tenant.server_id ? await ServerModel.findById(tenant.server_id) : null;
+
+            tenantPool = mysql.createPool({
+                host: server?.db_host || process.env.DB_HOST || 'localhost',
+                port: server?.db_port || process.env.DB_PORT || 3306,
+                user: server?.db_user || process.env.DB_USER,
+                password: server?.db_password || process.env.DB_PASSWORD,
+                database: tenant.db_name,
+                connectionLimit: 2
+            });
+
+            // A tenant that has not run migration 119 has no cost column yet, and
+            // one that predates NapMind has no ai_usage at all. Neither is an
+            // error — report what exists rather than failing the whole panel.
+            const [[usageTable]] = await tenantPool.query(
+                `SELECT COUNT(*) AS n FROM information_schema.tables
+                  WHERE table_schema = ? AND table_name = 'ai_usage'`, [tenant.db_name]
+            );
+            if (!usageTable.n) {
+                return res.json({ success: true, data: { available: false, reason: 'NapMind not initialized on this tenant' } });
+            }
+
+            const [[costColumn]] = await tenantPool.query(
+                `SELECT COUNT(*) AS n FROM information_schema.columns
+                  WHERE table_schema = ? AND table_name = 'ai_usage' AND column_name = 'cost_micros'`, [tenant.db_name]
+            );
+            const costExpr = costColumn.n ? 'COALESCE(SUM(cost_micros), 0)' : '0';
+
+            const [daily] = await tenantPool.query(
+                `SELECT usage_date, SUM(calls) AS calls, SUM(tokens_in) AS tokens_in,
+                        SUM(tokens_out) AS tokens_out, ${costExpr} AS cost_micros
+                   FROM ai_usage
+                  WHERE usage_date >= DATE_SUB(CURDATE(), INTERVAL ? DAY)
+                  GROUP BY usage_date ORDER BY usage_date DESC`, [days]
+            );
+
+            const [byPurpose] = await tenantPool.query(
+                `SELECT purpose, SUM(calls) AS calls, ${costExpr} AS cost_micros
+                   FROM ai_usage
+                  WHERE usage_date >= DATE_SUB(CURDATE(), INTERVAL ? DAY)
+                  GROUP BY purpose ORDER BY calls DESC`, [days]
+            );
+
+            let feedback = [];
+            const [[feedbackTable]] = await tenantPool.query(
+                `SELECT COUNT(*) AS n FROM information_schema.tables
+                  WHERE table_schema = ? AND table_name = 'ai_feedback'`, [tenant.db_name]
+            );
+            if (feedbackTable.n) {
+                const [rows] = await tenantPool.query(
+                    // user_id NULL means we rated it from here; a real id means
+                    // someone in the tenant did. Blending them hides the case
+                    // worth acting on: a detector the customer finds useless but
+                    // we consider correct is a different problem from one both
+                    // sides agree is noise.
+                    `SELECT subject_key,
+                            SUM(rating = 'useful'     AND user_id IS NOT NULL) AS tenant_useful,
+                            SUM(rating = 'not_useful' AND user_id IS NOT NULL) AS tenant_not_useful,
+                            SUM(rating = 'useful'     AND user_id IS NULL)     AS operator_useful,
+                            SUM(rating = 'not_useful' AND user_id IS NULL)     AS operator_not_useful,
+                            COUNT(*) AS total
+                       FROM ai_feedback WHERE subject_key IS NOT NULL
+                      GROUP BY subject_key ORDER BY total DESC LIMIT 50`
+                );
+                feedback = rows.map(r => {
+                    const tenant = { useful: Number(r.tenant_useful || 0), notUseful: Number(r.tenant_not_useful || 0) };
+                    const operator = { useful: Number(r.operator_useful || 0), notUseful: Number(r.operator_not_useful || 0) };
+                    const tenantTotal = tenant.useful + tenant.notUseful;
+                    const operatorTotal = operator.useful + operator.notUseful;
+                    return {
+                        subjectKey: r.subject_key,
+                        tenant: { ...tenant, total: tenantTotal },
+                        operator: { ...operator, total: operatorTotal },
+                        total: Number(r.total || 0),
+                        // The signal worth surfacing: both sides have judged it and
+                        // reached opposite conclusions. That is a detector to look
+                        // at, not one to quietly average away.
+                        disputed: tenantTotal > 0 && operatorTotal > 0
+                            && (tenant.useful > tenant.notUseful) !== (operator.useful > operator.notUseful)
+                    };
+                });
+            }
+
+            const toUsd = (micros) => Number(micros || 0) / 1_000_000;
+            const totals = daily.reduce((acc, r) => ({
+                calls: acc.calls + Number(r.calls || 0),
+                tokensIn: acc.tokensIn + Number(r.tokens_in || 0),
+                tokensOut: acc.tokensOut + Number(r.tokens_out || 0),
+                costUsd: acc.costUsd + toUsd(r.cost_micros)
+            }), { calls: 0, tokensIn: 0, tokensOut: 0, costUsd: 0 });
+
+            res.json({
+                success: true,
+                data: {
+                    available: true,
+                    costTracked: Boolean(costColumn.n),
+                    days,
+                    totals,
+                    daily: daily.map(r => ({
+                        date: r.usage_date,
+                        calls: Number(r.calls || 0),
+                        tokensIn: Number(r.tokens_in || 0),
+                        tokensOut: Number(r.tokens_out || 0),
+                        costUsd: toUsd(r.cost_micros)
+                    })),
+                    byPurpose: byPurpose.map(r => ({
+                        purpose: r.purpose,
+                        calls: Number(r.calls || 0),
+                        costUsd: toUsd(r.cost_micros)
+                    })),
+                    feedback
+                }
+            });
+        } catch (error) {
+            console.error('Get AI usage error:', error);
+            res.status(500).json({ error: 'Failed to fetch AI usage: ' + error.message });
+        } finally {
+            if (tenantPool) await tenantPool.end().catch(() => {});
+        }
+    }
+
+    /**
+     * Recent NapMind insights for a tenant, with whatever verdict we have
+     * already recorded against each one.
+     *
+     * Judging detector quality is our job, not the customer's: they see the
+     * insight and act on it, we decide whether it should have fired at all.
+     * That is why the rating lives here rather than in the tenant CRM.
+     */
+    async getAiInsights(req, res) {
+        let tenantPool = null;
+        try {
+            const tenant = await TenantModel.findById(req.params.id);
+            if (!tenant) return res.status(404).json({ error: 'Tenant not found' });
+            if (!tenant.db_name) return res.status(400).json({ error: 'Tenant has no database provisioned' });
+
+            tenantPool = await module.exports._tenantPool(tenant);
+            const limit = Math.min(Math.max(parseInt(req.query.limit, 10) || 25, 1), 100);
+
+            const [[insightsTable]] = await tenantPool.query(
+                `SELECT COUNT(*) AS n FROM information_schema.tables
+                  WHERE table_schema = ? AND table_name = 'ai_insights'`, [tenant.db_name]
+            );
+            if (!insightsTable.n) {
+                return res.json({ success: true, data: { available: false, insights: [] } });
+            }
+
+            const [[feedbackTable]] = await tenantPool.query(
+                `SELECT COUNT(*) AS n FROM information_schema.tables
+                  WHERE table_schema = ? AND table_name = 'ai_feedback'`, [tenant.db_name]
+            );
+
+            // Two separate verdicts, not "whichever row comes first". Selecting
+            // any rating meant the thumbs here could light up showing a tenant
+            // user's opinion as though it were ours — and clicking would then
+            // silently overwrite nothing, because the two are different rows.
+            const ratingSelect = feedbackTable.n
+                ? `(SELECT rating FROM ai_feedback f
+                     WHERE f.subject_type = 'insight' AND f.subject_id = CAST(i.id AS CHAR)
+                       AND f.user_id IS NULL LIMIT 1) AS rating,
+                   (SELECT rating FROM ai_feedback f
+                     WHERE f.subject_type = 'insight' AND f.subject_id = CAST(i.id AS CHAR)
+                       AND f.user_id IS NOT NULL ORDER BY f.created_at DESC LIMIT 1) AS tenant_rating`
+                : 'NULL AS rating, NULL AS tenant_rating';
+
+            const [rows] = await tenantPool.query(
+                `SELECT i.id, i.insight_key, i.agent, i.severity, i.title, i.narrative,
+                        i.status, i.created_at, ${ratingSelect}
+                   FROM ai_insights i
+                  ORDER BY FIELD(i.severity,'critical','high','medium','low','info'), i.created_at DESC
+                  LIMIT ?`, [limit]
+            );
+
+            res.json({
+                success: true,
+                data: {
+                    available: true,
+                    ratingsEnabled: Boolean(feedbackTable.n),
+                    insights: rows.map(r => ({
+                        id: r.id,
+                        insightKey: r.insight_key,
+                        agent: r.agent,
+                        severity: r.severity,
+                        title: r.title,
+                        narrative: r.narrative,
+                        status: r.status,
+                        createdAt: r.created_at,
+                        rating: r.rating || null,
+                        tenantRating: r.tenant_rating || null
+                    }))
+                }
+            });
+        } catch (error) {
+            console.error('Get AI insights error:', error);
+            res.status(500).json({ error: 'Failed to fetch AI insights: ' + error.message });
+        } finally {
+            if (tenantPool) await tenantPool.end().catch(() => {});
+        }
+    }
+
+    /** Record our verdict on one of a tenant's insights. */
+    async rateAiInsight(req, res) {
+        let tenantPool = null;
+        try {
+            const { rating, reason, insightKey } = req.body || {};
+            if (!['useful', 'not_useful'].includes(rating)) {
+                return res.status(400).json({ error: 'rating must be useful or not_useful' });
+            }
+
+            const tenant = await TenantModel.findById(req.params.id);
+            if (!tenant) return res.status(404).json({ error: 'Tenant not found' });
+            if (!tenant.db_name) return res.status(400).json({ error: 'Tenant has no database provisioned' });
+
+            tenantPool = await module.exports._tenantPool(tenant);
+            const [[feedbackTable]] = await tenantPool.query(
+                `SELECT COUNT(*) AS n FROM information_schema.tables
+                  WHERE table_schema = ? AND table_name = 'ai_feedback'`, [tenant.db_name]
+            );
+            if (!feedbackTable.n) {
+                return res.status(503).json({ error: 'Run migration 119 on this tenant before rating insights' });
+            }
+
+            // user_id stays NULL: the rater is an operator in the master database,
+            // and that id means nothing in the tenant's users table. Writing it
+            // would point at whichever tenant user happened to share the number.
+            await tenantPool.query(
+                `INSERT INTO ai_feedback (subject_type, subject_id, subject_key, rating, reason, user_id)
+                 VALUES ('insight', ?, ?, ?, ?, NULL)
+                 ON DUPLICATE KEY UPDATE rating = VALUES(rating), reason = VALUES(reason),
+                                         created_at = CURRENT_TIMESTAMP`,
+                [String(req.params.insightId), insightKey || null, rating, reason ? String(reason).slice(0, 500) : null]
+            );
+
+            res.json({ success: true });
+        } catch (error) {
+            console.error('Rate AI insight error:', error);
+            res.status(500).json({ error: 'Failed to record rating: ' + error.message });
+        } finally {
+            if (tenantPool) await tenantPool.end().catch(() => {});
+        }
+    }
+
+    /** Pool onto a tenant's own database, using its server's credentials. */
+    async _tenantPool(tenant) {
+        const server = tenant.server_id ? await ServerModel.findById(tenant.server_id) : null;
+        return mysql.createPool({
+            host: server?.db_host || process.env.DB_HOST || 'localhost',
+            port: server?.db_port || process.env.DB_PORT || 3306,
+            user: server?.db_user || process.env.DB_USER,
+            password: server?.db_password || process.env.DB_PASSWORD,
+            database: tenant.db_name,
+            connectionLimit: 2
+        });
     }
 }
 

@@ -152,7 +152,9 @@ async function resolveGeoRemote(ip) {
             geoCacheSet(`remote:${cleanIp}`, result);
             return result;
         }
-    } catch (_) {}
+    } catch (err) {
+        console.error(`[Telemetry] ip-api.com geo lookup failed for ${cleanIp}:`, err.message);
+    }
 
     // 2. ipinfo.io — free, no key, full region names
     try {
@@ -174,7 +176,9 @@ async function resolveGeoRemote(ip) {
             geoCacheSet(`remote:${cleanIp}`, result);
             return result;
         }
-    } catch (_) {}
+    } catch (err) {
+        console.error(`[Telemetry] ipinfo.io geo lookup failed for ${cleanIp}:`, err.message);
+    }
 
     return null;
 }
@@ -214,7 +218,9 @@ router.post('/', async (req, res) => {
             try {
                 const decoded = jwt.verify(token, process.env.JWT_SECRET);
                 userId = decoded.id || decoded.userId || null;
-            } catch (_) {}
+            } catch (err) {
+                console.error('[Telemetry] Failed to verify optional JWT on telemetry event:', err.message);
+            }
         }
 
         const id = randomUUID();

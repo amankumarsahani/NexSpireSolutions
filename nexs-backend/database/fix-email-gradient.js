@@ -76,7 +76,6 @@ async function fix() {
                 <div class="plan-row"><span class="plan-label">Price</span><span class="plan-value">{{plan_price}}</span></div>
                 <div class="plan-row"><span class="plan-label">Billing</span><span class="plan-value">{{plan_billing_cycle}}</span></div>
                 <div class="plan-row"><span class="plan-label">Start Date</span><span class="plan-value">{{start_date}}</span></div>
-                <div class="plan-row"><span class="plan-label">Trial Period</span><span class="plan-value">{{trial_period}}</span></div>
             </div>
             <div class="attachment-note">
                 <p><strong>Agreement attached as PDF.</strong> Please review and keep a copy for your records.</p>

@@ -85,7 +85,7 @@ router.delete('/accounts/:id', async (req, res) => {
         const account = rows[0];
 
         if (account.channel === 'baileys' && account.session_id) {
-            try { await waSvc.disconnectSession(account.session_id); } catch (_) {}
+            try { await waSvc.disconnectSession(account.session_id); } catch (err) { console.error(`[WhatsApp] Failed to disconnect session ${account.session_id} before delete:`, err.message); }
         }
 
         await pool.query(`DELETE FROM whatsapp_accounts WHERE id = ?`, [req.params.id]);
@@ -120,7 +120,7 @@ router.post('/accounts/:id/connect', async (req, res) => {
             } catch (_) { /* already exists */ }
             // Set webhook so incoming messages reach nexs-backend
             const webhookUrl = `${process.env.SERVER_URL || 'http://localhost:5000'}/api/admin/whatsapp/incoming/evolution`;
-            try { await waSvc.evolutionSetWebhook(account.evolution_api_url, account.evolution_api_key, account.session_id, webhookUrl); } catch (_) {}
+            try { await waSvc.evolutionSetWebhook(account.evolution_api_url, account.evolution_api_key, account.session_id, webhookUrl); } catch (err) { console.error(`[WhatsApp] Failed to set Evolution webhook for session ${account.session_id}:`, err.message); }
             const qrData = await waSvc.evolutionGetQR(account.evolution_api_url, account.evolution_api_key, account.session_id);
             await pool.query(`UPDATE whatsapp_accounts SET status = 'pending_qr' WHERE id = ?`, [account.id]);
             return res.json({ ...qrData, sessionId: account.session_id });
@@ -140,9 +140,9 @@ router.post('/accounts/:id/disconnect', async (req, res) => {
         const account = rows[0];
 
         if (account.channel === 'baileys' && account.session_id) {
-            try { await waSvc.disconnectSession(account.session_id); } catch (_) {}
+            try { await waSvc.disconnectSession(account.session_id); } catch (err) { console.error(`[WhatsApp] Failed to disconnect Baileys session ${account.session_id}:`, err.message); }
         } else if (account.channel === 'evolution' && account.session_id) {
-            try { await waSvc.evolutionDisconnect(account.evolution_api_url, account.evolution_api_key, account.session_id); } catch (_) {}
+            try { await waSvc.evolutionDisconnect(account.evolution_api_url, account.evolution_api_key, account.session_id); } catch (err) { console.error(`[WhatsApp] Failed to disconnect Evolution session ${account.session_id}:`, err.message); }
         }
         await pool.query(`UPDATE whatsapp_accounts SET status = 'disconnected', phone = NULL WHERE id = ?`, [account.id]);
         res.json({ success: true });
@@ -180,7 +180,9 @@ router.get('/accounts/:id/status', async (req, res) => {
                     await pool.query(`UPDATE whatsapp_accounts SET status = ? WHERE id = ?`, [mapped, account.id]);
                 }
                 return res.json({ ...account, status: mapped, liveStatus: state });
-            } catch (_) {}
+            } catch (err) {
+                console.error(`[WhatsApp] Failed to fetch live Evolution status for session ${account.session_id}:`, err.message);
+            }
         }
 
         res.json(account);

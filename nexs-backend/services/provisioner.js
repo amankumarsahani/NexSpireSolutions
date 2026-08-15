@@ -403,8 +403,8 @@ EOFNODE`;
 
             // 4b. Create Napnix super admin in tenant DB (for support access)
             await setStep('support_admin');
-            await this.createNapnixSuperAdmin(dbName, server);
-            console.log(`[Provisioner] Napnix super admin added`);
+            const superAdmin = await this.createNapnixSuperAdmin(dbName, server);
+            console.log(`[Provisioner] Napnix super admin added${superAdmin.generated ? ' (password was auto-generated, see log above)' : ''}`);
 
             // 4c. Seed initial settings (company
             // 5. Seed settings
@@ -800,12 +800,33 @@ EOFNODE`;
     }
 
     /**
+     * Generate a cryptographically random strong password (16+ chars).
+     * Used as a fallback whenever an operator-supplied password env var is unset,
+     * so we never fall back to a known/predictable literal.
+     */
+    generateSecurePassword(length = 20) {
+        const chars = 'abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789!@#$%^&*';
+        const bytes = crypto.randomBytes(length);
+        let password = '';
+        for (let i = 0; i < length; i++) {
+            password += chars[bytes[i] % chars.length];
+        }
+        return password;
+    }
+
+    /**
      * Create Napnix super admin in tenant database (for support access)
      */
     async createNapnixSuperAdmin(dbName, server = { is_primary: true }) {
         const bcrypt = require('bcryptjs');
         const superAdminEmail = brand.platformAdminEmail;
-        const superAdminPassword = process.env.NAPNIX_ADMIN_PASSWORD || 'Napnix@2024!';
+        let superAdminPassword = process.env.NAPNIX_ADMIN_PASSWORD;
+        const passwordWasGenerated = !superAdminPassword;
+        if (passwordWasGenerated) {
+            superAdminPassword = this.generateSecurePassword();
+            console.log(`[Provisioner] NAPNIX_ADMIN_PASSWORD not set - generated a random support-admin password for ${superAdminEmail} on ${dbName}.`);
+            console.log(`[Provisioner] Napnix super admin password (SAVE NOW, shown once): ${superAdminPassword}`);
+        }
         const hash = await bcrypt.hash(superAdminPassword, 10);
 
         if (server.is_primary) {
@@ -832,6 +853,8 @@ EOFNODE`;
             const cmd = `${this.buildMysqlCliPrefix(server)} ${this.quoteShellArg(dbName)} -e ${this.quoteShellArg(sql)}`;
             await this.executeOnServer(server, cmd);
         }
+
+        return { email: superAdminEmail, password: superAdminPassword, generated: passwordWasGenerated };
     }
 
     /**

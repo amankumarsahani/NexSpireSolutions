@@ -34,7 +34,19 @@ morgan.token('real-ip', (req) => {
 app.use(morgan(':real-ip - :method :url :status :response-time ms - :res[content-length]')); // Enhanced logging with normalized IP
 
 // CORS Configuration - MUST be before rate limiting to handle preflight requests
-const corsOptions = {
+//
+// This used to allow ANY HTTPS origin (with credentials: true) app-wide, to
+// support custom-domain storefronts calling the public /api/resolve-domain
+// route before we know which tenant a domain belongs to. That meant any
+// HTTPS site could make credentialed (cookie-bearing) cross-origin requests
+// to every route in this app, not just the one public/read-only route that
+// actually needs the wildcard. Instead, the default policy below only
+// trusts a fixed allowlist + napnix.in subdomains, and a second, narrower,
+// credential-less policy (`publicDomainCorsOptions`) is used only for routes
+// that must be reachable from arbitrary custom domains. Add new routes to
+// PUBLIC_DOMAIN_ROUTES only if they are read-only and return no
+// cookie/session data - never reuse it for anything gated by req.user/auth.
+const defaultCorsOptions = {
     origin: function (origin, callback) {
         const allowedOrigins = [
             process.env.CLIENT_URL,
@@ -49,13 +61,8 @@ const corsOptions = {
         // Allow any subdomain of this instance's base domain
         const isPlatformSubdomain = origin && platformSubdomainRe.test(origin);
 
-        // Allow any HTTPS origin (for custom domain storefronts calling /api/resolve-domain)
-        // The resolve-domain endpoint returns public, non-sensitive data.
-        // Protected endpoints are still gated by auth middleware.
-        const isHttps = origin && /^https:\/\/.+/.test(origin);
-
         // Allow requests with no origin (mobile apps, Postman, etc.)
-        if (!origin || allowedOrigins.indexOf(origin) !== -1 || isPlatformSubdomain || isHttps) {
+        if (!origin || allowedOrigins.indexOf(origin) !== -1 || isPlatformSubdomain) {
             callback(null, true);
         } else {
             callback(new Error('Not allowed by CORS'));
@@ -67,9 +74,36 @@ const corsOptions = {
     optionsSuccessStatus: 200
 };
 
+const publicDomainCorsOptions = {
+    origin: function (origin, callback) {
+        const isHttps = origin && /^https:\/\/.+/.test(origin);
+        if (!origin || isHttps) {
+            callback(null, true);
+        } else {
+            callback(new Error('Not allowed by CORS'));
+        }
+    },
+    credentials: false,
+    methods: ['GET', 'OPTIONS'],
+    allowedHeaders: ['Content-Type', 'Accept', 'Origin'],
+    optionsSuccessStatus: 200
+};
+
+// Routes that need the wildcard-HTTPS policy: called directly by browser JS
+// running on arbitrary tenant custom domains, before we can know the tenant.
+const PUBLIC_DOMAIN_ROUTES = ['/api/resolve-domain'];
+
+const corsOptionsDelegate = function (req, callback) {
+    if (PUBLIC_DOMAIN_ROUTES.includes(req.path)) {
+        callback(null, publicDomainCorsOptions);
+    } else {
+        callback(null, defaultCorsOptions);
+    }
+};
+
 // Handle preflight requests explicitly BEFORE other middleware
-app.options('*', cors(corsOptions));
-app.use(cors(corsOptions));
+app.options('*', cors(corsOptionsDelegate));
+app.use(cors(corsOptionsDelegate));
 
 // Rate Limiting & Rogue Path Protection (AFTER CORS)
 const { generalRateLimit } = require('./middleware/rateLimit');
@@ -190,7 +224,9 @@ if (isFull) {
 }
 
 // Public: Resolve custom domain → tenant info (no auth required)
-// Used by storefront to discover which tenant a custom domain belongs to
+// Used by storefront to discover which tenant a custom domain belongs to.
+// CORS: see PUBLIC_DOMAIN_ROUTES / corsOptionsDelegate above - this route
+// uses the narrow, credential-less wildcard-HTTPS policy.
 app.get('/api/resolve-domain', async (req, res) => {
     try {
         const { domain } = req.query;
