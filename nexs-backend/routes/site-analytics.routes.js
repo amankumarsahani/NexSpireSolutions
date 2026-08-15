@@ -323,7 +323,9 @@ router.get('/events', async (req, res) => {
                 };
                 prev.count += Number(row.click_count);
                 elemMap.set(key, prev);
-            } catch (_) {}
+            } catch (err) {
+                console.error(`[site-analytics] Failed to parse click metadata for path ${row.path}:`, err.message);
+            }
         }
 
         const topElements = [...elemMap.values()]
@@ -414,7 +416,9 @@ router.get('/heatmap', async (req, res) => {
                 prev.count += Number(row.cnt);
                 totalClicks += Number(row.cnt);
                 pointMap.set(key, prev);
-            } catch (_) {}
+            } catch (err) {
+                console.error(`[site-analytics] Failed to parse heatmap click metadata for page ${page}:`, err.message);
+            }
         }
 
         res.json({
