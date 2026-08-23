@@ -865,18 +865,35 @@ class WebhookController {
                         metaPhoneId: phoneNumberId,
                         wabaId: entry.id || null,
                         raw: { entry: [{ id: entry.id, changes: [change] }] },
-                        messages: messages.map((msg) => ({
-                            messageId: msg.id,
-                            from: msg.from,
-                            fromName: contactNameByWaId[msg.from] || null,
-                            text: msg.text?.body
-                                || msg.button?.text
-                                || msg.interactive?.button_reply?.title
-                                || msg.interactive?.list_reply?.title
-                                || '',
-                            mediaType: msg.type && msg.type !== 'text' ? msg.type : 'text',
-                            timestamp: Number(msg.timestamp) || Math.floor(Date.now() / 1000)
-                        })),
+                        messages: messages.map((msg) => {
+                            const mediaType = msg.type && msg.type !== 'text' ? msg.type : 'text';
+                            const media = msg[mediaType] || {};
+                            return {
+                                messageId: msg.id,
+                                from: msg.from,
+                                fromName: contactNameByWaId[msg.from] || null,
+                                text: msg.text?.body
+                                    || msg.caption
+                                    || media.caption
+                                    || msg.button?.text
+                                    || msg.interactive?.button_reply?.title
+                                    || msg.interactive?.list_reply?.title
+                                    || '',
+                                mediaType,
+                                // Meta pushes an id, not a file, and that id expires in
+                                // about 30 days — so the tenant must be told which file to
+                                // fetch, not left to discover it later.
+                                mediaId: media.id || null,
+                                mediaMimeType: media.mime_type || null,
+                                mediaFilename: msg.document?.filename || null,
+                                interactivePayload: msg.interactive?.button_reply?.id
+                                    || msg.interactive?.list_reply?.id
+                                    || msg.button?.payload
+                                    || null,
+                                replyToMessageId: msg.context?.id || null,
+                                timestamp: Number(msg.timestamp) || Math.floor(Date.now() / 1000)
+                            };
+                        }),
                         statuses: statuses.map((s) => ({
                             messageId: s.id,
                             status: s.status,
