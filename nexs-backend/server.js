@@ -327,6 +327,12 @@ workflowWorker.start(60000); // Check every 60 seconds
 const backupWorker = require('./workers/backupWorker');
 backupWorker.start(60000); // Check every minute
 
+// Retry WhatsApp inbound forwards that could not reach their tenant backend.
+// Meta is already acked by then, so this worker is the only thing standing
+// between a tenant restart and permanently lost inbound messages.
+const whatsappForwardWorker = require('./workers/whatsappForwardWorker');
+whatsappForwardWorker.start(30000);
+
 // 404 Handler
 app.use((req, res) => {
     res.status(404).json({

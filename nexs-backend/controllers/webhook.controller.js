@@ -14,6 +14,113 @@ const crypto = require('crypto');
 const bcrypt = require('bcryptjs');
 const axios = require('axios');
 
+/**
+ * WhatsApp webhook fan-out helpers.
+ *
+ * Module-level rather than class methods because they are pure plumbing with no
+ * request context, and keeping them out of the class makes them straightforward to
+ * exercise from tests/whatsapp/webhookRouting.test.js.
+ */
+
+const { loadRegistry, verifySignature, phoneIdsIn } = require('../services/whatsappWebhookAuth');
+
+/** Max attempts before a forward is given up on and left visible as `failed`. */
+const FORWARD_MAX_ATTEMPTS = 8;
+
+/**
+ * POST to the tenant, and persist for retry if that fails.
+ *
+ * Meta has already been acked by this point, so nothing else will re-deliver.
+ * A tenant restarting during a deploy is routine, and losing that window's
+ * messages with no trace is not acceptable.
+ */
+async function deliverToTenant(phoneNumberId, tenantApiUrl, body) {
+    try {
+        await axios.post(`${tenantApiUrl}/api/whatsapp/incoming`, body, {
+            timeout: 10000,
+            headers: { 'X-Internal-Key': process.env.INTERNAL_OAUTH_KEY }
+        });
+        await pool.query(
+            `UPDATE whatsapp_phone_registry
+                SET last_inbound_at = NOW(), last_forward_error = NULL
+              WHERE meta_phone_id = ?`,
+            [phoneNumberId]
+        ).catch(() => {});
+        return true;
+    } catch (err) {
+        const message = String(err.message || 'forward failed').slice(0, 500);
+        console.error(`[Webhook] Queueing WhatsApp forward for ${tenantApiUrl}: ${message}`);
+        await pool.query(
+            `INSERT INTO whatsapp_forward_queue
+                (meta_phone_id, tenant_api_url, payload, attempts, next_attempt_at, last_error)
+             VALUES (?, ?, ?, 1, DATE_ADD(NOW(), INTERVAL 30 SECOND), ?)`,
+            [phoneNumberId, tenantApiUrl, JSON.stringify(body), message]
+        ).catch((qErr) => {
+            // If even the queue insert fails the message really is lost; say so
+            // loudly rather than letting it disappear into a swallowed catch.
+            console.error('[Webhook] WhatsApp forward could not be queued, message lost:', qErr.message);
+        });
+        await pool.query(
+            `UPDATE whatsapp_phone_registry SET last_forward_error = ? WHERE meta_phone_id = ?`,
+            [message, phoneNumberId]
+        ).catch(() => {});
+        return false;
+    }
+}
+
+/**
+ * Drain the forward queue. Called on an interval by services/whatsappForwardWorker.
+ * Exported here so the delivery path and the retry path stay identical.
+ */
+async function drainForwardQueue(limit = 50) {
+    const [rows] = await pool.query(
+        `SELECT id, meta_phone_id, tenant_api_url, payload, attempts
+           FROM whatsapp_forward_queue
+          WHERE status = 'pending' AND next_attempt_at <= NOW()
+          ORDER BY next_attempt_at ASC
+          LIMIT ?`,
+        [limit]
+    );
+
+    let delivered = 0;
+    for (const row of rows) {
+        const payload = typeof row.payload === 'string' ? JSON.parse(row.payload) : row.payload;
+        try {
+            await axios.post(`${row.tenant_api_url}/api/whatsapp/incoming`, payload, {
+                timeout: 10000,
+                headers: { 'X-Internal-Key': process.env.INTERNAL_OAUTH_KEY }
+            });
+            await pool.query(
+                `UPDATE whatsapp_forward_queue SET status = 'delivered', last_error = NULL WHERE id = ?`,
+                [row.id]
+            );
+            delivered += 1;
+        } catch (err) {
+            const attempts = row.attempts + 1;
+            const message = String(err.message || 'forward failed').slice(0, 500);
+            if (attempts >= FORWARD_MAX_ATTEMPTS) {
+                await pool.query(
+                    `UPDATE whatsapp_forward_queue SET status = 'failed', attempts = ?, last_error = ? WHERE id = ?`,
+                    [attempts, message, row.id]
+                );
+                console.error(`[Webhook] WhatsApp forward to ${row.tenant_api_url} gave up after ${attempts} attempts`);
+            } else {
+                // Exponential backoff, capped at an hour: a tenant down for a
+                // deploy recovers in seconds, one down for maintenance in minutes.
+                const delaySeconds = Math.min(30 * Math.pow(2, attempts - 1), 3600);
+                await pool.query(
+                    `UPDATE whatsapp_forward_queue
+                        SET attempts = ?, last_error = ?, next_attempt_at = DATE_ADD(NOW(), INTERVAL ? SECOND)
+                      WHERE id = ?`,
+                    [attempts, message, delaySeconds, row.id]
+                );
+            }
+        }
+    }
+
+    return { examined: rows.length, delivered };
+}
+
 class WebhookController {
     /**
      * Main webhook handler
@@ -659,88 +766,130 @@ class WebhookController {
     }
 
     /**
-     * WhatsApp Cloud API (Meta) — inbound message delivery.
-     * One Meta App hosts every tenant's WhatsApp Business number, so this is the
-     * single central receiver. It resolves phone_number_id -> tenant via
-     * whatsapp_phone_registry, then forwards each message to that tenant's own
-     * nexcrm-backend /api/whatsapp/incoming so it lands in the tenant's own DB.
-     * Meta requires a fast 200 regardless of downstream outcome or it retries
-     * aggressively, so we ack immediately and process after.
+     * WhatsApp Cloud API (Meta) — inbound message and status delivery.
+     *
+     * This is the single central receiver: Meta allows one callback URL per Meta
+     * App, so every tenant's traffic arrives here and is fanned out to that
+     * tenant's own nexcrm-backend, where it lands in their own database.
+     *
+     * Two things this used to get wrong.
+     *
+     * 1. Signature verification used one global META_APP_SECRET. That is correct
+     *    for numbers on our own Meta App, but a tenant who brings their OWN app
+     *    signs with THEIR secret, so every one of their messages failed the check
+     *    and was dropped. Outbound worked and inbound silently did not. The secret
+     *    is now resolved per phone_number_id from whatsapp_phone_registry.
+     *
+     * 2. Only `messages[]` was forwarded. `statuses[]` — sent/delivered/read/failed
+     *    plus Meta's billing category — was discarded, which is why no delivery
+     *    receipt ever reached the CRM and whatsapp_messages.status was dead weight.
+     *
+     * Meta backs the whole app off if we are slow, so we ack immediately and do the
+     * work after. That makes delivery to the tenant entirely our problem, hence the
+     * durable whatsapp_forward_queue rather than a best-effort POST.
      */
     async handleWhatsAppMetaWebhook(req, res) {
         res.status(200).json({ received: true });
 
         try {
             const rawBody = req.body; // Buffer (express.raw)
-            const appSecret = process.env.META_APP_SECRET;
 
-            if (!appSecret) {
-                console.error('[Webhook] WhatsApp Meta: META_APP_SECRET is not set, dropping unsigned payload');
-                return;
-            }
             if (!process.env.INTERNAL_OAUTH_KEY) {
                 console.error('[Webhook] WhatsApp Meta: INTERNAL_OAUTH_KEY is not set, cannot deliver payload');
                 return;
             }
 
-            const signature = req.headers['x-hub-signature-256'] || '';
-            const expected = 'sha256=' + crypto.createHmac('sha256', appSecret).update(rawBody).digest('hex');
-            const sigBuf = Buffer.from(signature);
-            const expBuf = Buffer.from(expected);
-            if (sigBuf.length !== expBuf.length || !crypto.timingSafeEqual(sigBuf, expBuf)) {
+            let payload;
+            try {
+                payload = JSON.parse(rawBody.toString('utf8'));
+            } catch {
+                console.error('[Webhook] WhatsApp Meta: payload is not JSON, dropping');
+                return;
+            }
+
+            // Read (but do not act on) the phone ids so the right verification key
+            // can be chosen. Selecting a key by an unverified field is safe: the
+            // signature is then checked against that key, so naming another
+            // tenant's number cannot make a forged body verify.
+            const phoneIds = phoneIdsIn(payload);
+            if (!phoneIds.size) return;
+
+            const registry = await loadRegistry([...phoneIds]);
+
+            // Verify once per distinct secret. In practice a payload carries one
+            // WABA, but a shared-app payload spanning several tenants must not let
+            // one tenant's valid signature authorise another tenant's entries.
+            const verifiedPhoneIds = verifySignature(
+                req.headers['x-hub-signature-256'] || '',
+                rawBody,
+                registry
+            );
+            if (!verifiedPhoneIds.size) {
                 console.error('[Webhook] WhatsApp Meta: signature mismatch, dropping payload');
                 return;
             }
 
-            const payload = JSON.parse(rawBody.toString('utf8'));
-
             for (const entry of payload.entry || []) {
                 for (const change of entry.changes || []) {
                     const value = change.value || {};
-                    const phoneNumberId = value.metadata?.phone_number_id;
-                    const messages = value.messages || [];
-                    if (!phoneNumberId || !messages.length) continue;
+                    const phoneNumberId = value.metadata?.phone_number_id
+                        ? String(value.metadata.phone_number_id)
+                        : null;
+                    if (!phoneNumberId) continue;
 
-                    const [regRows] = await pool.query(
-                        `SELECT tenant_api_url FROM whatsapp_phone_registry WHERE meta_phone_id = ?`,
-                        [phoneNumberId]
-                    );
-                    if (!regRows.length) {
+                    if (!verifiedPhoneIds.has(phoneNumberId)) {
+                        console.error(`[Webhook] WhatsApp Meta: entry for ${phoneNumberId} not covered by a valid signature, skipping`);
+                        continue;
+                    }
+
+                    const registration = registry.get(phoneNumberId);
+                    if (!registration) {
                         console.warn(`[Webhook] WhatsApp Meta: no tenant registered for phone_number_id ${phoneNumberId}`);
                         continue;
                     }
-                    const tenantApiUrl = regRows[0].tenant_api_url;
+
+                    const messages = value.messages || [];
+                    const statuses = value.statuses || [];
+                    if (!messages.length && !statuses.length) continue;
 
                     const contactNameByWaId = {};
                     for (const c of value.contacts || []) {
                         contactNameByWaId[c.wa_id] = c.profile?.name || null;
                     }
 
-                    for (const msg of messages) {
-                        const text = msg.text?.body
-                            || msg.button?.text
-                            || msg.interactive?.button_reply?.title
-                            || msg.interactive?.list_reply?.title
-                            || '';
-                        const mediaType = msg.type && msg.type !== 'text' ? msg.type : 'text';
+                    // Forward the change verbatim alongside a pre-parsed summary.
+                    // The tenant re-normalises with its own provider code, so a
+                    // future Meta field is available without a hub deploy; the
+                    // summary keeps older tenant builds working.
+                    const body = {
+                        metaPhoneId: phoneNumberId,
+                        wabaId: entry.id || null,
+                        raw: { entry: [{ id: entry.id, changes: [change] }] },
+                        messages: messages.map((msg) => ({
+                            messageId: msg.id,
+                            from: msg.from,
+                            fromName: contactNameByWaId[msg.from] || null,
+                            text: msg.text?.body
+                                || msg.button?.text
+                                || msg.interactive?.button_reply?.title
+                                || msg.interactive?.list_reply?.title
+                                || '',
+                            mediaType: msg.type && msg.type !== 'text' ? msg.type : 'text',
+                            timestamp: Number(msg.timestamp) || Math.floor(Date.now() / 1000)
+                        })),
+                        statuses: statuses.map((s) => ({
+                            messageId: s.id,
+                            status: s.status,
+                            recipient: s.recipient_id,
+                            timestamp: Number(s.timestamp) || Math.floor(Date.now() / 1000),
+                            conversationId: s.conversation?.id || null,
+                            billingCategory: s.conversation?.origin?.type || s.pricing?.category || null,
+                            billable: s.pricing ? Boolean(s.pricing.billable) : null,
+                            errors: s.errors || null
+                        }))
+                    };
 
-                        try {
-                            await axios.post(`${tenantApiUrl}/api/whatsapp/incoming`, {
-                                metaPhoneId: phoneNumberId,
-                                from: msg.from,
-                                fromName: contactNameByWaId[msg.from] || null,
-                                text,
-                                mediaType,
-                                messageId: msg.id,
-                                timestamp: Number(msg.timestamp) || Math.floor(Date.now() / 1000)
-                            }, {
-                                timeout: 10000,
-                                headers: { 'X-Internal-Key': process.env.INTERNAL_OAUTH_KEY }
-                            });
-                        } catch (err) {
-                            console.error(`[Webhook] Failed to forward WhatsApp message to tenant ${tenantApiUrl}:`, err.message);
-                        }
-                    }
+                    await deliverToTenant(phoneNumberId, registration.tenant_api_url, body);
                 }
             }
         } catch (error) {
@@ -870,3 +1019,5 @@ class WebhookController {
 
 
 module.exports = new WebhookController();
+module.exports.drainForwardQueue = drainForwardQueue;
+

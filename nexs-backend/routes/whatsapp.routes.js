@@ -397,19 +397,37 @@ router.put('/internal/meta-credentials', async (req, res) => {
 // PUT /api/admin/whatsapp/internal/phone-registry — tenant registers its phone_number_id
 // so the single central Meta webhook (one Meta App for every tenant) knows where to
 // forward inbound messages for that number.
+//
+// `appSecret` is what makes bring-your-own-Meta-App work. A number on the platform
+// app is signed with META_APP_SECRET; a number on the tenant's own app is signed
+// with theirs, and without it here the webhook rejected every inbound message as a
+// signature mismatch while outbound carried on working.
 router.put('/internal/phone-registry', async (req, res) => {
-    const { phoneNumberId, tenantSlug, tenantApiUrl } = req.body;
+    const { phoneNumberId, tenantSlug, tenantApiUrl, appSecret, wabaId } = req.body;
     if (!phoneNumberId || !tenantSlug || !tenantApiUrl) {
         return res.status(400).json({ error: 'phoneNumberId, tenantSlug, tenantApiUrl required' });
     }
     try {
+        const appMode = appSecret ? 'tenant' : 'platform';
+        // Encrypted with the same scheme as meta_token — an app secret forges
+        // webhooks if it leaks, so it is never stored in the clear.
+        const storedSecret = appSecret ? waSvc.encryptToken(appSecret) : null;
+
         await pool.query(
-            `INSERT INTO whatsapp_phone_registry (meta_phone_id, tenant_slug, tenant_api_url)
-             VALUES (?, ?, ?)
-             ON DUPLICATE KEY UPDATE tenant_slug = VALUES(tenant_slug), tenant_api_url = VALUES(tenant_api_url)`,
-            [phoneNumberId, tenantSlug, tenantApiUrl]
+            `INSERT INTO whatsapp_phone_registry
+                (meta_phone_id, tenant_slug, tenant_api_url, app_mode, app_secret, waba_id)
+             VALUES (?, ?, ?, ?, ?, ?)
+             ON DUPLICATE KEY UPDATE
+                tenant_slug = VALUES(tenant_slug),
+                tenant_api_url = VALUES(tenant_api_url),
+                app_mode = VALUES(app_mode),
+                -- Only overwrite the stored secret when a new one is supplied, so a
+                -- routine re-registration (URL change, reconnect) does not wipe it.
+                app_secret = COALESCE(VALUES(app_secret), app_secret),
+                waba_id = COALESCE(VALUES(waba_id), waba_id)`,
+            [phoneNumberId, tenantSlug, tenantApiUrl, appMode, storedSecret, wabaId || null]
         );
-        res.json({ success: true });
+        res.json({ success: true, appMode });
     } catch (err) {
         res.status(500).json({ error: err.message });
     }
