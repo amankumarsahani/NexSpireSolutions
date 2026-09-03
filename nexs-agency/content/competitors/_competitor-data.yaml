@@ -1,0 +1,109 @@
+# Centralized competitor data for NapCRM comparison/alternative pages.
+# Single source of truth — update here, propagate to all pages.
+# Pricing/features last verified: 2026-08-28 (NapCRM from repo source of truth:
+# NexSpireSolutions/nexs-agency/src/constants/crmPricing.js).
+# Competitor figures are public-list-price knowledge and should be re-checked
+# quarterly against their live pricing pages before publishing.
+
+product:
+  name: NapCRM
+  vendor: Napnix
+  positioning: >
+    Multi-tenant CRM for service businesses, built around 14 industry-specific
+    templates out of the box (real estate, healthcare, legal, salon, restaurant,
+    hospitality, education, manufacturing, logistics, fitness, travel,
+    e-commerce, general, and more) — plus an agency behind it for custom
+    software when the CRM itself isn't enough.
+  pricing_model: "Per-tenant tiered plans, INR/USD/EUR, contact-sales CTA (no self-serve checkout)"
+  tiers:
+    - name: Starter
+      monthly_usd: 49
+      yearly_usd_effective: 42
+      limits: {leads: 500, customers: 200, products: 50, team_members: 2, storage: "1 GB"}
+    - name: Growth
+      monthly_usd: 79
+      yearly_usd_effective: 67
+      limits: {leads: 2000, customers: 1000, products: 500, team_members: 5, storage: "5 GB"}
+      note: most popular tier; first tier with WhatsApp integration + landing pages
+    - name: Business
+      monthly_usd: 99
+      yearly_usd_effective: 84
+      limits: {leads: 10000, customers: 5000, products: 2000, team_members: 15, storage: "25 GB"}
+      note: first tier with custom integrations + 99.5% SLA
+    - name: Enterprise
+      monthly_usd: custom
+      limits: {leads: unlimited, customers: unlimited, products: unlimited, team_members: unlimited, storage: custom}
+      note: only tier with white-label + 99.9% SLA
+  strengths:
+    - Industry-specific templates ship pre-built (14 verticals) — not a blank CRM you customize from zero
+    - Multi-tenant architecture with a fully isolated database per customer (no shared-schema row-level risk)
+    - Built-in storefront/e-commerce module — product catalog, orders, payment gateway on the CRM itself
+    - WhatsApp integration native from Growth tier up (not a paid add-on marketplace app)
+    - Backed by a software agency (Napnix) — custom feature work and integrations available directly from the vendor, not a partner network
+    - Transparent published tier limits (leads/customers/storage caps stated up front)
+  weaknesses:
+    - No self-serve signup or free tier — every tier is "Contact Sales," adds friction vs. instant-signup competitors
+    - Smaller ecosystem — no app marketplace, few native third-party integrations below the Business tier
+    - Newer brand — no large public customer logos or third-party review volume yet (G2/Capterra) to point to
+    - No native marketing-automation suite (email sequences, lead scoring) at the depth of dedicated marketing platforms
+  best_for:
+    - Service businesses (real estate, legal, salon, healthcare, hospitality, etc.) that want a CRM pre-shaped to their industry instead of building it from a generic base
+    - Teams under ~50 seats that also want a single vendor for CRM + storefront + custom dev work
+  not_ideal_for:
+    - Enterprises needing a large certified integration marketplace and app ecosystem out of the box
+    - Teams that need instant self-serve signup with no sales conversation
+
+competitors:
+  hubspot:
+    name: HubSpot
+    positioning: "All-in-one marketing/sales/service platform, free-tier-led growth"
+    pricing_model: "Free CRM tier; paid Hubs priced per seat + contact-tier pricing, scales up fast"
+    approx_entry_price: "Free (Starter Hub ~$15-20/seat/mo, Professional ~$800-900/mo for Sales Hub)"
+    strengths:
+      - Genuinely usable free tier, huge brand trust and content/education ecosystem
+      - Massive app marketplace and native integrations
+      - Deep marketing-automation and content tooling (blog, SEO, forms, sequences)
+    weaknesses:
+      - Cost balloons fast once you need Professional/Enterprise tiers or exceed contact limits
+      - Generic CRM object model — industry-specific workflows require custom build-out
+      - Contract structures and contact-based pricing can surprise growing teams
+    common_review_complaints:
+      - Price jumps between tiers are steep
+      - Contact-based pricing punishes list growth even without more usage
+    best_for: "Marketing-led teams that want inbound tooling and a free entry point, and can afford Professional+ later"
+
+  zoho_crm:
+    name: Zoho CRM
+    positioning: "Budget-friendly CRM inside the broader Zoho One suite"
+    pricing_model: "Per-user/month, Standard/Professional/Enterprise/Ultimate tiers"
+    approx_entry_price: "~$14-20/user/mo Standard, ~$40-52/user/mo Enterprise"
+    strengths:
+      - Low cost per seat relative to feature count
+      - Deep integration with the rest of Zoho's app suite (Books, Desk, Campaigns)
+      - Highly configurable — supports custom modules, workflows, Deluge scripting
+    weaknesses:
+      - UI/UX considered dated and cluttered by many reviewers
+      - Configuration-heavy — extensive customization needed to fit any one industry
+      - Support quality inconsistent below Enterprise tier
+    common_review_complaints:
+      - Steep learning curve to configure for a specific workflow
+      - Interface feels dated compared to newer entrants
+    best_for: "Cost-conscious teams already in or open to the Zoho ecosystem, with time to configure it"
+
+  salesforce:
+    name: Salesforce (Sales Cloud)
+    positioning: "Enterprise-standard CRM platform, extreme configurability via AppExchange + Apex"
+    pricing_model: "Per-user/month, Starter/Professional/Enterprise/Unlimited tiers"
+    approx_entry_price: "~$25/user/mo Starter Suite, ~$165-330/user/mo Enterprise/Unlimited"
+    strengths:
+      - Largest CRM ecosystem and app marketplace (AppExchange) in the market
+      - Extremely configurable/extensible for complex, large-org processes
+      - Industry-standard — easiest CRM to hire experienced admins/consultants for
+    weaknesses:
+      - Expensive at scale, often requires paid implementation partners
+      - Steep learning curve; typically needs a dedicated admin
+      - Overkill for small teams — most SMB users touch a fraction of the platform
+    common_review_complaints:
+      - Implementation cost and time frequently underestimated
+      - Requires ongoing admin overhead to keep configured correctly
+    best_for: "Larger orgs with dedicated CRM admins and budget for an implementation partner"
