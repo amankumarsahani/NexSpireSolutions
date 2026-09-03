@@ -64,6 +64,8 @@ const Contact = memo(function Contact() {
         phone: formData.phone,
         company: formData.company,
         message: buildInquiryMessage(formData.intent, formData.message),
+        intent: formData.intent,
+        contentName: 'contact_form',
         eventId: meta.eventId,
         fbp: meta.fbp,
         fbc: meta.fbc,
@@ -71,7 +73,7 @@ const Contact = memo(function Contact() {
       });
 
       // Meta Pixel conversion: contact form lead (shares eventId with server)
-      trackLead({ content_name: 'contact_form' }, meta.eventId);
+      trackLead({ content_name: 'contact_form', intent: formData.intent }, meta.eventId);
 
       setSubmitStatus({
         type: 'success',

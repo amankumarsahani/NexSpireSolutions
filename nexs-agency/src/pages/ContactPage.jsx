@@ -12,6 +12,7 @@ import { withBrandKeywords } from '../constants/seoConfig';
 import Icon from '../components/ui/Icon';
 import { RiCheckLine, RiErrorWarningLine, RiLoader4Line, RiMailSendLine, RiMapPinLine, RiPhoneLine, RiSendPlaneFill } from 'react-icons/ri';
 import { buildInquiryMessage, getInquiryIntentFromSearch, inquiryIntentOptions } from '../utils/inquiry';
+import { getMetaContext, trackLead } from '../utils/fbpixel';
 
 const FADE_IN_SMOOTH = { duration: 0.7, ease: [0.21, 0.47, 0.32, 0.98] };
 
@@ -64,13 +65,27 @@ const ContactPage = () => {
         setError('');
 
         try {
+            // Shared Meta context for browser<->server (CAPI) deduplication.
+            const meta = getMetaContext();
+
             await inquiryAPI.submit({
                 name: formState.name,
                 email: formState.email,
                 phone: formState.phone,
                 company: formState.company,
-                message: buildInquiryMessage(formState.intent, formState.message, getUtmContext(location.search))
+                message: buildInquiryMessage(formState.intent, formState.message, getUtmContext(location.search)),
+                intent: formState.intent,
+                contentName: 'contact_page',
+                eventId: meta.eventId,
+                fbp: meta.fbp,
+                fbc: meta.fbc,
+                sourceUrl: meta.sourceUrl
             });
+
+            // Meta Pixel conversion. `intent` is what separates a NapCRM demo
+            // request from an agency audit lead — the ad campaigns optimise on
+            // custom conversions filtered by it, not on the raw Lead event.
+            trackLead({ content_name: 'contact_page', intent: formState.intent }, meta.eventId);
 
             setIsSubmitting(false);
             // Redirect to a dedicated thank-you page (clean conversion event + next-step guidance).

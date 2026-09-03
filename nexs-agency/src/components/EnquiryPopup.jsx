@@ -152,6 +152,7 @@ const EnquiryPopup = memo(function EnquiryPopup() {
             await inquiryAPI.submit({
                 ...formData,
                 captchaToken,
+                contentName: 'enquiry_popup',
                 eventId: meta.eventId,
                 fbp: meta.fbp,
                 fbc: meta.fbc,

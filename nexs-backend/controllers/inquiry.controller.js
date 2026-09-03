@@ -70,7 +70,7 @@ class InquiryController {
     // Create inquiry (public endpoint for contact form)
     async createInquiry(req, res) {
         try {
-            const { name, email, phone, company, message, eventId, fbp, fbc, sourceUrl } = req.body;
+            const { name, email, phone, company, message, eventId, fbp, fbc, sourceUrl, intent, contentName } = req.body;
 
             // Validation
             if (!name || !email || !message) {
@@ -132,7 +132,13 @@ class InquiryController {
                     fbp,
                     fbc,
                 },
-                customData: { content_name: 'contact_form' },
+                // `intent` lets Ads Manager build custom conversions per offer
+                // (e.g. intent=demo -> NapCRM demo requests) instead of every
+                // form on the site collapsing into one undifferentiated Lead.
+                customData: {
+                    content_name: contentName || 'contact_form',
+                    ...(intent ? { intent } : {}),
+                },
             }).catch(err => console.error('Meta CAPI Lead failed:', err));
 
             res.status(201).json({
