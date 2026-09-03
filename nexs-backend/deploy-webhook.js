@@ -259,7 +259,7 @@ const server = http.createServer((req, res) => {
                     );
 
                     await runCommand(
-                        `cd ${REPO_PATH}/nexs-agency && npm run build:prod`,
+                        `cd ${REPO_PATH}/nexs-agency && VITE_API_URL=https://api.napnix.in/api VITE_ENV=production npm run build:prod`,
                         'Frontend build'
                     );
                     deploymentStatus.frontend = 'deployed';
