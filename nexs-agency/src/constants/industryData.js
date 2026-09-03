@@ -14,8 +14,8 @@ export const industryData = {
     },
     stats: [
       { value: '9+', label: 'Core Modules' },
-      { value: '₹999', label: 'Starting Price/Mo' },
-      { value: '14-Day', label: 'Free Trial' },
+      { value: '₹4,165', label: 'Starting Price/Mo' },
+      { value: '14+', label: 'Industry Templates' },
       { value: '6+', label: 'Communication Channels' },
     ],
     services: [
@@ -29,7 +29,7 @@ export const industryData = {
     whyChooseUs: [
       { icon: 'ri-plug-line', title: 'Ready in Minutes', desc: 'No complicated setup. Sign up, pick your industry, and your CRM is pre-configured with the right modules.' },
       { icon: 'ri-shield-check-line', title: 'Role-Based Access', desc: 'Control who sees what with granular permissions for employees, managers, and admins.' },
-      { icon: 'ri-money-rupee-circle-line', title: 'Transparent Pricing', desc: 'Plans from ₹999/mo. No hidden fees, no per-user surcharges on base plans, no surprise invoices.' },
+      { icon: 'ri-money-rupee-circle-line', title: 'Transparent Pricing', desc: 'Plans from ₹4,165/mo. No hidden fees, no per-user surcharges on base plans, no surprise invoices.' },
       { icon: 'ri-customer-service-line', title: 'Real Support', desc: 'Chat and email support from people who actually understand the product — not a script reader.' },
     ],
     differentiators: [
@@ -60,9 +60,9 @@ export const industryData = {
       image: 'https://images.unsplash.com/photo-1560250097-0b93528c311a?w=100&h=100&fit=crop&q=80&fm=webp',
     },
     faqs: [
-      { q: 'Is NapCRM suitable for small businesses?', a: 'Yes. The Starter plan supports up to 3 team members and 500 leads — enough for most small businesses to get started.' },
+      { q: 'Is NapCRM suitable for small businesses?', a: 'Yes. The Starter plan supports 2 team members and 500 leads — enough for most small businesses to get started.' },
       { q: 'Can I migrate from another CRM?', a: 'We support CSV imports for leads, contacts, and deals. Our team can assist with migration from spreadsheets or other CRMs.' },
-      { q: 'Is there a free trial?', a: 'Every plan comes with a 14-day free trial. No credit card required.' },
+      { q: 'Can I see it before I buy?', a: 'Yes. Book a 20-minute demo and we will walk through NapCRM configured for your industry, using your actual workflow.' },
       { q: 'What communication channels are included?', a: 'Email (templates and automated follow-ups), WhatsApp (business API, broadcasts), SMS, in-app chat, push notifications, and AI chatbot.' },
     ],
     seo: {
@@ -84,7 +84,7 @@ export const industryData = {
     },
     stats: [
       { value: '10+', label: 'E-Commerce Modules' },
-      { value: '₹999', label: 'Starting Price/Mo' },
+      { value: '₹4,165', label: 'Starting Price/Mo' },
       { value: 'Built-in', label: 'Vendor Management' },
       { value: 'Real-time', label: 'Inventory Tracking' },
     ],

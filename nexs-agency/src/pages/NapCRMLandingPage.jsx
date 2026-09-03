@@ -115,6 +115,7 @@ const featureCategoryLabels = {
     ecommerce: 'E-commerce',
     communication: 'Communication',
     automation: 'Automation',
+    visibility: 'Growth & Visibility (Managed)',
     support: 'Support & Extras',
 };
 

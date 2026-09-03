@@ -10,6 +10,14 @@ import useCurrency from '../hooks/useCurrency';
 import CurrencySwitcher from '../components/CurrencySwitcher';
 
 const tiers = crmTiers;
+
+const featureCategoryLabels = {
+    core: 'Core Features',
+    ecommerce: 'E-commerce',
+    marketing: 'Marketing',
+    visibility: 'Growth & Visibility (Managed)',
+    support: 'Support & Extras',
+};
 const features = crmFeatures;
 
 export default function CRMPricingPage() {
@@ -32,14 +40,14 @@ export default function CRMPricingPage() {
         <div className="min-h-screen bg-gradient-to-b from-slate-50 to-white">
             <Helmet>
                 <title>NapCRM Pricing - Plans from $49/mo | Starter, Growth, Business, Enterprise</title>
-                <meta name="description" content="Compare NapCRM pricing plans. Starter $49/mo, Growth $79/mo, Business $99/mo, Enterprise custom. Save 15% with yearly billing. 14-day free trial on all plans." />
+                <meta name="description" content="Compare NapCRM pricing plans. Starter $49/mo, Growth $79/mo, Business $99/mo, Enterprise custom. Save 15% with yearly billing. Book a 20-minute demo on any plan." />
                 <meta name="keywords" content={withBrandKeywords('NapCRM pricing, CRM pricing India, affordable CRM plans, CRM software cost, business CRM pricing, agency CRM plans')} />
                 <meta name="robots" content="index, follow, max-image-preview:large, max-snippet:-1" />
                 <link rel="canonical" href={`${SITE_URL}/napcrm/pricing`} />
                 <meta property="og:site_name" content="Napnix" />
                 <meta property="og:locale" content="en_IN" />
                 <meta property="og:title" content="NapCRM Pricing - Plans from $49/mo" />
-                <meta property="og:description" content="Compare NapCRM pricing plans. Starter, Growth, Business, Enterprise. Save 15% yearly. 14-day free trial." />
+                <meta property="og:description" content="Compare NapCRM pricing plans. Starter, Growth, Business, Enterprise. Save 15% yearly. Book a 20-minute demo." />
                 <meta property="og:type" content="website" />
                 <meta property="og:url" content={`${SITE_URL}/napcrm/pricing`} />
                 <meta property="og:image" content={`${SITE_URL}/og-image.jpg`} />
@@ -49,7 +57,7 @@ export default function CRMPricingPage() {
                 <meta name="twitter:site" content="@napnix" />
                 <meta name="twitter:creator" content="@napnix" />
                 <meta name="twitter:title" content="NapCRM Pricing - Plans from $49/mo" />
-                <meta name="twitter:description" content="Starter $49/mo, Growth $79/mo, Business $99/mo. Save 15% yearly. 14-day free trial." />
+                <meta name="twitter:description" content="Starter $49/mo, Growth $79/mo, Business $99/mo. Save 15% yearly. Book a 20-minute demo." />
             </Helmet>
             <script type="application/ld+json">{JSON.stringify({
                 "@context": "https://schema.org",
@@ -248,7 +256,7 @@ export default function CRMPricingPage() {
                                 {Object.entries(features).map(([category, categoryFeatures]) => (
                                     <FeatureCategory
                                         key={category}
-                                        title={category === 'support' ? 'Support & Extras' : category.charAt(0).toUpperCase() + category.slice(1)}
+                                        title={featureCategoryLabels[category] || category.charAt(0).toUpperCase() + category.slice(1)}
                                         features={categoryFeatures}
                                     />
                                 ))}
