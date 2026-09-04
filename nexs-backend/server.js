@@ -263,15 +263,20 @@ app.get('/api/resolve-domain', async (req, res) => {
 
 // NexCRM Master Routes (Tenant Management)
 app.use('/api/tenants', require('./routes/tenant.routes'));
+
+// These two must be mounted BEFORE the generic '/api/admin' router below.
+// Express matches app.use() prefixes in registration order, and admin.routes
+// applies a blanket JWT `auth` check to everything under '/api/admin/*' — if
+// it were registered first, every request under these two paths (including
+// their internal-key-authenticated '/internal/*' endpoints, which carry no
+// JWT by design) would be rejected by that blanket check before ever
+// reaching the router that actually knows how to authenticate them.
+app.use('/api/admin/whatsapp', require('./routes/whatsapp.routes'));
+app.use('/api/admin/meta-leads', require('./routes/metaLeads.routes'));
+
 app.use('/api/admin', require('./routes/admin.routes'));
 app.use('/api/cms', require('./routes/cms.routes')); // Added CMS Routes
 app.use('/api/plans', require('./routes/plan.routes'));
-
-// WhatsApp (admin + internal proxy for tenant sessions)
-app.use('/api/admin/whatsapp', require('./routes/whatsapp.routes'));
-
-// Meta Lead Ads (internal teardown endpoints called by tenant backends)
-app.use('/api/admin/meta-leads', require('./routes/metaLeads.routes'));
 
 // Security Monitoring
 app.get('/api/security/banned-ips', (req, res) => {
